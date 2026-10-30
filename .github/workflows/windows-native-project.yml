@@ -5,7 +5,7 @@ on:
       bundle_run:
         description: Successful matching native-toolchain candidate run
         required: true
-        default: '41121692409'
+        default: '41130221734'
   push:
     paths:
       - 'src/**'
@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 120
     env:
       PYTHONUTF8: '1'
-      BUNDLE_RUN: ${{ inputs.bundle_run || '41121692409' }}
+      BUNDLE_RUN: ${{ inputs.bundle_run || '41130221734' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

@@ -5,7 +5,7 @@ on:
       bundle_run:
         description: Successful native-toolchain run with a matching SDK and backend
         required: true
-        default: '41121692409'
+        default: '41130221734'
   push:
     paths:
       - 'tools/native-tls/**'
@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 120
     env:
       PYTHONUTF8: '1'
-      BUNDLE_RUN: ${{ inputs.bundle_run || '41121692409' }}
+      BUNDLE_RUN: ${{ inputs.bundle_run || '41130221734' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

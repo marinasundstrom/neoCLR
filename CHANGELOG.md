@@ -20,7 +20,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native presentation while preserving captured identities and malformed-name fallback.
   Refresh API/website/editor checks and release harnesses for current metadata,
   GC state, workspace membership, record semantics, synchronous slice streams and documented JIT retention
-  diagnostics; interpreter controls select their mode explicitly and unexpected errors remain failures. Console/HTTPS checks require
+  diagnostics; interpreter controls select their mode explicitly and unexpected errors remain failures. Development bundles include the source-matched reflection-root helper. Console/HTTPS checks require
   a successfully qualified matching package, while development-bootstrap imports remain available.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.

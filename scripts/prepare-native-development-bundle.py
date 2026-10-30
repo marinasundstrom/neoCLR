@@ -84,6 +84,12 @@ def main():
     if compiler_directory is not None:
         shutil.rmtree(bundle / 'sdk/tools/rvnc')
         shutil.copytree(compiler_directory, bundle / 'sdk/tools/rvnc')
+    # Older bootstrap archives predate reflection-root selection. Development
+    # libraries need the source-matched resolver, catalogued with the bundle.
+    helper = ROOT / 'scripts/run-native-sample.py'
+    (bundle / 'tools').mkdir(exist_ok=True)
+    shutil.copy2(helper, bundle / 'tools' / helper.name)
+    report['reflectionHelperSha256'] = sha(helper)
     catalog = json.loads((bundle / 'lib/bundle.json').read_text())
     manifest['modules'] = ['lib/' + name + '.dll' for name in catalog['assemblyNames']]
     manifest['files'] = {p.relative_to(bundle).as_posix(): sha(p) for p in sorted(bundle.rglob('*')) if p.is_file()}

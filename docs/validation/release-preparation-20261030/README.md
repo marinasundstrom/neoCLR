@@ -516,3 +516,19 @@ Two independent development workflows still need investigation: HTTP-client run
 cases before a pre-cancellation parity mismatch; collections run 41127754028
 passes collection consumers but fails to build the runtime test method-state
 fixture. Neither failure is being counted as a passing release check.
+
+The HTTP-client pre-cancellation mismatch is also encoded versus source-friendly
+fault names ([original report](windows-client-cancellation-failure.json.gz)).
+The final versioned runtime reproduces the Windows native diagnostic exactly
+using the retained Windows-built consumer
+([focused receipt](macos-cancellation-display-fixed.json.gz)).
+
+The method-state build [fails before code generation](windows-method-helper-missing.log.gz)
+because its older bootstrap bundle lacks `tools/run-native-sample.py`. Development
+bundle preparation now includes and fingerprints the source-matched reflection
+resolver; six existing helper contract tests pass. This does not migrate fixtures
+or alter runtime behavior.
+
+Final Windows package rebuild [41130221734](https://github.com/marinasundstrom/neoCLR/actions/runs/41130221734)
+uses runtime source `a079cffdffea9d9c69f7eb8c55a7b24981281c72`. Console/HTTPS
+workflow defaults now select that run and wait for its success before checking it.
