@@ -30,6 +30,20 @@
       "path": "/tmp/neoclr-preview19-sdk-20261030/raven-sdk-0.1.19-neoclr.20261030.1-osx-arm64.tar.gz",
       "bytes": 33381095,
       "sha256": "1ed2452b145e64ca19a341f34d905e27a7631865273fdac5c0500e57cedb12e1"
+    },
+    {
+      "path": "/tmp/neoclr-preview19-candidate3-20261030/neoclr-preview19-osx-arm64.tar.gz",
+      "bytes": 57207209,
+      "sha256": "fbbb63d19b556adf9354ffb10d1c30a9cfc091d0c4cdf4e5b0bdecfb3747176b",
+      "sourceRevision": "6edc02db00a386201a61f1bc95f7ebb9e3892029",
+      "note": "Refreshed file-input and default-JIT bindings; replaces earlier candidate for these changed components."
+    },
+    {
+      "path": "/tmp/neoclr-preview19-build-kit-file-input/neoclr-native-build-kit-osx-arm64.tar.gz",
+      "bytes": 71815224,
+      "sha256": "acd18f46a30739c04d2f4f53c2050f5a65584bc4dbd5ce2b4da227e3c1ccb107",
+      "sourceRevision": "6edc02db00a386201a61f1bc95f7ebb9e3892029",
+      "note": "Refreshed file-input and default-JIT bindings; replaces earlier candidate for these changed components."
     }
   ]
 }

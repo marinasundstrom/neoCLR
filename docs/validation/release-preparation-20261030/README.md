@@ -318,3 +318,26 @@ workflow pass.
 [Six interpreter file-input cases and the default-JIT binding test](macos-file-input-root.log.gz)
 pass, as do [both native/interpreter parity and exact opt-in tests](macos-file-input-parity.log.gz).
 The API snapshot and Rust formatting checks pass.
+
+
+## Refreshed macOS candidate and Windows rebuild
+
+Source fix `6edc02db00a386201a61f1bc95f7ebb9e3892029` is committed and pushed.
+The rebuilt runtime/backend/helper passes [watcher ownership and native/interpreter/JIT
+lifecycles](macos-filewatch-three-modes.json.gz), plus [configuration reload in all
+three modes](macos-reload-three-modes.json.gz). The matching
+[extracted standalone kit](macos-build-kit-file-input.json.gz) passes console/HTTP
+and negative controls. Updated archive hashes are in the candidate inventory.
+SDK, libraries and VSIX inputs are unchanged; earlier editor, PostgreSQL, TLS and
+measurement receipts identify their original binaries and are not relabeled as
+measurements of the refreshed runtime.
+
+Fresh Windows [package run 41121692409](https://github.com/marinasundstrom/neoCLR/actions/runs/41121692409)
+builds all components from this source; it does not reuse the older archive.
+Target-host file-input, three-mode watcher/reload, installed editor and package gates
+remain pending. Final version promotion, matching Windows measurements and asset
+identities remain open before publication.
+
+[Archive/extract default-JIT acceptance](macos-package-file-input.json.gz) passes
+2,590 manifest files, 12 commands and the HTTP/JSON exchange on the refreshed macOS
+candidate. No tag, release upload or website deployment has been performed.
