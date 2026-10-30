@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "scope": "Five-round candidate measurements; independently passing stages, with JSON HTTP rerun after diagnostic-policy repair",
+  "stages": [
+    {
+      "receipt": "macos-benchmark-execution.json.gz",
+      "source": "/tmp/neoclr-preview19-benchmarks-fixed/execution/results.json",
+      "sha256": "3b5a7b95094bdcb50bc11eb665960350e067c5eb79089fed017f3894a02bbc1f",
+      "passed": true
+    },
+    {
+      "receipt": "macos-benchmark-cpu-native.json.gz",
+      "source": "/tmp/neoclr-preview19-benchmarks-fixed/execution/cpu-native-longer.json",
+      "sha256": "ea930c6cd4ce956ba7ace16e02f385bdda9a481eb81f0229be8e01cfb69523f8",
+      "passed": true
+    },
+    {
+      "receipt": "macos-benchmark-http-plain.json.gz",
+      "source": "/tmp/neoclr-preview19-benchmarks-fixed/http-plain/results.json",
+      "sha256": "39f09e3c2d862467af4a1205239dfd719cd91b5174038ff33b87bb6b29fb2dbf",
+      "passed": true
+    },
+    {
+      "receipt": "macos-benchmark-http-json.json.gz",
+      "source": "/tmp/neoclr-preview19-http-json-benchmark-fixed/results.json",
+      "sha256": "4ff07eab629141848db8f1a984b906fc07b0c2f4080cc8476bd5010c3fb3250a",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Initial aggregate report remains failed; this index links passing stages without rewriting it.",
+    "Shared development host: unrelated work remained active; a local scalar-test compile also overlapped JSON HTTP rounds. These are loaded-host measurements, not a controlled regression comparison or throughput improvement claim."
+  ]
+}

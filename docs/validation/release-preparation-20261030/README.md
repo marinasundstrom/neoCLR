@@ -241,3 +241,33 @@ rounds. JSON HTTP stops on [documented DAM2001/2004 diagnostics](macos-http-json
 Its harness now reuses the existing bounded HTTP diagnostic policy only when explicit
 reflection roots are supplied, hashes that policy source, and preserves per-sample
 stderr. Only the JSON HTTP stage is repeated; passing measurement stages are retained.
+
+
+All macOS measurement stages now pass five rounds; the
+[stage index](macos-benchmark-stages.json) links the unchanged execution/CPU/plain
+receipts and the separately rerun JSON HTTP receipt. The original aggregate failure
+is preserved. These are shared-development-host measurements: unrelated work stayed
+active and a scalar-test compile overlapped JSON HTTP. Do not treat their timing
+ranges as controlled regression evidence or claim a throughput improvement.
+
+The older [Windows scalar log](windows-scalar-initial.log.gz) exposes stale tests:
+fresh Raven outputs NEOX envelopes, while the helper decodes only PE; optimized
+scalar bodies need not contain relocations. The relocation assertion also
+[fails locally](macos-scalar-baseline.log.gz). Tests now decode both transports and
+require relocation only for the external console adapter, preserving executable
+output/fault checks. The [Windows debug security run](windows-security-initial.log.gz)
+reports compiler exit 3221225725 (stack overflow). The debug-only Windows CLI entry
+now uses an 8 MiB compiler worker, matching the existing lazy compiler worker budget;
+optimized entry behavior is unchanged. Fresh target-host checks remain required.
+
+
+[Windows HTTPS project qualification](windows-https-project.json.gz) and its
+[protocol receipt](windows-https.json.gz) pass on
+[41116132713](https://github.com/marinasundstrom/neoCLR/actions/runs/41116132713),
+using the same candidate archive with corrected JIT diagnostic acceptance.
+
+
+[Local scalar rerun](macos-scalar-fixed.log.gz) passes all three cross-host COFF
+checks; four Windows execution cases remain explicitly ignored on macOS and must
+pass in the target-host workflow. Formatting passes. These checks do not establish
+the Windows debug worker outcome; its security workflow is the executable gate.

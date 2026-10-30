@@ -69,8 +69,10 @@ fn scalar_flow_faults_and_console_emit_x64_coff() {
             obj.symbols()
                 .any(|s| s.name().ok() == Some("neoclr_entry_v2") && s.is_definition())
         );
-        assert!(obj.sections().any(|s| s.relocations().next().is_some()));
         if source == CONSOLE {
+            // Optimized scalar-only bodies may need no relocations. The external
+            // console adapter still requires a linker-resolved call.
+            assert!(obj.sections().any(|s| s.relocations().next().is_some()));
             assert!(obj.symbols().any(|s| s.name().ok()
                 == Some("neoclr_console_write_line_utf8_v1")
                 && s.is_undefined()));
@@ -335,7 +337,11 @@ fn fresh_raven_calls_loops_and_utf8_run_as_standalone_windows_executable() {
 }
 
 fn assert_windows_program(fixture: &[u8], marker: &str, expected_stdout: &[u8]) {
-    let module = neoclr::metadata_container::decode(fixture).unwrap();
+    let module = if fixture.starts_with(b"NEOX") {
+        neoclr::metadata_container::decode_envelope(fixture).unwrap()
+    } else {
+        neoclr::metadata_container::decode(fixture).unwrap()
+    };
     let program = neoclr::LoadedProgram::new(&module).unwrap();
     let interpreted = program.run(neoclr::ExecutionOptions::default()).unwrap();
     assert_eq!(interpreted.stdout, expected_stdout);
