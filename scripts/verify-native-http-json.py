@@ -7,10 +7,29 @@ import os
 import signal
 from pathlib import Path
 import queue
+import re
 import threading
 import subprocess
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+
+
+def expected_retention_diagnostics(stderr, execution, explicit_roots):
+    """Accept bounded-analysis warnings only for samples with explicit retention.
+
+    Runtime output and exit status still have exact checks, and raw diagnostics
+    remain in the report. Interpreter runs and unrelated diagnostics stay strict.
+    """
+    if not stderr:
+        return True
+    if execution not in ('default', 'jit') or not explicit_roots:
+        return False
+    patterns = (
+        r'warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention',
+        r'warning: DAM2001: .+ instruction [0-9]+ -> .+: cannot prove dynamic member requirement (512|513); annotate the incoming TypeInfo parameter or supply explicit retention',
+    )
+    return all(any(re.fullmatch(pattern, line) for pattern in patterns)
+               for line in stderr.splitlines())
 
 
 def start_process(command, **kwargs):
@@ -110,7 +129,7 @@ def main():
                     run['clientCommand'] = command(args.client, base + '/')
                     client = run_process(run['clientCommand'], text=True, encoding='utf-8', timeout=60)
                     run['client'] = {'exitCode': client.returncode, 'stdout': client.stdout, 'stderr': client.stderr}
-                    assert client.returncode == 0 and not client.stderr, run['client']
+                    assert client.returncode == 0 and expected_retention_diagnostics(client.stderr, args.execution, args.client_reflection_roots), run['client']
                     assert json.loads(client.stdout) == {'accepted': True}, run['client']
                 else:
                     for method, path, payload, status, body in (
@@ -130,7 +149,7 @@ def main():
                             assert response.status == status and actual == body, run['requests'][-1]
                 stdout, stderr = server.communicate(timeout=60)
                 run['server'] = {'exitCode': server.returncode, 'stdout': stdout, 'stderr': stderr}
-                assert server.returncode == 0 and stdout == 'Reports served\n' and not stderr, run['server']
+                assert server.returncode == 0 and stdout == 'Reports served\n' and expected_retention_diagnostics(stderr, args.execution, args.server_reflection_roots), run['server']
                 print('Native HTTP/JSON ' + ('client/server pair' if paired else 'server requests') + ' passed', flush=True)
             finally:
                 stdout, stderr = stop_process(server)

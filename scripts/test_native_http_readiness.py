@@ -13,6 +13,19 @@ http = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(http)
 
 
+class RetentionDiagnosticTests(unittest.TestCase):
+    def test_only_documented_warnings_with_explicit_jit_roots_are_accepted(self):
+        warning = ('warning: DAM2001: Mapper.Read instruction 12 -> Reader.Parse parameter 1: '
+                   'cannot prove dynamic member requirement 513; annotate the incoming TypeInfo '
+                   'parameter or supply explicit retention\n')
+        self.assertTrue(http.expected_retention_diagnostics('', 'interpreter', None))
+        self.assertTrue(http.expected_retention_diagnostics(warning, 'default', 'roots.json'))
+        self.assertFalse(http.expected_retention_diagnostics(warning, 'interpreter', 'roots.json'))
+        self.assertFalse(http.expected_retention_diagnostics(warning, 'default', None))
+        for text in ('fault\n', warning + 'unknown warning\n', warning.replace('513', '999')):
+            self.assertFalse(http.expected_retention_diagnostics(text, 'default', 'roots.json'))
+
+
 class ReadinessTests(unittest.TestCase):
     def child(self, source):
         child = subprocess.Popen([sys.executable, '-u', '-c', source], stdout=subprocess.PIPE,

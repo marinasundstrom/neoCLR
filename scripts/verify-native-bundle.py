@@ -9,6 +9,17 @@ import subprocess
 import sys
 
 
+# The bounded retention analyzer intentionally reports unknown dynamic bodies.
+# Keep this exact diagnostic visible in receipts; no other stderr is accepted.
+RETENTION_WARNING = ('warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; '
+                     'reflection inside them may require explicit retention\n')
+
+
+def sample_output_matches(result, expected_stdout, allow_retention_warning=False):
+    expected_stderr = ('', RETENTION_WARNING) if allow_retention_warning else ('',)
+    return result.returncode == 0 and result.stdout == expected_stdout and result.stderr in expected_stderr
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('bundle', nargs='?', type=Path, default=Path(__file__).resolve().parent.parent)
@@ -43,11 +54,11 @@ def main():
             if path.relative_to(root).as_posix() not in manifest['files']:
                 raise ValueError('Untracked execution dependency: ' + str(path))
 
-        def run(command, expected_stdout=None):
+        def run(command, expected_stdout=None, allow_retention_warning=False):
             result = subprocess.run([str(p) for p in command], cwd=root, capture_output=True, text=True, encoding='utf-8', timeout=180)
             item = dict(command=[str(p) for p in command], exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr)
             report['commands'].append(item)
-            if result.returncode or expected_stdout is not None and (result.stdout != expected_stdout or result.stderr):
+            if result.returncode or expected_stdout is not None and not sample_output_matches(result, expected_stdout, allow_retention_warning):
                 raise RuntimeError('Bundle command failed: ' + json.dumps(item))
             return result
 
@@ -66,7 +77,8 @@ def main():
                             '--instructions', '100000000'] if execution == 'interpreter' else [])
                 if name in reflection:
                     context += ['--reflection-roots', reflection[name]]
-                run([runtime, 'run', assembly, *context], sample['expected'])
+                run([runtime, 'run', assembly, *context], sample['expected'],
+                    allow_retention_warning=execution == 'default')
         http_report = args.report.with_name(args.report.stem + '-http.json')
         http_options = ['--execution', execution]
         for name in ('server', 'client'):

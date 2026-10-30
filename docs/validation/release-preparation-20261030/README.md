@@ -100,3 +100,32 @@ build is not publication.
 and rebuilt libraries. Both native and interpreter lifecycle consumers and the
 native ownership harness pass. This is a focused base-package check; default-JIT
 archive/extract, editor, HTTPS and release measurements remain separate gates.
+
+## Extracted package and source outcomes
+
+The [initial optimized full source run](source-full-initial.log.gz) completes 273
+test targets with 2,293 passing tests and seven archived reflection failures. All
+seven belong to the 26-test suite passing after the adapter repair. Do not describe
+the original source run as passing or smoke-qualified: validation stops before
+smokes when the full tests fail. Fresh canonical CI runs on synced `ef334fa1d`.
+
+The [fresh macOS archive](macos-package.json.gz) passes default-JIT sample execution
+and both HTTP request/client-server cohorts; all 2,590 manifest files verify.
+The initial acceptance attempts rejected documented retention warnings despite
+correct exit status/output. Updated validators retain those diagnostics in reports:
+ordinary JIT samples admit only the exact DAM2004 warning; HTTP admits bounded
+DAM2001 requirements 512/513 only with supplied explicit reflection roots. Unknown
+warnings, runtime faults and wrong stdout/status still fail. Eight focused validator
+checks pass. The archive's binaries/libraries/SDK/VSIX are unchanged by this tooling
+repair. Final distribution hashes and remaining package gates are still required.
+
+[Configuration reload](macos-reload.json.gz) passes native/interpreter real-file
+changes, malformed settings, replacement, deletion, optional sources and disposal.
+The SDK notice audit covers 27 NuGet dependencies and verifies all 35 package notice
+sets. This does not substitute for the separate VSIX JavaScript dependency review.
+
+[Windows package run 40987072316](https://github.com/marinasundstrom/neoCLR/actions/runs/40987072316)
+builds the SDK, libraries and default-JIT archive, then fails the old collections
+validator on the same DAM2004 warning (exit zero, exact expected stdout). Its
+[failed receipt](windows-package-warning-failure.log.gz) remains separate from
+future qualification; watcher/reload/editor stages did not execute in that run.
