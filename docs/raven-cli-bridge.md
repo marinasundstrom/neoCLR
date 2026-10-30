@@ -16286,3 +16286,16 @@ GetResult. Error conversions and Error-interface propagation remain ordinary
 language binding. Raven owns generation; neoCLR executes existing instructions.
 See [the contract and qualification](native-result-entrypoints.md) for supported
 forms, output semantics, branch scope and platform evidence.
+
+
+## Runtime-only compact fault presentation — 2026-10-30
+
+The neoCLR host formatter now uses its existing reserved transport-name decoder for
+compact Fault diagnostics, matching guest stack capture and native presentation.
+Logical guest names are the intent; `NeoMetadata_<digest>.F_<hex>` and related
+helpers remain temporary transport spellings, not binding changes. Captured
+identities remain exact and malformed names remain literal. This changes no Raven
+compiler configuration, semantic/emission behavior, metadata or native ABI, so no
+Raven branch integration is required. neoCLR owns this presentation fix; native
+origin/debug metadata should eventually replace transport-based fallback naming.
+See [the contract and validation](stack-traces.md#compact-fault-name-correction-2026-10-30).

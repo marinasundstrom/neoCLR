@@ -107,3 +107,24 @@ New execution Fault paths must retain capture coverage, including failures outsi
 instruction body. Trace collection must not obscure the original Fault; further
 allocation/resource-exhaustion hardening remains possible. Capturing arguments or local values is
 outside this initial contract.
+
+
+## Compact fault-name correction (2026-10-30)
+
+The interpreter's `FaultDiagnostic` formatter now applies the existing bounded
+`diagnostic_function_name` decoding used by guest stack capture and native
+presentation. Reserved valid `NeoMetadata_<64 hex digits>` helper names display
+their logical function/type names, so a terminal fault reports `Divide` and `Main`
+rather than encoded transport identifiers. Unrecognized, malformed or invalid UTF-8
+encodings remain unchanged; no fabricated source locations are introduced.
+
+Only compact host presentation changes. Captured `FunctionRef` names, definition
+identities, ordering, instruction indexes and legacy detailed Fault formatting remain
+unchanged. Consumers parsing compact frame text should use logical names instead
+of relying on temporary metadata helper spellings. Formatting allocates display strings; the existing 64-frame limit does not bound
+metadata-name bytes. No fault-path performance claim is made.
+The compiler, Runtime Contract configuration, metadata and native ABI are unchanged.
+Structured native-origin/debug naming remains the eventual replacement for this
+transport fallback. [Release evidence](validation/release-preparation-20261030/README.md)
+includes valid/malformed identity controls and the retained Windows native/interpreter
+parity case.

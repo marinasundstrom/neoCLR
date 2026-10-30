@@ -475,3 +475,44 @@ invalid view bounds retain their existing memory-view test coverage.
 [All six native/interpreter/JIT cases pass locally](macos-console-streams-current.json.gz),
 with [input](macos-console-input-build.json.gz) and [output](macos-console-output-build.json.gz)
 build provenance. Windows target execution of these repaired fixtures remains required.
+
+
+## Final runtime diagnostic correction and versioned candidate
+
+The repaired Windows console run passes record, managed, interpolation and both
+stream consumers, then [fails strict fault-text parity](windows-fault-display-mismatch.log.gz).
+Native output names `Divide` and `Main`; compact interpreter diagnostics expose
+reserved encoded metadata helpers. `FaultDiagnostic` now uses the same existing
+diagnostic-name decoder as guest stack capture. Captured identities and legacy
+detailed formatting remain unchanged; malformed/unrecognized names remain literal.
+This is a runtime presentation correction, not permission to normalize mismatched
+errors in the validator.
+
+[28 focused CLI/fault/stack tests](macos-fault-display-tests.json.log.gz) pass. The
+[retained Windows-built fault consumer](macos-fault-display-native-parity.json.gz)
+now matches the recorded Windows native diagnostic byte for byte when interpreted
+by the rebuilt macOS runtime. A fresh Windows package must verify the same fix.
+Compiler behavior, Runtime Contract configuration and native ABI are unchanged.
+
+The runtime candidate is now assigned `0.1.0-preview.19`; SDK/editor version remains
+`0.1.19-neoclr.20261030.1` with Raven `6ceeb1be8`. Publication date and release assets
+remain unset. Earlier package/measurement receipts remain valid for their explicitly
+recorded inputs, but do not masquerade as receipts for this final CLI rebuild.
+
+The final versioned workspace release build passes with SDK 26.5. The CLI has no
+`--version` command; its package version is verified through the locked Cargo
+manifest and build receipt rather than treating the usage response as a version.
+
+[Windows five-round benchmarks](windows-refreshed-benchmarks-release-benchmarks.json.gz)
+pass on [run 41122439416](https://github.com/marinasundstrom/neoCLR/actions/runs/41122439416),
+with retained [archive hash](windows-refreshed-benchmarks-archive-hash.json.gz),
+[package selection](windows-refreshed-benchmarks-package-run.json.gz) and
+[source revisions](windows-refreshed-benchmarks-source-revisions.json.gz). These
+measure the preceding qualified package; the compact fault formatter and version
+bump do not change the measured execution or HTTP paths.
+
+Two independent development workflows still need investigation: HTTP-client run
+41127754155 passes greeting, numeric, fragmented, malformed, refused and timeout
+cases before a pre-cancellation parity mismatch; collections run 41127754028
+passes collection consumers but fails to build the runtime test method-state
+fixture. Neither failure is being counted as a passing release check.

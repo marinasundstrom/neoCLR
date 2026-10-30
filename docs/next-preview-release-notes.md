@@ -1,6 +1,6 @@
 # Preview 19 candidate release notes
 
-Preparation started 2026-10-30. Preview 19 is the candidate designation; no release
+Runtime candidate version: `0.1.0-preview.19`. Preparation started 2026-10-30. Preview 19 is the candidate designation; no release
 is published and its publication date is unset. [Preview 18](preview-18-release-notes.md)
 remains the current release. Target platforms remain macOS ARM64 and Windows x64.
 See the [candidate qualification record](validation/release-preparation-20261030/README.md)
@@ -40,6 +40,9 @@ qualification remain release gates. See [configuration](configuration.md),
   `Subscribe`. Preserve both rename paths and handle rescan requests.
 - Backtick test names replace description attributes in ordinary suites. Name-based
   filters, IDs and discovery order change; description-feature fixtures remain.
+
+Compact interpreter fault diagnostics now show decoded logical function names, matching
+native presentation; captured identities remain unchanged.
 
 Direct synchronous/asynchronous Result entry points are qualified in source:
 unit/integer success determines exit status; failure displays to stderr and exits

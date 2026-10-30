@@ -31,7 +31,11 @@ impl std::fmt::Display for FaultDiagnostic<'_> {
         if let Some(trace) = self.stack_trace {
             for frame in &trace.frames {
                 let CodeLocation::IlInstruction(pc) = frame.location;
-                writeln!(f, "   at {} [instruction {pc}]", frame.function.name)?;
+                writeln!(
+                    f,
+                    "   at {} [instruction {pc}]",
+                    crate::diagnostic_function_name(&frame.function.name)
+                )?;
             }
             if trace.truncated {
                 writeln!(f, "   ... stack trace truncated")?;

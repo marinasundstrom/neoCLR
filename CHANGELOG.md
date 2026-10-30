@@ -9,13 +9,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-10-30
 
 - Prepare Preview 19 for macOS ARM64 and Windows x64 with Raven `6ceeb1be8`,
-  matching SDK/editor inputs, migration guidance and [exact release-gate evidence](docs/validation/release-preparation-20261030/README.md).
+  runtime candidate version `0.1.0-preview.19`, matching SDK/editor inputs, migration guidance and [exact release-gate evidence](docs/validation/release-preparation-20261030/README.md).
   Add bounded Windows native UTF-8 file input behind the existing contract, including
   wide paths, regular-file checks, byte limits and handle closure before decoding.
   Default JIT selects file-input/watcher bindings; replace older Windows bundles
   with matching runtime, backend and native hosts. Windows native file output remains unsupported.
   Repair extracted build-kit `.inc` packaging, watcher provider dependency admission,
   Windows debug compiler stack capacity, Rust 1.85 compatibility and reflection fixtures.
+  Decode reserved transport names in compact interpreter fault diagnostics, matching
+  native presentation while preserving captured identities and malformed-name fallback.
   Refresh API/website/editor checks and release harnesses for current metadata,
   GC state, workspace membership, record semantics, synchronous slice streams and documented JIT retention
   diagnostics; interpreter controls select their mode explicitly and unexpected errors remain failures. Console/HTTPS checks require

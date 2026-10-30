@@ -334,3 +334,43 @@ fn native_diagnostic_names_decode_only_reserved_valid_transport_names() {
     let malformed = format!("{scope}.F_FF");
     assert_eq!(name(&malformed), malformed);
 }
+
+#[test]
+fn common_fault_diagnostic_decodes_transport_names_without_changing_identity() {
+    let scope = format!("NeoMetadata_{}", "A".repeat(64));
+    for (raw, display) in [
+        (format!("{scope}.F_4D61696E"), "Main".to_owned()),
+        (
+            "NeoMetadata_A.F_123".to_owned(),
+            "NeoMetadata_A.F_123".to_owned(),
+        ),
+        (format!("{scope}.F_FF"), format!("{scope}.F_FF")),
+        ("App.Main".to_owned(), "App.Main".to_owned()),
+    ] {
+        let module = assemble(&format!(
+            ".module App\n.entry {raw}\n.function {raw}() -> Void\nfault \"broken\"\n.end"
+        ))
+        .unwrap();
+        let fault = LoadedProgram::new(&module)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap_err();
+        assert_eq!(
+            fault.diagnostic().to_string(),
+            format!("UserFault: broken\n   at {display} [instruction 0]\n")
+        );
+        assert_eq!(
+            fault.stack_trace.as_ref().unwrap().frames[0].function.name,
+            raw
+        );
+        assert_eq!(
+            fault.stack_trace.as_ref().unwrap().frames[0]
+                .function
+                .definition
+                .as_ref()
+                .unwrap()
+                .module,
+            "App"
+        );
+    }
+}
