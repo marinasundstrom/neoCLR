@@ -794,3 +794,18 @@ This closes the bounded basic JSON platform gate on macOS ARM64 and Windows x64.
 It does not qualify Windows ARM64, remove document limits, add converters or prove
 the new collection corpus through HTTP. The author-selected collections review can
 proceed; HTTP integration and the earlier benchmark/publication follow-up remain open.
+
+## Expanded corpus host-profile gap — 2026-10-30
+
+The current expanded native mapper corpus reaches `SocketClose` through retained
+stream support. The minimal Windows console profile fails at that unbound contract.
+The validator now selects the HTTP host profile for this corpus, retaining console
+qualification for the separate introspection consumer. The HTTP profile provides
+the required socket bindings; the corpus itself performs no network I/O.
+
+Native and interpreter execution on the Preview 19 macOS candidate preserve all
+corpus assertions and expected output ([receipt](validation/release-preparation-20261030/macos-final-json-corpus.json.gz));
+Windows execution remains a target-specific check. The cost is a broader native
+host/dependency selection. Pruning unused stream implementations and restoring
+minimal-host qualification remain an implementation gap, not a permanent JSON API
+requirement or a change to ordinary .NET-compatible mapper semantics.

@@ -129,3 +129,14 @@ load-set relocation; unannotated interpreter-only System fixtures do not current
 survive that relocation. This is a fixture/backend integration limitation, not a
 new public Slice semantic restriction. Packaged-library primitive and nominal-array
 contracts must come from the matched native producer.
+
+## Current public project fixture — 2026-10-30
+
+The standalone project now calls public `SHA256`, `HMACSHA256` and
+`RandomNumberGenerator` APIs. Removed test-owned array InternalCalls that predated
+the slice-based public facade. Known answers, trailing-byte preservation, short
+destination errors, altered-tag rejection and random fills remain checked.
+Interpreter, default JIT and isolated native execution pass on the Preview 19 macOS
+candidate; the plain-project control still verifies unused provider omission.
+This updates an existing Raven consumer, without starting the deferred Python
+behavior-fixture migration. See the [release receipt](../../validation/release-preparation-20261030/macos-final-public-crypto-project.json.gz).

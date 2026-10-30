@@ -84,7 +84,11 @@ def main():
                 shutil.copy2(ROOT / 'docs/experiments' / sample / file, project / file)
             dest = out / (name + ' native output')
             roots = ['Report'] if name == 'introspection' else ['Report', 'Guarded', 'Bulletin', 'NodeEnvelope', 'GuardedNode', 'CollectionEnvelope']
-            run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-console' if windows else 'console',
+            # The expanded mapper corpus retains Stream implementations, including
+            # socket-backed cleanup. Until selection prunes those unused branches,
+            # it needs the full HTTP host bindings even though it does no network I/O.
+            profile = ('windows-http' if windows else 'http') if name == 'json' else ('windows-console' if windows else 'console')
+            run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', profile,
                  '--project', project / 'Native.rvnproj', *[arg for root in roots for arg in ('--reflection-type', root)],
                  '--bundle', bundle, '--aot', aot, '--output', dest], name + '-build')
             build = json.loads((dest / 'build.json').read_text())

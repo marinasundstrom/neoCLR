@@ -56,7 +56,7 @@ def main():
             shutil.copy2(build / executable.name, executable)
             run([executable], cwd=directory)
             assert list(Path(directory).iterdir()) == [executable]
-        # Unused private declarations must not add a cryptography dependency.
+        # A project with no cryptography calls must omit the provider.
         (project / 'Main.rvn').write_text('func Main() -> int {\n    return 0\n}\n')
         plain = output / 'plain'
         run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-console' if windows else 'console',

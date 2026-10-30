@@ -34,6 +34,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   entry callers documented by the current async-stack limitation. Console/HTTPS checks require
   a successfully qualified matching package, while development-bootstrap imports remain available.
   HTTP-client package checks select catalogued runtime/backend tools and the shared process helper.
+  Refresh the standalone cryptography consumer to public slice APIs; qualify the expanded JSON
+  corpus with HTTP host bindings while documenting the remaining minimal-host retention gap.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development

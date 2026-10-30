@@ -587,3 +587,12 @@ The package validation path now optionally selects verified, catalogued runtime
 and backend roles (`--packaged-tools`) and records the manifest hash. The Windows
 standalone-project workflow also checks HTTP clients against its same final archive,
 avoiding an unnecessary compiler/bootstrap rebuild. macOS execution is in progress.
+
+The standalone cryptography project used obsolete array InternalCalls from before
+the public facade. Its updated public API consumer passes [all three macOS modes
+and provider-omission control](macos-final-public-crypto-project.json.gz).
+The expanded JSON corpus requires socket cleanup bindings in its current retained
+stream surface. Its validator now explicitly selects the HTTP profile, preserving
+all assertions; macOS [build](macos-final-json-corpus-build.json.gz) and
+[native/interpreter execution](macos-final-json-corpus.json.gz) pass. Minimal-host
+qualification remains a documented gap; Windows reruns remain pending.
