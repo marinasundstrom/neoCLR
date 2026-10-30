@@ -1,0 +1,129 @@
+{
+  "release": "v0.1.0-preview.19",
+  "status": "qualified release assets",
+  "qualificationPassed": true,
+  "releaseDate": "2026-10-30",
+  "packageVersion": "0.1.19-neoclr.20261030.1",
+  "ravenRevision": "6ceeb1be8790e105a1394cb99fded41fafad5b4c",
+  "runtimeCodeRevision": "a079cffdffea9d9c69f7eb8c55a7b24981281c72",
+  "qualifiedSourceRevision": "0758082e4ec78bbd9eada3d0a90fb33fb6601015",
+  "windowsQualificationRevision": "0758082e4ec78bbd9eada3d0a90fb33fb6601015",
+  "macOSBenchmarkRevision": "5ccf78581d45e633b3990aaf3acb6273117fef72",
+  "windowsBenchmarkRevision": "4ca2b990bc2356ae159735976091495c9e793af0",
+  "sourceDelta": "Runtime payloads built from a079cffd; later source changes repair release harnesses/consumer fixtures and add attribution. The source asset is the exact canonical CI archive at 0758082e4. Current preparation commits only add documentation/evidence. Refreshed archives retain every executable, compiler, library and sample byte of the qualified original archives.",
+  "assetsSha256": {
+    "neoclr-native-build-kit-osx-arm64.tar.gz": "e8df7ea6b9bd78fdad0e5d85cd5b8753cd858aae5c0fc7909b1d6874d17345b0",
+    "neoclr-preview19-osx-arm64.tar.gz": "c48c91f21902e16528ec35bf41553a4c8c40318070c15f0186aa0b0d53b6c084",
+    "neoclr-preview19-qualified-source.tar": "80a77c97efc5d213f36e840c2d60bea91d70b61555a02389e6ca91eabfc169dc",
+    "neoclr-preview19-win-x64.tar.gz": "aff3edea978a074701ec91e929eeacfa673ff0ab8e9edcddda41377368e15b78",
+    "raven-0.1.19-neoclr.20261030.1-osx-arm64.vsix": "c511a6cf1bdf45cc3147bb1a740ca1b9dc711504e3b749a69f6b2a5e2d065f26",
+    "raven-0.1.19-neoclr.20261030.1-win-x64.vsix": "5f50e2a3d15ea4a4daf3307e20051b2901fd78f18fc927774541cf536455ba29",
+    "raven-sdk-0.1.19-neoclr.20261030.1-osx-arm64.tar.gz": "8963c3ec3ff9bebaad2cfcdacbba44b12afbb197bf4a3f45f11b37a3aaf15e8f",
+    "raven-sdk-0.1.19-neoclr.20261030.1-win-x64.tar.gz": "b91fe92a693e26b26cd6ab0d2c8f8d52b68fd0a6e382f5c1c2c2b386b7b45586",
+    "raven-tool-notices-osx-arm64.tar.gz": "9e1f2767868ecd5387145b1f22cd1a3dbecd3907f5ee13a19cd884d7259d6a81",
+    "raven-tool-notices-win-x64.tar.gz": "46f7665052afcb93e58c8cf6f909128a650010d08089c01c63537db536f16ecf"
+  },
+  "platforms": {
+    "osx-arm64": {
+      "manifestSha256": "6a543db3add2256348c0cecea438760832d79b31ead2bf24cdc0efb94c112000",
+      "manifestFilesVerified": 2593,
+      "includesPostgreSQL": true,
+      "sdkMatchedFiles": 469,
+      "companionNoticeFiles": 61
+    },
+    "win-x64": {
+      "manifestSha256": "0b2947dbbc5adce72e3c8c50f7a5b5eb2832c118fbec74eba2e3e730ac806110",
+      "manifestFilesVerified": 2588,
+      "includesPostgreSQL": false,
+      "sdkMatchedFiles": 469,
+      "companionNoticeFiles": 61
+    }
+  },
+  "checks": {
+    "canonicalSource": 41137959122,
+    "windowsFocusedConsumers": 41137958975,
+    "windowsPackageQualification": 41130221734,
+    "windowsConsole": 41130577126,
+    "windowsHttps": 41130576963,
+    "windowsClient": 41135630963,
+    "windowsBenchmarks": 41130708329
+  },
+  "noticeRefresh": [
+    {
+      "name": "neoclr-preview19-osx-arm64.tar.gz",
+      "originalArchive": "/tmp/neoclr-preview19-final-macos/neoclr-preview19-osx-arm64.tar.gz",
+      "originalArchiveSha256": "7822d1bb441fdb0b54ffff339570ca913da3471775e3e3a258e52bd9f31af73b",
+      "archiveSha256": "c48c91f21902e16528ec35bf41553a4c8c40318070c15f0186aa0b0d53b6c084",
+      "bytes": 57219542,
+      "originalManifestSha256": "83bc62f0fc3d89bef1b8d14548c935acabee0387cc439093d3ea31c4669157f9",
+      "unchangedOriginalFiles": 2588,
+      "changedFiles": [
+        "THIRD_PARTY_NOTICES.md",
+        "third-party/raven-tools/README.md",
+        "third-party/raven-tools/upstream/raven/LICENSE",
+        "third-party/raven-tools/upstream/raven/THIRD-PARTY-NOTICES.txt",
+        "third-party/raven-tools/upstream/raven/source.json"
+      ],
+      "executableCompilerLibrarySamplePayloadUnchanged": true,
+      "noticeAudit": "27 NuGet dependencies covered; all 35 package notice sets and Raven upstream notices verified",
+      "extractedPath": "/tmp/neoclr-preview19-notice-refresh-verified/osx-arm64/extracted/neoclr-native-poc"
+    },
+    {
+      "name": "neoclr-preview19-win-x64.tar.gz",
+      "originalArchive": "/tmp/neoclr-preview19-final-windows/jit-package/neoclr-native-poc.tar.gz",
+      "originalArchiveSha256": "a588c3da82b91e086fbce02590f9d5cae32054486df1bbfc4a2c86090f46b79d",
+      "archiveSha256": "aff3edea978a074701ec91e929eeacfa673ff0ab8e9edcddda41377368e15b78",
+      "bytes": 56796542,
+      "originalManifestSha256": "db34fb56ef19f44c1aedd4290d13c05db985b2d2056df20866a54e4109e0d403",
+      "unchangedOriginalFiles": 2583,
+      "changedFiles": [
+        "THIRD_PARTY_NOTICES.md",
+        "third-party/raven-tools/README.md",
+        "third-party/raven-tools/upstream/raven/LICENSE",
+        "third-party/raven-tools/upstream/raven/THIRD-PARTY-NOTICES.txt",
+        "third-party/raven-tools/upstream/raven/source.json"
+      ],
+      "executableCompilerLibrarySamplePayloadUnchanged": true,
+      "noticeAudit": "27 NuGet dependencies covered; all 35 package notice sets and Raven upstream notices verified",
+      "extractedPath": "/tmp/neoclr-preview19-notice-refresh-verified/win-x64/extracted/neoclr-native-poc"
+    },
+    {
+      "name": "neoclr-native-build-kit-osx-arm64.tar.gz",
+      "originalArchive": "/tmp/neoclr-preview19-final-build-kit/neoclr-native-build-kit-osx-arm64.tar.gz",
+      "originalArchiveSha256": "f74b9d7b741442a729b385465fe69e6ed9ec1509e67ae1ff5c2ac0ede21c19d1",
+      "archiveSha256": "e8df7ea6b9bd78fdad0e5d85cd5b8753cd858aae5c0fc7909b1d6874d17345b0",
+      "bytes": 71828714,
+      "originalManifestSha256": "83bc62f0fc3d89bef1b8d14548c935acabee0387cc439093d3ea31c4669157f9",
+      "unchangedOriginalFiles": 2588,
+      "changedFiles": [
+        "THIRD_PARTY_NOTICES.md",
+        "third-party/raven-tools/README.md",
+        "third-party/raven-tools/upstream/raven/LICENSE",
+        "third-party/raven-tools/upstream/raven/THIRD-PARTY-NOTICES.txt",
+        "third-party/raven-tools/upstream/raven/source.json"
+      ],
+      "executableCompilerLibrarySamplePayloadUnchanged": true,
+      "noticeAudit": "27 NuGet dependencies covered; all 35 package notice sets and Raven upstream notices verified",
+      "extractedPath": "/tmp/neoclr-preview19-notice-refresh-verified/build-kit/extracted/neoclr-native-build-kit"
+    }
+  ],
+  "prerequisites": {
+    "sdk": ".NET 10 and .NET 11 SDKs; packaged tool runtime is Microsoft.NETCore.App 11.0.0-rc.1.26425.128",
+    "nativeBuilds": {
+      "osx-arm64": "Xcode command-line tools",
+      "win-x64": "MSVC x64 developer environment"
+    }
+  },
+  "macOSMeasurements": "docs/validation/release-preparation-20261030/macos-final-benchmarks.json.gz",
+  "windowsMeasurements": "docs/validation/release-preparation-20261030/windows-final-benchmarks.json.gz",
+  "evidence": "docs/validation/release-preparation-20261030/README.md",
+  "limitations": [
+    "Eager JIT and synchronous GC remain defaults; concurrent/shared-worker and lazy-JIT experiments do not establish general performance claims.",
+    "macOS measurements use a loaded development host; cross-host measurements are not controlled speedup comparisons.",
+    "Windows native file output remains unsupported. PostgreSQL is included and qualified on macOS only.",
+    "Expanded native JSON mapper consumers currently require HTTP host bindings; minimal-host retention remains a gap.",
+    "Native signal execution remains blocked by unit boxing; Neo.Signals is excluded from the standard library bundle.",
+    "HTTP callback faults allow only the two documented native entry callers after shared inner frames; causal async stack stitching remains limited.",
+    "Separate SDK and VSIX dependency attribution is supplied in the matching companion raven-tool-notices archives."
+  ]
+}

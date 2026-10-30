@@ -2,7 +2,7 @@
 
 Status: **qualified candidate assets assembled; not published**. The author requested
 “Pursue a new release”. Preview 18 remains the current published release.
-[Draft notes](../../next-preview-release-notes.md) define the proposed bounded scope.
+[Versioned notes](../../preview-19-release-notes.md) define the bounded scope.
 This record owns the current release gates; older release/tracker checkpoints are
 historical evidence only.
 

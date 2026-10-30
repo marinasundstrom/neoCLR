@@ -1,5 +1,14 @@
 # Benchmark history
 
+## Preview 19 — 30 October 2026
+
+Five-round release measurements pass on macOS ARM64 and Windows x64 using the
+qualified runtime payloads. The macOS host was under development load; these are
+bounded workload measurements, not a controlled speedup comparison.
+[Exact reports and host conditions](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/release-preparation-20261030#final-runtime-payload-qualification).
+The notice-only archive refresh preserves the measured executable bytes.
+
+
 Recorded runs remain available as neoCLR evolves. Compare results only when the
 workload, machine and measurement settings match; a newer date alone does not make
 two runs comparable. These first Preview 14 measurements are exploratory baselines,

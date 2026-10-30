@@ -15,8 +15,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   from the roadmap, earlier Web API plan and conversation record. This is design
   work; no hosting API or release reprioritization is implemented.
 
-- Prepare Preview 19 for macOS ARM64 and Windows x64 with Raven `6ceeb1be8`,
-  runtime candidate version `0.1.0-preview.19`, matching SDK/editor inputs, migration guidance and [exact release-gate evidence](docs/validation/release-preparation-20261030/README.md).
+- Finalize Preview 19 release notes, asset provenance and installation guidance for
+  publication; retain the qualified payloads and source archive unchanged.
+
+## 0.1.0-preview.19 — 2026-10-30
+
+Application services, configuration and watching, API/compiler migrations, runtime
+improvements and explicitly bounded experiments. See [release notes](docs/preview-19-release-notes.md)
+and [qualification evidence](docs/validation/release-preparation-20261030/README.md).
+
+### 2026-10-30
+
+- Release Preview 19 for macOS ARM64 and Windows x64 with Raven `6ceeb1be8`,
+  runtime version `0.1.0-preview.19`, matching SDK/editor inputs, migration guidance and [exact release-gate evidence](docs/validation/release-preparation-20261030/README.md).
   Add bounded Windows native UTF-8 file input behind the existing contract, including
   wide paths, regular-file checks, byte limits and handle closure before decoding.
   Default JIT selects file-input/watcher bindings; replace older Windows bundles
@@ -41,7 +52,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Retain final runtime-payload package, HTTP/client and five-round measurement receipts
   for both targets; preserve timeout attempts. Complete the final canonical source and focused
   Windows consumer checks, refresh license-notice archives with executable payload equality,
-  and assemble all 12 candidate assets with verified manifest/checksums; publication remains pending.
+  and assemble all 12 candidate assets with verified manifest/checksums; publication assets are qualified.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development

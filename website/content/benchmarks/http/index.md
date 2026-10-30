@@ -1,5 +1,14 @@
 # HTTP request-processing benchmarks
 
+## Preview 19 — 30 October 2026
+
+Five-round release measurements pass on macOS ARM64 and Windows x64 using the
+qualified runtime payloads. The macOS host was under development load; these are
+bounded workload measurements, not a controlled speedup comparison.
+[Exact reports and host conditions](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/release-preparation-20261030#final-runtime-payload-qualification).
+The notice-only archive refresh preserves the measured executable bytes.
+
+
 [Current development sync/concurrent GC comparison](/benchmarks/gc/#plain-http-and-http-json)
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.

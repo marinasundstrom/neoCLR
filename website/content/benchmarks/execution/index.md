@@ -1,5 +1,14 @@
 # General execution benchmarks
 
+## Preview 19 — 30 October 2026
+
+Five-round release measurements pass on macOS ARM64 and Windows x64 using the
+qualified runtime payloads. The macOS host was under development load; these are
+bounded workload measurements, not a controlled speedup comparison.
+[Exact reports and host conditions](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/release-preparation-20261030#final-runtime-payload-qualification).
+The notice-only archive refresh preserves the measured executable bytes.
+
+
 [Allocation-pattern samples](/benchmarks/gc/#applications-with-different-allocation-patterns)
 compare low-allocation work, object churn, bursts and retained windows under sync
 and concurrent GC. The [standard procedure](/benchmarks/gc/procedure/) supports
