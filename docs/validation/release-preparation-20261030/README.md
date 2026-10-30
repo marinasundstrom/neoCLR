@@ -27,17 +27,17 @@ historical evidence only.
 
 | Gate | Current evidence / remaining work |
 | --- | --- |
-| Source archive | Full canonical validation, strict Clippy, host boundaries and all minimum-Rust jobs pass on 8595dea1f (run 41123751866). Later fixture-only deltas have focused checks below; initial failures remain preserved. |
+| Source archive | Full canonical validation, strict Clippy, both host boundaries and all minimum-Rust jobs pass on 78d675df3 (run 41133412647). Later harness, fixture and attribution deltas have focused checks below; final source assembly remains pending. |
 | Format / strict Clippy | Formatting repaired; needless test borrows repaired after Clippy diagnostics. Strict Clippy and formatting now pass; seven lookup tests pass. |
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar controls, seven HTTP readiness/diagnostic controls, bundle diagnostic control and async diagnostic control pass. |
-| macOS SDK | Matching SDK/VSIX and all 14 libraries built. Extracted default-JIT/HTTP package, watcher/reload, async (24), headers (132), PostgreSQL and standalone build-kit checks pass. |
-| Windows | Fresh package run 41121692409 passes all extracted-package, editor, watcher/reload and SDK contracts on 6edc02db0. Matching HTTPS passes 27 cases. Standalone console passes stream/record consumers; compact fault parity required the final runtime correction below. Final package run 41130221734 and its dependents are pending. |
+| macOS SDK | Final runtime payload, extracted samples/HTTP, build kit, 14 HTTP-client cases and five-round measurements pass. Reuse unchanged SDK/editor/library contracts, watcher/reload, async, headers and PostgreSQL evidence. Notice-only archive refresh remains pending. |
+| Windows | Final package 41130221734, console 41130577126, HTTPS 41130576963, client 41135630963 and five-round benchmarks 41130708329 pass. Focused refreshed crypto/JSON/content-copy consumers remain pending. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
 | Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows editor acceptance, inlays and two recovery runs pass; matching HTTPS passes 27 cases. |
-| Performance | Five-round macOS stages pass as loaded-host qualification only (see stage index below). Windows five-round measurements also pass on package 41121692409. Exact final-version binary refreshes are queued/running; prior receipts are not relabeled. No controlled performance gain is claimed. |
+| Performance | Final runtime payloads pass five-round measurements on both targets. macOS is a loaded development host; no controlled performance gain is claimed. Stage receipts are linked below. |
 | Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. Candidate archive/VSIX hashes are recorded; published asset identities remain unset. |
-| Publication | No tag, GitHub release, upload or website deployment. Publication date unset. |
+| Publication | No release tag, GitHub release, release-asset upload or website deployment. CI validation artifacts are retained. Publication date unset. |
 
 ## Preserved failures and repairs
 
@@ -596,3 +596,72 @@ stream surface. Its validator now explicitly selects the HTTP profile, preservin
 all assertions; macOS [build](macos-final-json-corpus-build.json.gz) and
 [native/interpreter execution](macos-final-json-corpus.json.gz) pass. Minimal-host
 qualification remains a documented gap; Windows reruns remain pending.
+
+## Final runtime payload qualification
+
+[Canonical source](canonical-source-78d675df3.json.gz) passes full tests, 25 smokes,
+source membership and notices on `78d675df3` in
+[41133412647](https://github.com/marinasundstrom/neoCLR/actions/runs/41133412647);
+all five other jobs pass. Subsequent changes are release harnesses, Raven consumer
+fixtures and attribution, with explicit focused evidence rather than a new runtime.
+
+macOS [composite package qualification](macos-final-qualification.json.gz) combines
+the verified 2,590-file catalog and 11 successful sample commands with the
+[strict HTTP continuation](macos-final-http.json.gz), which passes both exchanges
+under the unchanged 60-second startup limit after measurements finish. Original
+timeout attempts remain retained. [HTTP client](macos-final-http-client.json.gz)
+passes all 14 cases. [Five-round measurements](macos-final-benchmarks.json.gz) pass
+[execution](macos-final-execution-results.json.gz),
+[longer CPU](macos-final-execution-cpu-native-longer.json.gz),
+[plain HTTP](macos-final-http-plain-results.json.gz) and
+[JSON HTTP](macos-final-http-json-results.json.gz).
+
+Windows [package](windows-final-package.json.gz),
+[watcher](windows-final-watcher.json.gz), [reload](windows-final-reload.json.gz),
+[async](windows-final-await.json.gz), [JSON](windows-final-json.json.gz),
+[headers](windows-final-headers.json.gz), [editor](windows-final-editor.json.gz),
+[inlays](windows-final-inlays.json.gz), recovery
+([first](windows-final-config-1.json.gz), [second](windows-final-config-2.json.gz)),
+[console/faults](windows-final-console.json.gz), [HTTPS](windows-final-https.json.gz)
+and [HTTP client](windows-final-client.json.gz) pass on the final runtime archive.
+[Five-round measurements](windows-final-benchmarks.json.gz) pass
+[execution](windows-final-execution-results.json.gz),
+[longer CPU](windows-final-execution-cpu-native-longer.json.gz),
+[plain HTTP](windows-final-http-plain-results.json.gz) and
+[JSON HTTP](windows-final-http-json-results.json.gz). Exact runtime source is
+`a079cffdffea9d9c69f7eb8c55a7b24981281c72`; harness revisions are recorded separately.
+
+The broad Windows runtime-library run gets through native HTTP content-copy, then
+[exceeds 180 seconds in its interpreter case](windows-content-copy-180s-timeout.log.gz).
+macOS also [exceeds 180 seconds](macos-content-copy-180s-timeout.log.gz) once, then
+[passes all eight unchanged tests in 151 seconds](macos-content-copy-diagnostic.json.gz)
+with a 600-second diagnostic ceiling. The expensive case is the 65,537-byte text
+quota. Its interpreter harness now uses the existing 600-second large-text budget;
+assertions and native deadlines remain unchanged. A focused Windows package run
+checks that budget and the refreshed crypto/JSON consumers.
+
+The final attribution audit finds Raven's own MIT license and upstream notices
+absent from the native archives, despite the 35 dependency notice sets being present.
+The exact texts from Raven `6ceeb1be8` and source hashes are now retained under
+`third-party/raven-tools/upstream/raven`. The strengthened checker
+[rejects the uncorrected archive](missing-raven-notice-control.log.gz) and
+[verifies source/tool notices](upstream-source-notices.log.gz). A notice-only
+archive refresh will retain every executable/compiler/library/sample byte and
+preserve the original qualified archive plus a hash-level change report.
+
+## Remaining work after source sync
+
+Source/harness/attribution revision `0758082e4ec78bbd9eada3d0a90fb33fb6601015`
+is pushed. Its independent [source run 41137959122](https://github.com/marinasundstrom/neoCLR/actions/runs/41137959122)
+and focused [Windows package consumers 41137958975](https://github.com/marinasundstrom/neoCLR/actions/runs/41137958975)
+are in progress. The latter checks public cryptography, expanded JSON and the
+content-copy interpreter budget against the already qualified Windows runtime.
+
+Before publication, refresh both native archives and the macOS build kit with the
+pinned upstream notice files, updating their catalogs in fresh output directories.
+Retain the original qualified archives, prove that only attribution/catalog files
+changed, and run the strengthened notice checker on each refreshed extraction.
+Assemble matching separate SDK/VSIX and companion-notice assets, audit the final
+committed source archive and write the final release manifest/checksums. Update
+this gate record from the pending runs; do not relabel them as passed. No release
+tag, release-asset upload, GitHub release or website deployment has occurred.

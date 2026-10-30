@@ -67,6 +67,14 @@
       "sourceRevision": "4ca2b990bc2356ae159735976091495c9e793af0",
       "runtimeVersion": "0.1.0-preview.19",
       "note": "Final build kit; preparation records documentation-only dirty state and source input hashes. Console/HTTP validation passes."
+    },
+    {
+      "path": "/tmp/neoclr-preview19-final-windows/jit-package/neoclr-native-poc.tar.gz",
+      "bytes": 56759375,
+      "sha256": "a588c3da82b91e086fbce02590f9d5cae32054486df1bbfc4a2c86090f46b79d",
+      "sourceRevision": "a079cffdffea9d9c69f7eb8c55a7b24981281c72",
+      "runtimeVersion": "0.1.0-preview.19",
+      "qualificationRun": 41130221734
     }
   ]
 }

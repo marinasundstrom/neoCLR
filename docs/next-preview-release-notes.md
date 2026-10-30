@@ -57,7 +57,9 @@ correctness work retain measured tradeoffs and failed experiments. Eager JIT and
 synchronous GC remain the ordinary defaults; shared ready queues stay opt-in.
 JIT is the development execution path and native AOT the distribution direction.
 No universal throughput gain, complete scheduler unification or new concurrency
-capacity guarantee is claimed. Existing experiment measurements do not qualify
+capacity guarantee is claimed. The expanded native JSON mapper corpus currently needs
+HTTP host bindings because retained stream support reaches socket cleanup;
+minimal-host qualification remains an implementation gap. Existing experiment measurements do not qualify
 fresh release packages.
 
 Native format 6 adds experimental whole-function signatures and return projections;

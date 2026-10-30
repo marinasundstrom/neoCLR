@@ -38,6 +38,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   corpus with HTTP host bindings while documenting the remaining minimal-host retention gap.
   Give the interpreter content-copy quota probe the established large-text timeout budget.
   Include pinned Raven upstream license/notice texts and audit their presence in native bundles.
+  Retain final runtime-payload package, HTTP/client and five-round measurement receipts
+  for both targets; preserve timeout attempts and keep final attribution archive assembly pending.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development
