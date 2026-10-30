@@ -271,3 +271,19 @@ using the same candidate archive with corrected JIT diagnostic acceptance.
 checks; four Windows execution cases remain explicitly ignored on macOS and must
 pass in the target-host workflow. Formatting passes. These checks do not establish
 the Windows debug worker outcome; its security workflow is the executable gate.
+
+
+[Windows scalar qualification](windows-scalar-fixed.json.gz) passes on
+[41117251029](https://github.com/marinasundstrom/neoCLR/actions/runs/41117251029),
+including all fresh Raven/native execution cases. The debug security compiler now
+gets past stack exhaustion; [its next failure](windows-security-missing-exports.json.gz)
+is an outdated fixture DLL export list. Both crypto and TLS fixtures now export
+all four existing GC state-handle entry points; no native ABI is added.
+
+Windows package run 41116128327 again passes runtime contracts and now builds the
+watcher executable with admitted system DLLs. Its [ownership harness link](windows-watcher-harness-failure.log.gz)
+reveals that the validator replaced both the HTTP entry and Windows console adapter.
+Only the HTTP entry is now substituted; the console adapter stays linked. Two
+focused command-construction tests pass, including missing/duplicate entry rejection.
+The workflow moves watcher/reload/editor gates before repeated runtime contracts;
+all gates are still required, with unchanged package binaries.

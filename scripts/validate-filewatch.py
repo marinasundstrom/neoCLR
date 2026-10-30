@@ -66,6 +66,25 @@ def execute(command, root, env):
             process.wait()
 
 
+def ownership_command(command, harness, output):
+    command = command.copy()
+    # The HTTP profile uses http-host.c as entry on both platforms. Windows
+    # keeps windows-console-host.c for its console adapter (its main is disabled).
+    entry_host = 'http-host.c'
+    replaced = 0
+    for index, argument in enumerate(command):
+        if Path(argument).name == entry_host:
+            command[index] = str(harness)
+            replaced += 1
+        elif argument.startswith('/Fe:'):
+            command[index] = '/Fe:' + str(output)
+        elif index and command[index - 1] == '-o':
+            command[index] = str(output)
+    if replaced != 1:
+        raise ValueError('Expected exactly one ownership harness entry host')
+    return command
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--bundle', type=Path, required=True)
@@ -97,13 +116,7 @@ def main():
                        if item['phase'] == 'host-compile-link')[:]
         ownership = out / ('ownership.exe' if os.name == 'nt' else 'ownership')
         harness = PROJECT.parent / 'native-ownership.c'
-        for index, argument in enumerate(command):
-            if Path(argument).name in ('http-host.c', 'windows-console-host.c'):
-                command[index] = str(harness)
-            elif argument.startswith('/Fe:'):
-                command[index] = '/Fe:' + str(ownership)
-            elif index and command[index - 1] == '-o':
-                command[index] = str(ownership)
+        command = ownership_command(command, harness, ownership)
         compiled = subprocess.run(command, capture_output=True, text=True, cwd=ROOT, timeout=120)
         (out / 'ownership-build.log').write_text(compiled.stdout + compiled.stderr)
         if compiled.returncode:
