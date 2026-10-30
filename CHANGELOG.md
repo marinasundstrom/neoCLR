@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-30
 
+- Add the concrete [Neo.Web design proposal](docs/design/neo-web.md) for builder/application
+  hosting and structural minimal API handlers, including generic registration,
+  binding and result policies, request-scope ownership, invocation limits and a
+  compiler/runtime support matrix with focused validation steps. Link the proposal
+  from the roadmap, earlier Web API plan and conversation record. This is design
+  work; no hosting API or release reprioritization is implemented.
+
 - Prepare Preview 19 for macOS ARM64 and Windows x64 with Raven `6ceeb1be8`,
   runtime candidate version `0.1.0-preview.19`, matching SDK/editor inputs, migration guidance and [exact release-gate evidence](docs/validation/release-preparation-20261030/README.md).
   Add bounded Windows native UTF-8 file input behind the existing contract, including

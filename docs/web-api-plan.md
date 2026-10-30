@@ -1,5 +1,12 @@
 # Minimal Web API increment
 
+**Later proposal, 2026-10-30:** The author has revisited a separate `Neo.Web`
+hosting layer using DI, Configuration and Logging. See the concrete
+[Neo.Web design proposal](design/neo-web.md) for builders, generic handlers,
+existing capabilities and compiler/runtime gaps. The earlier bounded parser
+direction and its implemented evidence below remain historical context; the new
+proposal is not an implementation or a change to release priorities.
+
 **Author-selected direction, 2026-09-27; first nested JSON slice implemented in development.** The
 [platform roadmap](platform-roadmap.md) sets priority and the
 [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api) owns

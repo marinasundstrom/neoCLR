@@ -1,5 +1,64 @@
 # Development conversation record
 
+## 2026-10-30 — Neo.Web hosting and structural minimal API handlers
+
+- **Author proposal/question:** Build `Neo.Web` above neoCLR HttpServer and the
+  DI, Configuration and Logging extensions, with `WebApplicationBuilder` and
+  `WebApplication`; generalize hosting later. Asked whether function-type generics
+  can model minimal APIs without nominal delegates or a Delegate base class.
+- **Assistant proposal:** Accept handlers through a generic registration such as
+  `MapGet<F>(pattern, handler: F) where F: func` (uncompiled API sketch). Retain
+  the bound function/captures and build a registration-time binding/result plan,
+  adapting each supported endpoint to HttpServer's existing context callback.
+  A heterogeneous route table stores uniform adapters, not heterogeneous F values.
+  Builder owns composition; application owns built services, request scopes and
+  server lifetime. Extract general hosting only after concrete reuse establishes
+  the common contract.
+- **Comparison:** ASP.NET Core's
+  [RequestDelegateFactory](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.requestdelegatefactory?view=aspnetcore-10.0)
+  adapts Delegate handlers into RequestDelegate;
+  [parameter binding](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding)
+  supplies request/service arguments. Structural F replaces the registration
+  carrier, while binding and response semantics still require framework policy.
+- **Existing support and limits:** [Function contracts](../api-docs/functions.md)
+  include function-kind constraints, signature introspection, bound-target
+  `Function` metadata and projected-result `FunctionReflection.Invoke<F>`.
+  `where F: func` does not supply an arbitrary statically callable argument list.
+  Structural signature parameters have no names/attributes; target metadata must
+  be qualified for named functions, lambdas and adapters, with explicit binding
+  metadata as a fallback. Never cache name-dependent plans solely by F: handlers
+  with identical types can have different parameter names/binding policies.
+  Boxed invocation supports only its documented marshalling profile; projected
+  returns do not automatically await arbitrary Task results or encode HTTP policy.
+  Typed-helper validation faults must not become the handling path for bad client
+  input. Validate bindings first and preserve the distinction between recoverable
+  request errors and terminal target faults.
+- **Proposed bounded validation:** First compose builder/application with the
+  existing context callback; then qualify generic registration and a small explicit
+  set of route/service parameters and response/Task shapes. Check inference,
+  separate-library import, metadata preservation, capture lifetime, scoped-service
+  lifetime through response completion and interpreter/JIT/AOT behavior before
+  expanding convenience syntax. Generated typed adapters are a later alternative
+  to boxed invocation, with compiler/code-size costs and performance to measure.
+- **Status:** Design discussion only. No Neo.Web implementation, compiled example,
+  runtime/compiler change or new executable validation is claimed. This revisits
+  the previously deferred WebApplication idea without replacing current release
+  priorities or resuming the broader structural roadmap.
+- **Author follow-up:** Requested a concrete Neo.Web design proposal with
+  WebApplicationBuilder, WebApplication and generic minimal API handlers,
+  identifying what already works and what requires compiler/runtime support.
+  Subsequently requested committing the completed work.
+- **Assistant action/proposal:** Wrote [the design](design/neo-web.md), covering
+  proposed signatures, registration/binding policies, composition ownership,
+  shutdown, errors, result adaptation and staged validation. Selected the checked
+  Object invocation overload for the bounded initial adapter; projected signatures
+  are useful existing development machinery but not required by this dispatcher.
+  Identified request-scope ownership after callback return as a streaming gate and
+  separated native unit-boxing limitations from the existing scalar/reference
+  invocation profile. Linked the proposal from the roadmap and earlier Web API plan
+  without changing their implementation priority. Examples remain uncompiled sketches;
+  document validation does not qualify Neo.Web execution.
+
 ## 2026-10-30 — Pursue the next release
 
 - **Author:** “Pursue a new release”.
