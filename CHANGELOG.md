@@ -30,8 +30,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development
   host, without a controlled performance claim. The refreshed Windows package, editor
-  and HTTPS gates pass, as do five-round Windows measurements. Final versioned
-  packages and dependent checks remain under qualification before publication. Plan applicable Python behavior-fixture
+  and HTTPS gates pass, as do five-round Windows measurements. The final versioned macOS build kit passes console/HTTP checks; remaining
+  package and dependent checks stay under qualification before publication. Plan applicable Python behavior-fixture
   migration to `NeoClr.Testing` after release, as explicitly directed; this migration
   is deferred and is not part of current release-harness repairs.
 

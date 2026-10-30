@@ -59,6 +59,14 @@
       "sourceRevision": "a079cffdffea9d9c69f7eb8c55a7b24981281c72",
       "runtimeVersion": "0.1.0-preview.19",
       "note": "Final fault-diagnostic/version candidate; package acceptance and exact-binary measurements recorded separately."
+    },
+    {
+      "path": "/tmp/neoclr-preview19-final-build-kit/neoclr-native-build-kit-osx-arm64.tar.gz",
+      "bytes": 71828519,
+      "sha256": "f74b9d7b741442a729b385465fe69e6ed9ec1509e67ae1ff5c2ac0ede21c19d1",
+      "sourceRevision": "4ca2b990bc2356ae159735976091495c9e793af0",
+      "runtimeVersion": "0.1.0-preview.19",
+      "note": "Final build kit; preparation records documentation-only dirty state and source input hashes. Console/HTTP validation passes."
     }
   ]
 }

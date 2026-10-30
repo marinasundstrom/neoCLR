@@ -569,3 +569,11 @@ This matches the existing active-frame contract and documented causal async-stac
 stitching gap. The validator now permits only that exact suffix for callback faults;
 ordinary/cancellation cases remain byte-equal. The retained report and five negative
 comparison controls pass; target execution of the remaining recovery cases is pending.
+
+The [final macOS standalone build kit](macos-final-build-kit.json.gz) passes console
+and HTTP qualification, including the validator's negative controls. Its archive
+hash is in the inventory. Packaging records source `4ca2b990b` with documentation
+edits in progress and explicit source hashes; it contains the same final runtime
+bytes as the extracted macOS candidate. Five-round measurements of that final
+macOS archive are running; Windows benchmark run 41130708329 waits for final
+package 41130221734 to succeed.
