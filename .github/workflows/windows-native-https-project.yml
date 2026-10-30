@@ -5,7 +5,7 @@ on:
       bundle_run:
         description: Successful native-toolchain run with a matching SDK and backend
         required: true
-        default: '39073227105'
+        default: '41121692409'
   push:
     paths:
       - 'tools/native-tls/**'
@@ -32,10 +32,10 @@ permissions:
 jobs:
   https-project:
     runs-on: windows-2022
-    timeout-minutes: 45
+    timeout-minutes: 120
     env:
       PYTHONUTF8: '1'
-      BUNDLE_RUN: ${{ inputs.bundle_run || '39073227105' }}
+      BUNDLE_RUN: ${{ inputs.bundle_run || '41121692409' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -47,6 +47,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Wait for selected package qualification
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $deadline = (Get-Date).AddMinutes(85)
+          do {
+            $run = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:BUNDLE_RUN" | ConvertFrom-Json
+            if ($LASTEXITCODE) { exit $LASTEXITCODE }
+            if ($run.status -eq 'completed') { break }
+            if ((Get-Date) -gt $deadline) { throw 'Timed out waiting for package qualification' }
+            Start-Sleep -Seconds 30
+          } while ($true)
+          if ($run.conclusion -ne 'success') { throw "Package qualification failed: $($run.conclusion)" }
+          if ($run.path -ne '.github/workflows/native-toolchain.yml') { throw 'Selected run is not native-toolchain qualification' }
+          New-Item -ItemType Directory target/qualification -Force
+          $run | ConvertTo-Json -Depth 20 | Set-Content target/qualification/package-run.json
       - uses: actions/download-artifact@v4
         with:
           github-token: ${{ github.token }}
@@ -76,6 +93,7 @@ jobs:
         with:
           name: windows-native-https-project-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            target/qualification/package-run.json
             target/windows-https-project-validation/*.log
             target/windows-https-project-validation/validation.json
             target/windows-https-project-validation/https/build.json

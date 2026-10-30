@@ -365,3 +365,13 @@ repairs change harnesses, not candidate runtime behavior.
 The independent Windows console-project workflow still downloads Preview 13 and
 fails native metadata admission when paired with the current backend. It does not
 qualify the Preview 19 candidate; a matching-package rerun remains required.
+
+
+The [old Windows console-project failure](windows-console-old-package-failure.log.gz)
+is preserved. That validator now requires an explicit extracted bundle, verifies
+its manifest and uses its catalogued backend instead of downloading Preview 13
+and mixing in a checkout build. Console-project and HTTPS workflows select
+package run 41121692409, wait for successful native-toolchain qualification, and
+retain the selected run metadata. A failed package stops dependent checks.
+Workflow YAML parses and the validator's CLI/bytecode checks pass; actual Windows
+project/HTTPS execution remains pending the package gate.

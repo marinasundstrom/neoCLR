@@ -2,6 +2,7 @@
 """Build ordinary Raven projects and execute isolated Windows native console EXEs."""
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -9,14 +10,9 @@ import platform
 import shutil
 import subprocess
 import sys
-import tarfile
-import urllib.request
 import xml.etree.ElementTree as X
 
 ROOT = Path(__file__).resolve().parents[1]
-ARCHIVE = 'neoclr-preview13-win-x64.tar.gz'
-BUNDLE_SHA = 'ffcd3ec90d7ae9e0e7754ee276b16a18c2a087b4bb04acfc477b73913538d9cc'
-URL = 'https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/' + ARCHIVE
 
 
 def sha(path):
@@ -25,6 +21,7 @@ def sha(path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--bundle', type=Path, required=True, help='Extracted matching native toolchain candidate')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     out = args.output.resolve()
@@ -46,22 +43,19 @@ def main():
         if platform.system() != 'Windows' or platform.machine().lower() not in ('amd64', 'x86_64'):
             raise ValueError('Requires Windows x64 with MSVC and the .NET SDK used by the Raven bundle')
         report['revision'] = run(['git', '-C', ROOT, 'rev-parse', 'HEAD'], 'revision').stdout.decode().strip()
-        prerequisites = out.parent / 'windows-project-prerequisites'
-        prerequisites.mkdir(exist_ok=True)
-        archive = prerequisites / ARCHIVE
-        if not archive.exists():
-            urllib.request.urlretrieve(URL, archive)
-        if sha(archive) != BUNDLE_SHA:
-            raise ValueError('Published bundle archive hash mismatch')
-        bundle = prerequisites / 'neoclr-native-poc'
-        if not bundle.exists():
-            with tarfile.open(archive) as source:
-                source.extractall(prerequisites, filter='data')
-        report['bundle'] = dict(url=URL, sha256=BUNDLE_SHA, manifestSha256=sha(bundle / 'manifest.json'))
+        bundle = args.bundle.resolve()
+        manifest = json.loads((bundle / 'manifest.json').read_text())
+        spec = importlib.util.spec_from_file_location('project_builder', ROOT / 'scripts/build-native-project.py')
+        builder = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(builder)
+        builder.verify_files(bundle, manifest['files'])
+        compiler = manifest['jit']['compiler']
+        if compiler not in manifest['files']:
+            raise ValueError('Native compiler is not catalogued by the package')
+        aot = bundle / compiler
+        report['bundle'] = dict(path=str(bundle), manifestSha256=sha(bundle / 'manifest.json'),
+                               compilerSha256=sha(aot))
         report['dotnet'] = run(['dotnet', '--info'], 'dotnet').stdout.decode(errors='replace')
-        run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build', cwd=ROOT)
-        aot = ROOT / 'target/debug/neoclr-codegen.exe'
-        report['aotSha256'] = sha(aot)
         lib = bundle / 'lib'
         catalog = json.loads((lib / 'bundle.json').read_text())
         context = ['--system', lib / catalog['runtimeSeed'],
