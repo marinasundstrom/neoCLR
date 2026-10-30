@@ -51,6 +51,14 @@
       "sha256": "8062c4805262027d5f12291301d9f0785b6079929098d73e368edffa47b7962d",
       "sourceRevision": "6edc02db00a386201a61f1bc95f7ebb9e3892029",
       "qualificationRun": 41121692409
+    },
+    {
+      "path": "/tmp/neoclr-preview19-final-macos/neoclr-preview19-osx-arm64.tar.gz",
+      "bytes": 57214605,
+      "sha256": "7822d1bb441fdb0b54ffff339570ca913da3471775e3e3a258e52bd9f31af73b",
+      "sourceRevision": "a079cffdffea9d9c69f7eb8c55a7b24981281c72",
+      "runtimeVersion": "0.1.0-preview.19",
+      "note": "Final fault-diagnostic/version candidate; package acceptance and exact-binary measurements recorded separately."
     }
   ]
 }

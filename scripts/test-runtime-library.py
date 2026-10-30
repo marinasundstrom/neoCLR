@@ -15,6 +15,12 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 TEST_PROJECTS = json.loads((ROOT / 'scripts/runtime-test-projects.json').read_text())
+RETENTION_WARNING = ('warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; '
+                     'reflection inside them may require explicit retention\n')
+
+
+def expected_diagnostics(stderr, mode):
+    return stderr == '' or mode == 'jit' and stderr == RETENTION_WARNING
 
 
 def suite_project(name):
@@ -857,7 +863,7 @@ def main():
                               stderr=result.stderr.decode('utf-8').replace('\r\n', '\n'))
                 report['cases'].append(record)
                 print(name + ' (' + mode + '):\n' + record['stdout'], end='', flush=True)
-                if (record['exitCode'], record['stdout'], record['stderr']) != (exit_code, stdout, ''):
+                if (record['exitCode'], record['stdout']) != (exit_code, stdout) or not expected_diagnostics(record['stderr'], mode):
                     raise RuntimeError(name + ' ' + mode + ' did not match the runner contract')
             if name in ('index-range', 'collections'):
                 guards = {

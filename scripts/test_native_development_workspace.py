@@ -1,5 +1,6 @@
 """Compiler staging must stay short and retain diagnostics when a build fails."""
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -14,6 +15,46 @@ SPEC.loader.exec_module(bundle)
 
 
 class CompilerWorkspaceTests(unittest.TestCase):
+    def test_rebuilt_bundle_uses_current_runtime_and_reflection_helper(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original = root / 'original'
+            (original / 'bin').mkdir(parents=True)
+            (original / 'bin/neoclr').write_bytes(b'old metadata reader')
+            (original / 'manifest.json').write_text(json.dumps(dict(
+                files={'bin/neoclr': hashlib.sha256(b'old metadata reader').hexdigest()},
+                runtime='bin/neoclr', modules=[])))
+            (root / 'scripts').mkdir()
+            (root / 'scripts/run-native-sample.py').write_bytes(b'current reflection resolver')
+            output = root / 'prepared'
+            runtime = root / 'target/release/neoclr'
+
+            def run(command, **kwargs):
+                if command[0] == 'cargo':
+                    runtime.parent.mkdir(parents=True)
+                    runtime.write_bytes(b'current metadata reader')
+                else:
+                    self.assertEqual(Path(command[command.index('--runtime') + 1]), runtime)
+                    libraries = Path(command[command.index('--output') + 1])
+                    libraries.mkdir()
+                    (libraries / 'bundle.json').write_text(json.dumps({'assemblyNames': []}))
+                return subprocess.CompletedProcess(command, 0, '', '')
+
+            args = ['prepare', '--bundle', str(original), '--output', str(output),
+                    '--compiler-revision', 'a' * 40]
+            with patch.object(bundle, 'ROOT', root), patch('sys.argv', args), \
+                    patch.object(bundle.sys, 'platform', 'darwin'), \
+                    patch.object(bundle.subprocess, 'check_output', return_value='b' * 40), \
+                    patch.object(bundle.subprocess, 'run', side_effect=run):
+                bundle.main()
+            prepared = output / 'bundle'
+            self.assertEqual((prepared / 'bin/neoclr').read_bytes(), b'current metadata reader')
+            self.assertEqual((original / 'bin/neoclr').read_bytes(), b'old metadata reader')
+            self.assertEqual((prepared / 'tools/run-native-sample.py').read_bytes(), b'current reflection resolver')
+            manifest = json.loads((prepared / 'manifest.json').read_text())
+            for relative, digest in manifest['files'].items():
+                self.assertEqual(hashlib.sha256((prepared / relative).read_bytes()).hexdigest(), digest)
+
     def test_nested_evidence_path_does_not_lengthen_checkout_and_failure_cleans_it(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

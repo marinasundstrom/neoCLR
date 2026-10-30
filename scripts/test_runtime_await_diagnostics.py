@@ -31,6 +31,17 @@ class RuntimeAwaitDiagnosticsTests(unittest.TestCase):
                     with self.assertRaises(RuntimeError): guest.finish(allowed_stderr=allowed)
             finally: guest.close()
 
+    def test_runtime_library_warning_allowance_is_limited_to_jit(self):
+        spec = importlib.util.spec_from_file_location('runtime_library',
+            Path(__file__).with_name('test-runtime-library.py'))
+        library = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(library)
+        for mode in ('native', 'interpreter', 'jit'):
+            self.assertTrue(library.expected_diagnostics('', mode))
+            self.assertEqual(library.expected_diagnostics(module.RETENTION_WARNING, mode), mode == 'jit')
+            for stderr in ('fault', 'warning: unknown\n', module.RETENTION_WARNING + 'fault\n'):
+                self.assertFalse(library.expected_diagnostics(stderr, mode))
+
     def test_https_warning_allowance_is_limited_to_jit(self):
         spec = importlib.util.spec_from_file_location('https_validation',
             Path(__file__).resolve().parents[1] / 'docs/experiments/https-server/validate.py')

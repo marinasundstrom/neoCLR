@@ -20,14 +20,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native presentation while preserving captured identities and malformed-name fallback.
   Refresh API/website/editor checks and release harnesses for current metadata,
   GC state, workspace membership, record semantics, synchronous slice streams and documented JIT retention
-  diagnostics; interpreter controls select their mode explicitly and unexpected errors remain failures. Development bundles include the source-matched reflection-root helper. Console/HTTPS checks require
+  diagnostics; interpreter controls select their mode explicitly and unexpected errors remain failures.
+  Development bundles include the source-matched runtime and reflection-root helper.
+  Runtime-library JIT checks accept only the exact documented dynamic-dispatch warning. Console/HTTPS checks require
   a successfully qualified matching package, while development-bootstrap imports remain available.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development
   host, without a controlled performance claim. The refreshed Windows package, editor
-  and HTTPS gates pass; updated standalone console fixtures and Windows measurements
-  remain under qualification before publication. Plan applicable Python behavior-fixture
+  and HTTPS gates pass, as do five-round Windows measurements. Final versioned
+  packages and dependent checks remain under qualification before publication. Plan applicable Python behavior-fixture
   migration to `NeoClr.Testing` after release, as explicitly directed; this migration
   is deferred and is not part of current release-harness repairs.
 

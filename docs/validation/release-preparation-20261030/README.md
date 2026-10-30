@@ -32,10 +32,10 @@ historical evidence only.
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar controls, seven HTTP readiness/diagnostic controls, bundle diagnostic control and async diagnostic control pass. |
 | macOS SDK | Matching SDK/VSIX and all 14 libraries built. Extracted default-JIT/HTTP package, watcher/reload, async (24), headers (132), PostgreSQL and standalone build-kit checks pass. |
-| Windows | Fresh package run 41121692409 passes all extracted-package, editor, watcher/reload and SDK contracts on 6edc02db0. Matching HTTPS passes 27 cases. Standalone console fixtures are updated for current stream APIs and await their rerun. |
+| Windows | Fresh package run 41121692409 passes all extracted-package, editor, watcher/reload and SDK contracts on 6edc02db0. Matching HTTPS passes 27 cases. Standalone console passes stream/record consumers; compact fault parity required the final runtime correction below. Final package run 41130221734 and its dependents are pending. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
 | Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows editor acceptance, inlays and two recovery runs pass; matching HTTPS passes 27 cases. |
-| Performance | Five-round macOS stages pass as loaded-host qualification only (see stage index below). Windows measurements are running against the successful matching package. No controlled performance gain is claimed. |
+| Performance | Five-round macOS stages pass as loaded-host qualification only (see stage index below). Windows five-round measurements also pass on package 41121692409. Exact final-version binary refreshes are queued/running; prior receipts are not relabeled. No controlled performance gain is claimed. |
 | Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. Candidate archive/VSIX hashes are recorded; published asset identities remain unset. |
 | Publication | No tag, GitHub release, upload or website deployment. Publication date unset. |
 
@@ -532,3 +532,33 @@ or alter runtime behavior.
 Final Windows package rebuild [41130221734](https://github.com/marinasundstrom/neoCLR/actions/runs/41130221734)
 uses runtime source `a079cffdffea9d9c69f7eb8c55a7b24981281c72`. Console/HTTPS
 workflow defaults now select that run and wait for its success before checking it.
+
+Final macOS [method-state tests](macos-final-method-state.json.gz) pass native and
+interpreter execution with both discovered tests and their selection controls.
+The first extracted final-package check reaches HTTP startup but times out while
+local build work is concurrent; retained [HTTP diagnostics](macos-final-http-start-timeout.json.gz)
+and [outer failure log](macos-final-package-timeout.log.gz) remain unchanged. No
+passing status is inferred from that attempt. A retry of the same archive after
+local builds finish is required.
+
+Subsequent Windows development checks identify the second bootstrap mismatch:
+its Preview 13 runtime cannot read `before_field_init` in current metadata
+([failure](windows-development-old-runtime.log.gz)); reflection/JSON fails identically.
+Preparation now builds the source runtime and includes it in the verified catalog,
+using it for library preparation and reflection. Two workspace/staging contract
+tests pass, including keeping the original bootstrap unchanged. The JIT crypto
+[report](windows-crypto-warning-report.json.gz) has all three tests passing, exit zero
+and only the exact documented DAM2004 warning. The runner now accepts that exact
+warning in JIT mode only; four diagnostic controls reject unexpected/mixed errors
+and retain strict native/interpreter diagnostics. These are harness repairs, not
+post-release behavior-fixture migration.
+
+The macOS startup [diagnostic comparison](macos-final-startup-comparison.json.gz)
+finds final startup at 149 seconds and previous-package startup at 75 seconds on
+the loaded host. Both exceed the unchanged 60-second gate; this sequential pair
+is not a controlled regression measurement. A [focused HTTP retry](macos-final-http-focused-retry.json.gz)
+passes the server-request exchange, then times out starting the paired server.
+The final macOS package gate remains unresolved; timeouts have not been relaxed.
+
+Windows HTTP-client run 41130576934 now passes pre-cancellation and cancellation
+parity but exposes a continuation-fault parity mismatch, under investigation.

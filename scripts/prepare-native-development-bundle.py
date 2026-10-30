@@ -72,7 +72,11 @@ def main():
                 os.chmod(path, stat.S_IWRITE)
                 function(path)
             shutil.rmtree(source, onerror=remove_readonly)
-    vm = original / ('bin/neoclr.exe' if sys.platform == 'win32' else 'bin/neoclr')
+    # The bootstrap runtime cannot read newer source metadata. Use this checkout's
+    # runtime for library preparation and later bundled reflection disassembly.
+    run(['cargo', 'build', '--locked', '--release', '--bin', 'neoclr'])
+    vm = ROOT / 'target/release' / ('neoclr.exe' if sys.platform == 'win32' else 'neoclr')
+    report['runtimeSha256'] = sha(vm)
     # The library evidence retains compiler binaries as well as its declared revision.
     run([sys.executable, ROOT / 'scripts/build-native-class-library.py', '--compiler', compiler,
          '--runtime', vm,
@@ -81,6 +85,7 @@ def main():
     bundle = out / 'bundle'
     shutil.copytree(original, bundle, ignore=lambda directory, names: [n for n in names if Path(directory) == original and n in ('lib', 'manifest.json')])
     shutil.copytree(out / 'libraries', bundle / 'lib')
+    shutil.copy2(vm, bundle / manifest['runtime'])
     if compiler_directory is not None:
         shutil.rmtree(bundle / 'sdk/tools/rvnc')
         shutil.copytree(compiler_directory, bundle / 'sdk/tools/rvnc')
