@@ -1,0 +1,3 @@
+test reflection_metadata::relationship_group_tests::equal_target_sets_share_a_body_without_merging_distinct_relationships ... ok
+test selection::composition_admission_tests::dispatch_relationship_cache_preserves_closed_types_and_module_changes ... ok
+test reflection_metadata::tests::relationship_queries_bind_identity_and_reject_inexact_contracts ... ok

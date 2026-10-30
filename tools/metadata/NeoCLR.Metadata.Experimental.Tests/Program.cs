@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--parameter-defaults"]) { ParameterDefaultChecks.Run(); return 0; }
+
 if (args is ["--generic-interfaces"]) { GenericInterfaceChecks.Run(); return 0; }
 
 if (args is ["--inlining"]) { InliningChecks.Run(); return 0; }

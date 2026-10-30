@@ -16263,3 +16263,8 @@ Execution qualification: the signal consumers pass in the interpreter. The nativ
 compiler builds and shares signature specialization, but the signal JIT probe stops
 at unsupported boxing of inhabited unit (`Void`). JIT/AOT execution of this library
 is not qualified; unit boxing/unboxing support remains follow-up work.
+
+Configuration reload qualification additionally exposed duplicated closed type-
+assignability tests exceeding the native generated-method bound. Codegen now shares
+identical relationship target sets; the 8,192-instruction bound and semantic answers
+are unchanged. See [the focused receipt](validation/configuration-reload-20261030/README.md).

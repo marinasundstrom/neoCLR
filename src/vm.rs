@@ -847,6 +847,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
             function.instance,
         )?;
         crate::metadata::validate_slot_names(&function.local_names, function.locals.len(), false)?;
+        crate::parameter_defaults::validate(module, function)?;
         let mut previous = None;
         for point in &function.sequence_points {
             if point.instruction >= function.body.len()

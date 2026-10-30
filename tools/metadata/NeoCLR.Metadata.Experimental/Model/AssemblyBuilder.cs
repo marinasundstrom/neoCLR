@@ -809,10 +809,11 @@ public sealed partial class AssemblyBuilder
                 if (method.Definition.NullableAnnotations.TryGetValue(-1, out var returnFlags)) AnnotateNullable(returnParameter, returnFlags);
                 nextParameter++;
             }
-            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Keys.Any(i => i >= 0) || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
+            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterDefaults.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Keys.Any(i => i >= 0) || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
                 for (int i = 0; i < method.ParameterCount; i++)
                 {
-                    var parameter = metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
+                    var parameter = metadata.AddParameter((method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None) | (method.Definition.ParameterDefaults.ContainsKey(i) ? ParameterAttributes.Optional | ParameterAttributes.HasDefault : 0), method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
+                    if (method.Definition.ParameterDefaults.TryGetValue(i, out var parameterDefault)) metadata.AddConstant(parameter, parameterDefault.Value);
                     WriteAttributes(parameter, method.Definition.GetParameterCustomAttributes(i));
                     if (method.Definition.NullableAnnotations.TryGetValue(i, out var flags)) AnnotateNullable(parameter, flags);
                     if (method.Definition.ParameterArrayIndex == i && !HasParameterArrayAttribute(method, i))

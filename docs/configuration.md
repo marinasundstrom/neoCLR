@@ -53,8 +53,8 @@ Access is synchronous and owner-thread serialized. Source Build and provider Loa
 Set failures propagate using the runtime's terminal fault behavior; transactional
 reload, rollback and recoverable provider-load errors are not implemented. Writes
 with no providers and reads/writes/reloads through a disposed default root fault.
-No IChangeToken equivalent or GetReloadToken is supplied yet. Automatic reload,
-environment/command-line providers, file watching, binder, options, mutable configuration
+No IChangeToken equivalent or GetReloadToken is supplied yet.
+Environment/command-line providers, binder, options, mutable configuration
 manager, debug views and builder Properties are gaps, not claimed replacements.
 The sample reads configuration from appsettings.json and uses JSON localization
 resources. No artifact-folder change or automatic logging configuration
@@ -70,7 +70,7 @@ The author additionally requested appsettings.json loading. The optional
 Neo.Configuration.Json assembly provides JsonConfigurationProvider/Source and
 AddJsonFile. Required files are the default; optional ignores only NotFound. Paths
 are explicit and relative paths resolve against the current working directory.
-No automatic directory search, environment suffix selection or watching occurs.
+No automatic directory search or environment suffix selection occurs. Watching is opt-in.
 
 Objects flatten through colon paths and arrays through zero-based numeric segments.
 The root must be an object. Scalars become strings; number spelling is retained,
@@ -99,3 +99,30 @@ previous data. The parser itself no longer has a fixed byte or node-count limit.
 Runtime allocation budgets still apply. Parsing and flattened storage are fully
 buffered, and ordinal duplicate detection/flat-key storage currently use linear
 searches. Very large configurations may need storage optimization.
+
+## Opt-in file reload and native defaults (2026-10-30)
+
+`AddJsonFile(path, optional: bool = false, reloadOnChange: bool = false)` follows
+[Microsoft's JSON registration defaults](https://source.dot.net/Microsoft.Extensions.Configuration.Json/JsonConfigurationExtensions.cs.html).
+The provider watches the containing directory so editor atomic replacement also
+reloads. It debounces all matching notifications with a 250 ms one-shot timer,
+matching the default delay in
+[FileConfigurationSource](https://source.dot.net/Microsoft.Extensions.Configuration.FileExtensions/FileConfigurationSource.cs.html).
+Setup uses public System.IO.FileSystemWatcher and System.Concurrency.Timer APIs;
+notifications and reads are serialized on the runtime owner thread. Windows and
+macOS use their existing watcher backends; this slice is qualified on macOS only.
+
+Background failures retain the last valid data and are exposed by LastReloadError;
+optional deletion instead clears data. This deliberately avoids an unobserved
+background terminal fault: callers can inspect a typed error and recovery clears it.
+It differs from .NET's OnLoadException policy surface and does not yet provide
+change tokens. Each root owns independent watchers; disposal closes them. The DI
+registration still borrows the root. Live sections and injected Configuration read
+current values; already constructed settings/services are not automatically rebound.
+
+The native compiler now emits/imports scalar and reference-null parameter defaults
+in native metadata. Omitted arguments are inserted at the call site; runtime arity
+is unchanged. This consolidates JSON provider/source/registration overloads. Rebuild
+binary consumers. Arbitrary value-type defaults such as CancellationToken = default
+remain for the next runtime API slice; they are not implied by scalar support.
+See [default-argument contract and validation](parameter-defaults.md).

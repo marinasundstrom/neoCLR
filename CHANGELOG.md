@@ -12,6 +12,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Add experimental SDK authoring and reading of native format-6 whole-function method signatures, boxed-body transport markers and return-type projections. MethodInfo.FunctionType preserves constrained open signatures and exposes ordinary closed parameters/results through generic materialization. Format 5 remains readable; native metadata emission is required for these forms. Focused SDK reflection roundtrip checks pass.
 
+- Add native scalar/reference-null parameter defaults with strict metadata validation,
+  immutable introspection and CLI Param/Constant round trips. Raven can bind omitted
+  arguments across native assembly boundaries; full call arity is unchanged. Enable
+  opt-in JSON configuration reload with a 250 ms debounce, live DI reads, typed
+  background errors and disposal. Consolidate JSON registration/provider/source
+  overloads using false defaults; binary consumers must rebuild. Arbitrary value-type
+  defaults and runtime overload cleanup remain a separate slice. Share identical
+  generated reflection relationship checks so the integrated reload sample stays
+  within the existing native method instruction bound.
+
 - Replace FileSystemWatcher’s separate notification registrations and event-argument hierarchy with Subscribe and the FileSystemNotification union. Changes carry coherent root-relative paths; renames carry both paths from one root; rescan requests carry a reason. Remove WatcherChangeTypes and the old argument types; consumers must migrate and rebuild. Establish direct function callbacks as the notification convention, with library event support deferred. Update the configuration sample, runtime tests and API/website documentation.
 
 ### 2026-10-29

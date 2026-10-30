@@ -1,0 +1,7 @@
+import Defaults.*
+func Main() -> int {
+    let settings = Settings()
+    if settings.Value != 7 || settings.Add() != 9 { return 1 }
+    if Settings.Choose() != 42 || Settings.Choose(17) != 17 || Settings.Choose(enabled: false) != 0 { return 2 }
+    return 0
+}

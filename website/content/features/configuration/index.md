@@ -56,5 +56,24 @@ func Main() -> int {
 A single `Subscribe` callback receives the `FileSystemNotification` union.
 The standalone [FileSystemWatcher sample](https://github.com/marinasundstrom/neoCLR/tree/main/samples/file-watcher)
 shows debounced reload with failure preservation using the current JSON provider.
-This is application wiring; AddJsonFile does not automatically watch files yet.
+That sample demonstrates application-controlled policy. AddJsonFile now also offers
+built-in opt-in reload, described below.
 See [the watcher contract](../../docs/file-system-watcher.html).
+
+## Reload appsettings.json
+
+Automatic reload is opt-in in the development API:
+
+```raven
+_ = builder.AddJsonFile("appsettings.json", reloadOnChange: true)
+```
+
+The watcher reloads after a 250 ms quiet period. Existing sections and injected
+Configuration instances see new values. Failed background reads/parsing retain the
+last valid data and populate the provider's LastReloadError; a successful reload
+clears it. Dispose the root to stop watching. Optional files use `optional: true`;
+deleting one clears its values. Keep the app's asynchronous event loop running.
+
+Try the [integrated DI sample](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md)
+with `--watch`; it reads the greeting name repeatedly for 30 seconds.
+See the [complete reload contract](/docs/configuration.html#automatic-reload).

@@ -98,8 +98,8 @@ OS limits, permissions, mount behavior and unowned files can still affect delive
 
 [The sample](../samples/file-watcher/README.md) demonstrates debounced configuration
 reload while preserving prior values after malformed input. It does not change
-AddJsonFile, DI, or storage-provider contracts. Automatic reload policy and provider
-change tokens are separate work, not implied by adding this watcher.
+the storage-provider contract. [Neo.Configuration](configuration.md) now offers
+opt-in AddJsonFile reload using this watcher; provider change tokens remain separate work.
 
 ## Validation receipt
 

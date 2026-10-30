@@ -880,9 +880,27 @@ pub fn bind_queries(
                 Op::Return,
             ]);
         }
-        for (descriptor, (token, name, count, flags, metadata_token)) in
-            descriptors.iter().enumerate()
-        {
+        // Many closed types have identical non-identity relationships (for example,
+        // unrelated classes assignable only to Object). Share that result body so
+        // adding library types does not duplicate every target test per source type.
+        let groups = if relationship {
+            relationship_groups(&related)
+        } else {
+            (0..descriptors.len()).map(|index| vec![index]).collect()
+        };
+        for group in groups {
+            let descriptor = group[0];
+            let (token, name, count, flags, metadata_token) = &descriptors[descriptor];
+            let mut shared = Vec::new();
+            for candidate in group.iter().skip(1) {
+                body.extend([
+                    Op::Arg(0),
+                    Op::LoadTypeToken(descriptors[*candidate].0.clone()),
+                    Op::Equal,
+                    Op::BranchTrue(0),
+                ]);
+                shared.push(body.len() - 1);
+            }
             let branch = body.len() + 3;
             body.extend([
                 Op::Arg(0),
@@ -890,6 +908,9 @@ pub fn bind_queries(
                 Op::Equal,
                 Op::BranchFalse(0),
             ]);
+            for branch in shared {
+                body[branch] = Op::BranchTrue(body.len());
+            }
             if relationship {
                 let mut matches = Vec::new();
                 for (position, target) in related[descriptor].iter().enumerate() {
@@ -2029,5 +2050,27 @@ mod open_query_tests {
                     .contains(expected)
             );
         }
+    }
+}
+
+// Preserve the first source order and share only exactly equal target sets.
+fn relationship_groups(related: &[Vec<usize>]) -> Vec<Vec<usize>> {
+    let mut groups: Vec<Vec<usize>> = Vec::new();
+    for (source, targets) in related.iter().enumerate() {
+        if let Some(group) = groups.iter_mut().find(|group| related[group[0]] == *targets) {
+            group.push(source);
+        } else {
+            groups.push(vec![source]);
+        }
+    }
+    groups
+}
+
+#[cfg(test)]
+mod relationship_group_tests {
+    #[test]
+    fn equal_target_sets_share_a_body_without_merging_distinct_relationships() {
+        let targets = vec![vec![0], vec![0, 2], vec![0], vec![], vec![0, 2], vec![]];
+        assert_eq!(super::relationship_groups(&targets), vec![vec![0, 2], vec![1, 4], vec![3, 5]]);
     }
 }

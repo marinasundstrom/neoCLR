@@ -1,0 +1,1 @@
+PASS scalar default capability: int, bool, string; opt-in gating and arity

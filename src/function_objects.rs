@@ -91,6 +91,7 @@ pub(crate) fn structural_contract(ty: &Type) -> Result<Function, Fault> {
             instance: true,
             parameters: shape.parameters.clone(),
             parameter_names: vec![],
+            parameter_defaults: vec![],
             receiver_byref: false,
             receiver_readonly: false,
             is_virtual: false,

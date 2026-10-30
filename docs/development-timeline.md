@@ -23835,3 +23835,26 @@ Evidence: [design and implemented profile](design/generic-function-methods.md),
 [qualification](validation/generic-function-methods-20261030/README.md),
 [extension README](../extensions/Neo.Signals/README.md),
 [generics feature page](../website/content/features/generics/index.md).
+
+## 2026-10-30 — Configuration reload and native parameter defaults
+
+- **Author:** requested opt-in appsettings.json reload using the new watcher, then
+  asked whether Raven/neoCLR supported default arguments and directed fixing the gap.
+  Suggested eventual overload consolidation, including CancellationToken = default,
+  but explicitly kept Configuration first and runtime APIs for the next slice.
+- **Assistant:** implemented directory-based file watching with a 250 ms quiet period,
+  retained valid data on background failures, exposed a typed LastReloadError and
+  tied cleanup to configuration-root disposal. Added a --watch mode to the existing
+  DI sample and a native/interpreter lifecycle test.
+- **Author:** observed that defaults can live directly in metadata, relating this to
+  evolving beyond historical attribute/compiler encodings. **Assistant:** agreed
+  with explicit native contracts while clarifying that ordinary .NET scalar defaults
+  already use Param flags and the Constant table. The implemented bridge does too.
+- **Author correction:** the async test should return Task<Result<(), TestFailure>>.
+  **Assistant action:** changed assertion propagation to ? and left reporting at the
+  executable runner boundary.
+- **Outcome:** scalar/reference-null defaults are represented, validated, emitted and
+  imported across native libraries. Configuration uses false defaults instead of
+  overloads. Arbitrary struct defaults, including CancellationToken, remain open for
+  the next slice; no runtime API overload migration was performed. See the
+  [contract](parameter-defaults.md) and [qualification](validation/configuration-reload-20261030/README.md).

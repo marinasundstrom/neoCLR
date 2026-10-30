@@ -56,6 +56,7 @@ pub mod library;
 mod math;
 pub mod memory;
 pub mod metadata;
+mod parameter_defaults;
 mod native;
 mod numeric_format_core;
 mod numeric_parse;

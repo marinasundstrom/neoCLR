@@ -1,0 +1,93 @@
+module Neo.Configuration.Tests
+
+import System.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import System.Optional.*
+import System.Result.*
+import Neo.Configuration.*
+import Neo.Configuration.Json.*
+import Neo.DependencyInjection.*
+import NeoClr.Testing.*
+
+async func Settle() -> Task<()> {
+    let done = Promise<()>()
+    let timer = Timer(() => { _ = done.Complete(()) })
+    timer.Start(Duration.FromTicks(20000000L))
+    await done.Task
+    timer.Dispose()
+}
+
+func JsonProvider(configuration: ConfigurationRoot) -> JsonConfigurationProvider {
+    for item in configuration.Providers {
+        if item is JsonConfigurationProvider provider { return provider }
+    }
+    Panic("Missing JSON provider")
+}
+
+// External writes begin only after READY; async discovery is not yet supported.
+[Test]
+async func `JSON reload is opt in and updates DI consumers while preserving valid data`(directory: string) -> Task<Result<(), TestFailure>> {
+    let path = directory + "/appsettings.json"
+    let builder: ConfigurationBuilder = DefaultConfigurationBuilder()
+    _ = builder.AddJsonFile(path, reloadOnChange: true)
+    let configuration = builder.Build()
+    let json = JsonProvider(configuration)
+    let fixedBuilder: ConfigurationBuilder = DefaultConfigurationBuilder()
+    _ = fixedBuilder.AddJsonFile(path)
+    use fixedConfiguration = fixedBuilder.Build()
+    let optional = JsonConfigurationProvider(directory + "/optional.json", optional: true, reloadOnChange: true)
+    _ = Assert.True(optional.TryLoad() is Ok(_), "Optional file starts absent")?
+    let services: ServiceCollection = DefaultServiceCollection()
+    if services.AddConfiguration(configuration) is Failure(_) { Panic("Cannot register configuration") }
+    let Ok(root) = services.Build() else { Panic("Cannot build services") }
+    let Ok(live) = root.GetRequiredService<Configuration>() else { Panic("Cannot resolve configuration") }
+    let section = live.GetSection("Greeting")
+    _ = Assert.Equal("before", section["Name"] ?? "")?
+
+    Console.WriteLine("READY changed")
+    await Settle()
+    _ = Assert.Equal("changed", section["Name"] ?? "")?
+    _ = Assert.Equal("before", fixedConfiguration["Greeting:Name"] ?? "")?
+
+    Console.WriteLine("READY malformed")
+    await Settle()
+    _ = Assert.Equal("changed", section["Name"] ?? "")?
+    _ = Assert.True(json.LastReloadError is Some(JsonConfigurationError.Json(_)), "Malformed reload is observable")?
+
+    Console.WriteLine("READY replaced")
+    await Settle()
+    _ = Assert.Equal("replaced", section["Name"] ?? "")?
+    _ = Assert.True(json.LastReloadError is None, "Successful reload clears error")?
+
+    Console.WriteLine("READY deleted")
+    await Settle()
+    _ = Assert.Equal("replaced", section["Name"] ?? "")?
+    _ = Assert.True(json.LastReloadError is Some(JsonConfigurationError.File(_)), "Required missing file retains data")?
+
+    Console.WriteLine("READY optional-created")
+    await Settle()
+    _ = Assert.True(optional.Find("Value") is Some("created"), "Optional file appears")?
+    Console.WriteLine("READY optional-deleted")
+    await Settle()
+    _ = Assert.True(optional.Find("Value") is None, "Optional deletion clears data")?
+
+    root.Dispose()
+    configuration.Dispose()
+    configuration.Dispose()
+    optional.Dispose()
+    Console.WriteLine("READY disposed")
+    await Settle()
+    _ = Assert.True(json.Find("Greeting:Name") is Some("replaced"), "Disposal stops reload")?
+    _ = Assert.True(json.TryLoad() is Failure(JsonConfigurationError.Disposed), "Disposed provider cannot load")?
+    return Ok(())
+}
+
+async func Main(args: string[]) -> Task<int> {
+    if args.Length != 1 { Panic("Expected fixture directory") }
+    let result = await `JSON reload is opt in and updates DI consumers while preserving valid data`(args[0])
+    if result is Failure(let error) { Panic(error.Message) }
+    Console.WriteLine("PASS configuration reload lifecycle")
+    return 0
+}

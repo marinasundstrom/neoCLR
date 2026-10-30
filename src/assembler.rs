@@ -1025,6 +1025,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             instance,
                             parameters: target.parameters,
                             parameter_names,
+                            parameter_defaults: vec![],
                             out_parameters,
                             out_when_true,
                             readonly_parameters,

@@ -35,7 +35,7 @@ public sealed partial class NativeAssemblyDefinition
     }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments) { internal CustomAttributeNamedArgument[] Named { get; init; } = []; }
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal Dictionary<int, AttributeRow[]> GenericAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal AttributeRow[] ReturnAttributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal Dictionary<int, TypeParameterConstraints> SpecialConstraints { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner, bool Structural)[] TypeConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal Dictionary<int, AttributeRow[]> GenericAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal AttributeRow[] ReturnAttributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal Dictionary<int, ParameterDefaultValue> ParameterDefaults { get; init; } = []; internal Dictionary<int, TypeParameterConstraints> SpecialConstraints { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner, bool Structural)[] TypeConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring, int DeclaringArity);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -812,6 +812,7 @@ public sealed partial class NativeAssemblyDefinition
                 if (method.TryGetProperty("function_type", out _)) fields.Add("function_type");
                 if (method.TryGetProperty("boxed_arguments", out _)) fields.Add("boxed_arguments");
                 if (method.TryGetProperty("parameter_names", out _)) fields.Add("parameter_names");
+                if (method.TryGetProperty("parameter_defaults", out _)) fields.Add("parameter_defaults");
                 if (method.TryGetProperty("custom_attributes", out _)) fields.Add("custom_attributes");
                 if (method.TryGetProperty("out_parameters", out _)) fields.Add("out_parameters");
                 var genericNames = method.TryGetProperty("generic_parameters", out _) ? Array(method, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null generic name")).ToArray() : [];
@@ -1058,6 +1059,19 @@ public sealed partial class NativeAssemblyDefinition
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < (ownerIndex < 0 ? 4096 : 256), "too many methods per owner"); counts[ownerIndex] = count + 1;
+                var parameterDefaults = new Dictionary<int, ParameterDefaultValue>();
+                if (method.TryGetProperty("parameter_defaults", out _))
+                {
+                    var defaults = Array(method, "parameter_defaults", 256);
+                    Require(defaults.Length == 0 || defaults.Length == parameterTypes.Length, "parameter defaults must align with signature");
+                    for (int i = 0; i < defaults.Length; i++)
+                    {
+                        if (defaults[i].ValueKind == JsonValueKind.Null) continue;
+                        var value = ParameterDefaultValue.Decode(defaults[i]);
+                        value.Validate(parameterTypes[i]);
+                        parameterDefaults.Add(i, value);
+                    }
+                }
                 var parameterNames = new Dictionary<int, string>();
                 if (method.TryGetProperty("parameter_names", out _))
                 {
@@ -1123,11 +1137,11 @@ public sealed partial class NativeAssemblyDefinition
                     Require(boxed is null ? parameterTypes.Length == 0 && noResult :
                         parameterTypes.Length == 1 && parameterTypes[0].ArrayElement == boxed && resultType == boxed && !noResult,
                         "dependent method body signature disagrees with its argument representation");
-                    Require(signature.OutParameters.Count == 0 && parameterNames.Count == 0 && parameterArray is null && nullableAnnotations.Count == 0 && returnAttributes.Count == 0 && parameterAttributes.Count == 0,
+                    Require(signature.OutParameters.Count == 0 && parameterNames.Count == 0 && parameterDefaults.Count == 0 && parameterArray is null && nullableAnnotations.Count == 0 && returnAttributes.Count == 0 && parameterAttributes.Count == 0,
                         "dependent signature cannot contain explicit parameter/result metadata");
                     signature = boxed is null ? MethodSignature.FromFunctionType(functionType, genericNames) : MethodSignature.InteropFunction(functionType, boxed, genericNames);
                 }
-                methods.Add(new(ns, name, ownerIndex, signature, visibility, instance, isOverride) { GenericAttributes = genericAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), ReturnAttributes = returnAttributes.ToArray(), ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, SpecialConstraints = methodSpecialConstraints, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, signature, visibility, instance, isOverride) { GenericAttributes = genericAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), ReturnAttributes = returnAttributes.ToArray(), ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, ParameterDefaults = parameterDefaults, SpecialConstraints = methodSpecialConstraints, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
             if (externalRootAlias is not null)
@@ -1362,6 +1376,7 @@ public sealed partial class NativeAssemblyDefinition
             if (method.NativeImport is not null) output.SetNativeImport(method.NativeImport);
             foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
+            foreach (var pair in method.ParameterDefaults) output.SetParameterDefault(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
             if (method.SpecialConstraints.Values.Contains(TypeParameterConstraints.FunctionType)) throw new NotSupportedException("function-kind method constraints have no CLI projection");
             foreach (var (parameter, flags) in method.SpecialConstraints) output.SetSpecialConstraints(parameter, flags);

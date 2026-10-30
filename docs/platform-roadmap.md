@@ -7333,3 +7333,11 @@ separate experimental Neo.Signals library. The author requested this bounded sli
 it does not reprioritize broader structural work or the Rx proposal. Runtime inclusion
 of Signals remains undecided. See the [implemented profile](design/generic-function-methods.md)
 and [qualification evidence](validation/generic-function-methods-20261030/README.md).
+
+### Author-directed Configuration slice (2026-10-30)
+
+Opt-in JSON file reload and native scalar parameter defaults are implemented and
+qualified in the [Configuration reload receipt](validation/configuration-reload-20261030/README.md).
+This bounded author request does not reorder the roadmap. Runtime overload review
+and arbitrary value-type defaults, including CancellationToken = default, are the
+next requested slice and remain open.

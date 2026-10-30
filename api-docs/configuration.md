@@ -36,7 +36,7 @@ registers a caller-owned configuration root, reads its localization directory at
 startup and injects Configuration into GreetingService to select the greeting name.
 Dispose the container before its borrowed configuration root.
 
-Change tokens, automatic reload, environment/command-line configuration providers,
+Change tokens, environment/command-line configuration providers,
 binding and options are not implemented. Load/Set/source faults propagate;
 no rollback is promised. See [design and .NET comparison](https://github.com/marinasundstrom/neoCLR/blob/main/docs/configuration.md).
 
@@ -80,12 +80,12 @@ The abstractions and base implementation do not reference System.Data.
 
 | API | Members and behavior |
 | --- | --- |
-| JsonConfigurationExtensions | `builder.AddJsonFile(path)` adds a required file; `(path, optional)` ignores only missing files when optional. Returns the builder; no I/O until Build. |
-| JsonConfigurationSource | Constructor `(path, optional)`, read-only Path/Optional and Build(builder) producing a fresh provider. |
-| JsonConfigurationProvider | Constructors `(path)` and `(path, optional)`; Path/Optional, Find, Set, GetChildKeys and Load. Relative paths use the working directory. Set changes memory only. Load faults on failure; Reload through the root rereads the file. |
+| JsonConfigurationExtensions | `builder.AddJsonFile(path: string, optional: bool = false, reloadOnChange: bool = false)` adds a file source. Returns the builder; no I/O until Build. Named arguments may skip optional. |
+| JsonConfigurationSource | Constructor `(path: string, optional: bool = false, reloadOnChange: bool = false)`, read-only Path/Optional/ReloadOnChange and Build(builder) producing a fresh provider. |
+| JsonConfigurationProvider | Constructor `(path: string, optional: bool = false, reloadOnChange: bool = false)`; Path/Optional/ReloadOnChange, Find, Set, GetChildKeys, Load and Dispose. Relative paths use the working directory. Set changes memory only. Load faults on failure; Reload through the root rereads the file. |
 | JsonConfigurationProvider.TryLoad | Returns `Result<unit, JsonConfigurationError>`. Failed reads/parsing preserve previous values. A missing optional file replaces values with an empty provider. |
 | JsonConfigurationProvider.LoadText | Parses supplied text with the same rules and atomic replacement; future Load rereads Path. Returns the same Result. |
-| JsonConfigurationError | File(FileReadError), Json(JsonError), InvalidRoot and DuplicateKey(string). Duplicate flattened keys compare ignoring case. |
+| JsonConfigurationError | File(FileReadError), Json(JsonError), Watch(FileSystemWatcherError), Disposed, InvalidRoot and DuplicateKey(string). Duplicate flattened keys compare ignoring case. |
 
 Objects use colon keys and arrays numeric segments. Strings decode JSON escapes;
 numbers retain their text, booleans become True/False, null stays null, empty
@@ -93,8 +93,35 @@ objects yield null and empty arrays yield an empty string. The root must be an
 object. The provider accepts line/block comments, trailing commas and an initial
 UTF-8 BOM, using the public [JSON document options](json.html#document-parsing-options).
 Input is limited to **1 MiB and 64 container levels**; there is no fixed value or
-per-container entry limit. File watching remains unsupported. Size/depth/syntax
+per-container entry limit. Size/depth/syntax
 failures preserve prior values; they never truncate input. TryLoad reports
 File(TooLarge) for oversized files; LoadText reports Json(LimitExceeded).
 The sample's [appsettings.json](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/appsettings.json)
 sets Greeting:Name and Localization:Directory.
+
+## Automatic reload
+
+Pass `reloadOnChange: true` to AddJsonFile or JsonConfigurationProvider/Source.
+Both optional and reloadOnChange default to false. TryLoad/Load starts a watcher
+on the parent directory, filtered to the file, before the initial read. The parent
+must exist even for an optional file; watching rejects empty/wildcard filenames.
+Changes, deletion, rename/replacement and rescan notifications schedule a read after
+250 ms without another notification. Callbacks run on the runtime owner thread;
+the application must keep its asynchronous event loop alive.
+
+Existing sections and DI consumers read the new values without rebuilding services.
+`LastReloadError: Optional<JsonConfigurationError>` records the most recent
+background failure; successful background loading clears it. Malformed JSON or a
+missing required file leaves the last valid values intact. Deleting an optional
+file clears its values. Initial Load still faults; use TryLoad for recoverable setup.
+LoadText does not start watching. Set changes memory only and does not stop watching.
+
+Dispose stops the timer and watcher permanently and is idempotent. Retained provider
+values remain readable/mutable, but TryLoad and LoadText return Disposed. Disposing
+the owning configuration root disposes its providers and invalidates its sections.
+No reload token or application callback API is introduced in this slice.
+
+The integrated sample's `--watch` mode observes edits for 30 seconds. The localization
+directory is read at startup; changing it does not rebuild the localization service.
+The added parameter changes assembly signatures: rebuild callers against the matching
+compiler and libraries. Existing source calls remain valid through parameter defaults.

@@ -1,0 +1,12 @@
+{
+  "once": {
+    "exitCode": 0,
+    "stdout": "info: Examples.Extensions.GreetingService[0] Hej Ada! Logging and localization are composed through DI.\n",
+    "stderr": ""
+  },
+  "watch": {
+    "exitCode": 0,
+    "stdout": "info: Examples.Extensions.GreetingService[0] Hej Ada! Logging and localization are composed through DI.\nEdit Greeting:Name in appsettings.json; observing for 30 seconds.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\ninfo: Examples.Extensions.GreetingService[0] Hej Reloaded! Logging and localization are composed through DI.\n",
+    "stderr": ""
+  }
+}

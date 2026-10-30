@@ -84,3 +84,13 @@ cd samples/extensions
 
 ConfigurationIntro uses the shared appsettings.json. The other introductory
 programs have no file dependencies. ExtensionsDemo shows all four services together.
+
+### Observe configuration changes
+
+Run ExtensionsDemo with `--watch` from this directory. It prints a greeting every
+two seconds for 30 seconds. Edit `Greeting:Name` in appsettings.json while it runs;
+the same DI-resolved service reads the reloaded value. Without `--watch`, it prints
+once and does not start a watcher. Localization:Directory is a startup setting.
+The sample disposes its service scope/container before the borrowed configuration
+root; root disposal stops automatic reload. Background failures preserve valid data
+and can be inspected through JsonConfigurationProvider.LastReloadError.

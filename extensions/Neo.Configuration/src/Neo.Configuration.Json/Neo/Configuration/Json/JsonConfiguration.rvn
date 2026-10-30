@@ -2,6 +2,9 @@ module Neo.Configuration.Json
 
 import System.*
 import System.Collections.*
+import System.IO.*
+import System.Concurrency.*
+import System.Time.*
 import System.Data.Json.*
 import System.Optional.*
 import System.Result.*
@@ -13,31 +16,46 @@ import Neo.Configuration.*
 public union JsonConfigurationError {
     case File(error: FileReadError)
     case Json(error: JsonError)
+    case Watch(error: FileSystemWatcherError)
+    case Disposed
     case InvalidRoot
     case DuplicateKey(key: string)
 }
 
 /// Reads UTF-8 JSON objects into colon-delimited configuration keys.
 /// Accepts comments and trailing commas, with maximum depth 64 and a 1 MiB input limit.
-public class JsonConfigurationProvider : ConfigurationProvider {
+public class JsonConfigurationProvider : ConfigurationProvider, Disposable {
     val Path: string
     val Optional: bool
+    /// Whether TryLoad establishes automatic file watching; false by default.
+    val ReloadOnChange: bool
+    private var disposed = false
+    private var watcher: FileSystemWatcher? = null
+    private var debounce: Timer? = null
+    private var reloadError: Optional<JsonConfigurationError> = None
+    /// Most recent background reload failure; a successful background reload clears it.
+    val LastReloadError: Optional<JsonConfigurationError> {
+        get {
+            if reloadError is Some(let error) { return Some(error) }
+            return None
+        }
+    }
     private var data = MemoryConfigurationProvider(ArrayList<ConfigurationEntry>())
 
-    /// Configures a required file; relative paths resolve against the process working directory.
-    init(path: string) {
-        Path = path
-        Optional = false
-    }
-
-    /// Optional suppresses only FileReadError.NotFound, not malformed or unreadable files.
-    init(path: string, optional: bool) {
+    /// Configures file loading; optional and automatic reload are disabled by default.
+    /// Optional suppresses only NotFound. Reloads run after a 250 ms quiet period.
+    init(path: string, optional: bool = false, reloadOnChange: bool = false) {
         Path = path
         Optional = optional
+        ReloadOnChange = reloadOnChange
     }
 
     /// Reads the file and atomically replaces data on success; failures leave prior data intact.
     func TryLoad() -> Result<unit, JsonConfigurationError> {
+        if disposed { return Failure(JsonConfigurationError.Disposed) }
+        if ReloadOnChange && watcher is null {
+            _ = StartWatching()?
+        }
         let text = match ReadAllText(Path, 1048576) {
             Ok(let value) => value
             Failure(FileReadError.NotFound) => {
@@ -55,6 +73,7 @@ public class JsonConfigurationProvider : ConfigurationProvider {
     /// Parses supplied JSON instead of reading the file; failed parsing preserves previous values.
     /// Later Load/TryLoad reads Path again. Numeric spelling is preserved; booleans use True/False.
     func LoadText(json: string) -> Result<unit, JsonConfigurationError> {
+        if disposed { return Failure(JsonConfigurationError.Disposed) }
         if json.GetUtf8ByteCount() > 1048576 {
             return Failure(JsonConfigurationError.Json(JsonError.LimitExceeded("Configuration exceeds 1 MiB")))
         }
@@ -77,6 +96,64 @@ public class JsonConfigurationProvider : ConfigurationProvider {
         }
         data = next
         return Ok(())
+    }
+
+    private func StartWatching() -> Result<unit, JsonConfigurationError> {
+        if Path.IsEmpty || Path.ContainsOrdinal("\u0000") {
+            return Failure(JsonConfigurationError.Watch(FileSystemWatcherError.InvalidPath))
+        }
+        var windows = false
+        if Environment.GetOperatingSystem() is Ok(let os) {
+            windows = os is OperatingSystem.Windows
+        }
+        var lastSeparator = -1
+        var index = 0
+        for character in Path {
+            if character == '/' || (windows && character == '\\') { lastSeparator = index }
+            index += 1
+        }
+        var directory = "."
+        var name = Path
+        if lastSeparator >= 0 {
+            directory = Path[..(lastSeparator + 1)]
+            name = Path[(lastSeparator + 1)..]
+        }
+        if name.IsEmpty || name.ContainsOrdinal("*") || name.ContainsOrdinal("?") {
+            return Failure(JsonConfigurationError.Watch(FileSystemWatcherError.InvalidPath))
+        }
+        let next = FileSystemWatcher(directory, name)
+        _ = next.Subscribe(FileChanged)
+        if next.TryStart() is Failure(let error) {
+            next.Dispose()
+            return Failure(JsonConfigurationError.Watch(error))
+        }
+        debounce = Timer(ReloadChangedFile)
+        watcher = next
+        return Ok(())
+    }
+
+    private func FileChanged(notification: FileSystemNotification) {
+        if disposed { return }
+        // All variants, including ambiguous rename/loss, require a fresh read.
+        if debounce is Timer timer { timer.Start(Duration.FromTicks(2500000L)) }
+    }
+
+    private func ReloadChangedFile() {
+        if disposed { return }
+        match TryLoad() {
+            Ok(_) => { reloadError = None }
+            Failure(let error) => { reloadError = Some(error) }
+        }
+    }
+
+    /// Stops automatic reload permanently. Retained values remain readable; loading returns Disposed.
+    func Dispose() {
+        if disposed { return }
+        disposed = true
+        if debounce is Timer timer { timer.Dispose() }
+        debounce = null
+        if watcher is FileSystemWatcher current { current.Dispose() }
+        watcher = null
     }
 
     private static func Store(data: MemoryConfigurationProvider, path: string, value: string?) -> Result<unit, JsonConfigurationError> {
@@ -129,9 +206,12 @@ public class JsonConfigurationProvider : ConfigurationProvider {
 public class JsonConfigurationSource : ConfigurationSource {
     val Path: string
     val Optional: bool
-    init(path: string, optional: bool) {
+    val ReloadOnChange: bool
+    /// Configures an independently owned provider for each root; defaults perform no watching.
+    init(path: string, optional: bool = false, reloadOnChange: bool = false) {
         Path = path
         Optional = optional
+        ReloadOnChange = reloadOnChange
     }
-    func Build(builder: ConfigurationBuilder) -> ConfigurationProvider => JsonConfigurationProvider(Path, Optional)
+    func Build(builder: ConfigurationBuilder) -> ConfigurationProvider => JsonConfigurationProvider(Path, Optional, ReloadOnChange)
 }

@@ -5,14 +5,14 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "7b7a4f604cb4d6da8630a07f55defffa8eefd2cc25248bf44be9a9d29a30a979",
-  "librarySourceRevision": "00b2c638e-with-watcher-union",
-  "compilerRevision": "b4c5790e1-pinned",
+  "sha256": "4e587a117c4953e3dbb56adbf5404a2535169e33345ce54e4980a0576a0729da",
+  "librarySourceRevision": "configuration-reload-source-sha256:0fd4e6488b99d84913825b0fc67a7fdbe87ae8e41fb1edd25def8785d2d808e3",
+  "compilerRevision": "binary-sha256:69ad24335dbf141a22b874103bddae78ee1843b25ea3dfb7686cba1675a2498e",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "f0280fc853e59aabb8b1c13ccc363be84efc550f78780476fd4611a5c9117a90"
+    "sha256": "af5d66f089883579167cb0e134d0be4139d994d62123405e7e11a9a74ffb2bd5"
   },
-  "rendererRevision": "binary-sha256:b7d34d498041b53167e73a4ce081edbdea89225df47dd70436914747f61b5ddb",
+  "rendererRevision": "binary-sha256:0e55f72b8257431f2c235438148f46c5ed6f2ba6a2c82e03c985190dd0ea9b5c",
   "libraryArtifacts": {
     "System.Web.dll": "b56f9caba1d1af30484259c1005fc2640bf44b6e92fdb311d5dbba48574740f5",
     "Neo.DependencyInjection.Abstractions.dll": "0f445f2f2b0ab68371f43788161b3931e633ead91d9a2c182bd6d51eeda7db5a",
@@ -20,7 +20,7 @@
     "Neo.Logging.Abstractions.dll": "d48030829bba91c6d4cd043679c8547e05c9469772524ad42b4e3fbc78edd21d",
     "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
     "System.Networking.dll": "bfe1938928e3819121207111a8be581ad689154a07b6c751b54ca4e28c2e7247",
-    "Neo.Configuration.Json.dll": "f3f6601fdce5ff08cb97114bd42dc2f4efbc211342a5454fd79569eca8e74f2c",
+    "Neo.Configuration.Json.dll": "bafb434a96fad347f596e26d89dd50ebf0f0ad7ed28a6e4e4ad4b2bd4b29f554",
     "Neo.Logging.dll": "6b064cb50092005fa8039a7456ecb899ce451ccf2a0a0864c9b5168f937f3aac",
     "System.Runtime.dll": "f8a230acc8df88a1f20ad8005fe0cdb923b914c3e6367209d799ad44d5b036ec",
     "Neo.Configuration.dll": "7dddd94e80c38902ab5d4ce108bdeeede4ba50c755ddc456be553d7481980b9d",

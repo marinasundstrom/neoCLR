@@ -575,6 +575,9 @@ pub struct Function {
     /// Optional names aligned with declared parameters (excluding the receiver).
     #[serde(default)]
     pub parameter_names: Vec<Option<String>>,
+    /// Caller-supplied defaults; execution still requires the full declared argument list.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub parameter_defaults: Vec<Option<ParameterDefault>>,
     /// Instance argument zero addresses the caller slot rather than containing a value copy.
     #[serde(default)]
     pub receiver_byref: bool,
@@ -1871,4 +1874,12 @@ mod function_return_tests {
         );
         assert!(Type::function_return(Type::String).is_err());
     }
+}
+
+/// A bounded scalar parameter constant. Floating values use exact hexadecimal bit strings.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ParameterDefault {
+    pub kind: String,
+    pub value: String,
 }

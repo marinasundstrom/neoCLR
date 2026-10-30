@@ -10641,3 +10641,19 @@ type expressions. Format 5 remains readable. Positional parameter metadata canno
 contradict a whole-signature reference. CLI executable emission and neoIL text export
 of these new forms are not supported; use the native metadata writer. These host
 SDK APIs are documented here rather than included in the guest RavenDoc selection.
+
+## Parameter defaults (development)
+
+`ParameterDefaultValue(object? value)` accepts bool, signed/unsigned integer, float,
+double, string and explicit null constants. Other values throw ArgumentException.
+`Value` returns the immutable value. `MethodDefinition.ParameterDefaults` is a read-
+only position-to-default map excluding the receiver. `SetParameterDefault(position,
+value)` (also on MethodBuilder) sets or clears a default on authored definitions;
+null clears, `new ParameterDefaultValue(null)` stores explicit null. Invalid position
+throws ArgumentOutOfRangeException; incompatible types throw InvalidDataException;
+loaded definitions reject mutation with InvalidOperationException.
+
+`ParameterInfo.HasDefaultValue` distinguishes absence from explicit null; DefaultValue
+returns the constant or null. Native and CLI snapshots preserve these values. CLI
+projection uses Param flags and Constant rows. See the [native default contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/parameter-defaults.md)
+for supported kinds, validation and remaining value-type gaps.

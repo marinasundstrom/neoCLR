@@ -385,6 +385,7 @@ mod tests {
         });
         function.parameters = vec![Type::Int32, crate::file_streams::memory_type(readonly)];
         function.parameter_names.clear();
+        function.parameter_defaults.clear();
         function
     }
 

@@ -27,6 +27,7 @@ public sealed partial class MethodDefinition
         signature = row.Signature;
         outParameters = row.OutParameters;
         LoadParameterNames(row.ParameterNames);
+        LoadParameterDefaults(row.ParameterDefaults);
         LoadNullableAnnotations(row.NullableAnnotations);
         parameterArrayIndex = row.ParameterArrayIndex;
         nativeSignature = row.NativeSignature?.Materialize(module);

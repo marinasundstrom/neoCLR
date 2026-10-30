@@ -41,7 +41,7 @@ public sealed partial class AssemblyBuilder
         {
             if (method.Definition.ReturnCustomAttributes.Count != 0) returnTokens.Add(method, nextParameterToken++);
             var tokens = new int[method.Signature.TransportSignature.ParameterTypes.Count];
-            if (method.Signature.TransportSignature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
+            if (method.Signature.TransportSignature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterDefaults.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
                 for (int position = 0; position < tokens.Length; position++) tokens[position] = nextParameterToken++;
             parameterTokens.Add(method, tokens);
         }
@@ -521,7 +521,8 @@ public sealed partial class AssemblyBuilder
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.TransportSignature.OutParameters.Count == 0 ? null : method.Signature.TransportSignature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
                 method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.Signature.TransportSignature.ParameterTypes.Count).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
-                method.Definition.TypeConstraints.Count == 0 && method.Definition.SpecialConstraints.Count == 0 ? null : method.Definition.TypeConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(c.Bound) } }).Concat(method.Definition.SpecialConstraints.OrderBy(c => c.Key).SelectMany(c => new[] { TypeParameterConstraints.ReferenceType, TypeParameterConstraints.ValueType, TypeParameterConstraints.DefaultConstructor, TypeParameterConstraints.FunctionType }.Where(flag => c.Value.HasFlag(flag)).Select(flag => (object)new { parameter = c.Key, kind = flag.ToString() }))).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes, MethodAttributes(method), method.Definition.NativeImport, method.Signature.IsDependent ? SignatureValue(method.Signature.FunctionType) : null, method.Signature.InteropObjectType is { } boxed ? SignatureValue(boxed) : null)).ToArray()
+                method.Definition.TypeConstraints.Count == 0 && method.Definition.SpecialConstraints.Count == 0 ? null : method.Definition.TypeConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(c.Bound) } }).Concat(method.Definition.SpecialConstraints.OrderBy(c => c.Key).SelectMany(c => new[] { TypeParameterConstraints.ReferenceType, TypeParameterConstraints.ValueType, TypeParameterConstraints.DefaultConstructor, TypeParameterConstraints.FunctionType }.Where(flag => c.Value.HasFlag(flag)).Select(flag => (object)new { parameter = c.Key, kind = flag.ToString() }))).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes, MethodAttributes(method), method.Definition.NativeImport, method.Signature.IsDependent ? SignatureValue(method.Signature.FunctionType) : null, method.Signature.InteropObjectType is { } boxed ? SignatureValue(boxed) : null,
+                method.Definition.ParameterDefaults.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterDefaults.GetValueOrDefault(i)?.Encode()).ToArray())).ToArray()
         };
         foreach (var type in types) type.ValidateMemoryView();
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
@@ -563,7 +564,9 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object? function_type,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object? boxed_arguments);
+        object? boxed_arguments,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object?[]? parameter_defaults);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]

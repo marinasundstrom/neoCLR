@@ -103,7 +103,7 @@ OnRenamed/OnError registrations with Subscribe and union matching. WatcherChange
 FileSystemEventArgs, RenamedEventArgs and ErrorEventArgs are removed; rebuild consumers.
 The callback no longer receives a sender; capture the watcher when needed.
 
-Direct callbacks are the notification convention. Library event support, automatic
-configuration reload and provider-level storage notifications remain later work.
+Direct callbacks are the notification convention. [Configuration reload](configuration.html#automatic-reload)
+uses this watcher. Library event support and provider-level storage notifications remain later work.
 NotifyFilter, Filters collections, InternalBufferSize tuning, synchronizing objects
 and WaitForChanged are not implemented.

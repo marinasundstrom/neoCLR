@@ -147,6 +147,10 @@ public sealed class ParameterInfo
     public ParameterPassingMode PassingMode { get; }
     /// <summary>Gets explicit CLI nullable parameter flags, or null when absent. Physical ParameterType is unchanged.</summary>
     public NullableAnnotation? NullableAnnotation => DeclaringMethod.Definition.NullableAnnotations.GetValueOrDefault(Position);
+    /// <summary>Whether the parameter has an explicit compile-time default.</summary>
+    public bool HasDefaultValue => DeclaringMethod.Definition.ParameterDefaults.ContainsKey(Position);
+    /// <summary>The explicit constant, including null; inspect HasDefaultValue to distinguish absence.</summary>
+    public object? DefaultValue => DeclaringMethod.Definition.ParameterDefaults.GetValueOrDefault(Position)?.Value;
     /// <summary>Gets whether this final vector parameter carries the parameter-array expansion contract.</summary>
     public bool IsParameterArray => DeclaringMethod.Definition.ParameterArrayIndex == Position;
     /// <summary>Gets the projected value type, or the referenced element type for ref/out parameters.</summary>

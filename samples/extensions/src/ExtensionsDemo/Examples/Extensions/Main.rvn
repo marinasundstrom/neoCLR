@@ -2,15 +2,18 @@ module Examples.Extensions
 
 import System.*
 import System.Globalization.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Time.*
 import System.Result.*
 import Neo.DependencyInjection.*
 import Neo.Localization.*
 import Neo.Logging.*
 import Neo.Configuration.*
 
-func Run() -> Result<unit, ServiceError> {
+async func Run(watch: bool) -> Task<Result<(), ServiceError>> {
     let builder: ConfigurationBuilder = DefaultConfigurationBuilder()
-    _ = builder.AddJsonFile("appsettings.json")
+    _ = builder.AddJsonFile("appsettings.json", reloadOnChange: watch)
     use configuration = builder.Build()
     let services: ServiceCollection = DefaultServiceCollection()
     _ = services.AddConfiguration(configuration)?
@@ -26,11 +29,24 @@ func Run() -> Result<unit, ServiceError> {
     use scope = root.CreateScope()?
     let greeting = scope.GetRequiredService<GreetingService>()?
     greeting.Greet()
+    if watch {
+        Console.WriteLine("Edit Greeting:Name in appsettings.json; observing for 30 seconds.")
+        var remaining = 15
+        while remaining > 0 {
+            let done = Promise<()>()
+            use timer = Timer(() => { _ = done.Complete(()) })
+            timer.Start(Duration.FromTicks(20000000L))
+            await done.Task
+            greeting.Greet()
+            remaining -= 1
+        }
+    }
     return Ok(())
 }
 
-func Main() -> int {
-    let Ok(_) = Run() else {
+async func Main(args: string[]) -> Task<int> {
+    let watch = args.Length > 0 && args[0] == "--watch"
+    let Ok(_) = await Run(watch) else {
         Console.WriteLine("Could not compose the extension services.")
         return 1
     }

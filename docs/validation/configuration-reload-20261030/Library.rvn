@@ -1,0 +1,10 @@
+module Defaults
+public class Settings {
+    val Value: int
+    init(value: int = 7) { Value = value }
+    func Add(delta: int = 2) -> int => Value + delta
+    static func Choose(value: int = 42, enabled: bool = true, text: string = "yes") -> int {
+        if enabled && text == "yes" { return value }
+        return 0
+    }
+}
