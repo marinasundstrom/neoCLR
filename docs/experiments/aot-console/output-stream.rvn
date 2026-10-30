@@ -5,33 +5,24 @@ import System.Result.*
 func Main() -> int {
     let output = Console.OpenStandardOutput()
     let error = Console.OpenStandardError()
-    let bytes: byte[] = [(byte)65, (byte)0, (byte)66]
-    let Ok(empty) = output.Write(bytes, 0, 0) else {
+    let bytes = [(byte)65, (byte)0, (byte)66]
+    let Ok(_) = output.Write(bytes[..0]) else {
         return 1
     }
-    if empty != 0 {
-        return 2
-    }
-    let Failure(_) = output.Write(bytes, -1, 1) else {
-        return 3
-    }
-    let Ok(written) = output.Write(bytes, 0, 3) else {
+    let Ok(_) = output.Write(bytes) else {
         return 4
-    }
-    if written != 3 {
-        return 5
     }
     let Ok(_) = output.Flush() else {
         return 6
     }
-    let Ok(_) = error.Write(bytes, 2, 1) else {
+    let Ok(_) = error.Write(bytes[2..3]) else {
         return 7
     }
     let Ok(_) = error.Flush() else {
         return 8
     }
     output.Close()
-    let Failure(_) = output.Write(bytes, 0, 1) else {
+    let Failure(_) = output.Write(bytes[..1]) else {
         return 9
     }
     let Failure(_) = output.Flush() else {

@@ -13,6 +13,11 @@ import sys
 import xml.etree.ElementTree as X
 
 ROOT = Path(__file__).resolve().parents[1]
+# Compatibility inputs for development validators that rebuild compiler/libraries
+# from source. This package validator itself requires --bundle and never uses them.
+ARCHIVE = 'neoclr-preview13-win-x64.tar.gz'
+BUNDLE_SHA = 'ffcd3ec90d7ae9e0e7754ee276b16a18c2a087b4bb04acfc477b73913538d9cc'
+URL = 'https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/' + ARCHIVE
 
 
 def sha(path):
@@ -62,6 +67,8 @@ def main():
                    *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))],
                    '--object-root', lib / 'System.Runtime.dll']
         cases = [
+            ('record-contracts', (ROOT / 'docs/experiments/native-collections/record-contracts/Main.rvn').read_text(encoding='utf-8'),
+             b'Record contracts passed\n', b'', 0, b''),
             ('managed', (ROOT / 'samples/native-windows/Main.rvn').read_text(encoding='utf-8'),
              'Hello, Café 🌍\nAnswer: 42\nhé😀\0z\nreplacement\n'.encode(), b'', 0, b''),
             ('interpolation', (ROOT / 'docs/experiments/aot-console/interpolation.rvn').read_text(),

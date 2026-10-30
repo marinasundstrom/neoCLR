@@ -1,5 +1,15 @@
 # Map pair contract
 
+**Release-check update (2026-10-30):** The historical exclusions below were
+superseded by mutable positional records and generated value/reference record
+semantics. The collections validator now executes
+[record contracts](../native-collections/record-contracts/Main.rvn) in native and
+interpreter modes instead of expecting compiler rejection. Imported KeyValuePair
+property mutation remains a negative check. See the
+[release evidence](../../validation/release-preparation-20261030/README.md).
+
+The remaining text describes the original bounded map-pair checkpoint.
+
 Map<K,V> now extends Iterable<KeyValuePair<K,V>>. The pair uses a positional Raven
 record struct; the native development contract supports constructors, copying,
 read-only components and Deconstruct. HashMap supplies a shallow snapshot iterator.

@@ -1,0 +1,26 @@
+import System.*
+
+record struct Pair(val Value: int)
+record class ReferencePair(val Value: int)
+record struct MutablePair(var Value: int)
+
+class Program {
+    static func Main() -> int {
+        let pair = Pair(1)
+        if !pair.Equals(Pair(1)) || pair.Equals(Pair(2)) {
+            return 1
+        }
+        let reference = ReferencePair(3)
+        if reference.Value != 3 || !reference.Equals(ReferencePair(3)) {
+            return 2
+        }
+        var mutable = MutablePair(4)
+        let original = mutable
+        mutable.Value = 5
+        if original.Value != 4 || mutable.Value != 5 {
+            return 3
+        }
+        Console.WriteLine("Record contracts passed")
+        return 0
+    }
+}

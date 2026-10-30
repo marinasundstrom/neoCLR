@@ -1,4 +1,0 @@
-record struct Pair(var Value: int)
-class Program {
-    static func Main() -> int => 0
-}

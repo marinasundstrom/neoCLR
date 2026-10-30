@@ -8,7 +8,24 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-30
 
-- Begin Preview 19 preparation for macOS ARM64 and Windows x64: draft themed release notes and migration guidance, track exact candidate evidence, align toolchain/scalar qualification with Raven 6ceeb1be8 and repair Rust formatting/Clippy gates and the stale HTTP Serve documentation expectation. Update the native callback excerpt boundary for backtick test names and deduplicate shared manual API pages, preserve Signals reference navigation and add the missing watcher guide entry. Keep watcher atomic updates compatible with Rust 1.85 despite the newer stable deprecation. Align the archived reflection test adapter with the native method signature field. Add extracted Windows package gates for real filesystem notifications and configuration reload. Recognize documented retention diagnostics during JIT sample acceptance: DAM2004 for ordinary, SDK async, header-contract, HTTPS and benchmark samples, and bounded DAM2001 only for HTTP samples supplied explicit reflection roots. Retain stderr and reject other output/errors. Admit the watcher provider’s Windows system dependencies only when that provider is linked. Include native host `.inc` fragments in extracted build kits and build input fingerprints. Update Windows scalar tests for native envelopes and optimized relocation-free scalar bodies; give the Windows debug compiler an 8 MiB worker stack, preserving the optimized entry path. Refresh Windows security fixture GC exports and preserve the Windows console adapter when substituting the watcher ownership harness. Run watcher/editor gates before repeated runtime contracts to expose new failures earlier. Add bounded Windows native UTF-8 file input behind the existing binding, with wide paths, regular-file checks, byte limits and handle closure before managed decoding, enabling configuration reload qualification. Refresh native hosts and default-JIT binding selection together; older Windows bundles require replacement. Qualify watcher and configuration reload through native, interpreter and default JIT on the refreshed macOS candidate, including extracted package and standalone kit checks. Repair relocated GC profiling includes/state hooks, the socket readiness fixture’s submission order and runtime-product watcher workspace inventory. Native network/GC qualification now passes on both target hosts, including Windows file-input contracts; local runtime-product integration also passes. Require matching, manifest-verified candidate inputs for standalone Windows console checks; gate console and HTTPS workflows on successful selected package qualification. Record passing macOS extracted-package, editor, HTTPS, async, header, PostgreSQL and standalone-kit qualification; Windows and performance gates remain pending before publication.
+- Prepare Preview 19 for macOS ARM64 and Windows x64 with Raven `6ceeb1be8`,
+  matching SDK/editor inputs, migration guidance and [exact release-gate evidence](docs/validation/release-preparation-20261030/README.md).
+  Add bounded Windows native UTF-8 file input behind the existing contract, including
+  wide paths, regular-file checks, byte limits and handle closure before decoding.
+  Default JIT selects file-input/watcher bindings; replace older Windows bundles
+  with matching runtime, backend and native hosts. Windows native file output remains unsupported.
+  Repair extracted build-kit `.inc` packaging, watcher provider dependency admission,
+  Windows debug compiler stack capacity, Rust 1.85 compatibility and reflection fixtures.
+  Refresh API/website/editor checks and release harnesses for current metadata,
+  GC state, workspace membership, record semantics, synchronous slice streams and documented JIT retention
+  diagnostics; interpreter controls select their mode explicitly and unexpected errors remain failures. Console/HTTPS checks require
+  a successfully qualified matching package, while development-bootstrap imports remain available.
+  Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
+  checks; native network/GC and runtime-product integration pass on both target hosts.
+  Refreshed macOS five-round workload measurements pass on a loaded development
+  host, without a controlled performance claim. The refreshed Windows package, editor
+  and HTTPS gates pass; updated standalone console fixtures and Windows measurements
+  remain under qualification before publication.
 
 - Support nominal value-type parameter defaults, including CancellationToken = default,
   through native and CLI metadata. Consolidate runtime stream, socket, DNS, TLS and

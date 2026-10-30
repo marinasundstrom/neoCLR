@@ -139,7 +139,7 @@ def main():
         lib = bundle / 'lib'; catalog = json.loads((lib / 'bundle.json').read_text())
         vm = http.build_interpreter(run, windows)
         report['interpreterSha256'] = sha(vm)
-        context = ['--system', lib / catalog['runtimeSeed'], *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))], '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
+        context = ['--execution', 'interpreter', '--system', lib / catalog['runtimeSeed'], *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))], '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
         environment = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
         builds = {}; isolated = {}
         for name, directory, reuse in [('client', 'native-http-client', args.client_build), ('server', 'http-server', args.server_build), ('factories', 'task-factories', None)]:

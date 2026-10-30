@@ -44,6 +44,13 @@
       "sha256": "acd18f46a30739c04d2f4f53c2050f5a65584bc4dbd5ce2b4da227e3c1ccb107",
       "sourceRevision": "6edc02db00a386201a61f1bc95f7ebb9e3892029",
       "note": "Refreshed file-input and default-JIT bindings; replaces earlier candidate for these changed components."
+    },
+    {
+      "path": "/tmp/neoclr-preview19-windows-refreshed/jit-package/neoclr-native-poc.tar.gz",
+      "bytes": 56773096,
+      "sha256": "8062c4805262027d5f12291301d9f0785b6079929098d73e368edffa47b7962d",
+      "sourceRevision": "6edc02db00a386201a61f1bc95f7ebb9e3892029",
+      "qualificationRun": 41121692409
     }
   ]
 }

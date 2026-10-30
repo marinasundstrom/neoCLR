@@ -1,5 +1,13 @@
 # Native Console progression (development, 2026-10-08)
 
+**Release fixture update (2026-10-30):** The standalone input/output consumers now
+use `SyncInputStream.Read(Slice<byte>)` and `SyncOutputStream.Write(ReadOnlySlice<byte>)`.
+Writes return unit after accepting the full range. Empty operations, partial input,
+NUL bytes, flush and closed-stream errors remain checked; invalid view bounds belong
+to the [memory-view contract tests](../../../tests/memory_views.rs), rather than
+removed offset/count overloads. The older API descriptions below are historical.
+See [current release evidence](../../validation/release-preparation-20261030/README.md).
+
 Latest lifetime checkpoint: [basic native GC](native-gc.md) now runs the repeated Raven
 routing workload within a fixed 64 KiB heap. The sections below record the progression;
 diagnostic-only collection restrictions do not describe the explicit `--native-gc` mode.

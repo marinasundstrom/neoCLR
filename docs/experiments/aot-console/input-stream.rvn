@@ -4,17 +4,14 @@ import System.Result.*
 
 func Main() -> int {
     let input = Console.OpenStandardInput()
-    let buffer: byte[] = [(byte)0, (byte)0]
-    let Ok(empty) = input.Read(buffer, 0, 0) else {
+    let buffer = [(byte)0, (byte)0]
+    let Ok(empty) = input.Read(buffer[..0]) else {
         return 1
     }
     if empty != 0 {
         return 2
     }
-    let Failure(_) = input.Read(buffer, -1, 1) else {
-        return 3
-    }
-    let Ok(count) = input.Read(buffer, 1, 1) else {
+    let Ok(count) = input.Read(buffer[1..2]) else {
         return 4
     }
     Console.WriteLine(count)
@@ -24,7 +21,7 @@ func Main() -> int {
         Console.WriteLine("End of input")
     }
     input.Close()
-    let Failure(_) = input.Read(buffer, 0, 1) else {
+    let Failure(_) = input.Read(buffer[..1]) else {
         return 5
     }
     Console.WriteLine("Closed input")

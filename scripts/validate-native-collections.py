@@ -43,7 +43,8 @@ def main():
             raise ValueError('Requires macOS ARM64 or Windows x64')
         report['revision'] = run(['git', 'rev-parse', 'HEAD'], 'revision').stdout.decode().strip()
         samples = [('collections', 'native-collections', 'collections passed\n'),
-                   ('init-accessors', 'init-accessors/native', 'Init accessors passed\n')]
+                   ('init-accessors', 'init-accessors/native', 'Init accessors passed\n'),
+                   ('record-contracts', 'native-collections/record-contracts', 'Record contracts passed\n')]
         samples += [('duplicate-' + name, 'native-collections/duplicate-' + name, None)
                     for name in ('constructor', 'pairs', 'selectors')]
         inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py',

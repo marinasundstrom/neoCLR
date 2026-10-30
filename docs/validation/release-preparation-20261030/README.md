@@ -27,15 +27,15 @@ historical evidence only.
 
 | Gate | Current evidence / remaining work |
 | --- | --- |
-| Source archive | Canonical source CI passes on c1b817ce6 and bb631c0e8 after the repairs below; initial local failures remain preserved. |
+| Source archive | Full canonical validation, strict Clippy, host boundaries and all minimum-Rust jobs pass on 8595dea1f (run 41123751866). Later fixture-only deltas have focused checks below; initial failures remain preserved. |
 | Format / strict Clippy | Formatting repaired; needless test borrows repaired after Clippy diagnostics. Strict Clippy and formatting now pass; seven lookup tests pass. |
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar controls, seven HTTP readiness/diagnostic controls, bundle diagnostic control and async diagnostic control pass. |
 | macOS SDK | Matching SDK/VSIX and all 14 libraries built. Extracted default-JIT/HTTP package, watcher/reload, async (24), headers (132), PostgreSQL and standalone build-kit checks pass. |
-| Windows | Scalar, HTTPS, security and watcher checks pass on the revisions documented below. Configuration reload exposes a missing native file-input binding; a bounded implementation now awaits a freshly rebuilt package and target-host checks. Editor acceptance remains open. |
+| Windows | Fresh package run 41121692409 passes all extracted-package, editor, watcher/reload and SDK contracts on 6edc02db0. Matching HTTPS passes 27 cases. Standalone console fixtures are updated for current stream APIs and await their rerun. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
-| Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows acceptance remains open. |
-| Performance | Five-round macOS stages pass as loaded-host qualification only (see stage index below). Windows measurements await a passing package. No controlled performance gain is claimed. |
+| Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows editor acceptance, inlays and two recovery runs pass; matching HTTPS passes 27 cases. |
+| Performance | Five-round macOS stages pass as loaded-host qualification only (see stage index below). Windows measurements are running against the successful matching package. No controlled performance gain is claimed. |
 | Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. Candidate archive/VSIX hashes are recorded; published asset identities remain unset. |
 | Publication | No tag, GitHub release, upload or website deployment. Publication date unset. |
 
@@ -395,3 +395,83 @@ the clean-source counterpart.
 
 Fresh fetches confirm neoCLR main, Raven codex/neoclr and separate Raven main are
 all 0 ahead/0 behind their upstreams. No Raven branch merge was performed.
+
+
+## Refreshed measurements and record-test repair
+
+The [five-round aggregate](macos-refreshed-release-benchmarks.json.gz) passes against
+the refreshed macOS archive (candidate3), with separate
+[execution](macos-refreshed-execution.json.gz),
+[longer native CPU](macos-refreshed-cpu-native.json.gz),
+[plain HTTP](macos-refreshed-http-plain.json.gz) and
+[JSON HTTP](macos-refreshed-http-json.json.gz) receipts. All bundle hashes remain
+unchanged throughout measurement. Unrelated Aspire, browser and VM activity remained
+active; host load was substantial. These establish workload qualification only,
+not an isolated regression comparison or throughput improvement. Further local
+compiler/test builds were deferred until this run completed. Source-status records
+include unrelated fixture/evidence edits; no benchmark or candidate binary was changed.
+
+[Windows scalar run 41121685230](https://github.com/marinasundstrom/neoCLR/actions/runs/41121685230)
+passes the [updated suite](windows-scalar-file-input.json.gz), including the explicit
+file-input binding control. Hosted runtime-product qualification passes both
+[macOS](macos-runtime-product-hosted.json.gz) and
+[Windows](windows-runtime-product-hosted.json.gz) on `40fbef816`.
+
+The collections workflow [fails an obsolete rejection](windows-collections-stale-rejection.log.gz):
+generated record equality, reference records and mutable positional components
+were already integrated. Replace those exclusions with an executable consumer
+covering equal/unequal values, reference-record equality and mutable-value copying.
+[Native/interpreter/JIT execution and the remaining read-only-property rejection](macos-record-contracts.json.gz)
+pass with the matching candidate; [build provenance](macos-record-contracts-build.json.gz)
+identifies source and binaries. Windows console-package qualification includes the
+same consumer; its target-host result remains required. Historical evidence is unchanged.
+
+The standalone console validator still requires explicit matching package input.
+Its old bootstrap constants remain available solely for existing development
+validators that rebuild compiler/libraries from source; preserving those imports
+avoids breaking their separate bootstrap path.
+
+
+The refreshed PostgreSQL package check passes mapper contracts and live JIT/interpreter
+queries in its [initial receipt](macos-postgresql-refreshed-initial.json.gz). Its AOT
+link selects the incompatible installed macOS 27 SDK and fails before execution.
+A [focused SDK 26.5 continuation](macos-postgresql-refreshed-aot.json.gz) verifies all
+unchanged input hashes, relinks the already emitted object and passes the live AOT
+consumer. The original failure remains unchanged. Unchanged hostile-wire cases reuse
+the earlier recorded coverage. The disposable PostgreSQL container was stopped/removed.
+
+Windows [package run 41121692409](https://github.com/marinasundstrom/neoCLR/actions/runs/41121692409)
+now passes all required package, three-mode watcher/reload, installed-editor and
+SDK runtime gates. Its exact source remains `6edc02db0`; later changes are validation
+and evidence updates. Dependent HTTPS, standalone console and benchmark workflows
+consume that successful archive.
+
+
+Canonical [source CI 41123751866](https://github.com/marinasundstrom/neoCLR/actions/runs/41123751866)
+passes all jobs on `8595dea1f46da4c3cd95974d418d7e1ad2e697a1`, including strict
+Clippy, full source validation, both host boundaries and all three Rust 1.85 checks.
+
+The refreshed Windows archive verifies [2,585 files and extracted samples](windows-refreshed-package.json.gz).
+Retained package receipts pass [GC](windows-refreshed-gc.json.gz),
+[watcher](windows-refreshed-watcher.json.gz), [reload](windows-refreshed-reload.json.gz),
+[24 async cases](windows-refreshed-await.json.gz), [JSON](windows-refreshed-json.json.gz),
+[132 headers](windows-refreshed-headers.json.gz), [26 editor checks](windows-refreshed-editor.json.gz),
+[inlays](windows-refreshed-inlays.json.gz) and two configuration-recovery runs
+([first](windows-refreshed-config-1.json.gz), [second](windows-refreshed-config-2.json.gz)).
+Matching [HTTPS project qualification](windows-refreshed-https-project.json.gz) and
+[27 protocol cases](windows-refreshed-https-protocol.json.gz) pass on
+[41123260046](https://github.com/marinasundstrom/neoCLR/actions/runs/41123260046).
+
+The independent HTTP-client [failure](windows-http-client-mode-failure.log.gz)
+selected default JIT while requesting interpreter limits. Its shared interpreter
+arguments now explicitly select that mode; the retained Windows-built task-factory
+consumer [passes the focused interpreter check](macos-http-client-mode-fixed.json.gz).
+
+The matching standalone console [failure](windows-console-stream-fixture-failure.log.gz)
+is an obsolete source fixture calling removed synchronous offset/count overloads.
+Input/output fixtures now use borrowed slices and unit-valued full writes. Empty
+operations, partial input, NUL output, flush and closure failures remain covered;
+invalid view bounds retain their existing memory-view test coverage.
+[All six native/interpreter/JIT cases pass locally](macos-console-streams-current.json.gz),
+with [input](macos-console-input-build.json.gz) and [output](macos-console-output-build.json.gz)
+build provenance. Windows target execution of these repaired fixtures remains required.
