@@ -341,3 +341,27 @@ identities remain open before publication.
 [Archive/extract default-JIT acceptance](macos-package-file-input.json.gz) passes
 2,590 manifest files, 12 commands and the HTTP/JSON exchange on the refreshed macOS
 candidate. No tag, release upload or website deployment has been performed.
+
+
+## Target-host reader and validation harness follow-up
+
+[Windows GC/native-input contracts](windows-file-input-gc.json.gz) pass in
+[41121685095](https://github.com/marinasundstrom/neoCLR/actions/runs/41121685095),
+including the new Unicode, strict decoding, limits, sharing-denial, device rejection
+and repeated handle-cleanup fixture. The workflow nevertheless fails its separate
+[relocation test](native-network-qualification-failure.log.gz): copied collector
+sources need the canonical GC include directory. Diagnostic instrumentation also
+still names pre-consolidation GC fields. The helper now supplies that include path,
+uses the current stack boundary and reads allocation counts through the existing
+statistics accessor. [Local relocated/instrumented builds pass](macos-gc-layout-fixed.log.gz).
+
+The macOS network receipt fails a synthetic runnable with order zero. Real queue
+entries have nonzero submission order; the fixture now uses order one, retaining
+the assertion that ready work must not wait. [Focused sanitized execution passes](macos-readiness-fixed.log.gz).
+Runtime-product qualification stopped at an outdated workspace inventory; its
+explicit expected set and input hashes now include the watcher provider. These
+repairs change harnesses, not candidate runtime behavior.
+
+The independent Windows console-project workflow still downloads Preview 13 and
+fails native metadata admission when paired with the current backend. It does not
+qualify the Preview 19 candidate; a matching-package rerun remains required.

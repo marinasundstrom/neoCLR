@@ -29,10 +29,11 @@ class NativeGcLayoutTests(unittest.TestCase):
                 cc = ['cl', '/nologo', '/W4', '/WX', '/O2', '/std:c11', '/experimental:c11atomics', '/MT', '/DNEOCLR_NATIVE_GC', '/I' + str(base)]
             else:
                 cc = ['clang', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-I', str(base)]
+            cc.append(('/I' if windows else '-I') + str(canonical.parent))
             # Profilers copy and instrument the canonical text outside its directory.
             copied = root / 'profile-collector.c'
-            copied.write_text(canonical.read_text().replace('    statistics.allocations++;',
-                '    statistics.allocations += 1;'))
+            copied.write_text(canonical.read_text().replace('    gc_state.statistics.allocations++;',
+                '    gc_state.statistics.allocations += 1;', 1))
             for name, source in [('compatibility', base / 'native-gc.c'), ('canonical', canonical), ('profile', copied)]:
                 binary = root / (name + ('.exe' if windows else ''))
                 probe = base / 'root-probe.c' if name == 'compatibility' else root / 'runtime/native/gc/root-probe.c'
@@ -78,6 +79,7 @@ class NativeGcLayoutTests(unittest.TestCase):
             phases = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(phases)
             command, _ = phases.instrument(root, root, [str(base / 'native-gc.c'), str(base / 'root-probe.c')])
+            self.assertIn(('/I' if windows else '-I') + str(canonical.parent), command)
             for source in command[:2]:
                 output = root / (Path(source).stem + ('.obj' if windows else '.o'))
                 flags = ['/c', '/Fo' + str(output)] if windows else ['-c', '-o', str(output)]

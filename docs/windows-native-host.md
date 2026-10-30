@@ -311,5 +311,6 @@ The C contract fixture checks multibyte/non-BMP names, BOM/NUL/CRLF preservation
 empty/exact/oversized input, invalid UTF-8, invalid/missing/directory paths,
 allocation failure and cleanup. Windows adds device/sharing errors and handle-count
 checks. COFF admission and real reload consumers provide independent coverage.
-Target execution is tracked in the [release record](validation/release-preparation-20261030/README.md);
+The Windows C fixture now passes, including device/sharing errors and handle-count checks.
+Package-level execution is tracked in the [release record](validation/release-preparation-20261030/README.md);
 implementation alone does not qualify the refreshed Windows package.

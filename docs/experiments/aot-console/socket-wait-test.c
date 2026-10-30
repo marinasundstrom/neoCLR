@@ -53,7 +53,7 @@ int main(void) {
     scope.scheduler_delivery = 99;
     neoclr_scheduler_wait_v1(&c); assert(observed == 5);
     scope.scheduler_delivery = 0;
-    neoclr_runnable queued = {0}; scope.runnable_head = &queued;
+    neoclr_runnable queued = {.order = 1}; scope.runnable_head = &queued;
     neoclr_scheduler_wait_v1(&c); assert(observed == 5);
     scope.runnable_head = NULL;
     memset(&scope.operations[0], 0, sizeof(scope.operations[0]));

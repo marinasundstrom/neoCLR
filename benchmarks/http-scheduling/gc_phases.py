@@ -1,5 +1,6 @@
 """Inject exact phase hooks into diagnostic copies; fail closed on source drift."""
 from pathlib import Path
+import os
 
 def replace_once(source, old, new):
     if source.count(old) != 1:
@@ -13,7 +14,7 @@ def instrument(root, out, command):
     text = (root/'runtime/native/gc/native-gc.c').read_text()
     text = '#include <stdint.h>\nextern void neoclr_gc_phase_begin(uint64_t);\nextern void neoclr_gc_phase_next(unsigned);\nextern void neoclr_gc_phase_end(int32_t);\n' + text
     hook = '    int32_t status = collect_conditional(context, head, conditional, count);'
-    text = replace_once(text, hook, '    neoclr_gc_phase_begin(statistics.allocations);\n'+hook+'\n    neoclr_gc_phase_end(status);')
+    text = replace_once(text, hook, '    neoclr_gc_phase_begin(neoclr_gc_statistics_v1().allocations);\n'+hook+'\n    neoclr_gc_phase_end(status);')
     for phase, marker in enumerate(['    neoclr_probe_storage fault[65];',
         '    /* Each newly marked reference-bearing allocation enters the worklist once.',
         '    for (neoclr_gc_resource **link = &resource_head; *link;) {',
@@ -23,7 +24,7 @@ def instrument(root, out, command):
     gc_copy.write_text(text)
     text = (root/'runtime/native/gc/root-probe.c').read_text()
     text = '#include <stdint.h>\nextern uint64_t neoclr_schedule_profile_now(void);\nextern void neoclr_gc_boundary_end(uint64_t);\n' + text
-    marker = '    if (!frame || head != frame || instruction >= 8192'
+    marker = '    if (!frame || state->roots.head != frame || instruction >= 8192'
     text = replace_once(text, marker, '    uint64_t phase_start = neoclr_schedule_profile_now();\n'+marker)
     marker = '    /* Complete snapshot: audited allocating helpers additionally protect their temporaries. */'
     text = replace_once(text, marker, '    neoclr_gc_boundary_end(phase_start);\n'+marker)
@@ -31,5 +32,7 @@ def instrument(root, out, command):
     probe_copy.write_text(text)
     command = [str(gc_copy) if v == str(collector) else str(probe_copy) if v == str(probe) else v for v in command]
     support = Path(__file__).with_name('gc-phases.c').resolve()
+    # Copies retain canonical sibling header/fragment dependencies.
+    command.append(('/I' if os.name == 'nt' else '-I') + str(root/'runtime/native/gc'))
     command.append(str(support))
-    return command, [*sorted((root/'runtime/native').rglob('*.[ch]')), gc_copy, probe_copy, support, Path(__file__).resolve()]
+    return command, [*sorted(p for p in (root/'runtime/native').rglob('*') if p.suffix in ('.c', '.h', '.inc')), gc_copy, probe_copy, support, Path(__file__).resolve()]

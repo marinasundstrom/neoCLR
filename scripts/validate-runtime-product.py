@@ -35,12 +35,13 @@ def main():
         report['revision'] = run('revision', ['git', 'rev-parse', 'HEAD']).decode().strip()
         metadata = json.loads(run('workspace', ['cargo', 'metadata', '--locked', '--format-version', '1', '--no-deps']))
         members = {p['name'] for p in metadata['packages'] if p['id'] in metadata['workspace_members']}
-        if members != {'neoclr', 'neoclr-codegen', 'neoclr-native-tls', 'neoclr-security-provider'}:
+        if members != {'neoclr', 'neoclr-codegen', 'neoclr-native-tls', 'neoclr-security-provider', 'neoclr-filewatch-provider'}:
             raise RuntimeError('Unexpected runtime workspace membership')
         report['members'] = sorted(members)
         report['inputs'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
                             for p in [ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', Path(__file__).resolve(),
-                                      ROOT / 'runtime/codegen/Cargo.toml', ROOT / 'tools/native-tls/Cargo.toml']}
+                                      ROOT / 'runtime/codegen/Cargo.toml', ROOT / 'tools/native-tls/Cargo.toml',
+                                      ROOT / 'tools/security-provider/Cargo.toml', ROOT / 'tools/filewatch-provider/Cargo.toml']}
         spec = importlib.util.spec_from_file_location('release_audit', ROOT / 'scripts/validate-release.py')
         release = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(release)
