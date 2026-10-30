@@ -1,0 +1,11 @@
+module NeoClr.RuntimeTests.EntryPoints
+import System.*
+import System.Result.*
+
+func Main(args: string[]) -> Result<int, string | int> {
+    if args.Length > 0 {
+        if args[0] == "text" { return Failure("scalar union failure") }
+        return Failure(42)
+    }
+    return Ok(8)
+}

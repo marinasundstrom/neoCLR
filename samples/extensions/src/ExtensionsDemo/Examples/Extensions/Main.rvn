@@ -11,7 +11,8 @@ import Neo.Localization.*
 import Neo.Logging.*
 import Neo.Configuration.*
 
-async func Run(watch: bool) -> Task<Result<(), ServiceError>> {
+async func Main(args: string[]) -> Task<Result<(), ServiceError>> {
+    let watch = args.Length > 0 && args[0] == "--watch"
     let builder: ConfigurationBuilder = DefaultConfigurationBuilder()
     _ = builder.AddJsonFile("appsettings.json", reloadOnChange: watch)
     use configuration = builder.Build()
@@ -42,13 +43,4 @@ async func Run(watch: bool) -> Task<Result<(), ServiceError>> {
         }
     }
     return Ok(())
-}
-
-async func Main(args: string[]) -> Task<int> {
-    let watch = args.Length > 0 && args[0] == "--watch"
-    let Ok(_) = await Run(watch) else {
-        Console.WriteLine("Could not compose the extension services.")
-        return 1
-    }
-    return 0
 }

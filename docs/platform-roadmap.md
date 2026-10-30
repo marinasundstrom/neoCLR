@@ -7341,3 +7341,8 @@ qualified in the [Configuration reload receipt](validation/configuration-reload-
 This bounded author request does not reorder the roadmap. Runtime overload review
 and arbitrary value-type defaults, including CancellationToken = default, are the
 next requested slice and remain open.
+
+The related native Result entrypoint gap is now closed, including concrete structural
+error alternatives, without widening whole-union boxing or bare-generic composition
+metadata. The integrated reload sample returns its Result directly from Main; see
+[entrypoint qualification](validation/result-entrypoints-20261030/README.md).

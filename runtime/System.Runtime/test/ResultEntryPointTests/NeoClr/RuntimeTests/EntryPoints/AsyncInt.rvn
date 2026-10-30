@@ -1,0 +1,13 @@
+module NeoClr.RuntimeTests.EntryPoints
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+async func Main(args: string[]) -> Task<Result<int, string?>> {
+    await Task.CompletedTask
+    if args.Length > 0 {
+        if args[0] == "null" { return Failure(null) }
+        return Failure("async int failure")
+    }
+    return Ok(7)
+}

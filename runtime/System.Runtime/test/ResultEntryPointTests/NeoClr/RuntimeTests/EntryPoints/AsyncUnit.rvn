@@ -1,0 +1,22 @@
+module NeoClr.RuntimeTests.EntryPoints
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Diagnostics.*
+import System.Optional.*
+
+class AppError : Error {
+    val Message: string => "interface failure"
+    val Cause: Optional<Error> => None
+    val StackTrace: Optional<StackTrace> => None
+    override func ToString() -> string => Message
+}
+func Read(fail: bool) -> Result<(), AppError> {
+    if fail { return Failure(AppError()) }
+    return Ok(())
+}
+async func Main(args: string[]) -> Task<Result<(), Error>> {
+    await Task.CompletedTask
+    _ = Read(args.Length > 0)?
+    return Ok(())
+}

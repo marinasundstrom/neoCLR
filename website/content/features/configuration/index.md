@@ -77,3 +77,6 @@ deleting one clears its values. Keep the app's asynchronous event loop running.
 Try the [integrated DI sample](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md)
 with `--watch`; it reads the greeting name repeatedly for 30 seconds.
 See the [complete reload contract](/docs/configuration.html#automatic-reload).
+
+The sample returns `Task<Result<(), ServiceError>>` from Main, so service failures
+propagate with `?`. See [entry-point results and exit codes](../error-handling/#return-an-outcome-from-main).

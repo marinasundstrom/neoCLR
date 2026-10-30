@@ -1,0 +1,24 @@
+{
+  "compilerRevision": "1a759015fbf9d8058e3eeda1462a5c1e9da40781",
+  "sources": {
+    "Raven/src/Raven.CodeAnalysis.NeoClr/Int32Emitter.cs": "697ec497498af65e4a0e150ce2e3c3041881854fd38528c80aa57a5ce109b421",
+    "Raven/src/Raven.CodeAnalysis.NeoClr/NeoClrCompilationEmitter.cs": "6f37666a050f631b28c3b6cca337e46f33305c0d8de0ef7b742c816eb5d8228c",
+    "Raven/src/Raven.CodeAnalysis.NeoClr/NeoClrEntryPoint.cs": "d136f34fbe2886fdc856bb30abddfcc8db087bd3c8766875861505da2a4c0fdf",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/PlatformUnion.rvn": "dd86457d43874cd8ae03175cad15b397caaf7553fb100248d821aa977a46117d",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/SyncUnit.rvn": "17030e8fd5efbdc9400fedfce01259edbe0f399ef02f60c11a74250e73fe9bf0",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/ScalarUnion.rvn": "4550a5aa298bf7769cd2b96696f223211ff2ca8cc8c51493075fa5101ef7c381",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/SyncUnion.rvn": "1ff54fcaf5f6c8ee142ef6c24e922c2d43e4dfba6ef36f7932d3e4b10a8fe98e",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/AsyncUnit.rvn": "100ee19fa38d0e8dac2b83a7b9995bab3ffbaede4a8cfcccee8b80c1feb6f965",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/AsyncInt.rvn": "09c0422e9b3c00f1979102f1f3621f2205a11e23207ca960dce155b3a470fcc7",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/AsyncUnion.rvn": "c72596670ad9cfcce696b0bc90a3dec6c4b1cfdcebe8c0b89a30c5a6a23268b5",
+    "runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints/SyncInt.rvn": "c8905c0244ae6bbc1a7a5f22f5aa187c1e8d66833d55d82d9264ab169f1d3216",
+    "scripts/validate-result-entrypoints.py": "869f1e314faac5296f34caa1377f373e1c8ed268aa5c9dab0d744bb3bf660ca4"
+  },
+  "artifacts": {
+    "target/result-entry-20261030/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "8e02f7bf6cd7d800a816c42d5c15edaeddc7cfd81658595185e0a879ac52d6dd",
+    "target/result-entry-20261030/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2165115682eabef11da75a748e680b68d6cc166ba6284515779ec63d7a7d2728",
+    "target/default-arguments/rust-target/debug/neoclr": "98c494185465889648cece4a8a3aadcae558567a12db94932efb4fdedb90d424",
+    "target/default-arguments/rust-target/debug/neoclr-codegen": "d9cb3acb464d9f8092a98490b9a393393c1b88f4d5c0b6f7b171443b8b45fa73",
+    "target/result-entry-20261030/bundle/lib/System.Runtime.dll": "f8a230acc8df88a1f20ad8005fe0cdb923b914c3e6367209d799ad44d5b036ec"
+  }
+}

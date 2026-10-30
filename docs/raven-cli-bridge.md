@@ -16268,3 +16268,16 @@ Configuration reload qualification additionally exposed duplicated closed type-
 assignability tests exceeding the native generated-method bound. Codegen now shares
 identical relationship target sets; the 8,192-instruction bound and semantic answers
 are unchanged. See [the focused receipt](validation/configuration-reload-20261030/README.md).
+
+## Native Result entry points (2026-10-30)
+
+The native target now adapts sync/async Result<int, E> and Result<(), E> Main
+returns to process statuses and stderr. This closes a native emitter gap relative
+to Raven's existing CLI entry adaptation. No Runtime Contract option or metadata
+encoding is added. Ordinary Result extraction, alternative type tests, generic
+payload formatting and Console.Error implement the policy; whole-union Object
+boxing remains separate. Async entry still drains registered runtime work before
+GetResult. Error conversions and Error-interface propagation remain ordinary
+language binding. Raven owns generation; neoCLR executes existing instructions.
+See [the contract and qualification](native-result-entrypoints.md) for supported
+forms, output semantics, branch scope and platform evidence.

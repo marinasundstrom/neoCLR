@@ -1,0 +1,258 @@
+{
+  "passed": true,
+  "count": 42,
+  "cases": {
+    "AsyncInt/native/success": {
+      "exitCode": 7,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-2"
+    },
+    "AsyncInt/native/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "async int failure\n",
+      "run": "verification-2"
+    },
+    "AsyncInt/native/null": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "\n",
+      "run": "verification-2"
+    },
+    "AsyncInt/interpreter/success": {
+      "exitCode": 7,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-2"
+    },
+    "AsyncInt/interpreter/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "async int failure\n",
+      "run": "verification-2"
+    },
+    "AsyncInt/interpreter/null": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "\n",
+      "run": "verification-2"
+    },
+    "AsyncUnit/native/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-2"
+    },
+    "AsyncUnit/native/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "interface failure\n",
+      "run": "verification-2"
+    },
+    "AsyncUnit/interpreter/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-2"
+    },
+    "AsyncUnit/interpreter/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "interface failure\n",
+      "run": "verification-2"
+    },
+    "AsyncUnion/native/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-5"
+    },
+    "AsyncUnion/native/first": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "first union failure\n",
+      "run": "verification-5"
+    },
+    "AsyncUnion/native/second": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "second union failure\n",
+      "run": "verification-5"
+    },
+    "AsyncUnion/interpreter/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-5"
+    },
+    "AsyncUnion/interpreter/first": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "first union failure\n",
+      "run": "verification-5"
+    },
+    "AsyncUnion/interpreter/second": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "second union failure\n",
+      "run": "verification-5"
+    },
+    "SyncUnion/native/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-5"
+    },
+    "SyncUnion/native/first": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "first union failure\n",
+      "run": "verification-5"
+    },
+    "SyncUnion/native/second": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "second union failure\n",
+      "run": "verification-5"
+    },
+    "SyncUnion/interpreter/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-5"
+    },
+    "SyncUnion/interpreter/first": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "first union failure\n",
+      "run": "verification-5"
+    },
+    "SyncUnion/interpreter/second": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "second union failure\n",
+      "run": "verification-5"
+    },
+    "PlatformUnion/native/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "PlatformUnion/native/file": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "NotFound\n",
+      "run": "verification-6"
+    },
+    "PlatformUnion/native/number": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "NumberParseError.InvalidFormat\n",
+      "run": "verification-6"
+    },
+    "PlatformUnion/interpreter/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "PlatformUnion/interpreter/file": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "NotFound\n",
+      "run": "verification-6"
+    },
+    "PlatformUnion/interpreter/number": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "NumberParseError.InvalidFormat\n",
+      "run": "verification-6"
+    },
+    "ScalarUnion/native/success": {
+      "exitCode": 8,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "ScalarUnion/native/text": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "scalar union failure\n",
+      "run": "verification-6"
+    },
+    "ScalarUnion/native/number": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "42\n",
+      "run": "verification-6"
+    },
+    "ScalarUnion/interpreter/success": {
+      "exitCode": 8,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "ScalarUnion/interpreter/text": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "scalar union failure\n",
+      "run": "verification-6"
+    },
+    "ScalarUnion/interpreter/number": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "42\n",
+      "run": "verification-6"
+    },
+    "SyncUnit/native/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "SyncUnit/native/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "sync unit failure\n",
+      "run": "verification-6"
+    },
+    "SyncUnit/interpreter/success": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "SyncUnit/interpreter/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "sync unit failure\n",
+      "run": "verification-6"
+    },
+    "SyncInt/native/success": {
+      "exitCode": 9,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "SyncInt/native/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "converted failure\n",
+      "run": "verification-6"
+    },
+    "SyncInt/interpreter/success": {
+      "exitCode": 9,
+      "stdout": "",
+      "stderr": "",
+      "run": "verification-6"
+    },
+    "SyncInt/interpreter/fail": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "converted failure\n",
+      "run": "verification-6"
+    }
+  }
+}

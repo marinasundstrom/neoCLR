@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>ResultEntryPointTests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NeoClrEntryFixture Condition="'$(NeoClrEntryFixture)' == ''">AsyncInt</NeoClrEntryFixture>
+  </PropertyGroup>
+  <ItemGroup><Compile Include="NeoClr/RuntimeTests/EntryPoints/$(NeoClrEntryFixture).rvn" /></ItemGroup>
+</Project>

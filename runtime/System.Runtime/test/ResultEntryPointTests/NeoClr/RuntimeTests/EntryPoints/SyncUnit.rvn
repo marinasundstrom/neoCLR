@@ -1,0 +1,9 @@
+module NeoClr.RuntimeTests.EntryPoints
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+func Main(args: string[]) -> Result<(), string> {
+    if args.Length > 0 { return Failure("sync unit failure") }
+    return Ok(())
+}

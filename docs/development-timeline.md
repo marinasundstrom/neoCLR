@@ -23887,3 +23887,26 @@ Evidence: [design and implemented profile](design/generic-function-methods.md),
   **Assistant action:** recorded Console input as a concrete caller-selected terminal
   policy in the conventions, retaining recoverable API errors and separate EOF
   handling. Current Write/WriteLine return directly; no Console API was changed.
+
+## 2026-10-30 — Result entry points and structural error alternatives
+
+- **Author correction:** the asynchronous configuration test should return
+  Task<Result<(), TestFailure>>; Main can also return Result, with ordinary error
+  conversions or an Error interface. The author asked to fix the native gap,
+  commit slices separately and document entry points on the website.
+- **Assistant action:** committed configuration reload and scalar parameter defaults
+  separately, then implemented native process adaptation for synchronous and
+  asynchronous Result Main. The integrated sample now propagates ServiceError
+  directly instead of manually translating it to an integer.
+- **Author question:** presumed that Result<(), T1 | T2> also works.
+  **Investigation:** generic formatting exposed unsupported whole-union boxing;
+  an open generic union helper also crossed the existing metadata boundary.
+  The entry adapter instead extracts the residual, tests its concrete alternatives
+  and formats the selected payload with the ordinary generic formatter. This does
+  not expand general whole-union boxing or open-composition metadata support.
+- **Evidence:** [entry contract and process fixtures](native-result-entrypoints.md)
+  and [dated qualification](validation/result-entrypoints-20261030/README.md).
+  The website describes the development entry forms and failure policy.
+- **Author next direction:** introduce default arguments where appropriate to remove
+  redundant runtime overloads, after this entrypoint slice. Runtime overload cleanup
+  remains a separate commit; computed defaults require separate consideration.

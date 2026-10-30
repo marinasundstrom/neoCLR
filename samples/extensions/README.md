@@ -94,3 +94,7 @@ once and does not start a watcher. Localization:Directory is a startup setting.
 The sample disposes its service scope/container before the borrowed configuration
 root; root disposal stops automatic reload. Background failures preserve valid data
 and can be inspected through JsonConfigurationProvider.LastReloadError.
+
+The entry point returns `Task<Result<(), ServiceError>>` directly. DI failures
+propagate with `?`; the native process adapter writes the error to stderr and exits
+one. Successful completion exits zero. See [Result entry points](../../docs/native-result-entrypoints.md).

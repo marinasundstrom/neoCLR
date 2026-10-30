@@ -1,0 +1,19 @@
+module NeoClr.RuntimeTests.EntryPoints
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+class FirstError {
+    override func ToString() -> string => "first union failure"
+}
+class SecondError {
+    override func ToString() -> string => "second union failure"
+}
+
+func Main(args: string[]) -> Result<(), FirstError | SecondError> {
+    if args.Length > 0 {
+        if args[0] == "first" { return Failure(FirstError()) }
+        return Failure(SecondError())
+    }
+    return Ok(())
+}

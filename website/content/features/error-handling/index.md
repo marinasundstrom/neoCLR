@@ -72,6 +72,69 @@ NumberParseError and handles that type's cases. Ad-hoc unions are useful for
 composition; a named domain union can give a public API a more stable contract
 that is independent of lower-level implementation choices.
 
+## Return an outcome from Main
+
+**Development:** a Raven program can return Result directly from its entry point,
+including after asynchronous work. Main is static and nongeneric, with either no
+parameters or one `string[]` parameter. Exactly one matching Main is required.
+
+| Main return type | Successful process exit |
+| --- | --- |
+| `()` or `Task<()>` | `0` after completion. |
+| `int` or `Task<int>` | The returned integer. |
+| `Result<(), E>` or `Task<Result<(), E>>` | `Ok(())` becomes `0`. |
+| `Result<int, E>` or `Task<Result<int, E>>` | `Ok(code)` supplies the exit code. |
+
+For each Result form, `Failure(error)` writes the error's normal `ToString()` display
+and a newline to **standard error**, then exits with code `1`. A null error writes
+an empty line. Normal console output remains on standard output. The operating
+system's usual exit-code range/truncation rules still apply.
+
+This complete, tested entry point needs no manual conversion to an exit code:
+
+```raven
+module NeoClr.RuntimeTests.EntryPoints
+
+import System.*
+import System.Result.*
+
+func Main(args: string[]) -> Result<(), string> {
+    if args.Length > 0 { return Failure("sync unit failure") }
+    return Ok(())
+}
+```
+
+The [integrated configuration sample](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/src/ExtensionsDemo/Examples/Extensions/Main.rvn)
+uses `async func Main(args: string[]) -> Task<Result<(), ServiceError>>`. It uses `?`
+when composing DI services, then awaits configuration observations in `--watch` mode.
+The native entry adapter drives the existing task queue and host operations before
+observing completion; application code should use `await`. A function returning a
+Task directly follows the same startup rules. neoCLR spells the unit task `Task<()>`
+(or `Task<unit>`); there is no separate nongeneric .NET Task class.
+
+`E` follows Raven's ordinary error-conversion rules. A user-defined implicit
+conversion can translate a lower-level error into the outward error type, and an
+error implementing `System.Error` can propagate to `Result<T, Error>`. Neither an
+interface nor a converter is required when the existing error type already matches.
+These conversions preserve normal `?` semantics; they do not change the exit-code
+mapping. Implement `ToString()` for a useful entry-boundary display, or explicitly
+format structured diagnostics before returning a string error. Implementing Error
+alone does not automatically print its cause chain or capture a stack trace.
+
+Structural error unions work too: `Result<(), FirstError | SecondError>` (and
+its Task form) preserves either error alternative. The process adapter prints the
+active error's normal display. The same rule applies to `Result<int, string | int>`;
+see the [tested union entries](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/System.Runtime/test/ResultEntryPointTests/NeoClr/RuntimeTests/EntryPoints).
+This does not imply general-purpose boxing of a whole structural union as Object.
+
+Result failures are recoverable application outcomes. Cancellation, a task that
+remains incomplete after registered work drains, and terminal runtime faults still
+follow their existing fault behavior. The entry adapter does not add exception
+catching or drive application-owned private queues.
+
+[Executable entry-point fixtures](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/System.Runtime/test/ResultEntryPointTests) ·
+[Native entry-point contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-result-entrypoints.md)
+
 ## Optional diagnostic conventions
 
 Once the error contract is chosen, authors may add a common diagnostic view.

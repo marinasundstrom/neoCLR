@@ -1,0 +1,20 @@
+module NeoClr.RuntimeTests.EntryPoints
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+class ParseError {}
+class AppError {
+    override func ToString() -> string => "converted failure"
+}
+extension ErrorConversion for ParseError {
+    static func implicit(error: ParseError) -> AppError => AppError()
+}
+func Read(fail: bool) -> Result<int, ParseError> {
+    if fail { return Failure(ParseError()) }
+    return Ok(9)
+}
+func Main(args: string[]) -> Result<int, AppError> {
+    let value = Read(args.Length > 0)?
+    return Ok(value)
+}
