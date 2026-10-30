@@ -7,7 +7,7 @@ from pathlib import Path
 import platform
 import statistics
 
-from process import Guest
+from process import Guest, RETENTION_WARNING
 from configuration import resolve, MEASUREMENTS
 
 
@@ -15,17 +15,17 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def sample(command, operations, timeout=120):
+def sample(command, operations, timeout=120, mode=None):
     guest = Guest(command, timeout=timeout)
     try:
         _, ready = guest.line(b'NEOBENCH/1 READY')
         _, begin = guest.line(b'NEOBENCH/1 BEGIN')
         _, end = guest.line(b'NEOBENCH/1 END')
         guest.line(str(operations).encode())
-        guest.finish()
+        stderr = guest.finish(allowed_stderr=(b'', RETENTION_WARNING) if mode == 'jit' else (b'',))
         if len(guest.output) != 4 or end <= begin:
             raise RuntimeError('Invalid worker output or nonpositive batch duration')
-        return dict(startupSeconds=ready-guest.started, warmupSeconds=begin-ready,
+        return dict(stderr=stderr.decode(), startupSeconds=ready-guest.started, warmupSeconds=begin-ready,
                     batchSeconds=end-begin, operations=operations,
                     operationsPerSecond=operations/(end-begin))
     finally:
@@ -79,7 +79,7 @@ def run(manifest, output, rounds=None, warmups=None, operations=None, selected=N
                     command = [*config['commands'][mode], *([] if mode == 'aot' else ['--']),
                                case, str(warmups), str(operations)]
                     report["currentJob"] = dict(case=case, mode=mode, round=index, command=command)
-                    value = sample(command, operations, timeout=effective['timeout'])
+                    value = sample(command, operations, timeout=effective['timeout'], mode=mode)
                     value.update(case=case, mode=mode, round=index)
                     report['samples'].append(value)
                     print(f'{case} {mode} round {index}: {value[metric]:.6f} {unit}', flush=True)

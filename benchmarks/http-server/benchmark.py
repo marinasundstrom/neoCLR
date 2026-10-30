@@ -24,7 +24,7 @@ sha = workbench.sha
 from host import target, cpu_description, load_average, process_snapshot
 
 
-def server_sample(command, workload):
+def server_sample(command, workload, mode=None):
     guest = workbench.Guest(command)
     try:
         port, ready = guest.line()
@@ -60,8 +60,9 @@ def server_sample(command, workload):
             if index >= 8:
                 samples.append(time.perf_counter()-start)
         guest.line(b'DONE')
-        guest.finish()
-        return dict(startupSeconds=ready-guest.started, requestSeconds=samples,
+        from process import RETENTION_WARNING
+        stderr = guest.finish(allowed_stderr=(b'', RETENTION_WARNING) if mode == 'jit' else (b'',))
+        return dict(stderr=stderr.decode(), startupSeconds=ready-guest.started, requestSeconds=samples,
                     measuredSeconds=sum(samples), requestsPerSecond=24/sum(samples))
     finally:
         guest.close()
@@ -202,7 +203,7 @@ def main():
         for index in range(-1,args.rounds):
             offset=max(index,0)%3
             for mode in modes[offset:]+modes[:offset]:
-                row=server_sample(report['commands'][mode],args.workload)
+                row=server_sample(report['commands'][mode],args.workload,mode=mode)
                 row.update(mode=mode,round=index)
                 report['warmups' if index<0 else 'samples'].append(row)
                 (out/'results.json').write_text(json.dumps(report,indent=2)+'\n')

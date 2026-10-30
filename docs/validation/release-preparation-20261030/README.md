@@ -210,3 +210,12 @@ native executable/library consumers and tamper rejection. Candidate archive/VSIX
 identities are retained in [the artifact inventory](candidate-artifact-hashes.json);
 these are qualification candidates, not published release assets. Five-round macOS
 release measurements are now running after local qualification builds finish.
+
+
+The initial release measurement [report](macos-benchmark-warning-failure.json.gz)
+and [log](macos-benchmark-warning-failure.log.gz) stop at the first JIT worker:
+exit zero and exact measurement protocol, with DAM2004. Execution and HTTP benchmark
+callers now explicitly admit only that exact warning in JIT mode and retain stderr
+in every sample. Shared subprocess controls still reject nonzero exits and unknown
+messages; timing/workload/output checks are unchanged. A fresh five-round measurement
+run uses this harness repair; the failed attempt is not performance evidence.

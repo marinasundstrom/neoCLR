@@ -7,6 +7,9 @@ import threading
 import time
 import tempfile
 
+RETENTION_WARNING = b'warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n'
+
+
 class Guest:
     def __init__(self, command, timeout=120):
         self.timeout = timeout
