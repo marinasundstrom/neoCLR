@@ -1,0 +1,20 @@
+{
+  "status": "qualification candidates; not published assets",
+  "artifacts": [
+    {
+      "path": "/tmp/neoclr-preview19-candidate2-20261030/neoclr-preview19-osx-arm64.tar.gz",
+      "bytes": 63264290,
+      "sha256": "12ec9e4b6520496f009834e63fa127aba36c5ffb290a587e9f9c283d5d8c2a6b"
+    },
+    {
+      "path": "/tmp/neoclr-preview19-build-kit-fixed/neoclr-native-build-kit-osx-arm64.tar.gz",
+      "bytes": 71816629,
+      "sha256": "4263f4a881bd4e7000de8a77167e2b879f5cf57878a52198b887f7bc4ac1ef22"
+    },
+    {
+      "path": "/tmp/neoclr-preview19-sdk-20261030/raven-vscode.vsix",
+      "bytes": 10899935,
+      "sha256": "c511a6cf1bdf45cc3147bb1a740ca1b9dc711504e3b749a69f6b2a5e2d065f26"
+    }
+  ]
+}

@@ -31,12 +31,12 @@ historical evidence only.
 | Format / strict Clippy | Formatting repaired; needless test borrows repaired after Clippy diagnostics. Strict Clippy and formatting now pass; seven lookup tests pass. |
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar controls, seven HTTP readiness/diagnostic controls, bundle diagnostic control and async diagnostic control pass. |
-| macOS SDK | Matching SDK and VSIX built; all 14 libraries including PostgreSQL build. Fresh watcher native/interpreter ownership and lifecycle checks pass. Default-JIT bundle assembled; archive/extract qualification follows. |
+| macOS SDK | Matching SDK/VSIX and all 14 libraries built. Extracted default-JIT/HTTP package, watcher/reload, async (24), headers (132), PostgreSQL and standalone build-kit checks pass. |
 | Windows | Prior scalar run fails at compiler build; stale pins updated. Fresh host/package execution remains required. The workflow now includes real-file watcher and configuration reload checks against extracted package binaries, retaining their reports even on failure. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
-| Editor / HTTPS | macOS editor acceptance (26 checks), inlays and all 15 HTTPS/cleartext cases pass. Repeated editor configuration recovery and Windows acceptance remain open. |
+| Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows acceptance remains open. |
 | Performance | Fresh package release measurements required; existing development experiments are not release measurements. |
-| Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. Complete bundled dependency notice review and final artifact hashes remain required. |
+| Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. Candidate archive/VSIX hashes are recorded; published asset identities remain unset. |
 | Publication | No tag, GitHub release, upload or website deployment. Publication date unset. |
 
 ## Preserved failures and repairs
@@ -202,3 +202,11 @@ The [repaired extracted kit](macos-build-kit.json.gz) passes console/HTTP execut
 HTTP fault propagation and all four tamper controls, with Cargo absent from PATH,
 no checkout inputs and standalone execution in an empty environment. The fix changes
 packaging/fingerprinting only; native runtime fragments themselves are unchanged.
+
+
+The [settled-source async run](macos-async.json.gz) passes all 24 cases across
+AOT/interpreter/JIT. [Extracted native interop](macos-kit-interop.json.gz) passes
+native executable/library consumers and tamper rejection. Candidate archive/VSIX
+identities are retained in [the artifact inventory](candidate-artifact-hashes.json);
+these are qualification candidates, not published release assets. Five-round macOS
+release measurements are now running after local qualification builds finish.
