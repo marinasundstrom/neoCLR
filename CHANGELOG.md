@@ -6,6 +6,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-31
+
+- Set Preview 19 publication metadata to the actual publication day after the
+  final source-asset upload crosses midnight; qualified payloads remain unchanged.
+
 ### 2026-10-30
 
 - Add the concrete [Neo.Web design proposal](docs/design/neo-web.md) for builder/application
@@ -18,7 +23,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Finalize Preview 19 release notes, asset provenance and installation guidance for
   publication; retain the qualified payloads and source archive unchanged.
 
-## 0.1.0-preview.19 — 2026-10-30
+## 0.1.0-preview.19 — 2026-10-31
 
 Application services, configuration and watching, API/compiler migrations, runtime
 improvements and explicitly bounded experiments. See [release notes](docs/preview-19-release-notes.md)

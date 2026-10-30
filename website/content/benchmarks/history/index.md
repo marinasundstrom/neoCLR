@@ -1,6 +1,6 @@
 # Benchmark history
 
-## Preview 19 — 30 October 2026
+## Preview 19 — 31 October 2026
 
 Five-round release measurements pass on macOS ARM64 and Windows x64 using the
 qualified runtime payloads. The macOS host was under development load; these are

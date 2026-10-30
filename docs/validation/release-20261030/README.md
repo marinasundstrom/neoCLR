@@ -1,4 +1,6 @@
-# Preview 19 publication — 2026-10-30
+# Preview 19 publication — 2026-10-31
+
+Preparation began 2026-10-30; publication follows after midnight in Europe/Stockholm.
 
 All [prepublication checks](../release-preparation-20261030/README.md) pass.
 The [release manifest](release-manifest.json) and [checksums](SHA256SUMS) identify

@@ -1,6 +1,6 @@
 # Preview 19 release notes
 
-Runtime version: `0.1.0-preview.19`. Release date: 2026-10-30.
+Runtime version: `0.1.0-preview.19`. Release date: 2026-10-31.
 Platforms: macOS ARM64 and Windows x64. Matching SDK/editor:
 `0.1.19-neoclr.20261030.1` from Raven `6ceeb1be8790e105a1394cb99fded41fafad5b4c`.
 See [qualification evidence](validation/release-preparation-20261030/README.md),
