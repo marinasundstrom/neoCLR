@@ -14,3 +14,19 @@ class RuntimeAwaitDiagnosticsTests(unittest.TestCase):
             self.assertEqual(module.expected_diagnostics(module.RETENTION_WARNING, mode), mode == 'jit')
             for stderr in ('fault', 'warning: unknown\n', module.RETENTION_WARNING + 'fault\n'):
                 self.assertFalse(module.expected_diagnostics(stderr, mode))
+
+    def test_guest_diagnostics_require_explicit_exact_allowance_and_success(self):
+        import sys
+        warning = module.RETENTION_WARNING.encode()
+        for code, stderr, allowed, accepted in (
+            (0, b'', (b'',), True), (0, warning, (b'',), False),
+            (0, warning, (b'', warning), True), (1, warning, (b'', warning), False),
+            (0, warning + b'fault', (b'', warning), False)):
+            guest = module.Guest([sys.executable, '-c',
+                f'import sys; sys.stderr.buffer.write({stderr!r}); sys.exit({code})'])
+            try:
+                if accepted:
+                    self.assertEqual(guest.finish(allowed_stderr=allowed), stderr)
+                else:
+                    with self.assertRaises(RuntimeError): guest.finish(allowed_stderr=allowed)
+            finally: guest.close()

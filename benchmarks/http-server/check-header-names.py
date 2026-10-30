@@ -103,7 +103,10 @@ def main():
                         if not head.startswith(b'HTTP/1.1 200 OK\r\n') or body != row['expected'] or line != b'OK':
                             raise ValueError((mode, row['name'], data, line))
                     report['cases'].append(dict(mode=mode, name=row['name'], passed=True, responseHex=data.hex(), outcome=line.decode()))
-                guest.line(b'DONE'); guest.finish()
+                guest.line(b'DONE')
+                warning = b'warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n'
+                stderr = guest.finish(allowed_stderr=(b'', warning) if mode == 'jit' else (b'',))
+                report.setdefault('diagnostics', []).append(dict(mode=mode, stderr=stderr.decode()))
             finally: guest.close()
             print(mode, 'passed', len(rows), 'cases', flush=True)
         for path, digest in report['inputs'].items():

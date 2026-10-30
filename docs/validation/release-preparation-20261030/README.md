@@ -27,14 +27,14 @@ historical evidence only.
 
 | Gate | Current evidence / remaining work |
 | --- | --- |
-| Source archive | First attempt fails before tests at SDK/linker setup; see below. Separate SDK 26.5 optimized full-suite run started. |
+| Source archive | Canonical source CI passes on c1b817ce6 and bb631c0e8 after the repairs below; initial local failures remain preserved. |
 | Format / strict Clippy | Formatting repaired; needless test borrows repaired after Clippy diagnostics. Strict Clippy and formatting now pass; seven lookup tests pass. |
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
-| Validator controls | Four Windows scalar evidence tests and six HTTP readiness/process cleanup tests pass. |
+| Validator controls | Four Windows scalar controls, seven HTTP readiness/diagnostic controls, bundle diagnostic control and async diagnostic control pass. |
 | macOS SDK | Matching SDK and VSIX built; all 14 libraries including PostgreSQL build. Fresh watcher native/interpreter ownership and lifecycle checks pass. Default-JIT bundle assembled; archive/extract qualification follows. |
 | Windows | Prior scalar run fails at compiler build; stale pins updated. Fresh host/package execution remains required. The workflow now includes real-file watcher and configuration reload checks against extracted package binaries, retaining their reports even on failure. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
-| Editor / HTTPS | Matching extracted SDK/VSIX completion, hover, recovery and HTTPS acceptance required on both targets. |
+| Editor / HTTPS | macOS editor acceptance (26 checks), inlays and all 15 HTTPS/cleartext cases pass. Repeated editor configuration recovery and Windows acceptance remain open. |
 | Performance | Fresh package release measurements required; existing development experiments are not release measurements. |
 | Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. Complete bundled dependency notice review and final artifact hashes remain required. |
 | Publication | No tag, GitHub release, upload or website deployment. Publication date unset. |
@@ -152,3 +152,27 @@ PASS output with only DAM2004. The async validator now accepts that exact warnin
 only for JIT, retaining raw stderr; its focused test rejects other diagnostics and
 rejects the warning for AOT/interpreter. Remaining Windows stages require a rerun
 against the same packaged artifacts with this validator repair.
+
+
+The [inlay acceptance](macos-inlays.json.gz) passes. The complete
+[HTTPS/cleartext receipt](macos-https-cleartext.json.gz) passes all 15 cases,
+including isolation of ordinary cleartext hosts. The
+[production npm audit](npm-notices.json.gz) finds the same eight package versions
+covered by the preserved notices; rebuilding the production input graph produces
+exactly the SHA-256 of the installed VSIX JavaScript. Both dependency notice audits
+are now complete for these artifacts.
+
+Windows requalification [41113298319](https://github.com/marinasundstrom/neoCLR/actions/runs/41113298319)
+uses source 7a81940d1 and reuses the archive from 40989683340. This is a validator
+repair against unchanged package inputs; no successful outcome is inferred while
+that run is pending.
+
+
+The [first repeated editor recovery run](macos-editor-configuration-1.json.gz)
+passes ten invalidation/recovery cycles for both native projects. The
+[initial header-contract run](macos-header-warning-failure.log.gz) passes all 44
+cases under AOT/interpreter and all JIT responses, but rejects DAM2004 at shutdown.
+The shared subprocess checker now accepts an explicitly supplied exact stderr set,
+with empty stderr still the default, and returns raw diagnostics for receipts.
+Only header and async JIT consumers opt into the exact warning. Focused subprocess
+controls verify unexpected diagnostics and nonzero exits still fail.

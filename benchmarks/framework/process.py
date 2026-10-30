@@ -42,12 +42,14 @@ class Guest:
         self.error_file.seek(0)
         return self.error_file.read(8192)
 
-    def finish(self):
+    def finish(self, allowed_stderr=(b'',)):
+        """Require success and exact approved diagnostics; return raw stderr for receipts."""
         code = self.process.wait(timeout=self.timeout)
         self.reader.join(timeout=5)
         error = self.errors()
-        if code or error or self.reader.is_alive():
+        if code or error not in allowed_stderr or self.reader.is_alive():
             raise RuntimeError(f'Guest failed: {code}, {error!r}, {self.output!r}')
+        return error
 
     def close(self):
         if self.process.poll() is None:

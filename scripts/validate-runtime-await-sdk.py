@@ -128,7 +128,8 @@ def main():
                                 response += part
                                 if len(response) > 8192: raise ValueError('Oversized HTTP response')
                         assert response.startswith(b'HTTP/1.1 200 OK\r\n') and response.split(b'\r\n\r\n', 1)[1] == BODY
-                        guest.finish()
+                        stderr = guest.finish(allowed_stderr=(b'', RETENTION_WARNING.encode()) if mode == 'jit' else (b'',))
+                        report['commands'].append(dict(command=command, exitCode=0, stdout=b''.join(guest.output).decode(), stderr=stderr.decode()))
                         assert b'Served greeting; server closed' in b''.join(guest.output)
                     finally:
                         guest.close()
