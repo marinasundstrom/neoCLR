@@ -4,7 +4,7 @@ Runtime candidate version: `0.1.0-preview.19`. Preparation started 2026-10-30. P
 is published and its publication date is unset. [Preview 18](preview-18-release-notes.md)
 remains the current release. Target platforms remain macOS ARM64 and Windows x64.
 See the [candidate qualification record](validation/release-preparation-20261030/README.md)
-for exact inputs, failures and remaining gates.
+for exact inputs, preserved failures and completed qualification gates.
 
 ## Application services and configuration
 
@@ -19,7 +19,7 @@ services, not full Microsoft.Extensions compatibility.
 
 Standalone `System.IO.FileSystemWatcher` delivers `FileSystemNotification` unions
 through disposable `Subscribe` registrations. Windows execution and packaged reload
-qualification remain release gates. See [configuration](configuration.md),
+qualification pass on the matching candidate bundle. See [configuration](configuration.md),
 [application services](application-services.md) and [watching](file-system-watcher.md).
 
 ## API and compiler migration
@@ -72,7 +72,8 @@ standard packaged class-library selection. Broader structural work stays parked.
 
 Candidate matching SDK/editor version: `0.1.19-neoclr.20261030.1`, Raven
 `6ceeb1be8790e105a1394cb99fded41fafad5b4c`. Source validation, extracted packages,
-editor, HTTPS, Windows watcher/reload behavior and release measurements must pass
-before publication. Preserve optional PostgreSQL on macOS only if the matching
-package passes its existing acceptance. No artifact download or deployment is
+editor, HTTPS, Windows watcher/reload behavior and five-round release measurements
+pass. Optional PostgreSQL is preserved and qualified on macOS. Final notice-refreshed
+archives, separate SDK/VSIX assets and companion notices are assembled with verified
+checksums; publication remains pending. No artifact download or deployment is
 announced by these notes.

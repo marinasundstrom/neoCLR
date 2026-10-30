@@ -1,5 +1,5 @@
 {
-  "status": "qualification candidates; not published assets",
+  "status": "Final qualified candidate assets assembled; original qualification archives preserved; not published",
   "artifacts": [
     {
       "path": "/tmp/neoclr-preview19-candidate2-20261030/neoclr-preview19-osx-arm64.tar.gz",
@@ -75,6 +75,68 @@
       "sourceRevision": "a079cffdffea9d9c69f7eb8c55a7b24981281c72",
       "runtimeVersion": "0.1.0-preview.19",
       "qualificationRun": 41130221734
+    }
+  ],
+  "finalAssets": [
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/SHA256SUMS",
+      "bytes": 1155,
+      "sha256": "97f1d0cf7708d02bd5fff5f5a8e46ee93af0fbe06f27ef002bd37ac3997d9c6a"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/neoclr-native-build-kit-osx-arm64.tar.gz",
+      "bytes": 71828714,
+      "sha256": "e8df7ea6b9bd78fdad0e5d85cd5b8753cd858aae5c0fc7909b1d6874d17345b0"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/neoclr-preview19-osx-arm64.tar.gz",
+      "bytes": 57219542,
+      "sha256": "c48c91f21902e16528ec35bf41553a4c8c40318070c15f0186aa0b0d53b6c084"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/neoclr-preview19-qualified-source.tar",
+      "bytes": 755916800,
+      "sha256": "80a77c97efc5d213f36e840c2d60bea91d70b61555a02389e6ca91eabfc169dc"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/neoclr-preview19-win-x64.tar.gz",
+      "bytes": 56796542,
+      "sha256": "aff3edea978a074701ec91e929eeacfa673ff0ab8e9edcddda41377368e15b78"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/raven-0.1.19-neoclr.20261030.1-osx-arm64.vsix",
+      "bytes": 10899935,
+      "sha256": "c511a6cf1bdf45cc3147bb1a740ca1b9dc711504e3b749a69f6b2a5e2d065f26"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/raven-0.1.19-neoclr.20261030.1-win-x64.vsix",
+      "bytes": 10924681,
+      "sha256": "5f50e2a3d15ea4a4daf3307e20051b2901fd78f18fc927774541cf536455ba29"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/raven-sdk-0.1.19-neoclr.20261030.1-osx-arm64.tar.gz",
+      "bytes": 33177596,
+      "sha256": "8963c3ec3ff9bebaad2cfcdacbba44b12afbb197bf4a3f45f11b37a3aaf15e8f"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/raven-sdk-0.1.19-neoclr.20261030.1-win-x64.tar.gz",
+      "bytes": 33277976,
+      "sha256": "b91fe92a693e26b26cd6ab0d2c8f8d52b68fd0a6e382f5c1c2c2b386b7b45586"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/raven-tool-notices-osx-arm64.tar.gz",
+      "bytes": 144802,
+      "sha256": "9e1f2767868ecd5387145b1f22cd1a3dbecd3907f5ee13a19cd884d7259d6a81"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/raven-tool-notices-win-x64.tar.gz",
+      "bytes": 144304,
+      "sha256": "46f7665052afcb93e58c8cf6f909128a650010d08089c01c63537db536f16ecf"
+    },
+    {
+      "path": "/Users/robert/Projects/neoclr/target/releases/preview19-20261030/release-manifest.json",
+      "bytes": 7818,
+      "sha256": "5df8bc96f4e029534dadab0d027b3bff32be753b39e0f94fc25d2d2bab44b7b8"
     }
   ]
 }

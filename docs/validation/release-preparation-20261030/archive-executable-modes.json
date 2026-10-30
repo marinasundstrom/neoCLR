@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "archives": [
+    {
+      "archive": "neoclr-preview19-osx-arm64.tar.gz",
+      "originalExecutableFiles": 161,
+      "executableBitsPreserved": true
+    },
+    {
+      "archive": "neoclr-preview19-win-x64.tar.gz",
+      "originalExecutableFiles": 9,
+      "executableBitsPreserved": true
+    },
+    {
+      "archive": "neoclr-native-build-kit-osx-arm64.tar.gz",
+      "originalExecutableFiles": 162,
+      "executableBitsPreserved": true
+    }
+  ]
+}

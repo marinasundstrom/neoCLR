@@ -39,13 +39,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Give the interpreter content-copy quota probe the established large-text timeout budget.
   Include pinned Raven upstream license/notice texts and audit their presence in native bundles.
   Retain final runtime-payload package, HTTP/client and five-round measurement receipts
-  for both targets; preserve timeout attempts and keep final attribution archive assembly pending.
+  for both targets; preserve timeout attempts. Complete the final canonical source and focused
+  Windows consumer checks, refresh license-notice archives with executable payload equality,
+  and assemble all 12 candidate assets with verified manifest/checksums; publication remains pending.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development
   host, without a controlled performance claim. The refreshed Windows package, editor
-  and HTTPS gates pass, as do five-round Windows measurements. The final versioned macOS build kit passes console/HTTP checks; remaining
-  package and dependent checks stay under qualification before publication. Plan applicable Python behavior-fixture
+  and HTTPS gates pass, as do five-round Windows measurements. The final versioned macOS build kit passes console/HTTP checks; final
+  package and dependent checks now pass before publication. Plan applicable Python behavior-fixture
   migration to `NeoClr.Testing` after release, as explicitly directed; this migration
   is deferred and is not part of current release-harness repairs.
 

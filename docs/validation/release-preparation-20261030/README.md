@@ -1,6 +1,6 @@
 # Preview 19 preparation — 2026-10-30
 
-Status: **candidate preparation; not approved or published**. The author requested
+Status: **qualified candidate assets assembled; not published**. The author requested
 “Pursue a new release”. Preview 18 remains the current published release.
 [Draft notes](../../next-preview-release-notes.md) define the proposed bounded scope.
 This record owns the current release gates; older release/tracker checkpoints are
@@ -27,16 +27,16 @@ historical evidence only.
 
 | Gate | Current evidence / remaining work |
 | --- | --- |
-| Source archive | Full canonical validation, strict Clippy, both host boundaries and all minimum-Rust jobs pass on 78d675df3 (run 41133412647). Later harness, fixture and attribution deltas have focused checks below; final source assembly remains pending. |
+| Source archive | Final canonical run 41137959122 passes on 0758082e4, including full tests, source/notices audit, strict Clippy, both host boundaries and all three minimum-Rust jobs. The exact CI source archive is assembled as a release asset. |
 | Format / strict Clippy | Formatting repaired; needless test borrows repaired after Clippy diagnostics. Strict Clippy and formatting now pass; seven lookup tests pass. |
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar controls, seven HTTP readiness/diagnostic controls, bundle diagnostic control and async diagnostic control pass. |
-| macOS SDK | Final runtime payload, extracted samples/HTTP, build kit, 14 HTTP-client cases and five-round measurements pass. Reuse unchanged SDK/editor/library contracts, watcher/reload, async, headers and PostgreSQL evidence. Notice-only archive refresh remains pending. |
-| Windows | Final package 41130221734, console 41130577126, HTTPS 41130576963, client 41135630963 and five-round benchmarks 41130708329 pass. Focused refreshed crypto/JSON/content-copy consumers remain pending. |
-| Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
+| macOS SDK | Final runtime payload, extracted samples/HTTP, build kit, 14 HTTP-client cases and five-round measurements pass. Reuse unchanged SDK/editor/library contracts, watcher/reload, async, headers and PostgreSQL evidence. Notice-only archive and build-kit refreshes pass extraction, catalog and attribution checks; all executable/compiler/library/sample bytes are preserved. |
+| Windows | Final package 41130221734, console 41130577126, HTTPS 41130576963, client 41135630963 and five-round benchmarks 41130708329 pass. Focused refreshed crypto/JSON/content-copy consumers and repeated console/client checks pass in 41137958975. |
+| Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers now pass on both targets; exact reports are linked below. |
 | Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows editor acceptance, inlays and two recovery runs pass; matching HTTPS passes 27 cases. |
 | Performance | Final runtime payloads pass five-round measurements on both targets. macOS is a loaded development host; no controlled performance gain is claimed. Stage receipts are linked below. |
-| Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. Candidate archive/VSIX hashes are recorded; published asset identities remain unset. |
+| Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. All 12 final candidate assets are assembled with manifest/checksums; published asset identities remain unset. |
 | Publication | No release tag, GitHub release, release-asset upload or website deployment. CI validation artifacts are retained. Publication date unset. |
 
 ## Preserved failures and repairs
@@ -649,19 +649,47 @@ The exact texts from Raven `6ceeb1be8` and source hashes are now retained under
 archive refresh will retain every executable/compiler/library/sample byte and
 preserve the original qualified archive plus a hash-level change report.
 
-## Remaining work after source sync
+## Final source, consumer and archive gates
 
 Source/harness/attribution revision `0758082e4ec78bbd9eada3d0a90fb33fb6601015`
-is pushed. Its independent [source run 41137959122](https://github.com/marinasundstrom/neoCLR/actions/runs/41137959122)
-and focused [Windows package consumers 41137958975](https://github.com/marinasundstrom/neoCLR/actions/runs/41137958975)
-are in progress. The latter checks public cryptography, expanded JSON and the
-content-copy interpreter budget against the already qualified Windows runtime.
+passes [canonical run 41137959122](https://github.com/marinasundstrom/neoCLR/actions/runs/41137959122)
+([source report](canonical-source-0758082e4.json.gz), [workflow receipt](canonicalSource-workflow.json)).
+The release source asset is that exact CI archive. The later documentation/evidence
+snapshot also passes [membership and attribution review](source-head-audit.json.gz);
+it does not replace the independently tested source archive.
 
-Before publication, refresh both native archives and the macOS build kit with the
-pinned upstream notice files, updating their catalogs in fresh output directories.
-Retain the original qualified archives, prove that only attribution/catalog files
-changed, and run the strengthened notice checker on each refreshed extraction.
-Assemble matching separate SDK/VSIX and companion-notice assets, audit the final
-committed source archive and write the final release manifest/checksums. Update
-this gate record from the pending runs; do not relabel them as passed. No release
-tag, release-asset upload, GitHub release or website deployment has occurred.
+[Focused Windows run 41137958975](https://github.com/marinasundstrom/neoCLR/actions/runs/41137958975)
+passes [console/faults](windows-focused-console.json.gz),
+[14 HTTP-client cases](windows-focused-client.json.gz),
+[public cryptography](windows-focused-crypto.json.gz),
+[expanded JSON](windows-focused-json.json.gz) and
+[all eight content-copy tests](windows-focused-content-copy.json.gz).
+Content-copy interpreter execution takes 130.057 seconds within its 600-second budget;
+assertions are unchanged. [Package provenance](windows-focused-package-run.json.gz)
+and the [workflow receipt](windowsFocusedConsumers-workflow.json) identify the inputs.
+
+The [notice-only refresh](notice-refresh.json.gz) of both native archives and the
+macOS build kit passes fresh extraction, complete file-catalog verification and the
+strengthened 27-NuGet/35-package-set plus Raven-upstream notice audit. Exactly five
+attribution paths change or are added, plus the corresponding catalogs. Every
+executable, compiler, library and sample byte remains equal to the qualified originals;
+[Unix executable modes are preserved](archive-executable-modes.json). The original archives remain available under
+the identities in the report. A [rejected first refresh](notice-refresh-rejected.log.gz)
+changed Windows line endings beyond that scope and was not used.
+The [retained refresh script](notice-refresh.py.gz) documents the corrected process.
+
+Separate SDK archives, VSIX files and companion-notice archives pass
+[asset assembly checks](asset-assembly.json.gz): each SDK's 469 files match the
+qualified bundle, each VSIX retains its qualified hash and each notice archive
+contains 61 verified files. [Assembly script](asset-assembly.py.gz).
+
+The 12 candidate assets are assembled under the ignored local directory
+`target/releases/preview19-20261030/`. The [release manifest](release-manifest.json)
+records payload/source revisions, original-to-refreshed hashes, prerequisites,
+platform limits and exact gates. [SHA256SUMS](SHA256SUMS) verifies all 11 other files;
+[the inventory](candidate-artifact-hashes.json) also retains earlier candidates.
+Source tests and runtime measurements apply to the explicitly identified original
+payloads; attribution-only derivation is established by the file-hash comparison.
+No tag, GitHub release, release-asset upload or website deployment has occurred.
+Publication and its date remain unset. Python behavior-fixture migration remains
+deferred until after release.
