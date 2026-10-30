@@ -577,3 +577,13 @@ edits in progress and explicit source hashes; it contains the same final runtime
 bytes as the extracted macOS candidate. Five-round measurements of that final
 macOS archive are running; Windows benchmark run 41130708329 waits for final
 package 41130221734 to succeed.
+
+Windows HTTP-client run 41133279887 passes all initial cases, including the
+callback-fault comparison, then stops on a stale `http.start_process` import in
+its paired-server path. Calls now select the shared process helper explicitly.
+Seven existing readiness/process-tree/diagnostic controls pass with Python 3.14;
+an earlier Python 3.9 control invocation hit a duplicate-cleanup PermissionError.
+The package validation path now optionally selects verified, catalogued runtime
+and backend roles (`--packaged-tools`) and records the manifest hash. The Windows
+standalone-project workflow also checks HTTP clients against its same final archive,
+avoiding an unnecessary compiler/bootstrap rebuild. macOS execution is in progress.

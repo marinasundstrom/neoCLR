@@ -117,9 +117,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--bundle', type=Path)
+    parser.add_argument('--packaged-tools', action='store_true', help='Use verified runtime/backend roles from --bundle')
     parser.add_argument('--client-build', type=Path, help='Reuse an unchanged successful local build, checking all recorded inputs/artifacts')
     parser.add_argument('--server-build', type=Path, help='Reuse a matching successful local server build')
     args = parser.parse_args()
+    if args.packaged_tools and not args.bundle:
+        parser.error('--packaged-tools requires --bundle')
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=False)
     report = dict(passed=False, platform=platform.platform(), commands=[], cases=[])
     def run(command, name):
@@ -146,14 +149,25 @@ def main():
                 with tarfile.open(archive) as tar: tar.extractall(prereq, filter='data')
             report['bundle'] = dict(url=dependency.URL, sha256=sha(archive))
         else: raise ValueError('--bundle is required on macOS')
-        if not args.client_build or not args.server_build:
-            run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build')
-        aot = ROOT / ('target/debug/neoclr-codegen' + ('.exe' if windows else ''))
+        if args.packaged_tools:
+            manifest = json.loads((bundle / 'manifest.json').read_text())
+            builder = http.load('client_builder', ROOT / 'scripts/build-native-project.py')
+            builder.verify_files(bundle, manifest['files'])
+            roles = [manifest['runtime'], manifest['jit']['compiler']]
+            if any(role not in manifest['files'] for role in roles):
+                raise ValueError('Uncatalogued runtime/backend role')
+            vm, aot = [bundle / role for role in roles]
+            report['bundleManifestSha256'] = sha(bundle / 'manifest.json')
+        else:
+            if not args.client_build or not args.server_build:
+                run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build')
+            aot = ROOT / ('target/debug/neoclr-codegen' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
         if windows and not args.bundle:
             bundle = http.rebuild_libraries(run, bundle, out / 'development toolchain')
         lib = bundle / 'lib'; catalog = json.loads((lib / 'bundle.json').read_text())
-        vm = http.build_interpreter(run, windows)
+        if not args.packaged_tools:
+            vm = http.build_interpreter(run, windows)
         report['interpreterSha256'] = sha(vm)
         context = ['--execution', 'interpreter', '--system', lib / catalog['runtimeSeed'], *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))], '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
         environment = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
@@ -240,7 +254,7 @@ def main():
         row = dict(name='paired-raven-server'); report['cases'].append(row)
         for mode in commands:
             command = [isolated['server']] if mode == 'native' else [vm, 'run', builds['server'] / 'app.dll', *context]
-            server = http.start_process(list(map(str, command)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0,
+            server = http.http_process.start_process(list(map(str, command)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0,
                                       cwd=isolated['server'].parent if mode == 'native' else ROOT, env=environment if mode == 'native' else None)
             try:
                 port = http.read_port(server.stdout, timeout=30)
@@ -249,7 +263,7 @@ def main():
                 stdout, stderr = server.communicate(timeout=20)
                 row[mode + 'Server'] = dict(exitCode=server.returncode, stdout=stdout.decode(), stderr=stderr.decode())
             finally:
-                http.stop_process(server)
+                http.http_process.stop_process(server)
             if row[mode] != dict(exitCode=0, stdout='Café 🌍\n', stderr='') or row[mode+'Server'] != dict(exitCode=0, stdout='Other work runs while HTTP accept is pending\nServed greeting; server closed\n', stderr=''): raise ValueError('Paired Raven server/client mismatch')
         row['passed'] = True
         report['cases'].extend(qualify_reuse(run, out, builds['client'], commands, environment, response))

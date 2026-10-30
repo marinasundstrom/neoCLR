@@ -26,6 +26,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   HTTP callback-fault checks preserve shared frames while allowing the two active native
   entry callers documented by the current async-stack limitation. Console/HTTPS checks require
   a successfully qualified matching package, while development-bootstrap imports remain available.
+  HTTP-client package checks select catalogued runtime/backend tools and the shared process helper.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development
