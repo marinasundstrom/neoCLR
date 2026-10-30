@@ -8,8 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
-- Set Preview 19 publication metadata to the actual publication day after the
-  final source-asset upload crosses midnight; qualified payloads remain unchanged.
+- Publish Preview 19 after final source-asset upload crosses midnight in Stockholm.
+  Verify all 12 public asset hashes/sizes and the checksum download; qualified
+  payloads remain unchanged. Manual website deployment passes, and four live pages
+  show Preview 19. Retain publication and deployment evidence.
 
 ### 2026-10-30
 

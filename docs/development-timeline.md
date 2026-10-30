@@ -1,5 +1,22 @@
 # Development conversation record
 
+## 2026-10-31 — Preview 19 publication
+
+- **Author direction:** Continue after the remaining release checks and license-notice
+  archive refreshes. Earlier direction required local work to be synced and deferred
+  applicable Python behavior-fixture migration until after release.
+- **Assistant actions/outcome:** Completed canonical source and focused Windows gates,
+  preserved executable bytes through the notice refresh, assembled and verified twelve
+  assets, updated release/install documentation and published Preview 19. The large
+  source upload crossed midnight in Stockholm, so publication metadata uses October 31.
+  All public asset hashes/sizes and the checksum download match. The separate website
+  deployment and live checks are recorded in [publication evidence](validation/release-20261030/README.md).
+- **Scope retained:** Eager JIT and synchronous GC remain defaults; PostgreSQL is
+  macOS-only, native Signals remains limited, and no controlled performance gain is
+  claimed. The Neo.Web proposal remains exploratory. Python behavior-fixture migration
+  remains follow-up work and was not started during release preparation.
+
+
 ## 2026-10-30 — Neo.Web hosting and structural minimal API handlers
 
 - **Author proposal/question:** Build `Neo.Web` above neoCLR HttpServer and the

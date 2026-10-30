@@ -1,7 +1,8 @@
 # Preview 19 preparation — 2026-10-30
 
-Status: **qualified candidate assets assembled; not published**. The author requested
-“Pursue a new release”. Preview 18 remains the current published release.
+Status: **qualification complete; Preview 19 published 2026-10-31**. The author requested
+“Pursue a new release”. [Publication evidence](../release-20261030/README.md) records
+the final public asset identities; earlier checkpoints below remain historical.
 [Versioned notes](../../preview-19-release-notes.md) define the bounded scope.
 This record owns the current release gates; older release/tracker checkpoints are
 historical evidence only.
@@ -37,7 +38,7 @@ historical evidence only.
 | Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows editor acceptance, inlays and two recovery runs pass; matching HTTPS passes 27 cases. |
 | Performance | Final runtime payloads pass five-round measurements on both targets. macOS is a loaded development host; no controlled performance gain is claimed. Stage receipts are linked below. |
 | Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. All 12 final candidate assets are assembled with manifest/checksums; published asset identities remain unset. |
-| Publication | No release tag, GitHub release, release-asset upload or website deployment. CI validation artifacts are retained. Publication date unset. |
+| Publication | Preview 19 published 2026-10-31; all 12 public asset hashes/sizes and the downloaded checksums verify. See the separate publication/deployment record. |
 
 ## Preserved failures and repairs
 
@@ -693,3 +694,10 @@ payloads; attribution-only derivation is established by the file-hash comparison
 No tag, GitHub release, release-asset upload or website deployment has occurred.
 Publication and its date remain unset. Python behavior-fixture migration remains
 deferred until after release.
+
+## Publication handoff
+
+[Preview 19](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.19)
+is published. The original preparation manifest/checksums above remain frozen as
+candidate evidence. [Final publication manifest](../release-20261030/release-manifest.json)
+changes only publication status/date; its payload hashes are identical.
