@@ -375,3 +375,23 @@ package run 41121692409, wait for successful native-toolchain qualification, and
 retain the selected run metadata. A failed package stops dependent checks.
 Workflow YAML parses and the validator's CLI/bytecode checks pass; actual Windows
 project/HTTPS execution remains pending the package gate.
+
+
+[Native network/GC run 41123011320](https://github.com/marinasundstrom/neoCLR/actions/runs/41123011320)
+passes both target hosts on committed harness revision `40fbef8166529ed9cd4204490fc6b8b178f31253`:
+[macOS network](macos-native-network-validation-fixed.json.gz),
+[macOS GC](macos-native-gc-validation-fixed.json.gz),
+[Windows network](windows-native-network-validation-fixed.json.gz) and
+[Windows GC](windows-native-gc-validation-fixed.json.gz). Relocation/instrumented
+source checks also pass in both jobs.
+
+The [local runtime-product run](macos-runtime-product-fixed.json.gz) passes workspace
+build, CLI, hosting, inline values, scalar execution, compiled roots, native GC,
+security, relocation, notices and HTTPS build controls. It started from `052f2a36e`
+with the harness repairs then committed as `40fbef816`; it is local delta evidence,
+not a clean-source run of that original revision. The receipt records validator
+and workspace manifest hashes. Hosted runtime-product run 41123011225 remains
+the clean-source counterpart.
+
+Fresh fetches confirm neoCLR main, Raven codex/neoclr and separate Raven main are
+all 0 ahead/0 behind their upstreams. No Raven branch merge was performed.
