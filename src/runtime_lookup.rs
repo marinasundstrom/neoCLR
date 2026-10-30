@@ -360,7 +360,7 @@ mod tests {
                         .is_none()
                 )
             });
-            assert_eq!(definition_row(&module, &identity), Some(None));
+            assert_eq!(definition_row(module, &identity), Some(None));
             ACTIVE.with(|active| {
                 let active = active.borrow();
                 let index = active.as_ref().unwrap();
@@ -406,30 +406,30 @@ mod tests {
         assert!(owned_functions(&module, &module.types[0]).is_none());
         module.with_metadata_lookups(|module| {
             ACTIVE.with(|active| assert!(active.borrow().as_ref().unwrap().owners.get().is_none()));
-            check(&module);
-            let rows = owned_functions(&module, &module.types[0]).unwrap();
+            check(module);
+            let rows = owned_functions(module, &module.types[0]).unwrap();
             assert_eq!(&*rows, &[2, 4]);
             assert!(Rc::ptr_eq(
                 &rows,
-                &owned_functions(&module, &module.types[0]).unwrap()
+                &owned_functions(module, &module.types[0]).unwrap()
             ));
             let other = super::tests::module(1);
             let caught = std::panic::catch_unwind(|| {
                 other.with_metadata_lookups(|_other| {
-                    assert!(owned_functions(&module, &module.types[0]).is_none());
+                    assert!(owned_functions(module, &module.types[0]).is_none());
                     panic!("restore owner scope");
                 })
             });
             assert!(caught.is_err());
             assert!(Rc::ptr_eq(
                 &rows,
-                &owned_functions(&module, &module.types[0]).unwrap()
+                &owned_functions(module, &module.types[0]).unwrap()
             ));
             std::thread::scope(|scope| {
                 scope
                     .spawn(|| {
-                        assert!(owned_functions(&module, &module.types[0]).is_none());
-                        module.with_metadata_lookups(|module| check(&module));
+                        assert!(owned_functions(module, &module.types[0]).is_none());
+                        module.with_metadata_lookups(|module| check(module));
                     })
                     .join()
                     .unwrap();
@@ -437,8 +437,8 @@ mod tests {
         });
         module.functions[2].owner = Some(crate::assembler::parse_type("Cell<Int32>").unwrap());
         module.with_metadata_lookups(|module| {
-            check(&module);
-            assert_eq!(&*owned_functions(&module, &module.types[0]).unwrap(), &[4]);
+            check(module);
+            assert_eq!(&*owned_functions(module, &module.types[0]).unwrap(), &[4]);
         });
     }
 
@@ -448,7 +448,7 @@ mod tests {
         let second = module(2);
         assert!(functions(&first, "Main").is_none());
         first.with_metadata_lookups(|first| {
-            assert_eq!(&*functions(&first, "Main").unwrap(), &[0]);
+            assert_eq!(&*functions(first, "Main").unwrap(), &[0]);
             let rows = functions(first, "Main").unwrap();
             first.with_metadata_lookups(|first| {
                 assert!(Rc::ptr_eq(&rows, &functions(first, "Main").unwrap()));
@@ -456,12 +456,12 @@ mod tests {
             assert!(functions(&second, "Main").is_none());
             let caught = std::panic::catch_unwind(|| {
                 second.with_metadata_lookups(|_second| {
-                    assert!(functions(&first, "Main").is_none());
+                    assert!(functions(first, "Main").is_none());
                     panic!("unwind nested lookup");
                 })
             });
             assert!(caught.is_err());
-            assert_eq!(&*functions(&first, "Main").unwrap(), &[0]);
+            assert_eq!(&*functions(first, "Main").unwrap(), &[0]);
         });
         assert!(functions(&first, "Main").is_none());
     }
@@ -479,19 +479,19 @@ mod tests {
         };
         module.with_metadata_lookups(|module| {
             assert_eq!(
-                crate::vm::resolve(&module, &target).unwrap().returns,
+                crate::vm::resolve(module, &target).unwrap().returns,
                 Type::Int32
             )
         });
         module.functions.push(module.functions[0].clone());
         let expected = crate::vm::resolve(&module, &target).unwrap_err();
         module.with_metadata_lookups(|module| {
-            assert_eq!(&*functions(&module, "Main").unwrap(), &[0, 1]);
+            assert_eq!(&*functions(module, "Main").unwrap(), &[0, 1]);
             assert_eq!(
-                crate::vm::resolve(&module, &target).unwrap_err().message,
+                crate::vm::resolve(module, &target).unwrap_err().message,
                 expected.message
             );
-            assert!(functions(&module, "Absent").unwrap().is_empty());
+            assert!(functions(module, "Absent").unwrap().is_empty());
         });
     }
     #[test]
@@ -523,9 +523,9 @@ mod tests {
             std::thread::scope(|scope| {
                 scope
                     .spawn(|| {
-                        assert!(super::types(&module, "Cell").is_none());
+                        assert!(super::types(module, "Cell").is_none());
                         module.with_metadata_lookups(|module| {
-                            assert_eq!(&*super::types(&module, "Cell").unwrap(), &[0, 1])
+                            assert_eq!(&*super::types(module, "Cell").unwrap(), &[0, 1])
                         });
                     })
                     .join()

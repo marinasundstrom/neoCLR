@@ -2057,7 +2057,10 @@ mod open_query_tests {
 fn relationship_groups(related: &[Vec<usize>]) -> Vec<Vec<usize>> {
     let mut groups: Vec<Vec<usize>> = Vec::new();
     for (source, targets) in related.iter().enumerate() {
-        if let Some(group) = groups.iter_mut().find(|group| related[group[0]] == *targets) {
+        if let Some(group) = groups
+            .iter_mut()
+            .find(|group| related[group[0]] == *targets)
+        {
             group.push(source);
         } else {
             groups.push(vec![source]);
@@ -2071,6 +2074,9 @@ mod relationship_group_tests {
     #[test]
     fn equal_target_sets_share_a_body_without_merging_distinct_relationships() {
         let targets = vec![vec![0], vec![0, 2], vec![0], vec![], vec![0, 2], vec![]];
-        assert_eq!(super::relationship_groups(&targets), vec![vec![0, 2], vec![1, 4], vec![3, 5]]);
+        assert_eq!(
+            super::relationship_groups(&targets),
+            vec![vec![0, 2], vec![1, 4], vec![3, 5]]
+        );
     }
 }

@@ -41,9 +41,7 @@ pub fn bind(
                 .chain([&shape.returns])
                 .all(concrete),
             Type::Tuple(parts) => parts.iter().all(concrete),
-        Type::Union(parts) | Type::Intersection(parts) => {
-                parts.iter().all(concrete)
-            }
+            Type::Union(parts) | Type::Intersection(parts) => parts.iter().all(concrete),
             _ => true,
         }
     }

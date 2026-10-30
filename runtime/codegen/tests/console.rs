@@ -12003,7 +12003,9 @@ fn rooted_native_preferences_execute_and_reclaim() {
         }
         let source = format!(
             "{source}\n{}\n{}",
-            include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/SystemCultureName.neoil"),
+            include_str!(
+                "../../../runtime/legacy/bootstrap/neoCLR/Runtime/SystemCultureName.neoil"
+            ),
             include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/TimeZones.neoil")
         );
         let result = compile_source(&dir, &seed, &source, &flags, false);

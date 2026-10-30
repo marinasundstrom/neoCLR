@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: marinasundstrom/raven
-          ref: 71cafd353900394a4f670a8ad8691597f6115091
+          ref: 6ceeb1be8790e105a1394cb99fded41fafad5b4c
           path: target/raven-source
       - uses: actions/setup-dotnet@v4
         with:

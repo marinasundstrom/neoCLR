@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Author-directed release preparation (2026-10-30):** Pursue the next release, designated Preview 19 candidate, with macOS ARM64 and Windows x64 as target platforms. Qualify the current bounded surface and matching compiler/SDK/editor; preserve explicit experimental limits and existing defaults. [Candidate status](validation/release-preparation-20261030/README.md) owns the gates and [draft notes](next-preview-release-notes.md) own the release scope. Publication remains pending; this release task does not permanently reorder the roadmap.
+
 **Author-directed callbacks (2026-10-30):** Direct function callbacks are the default notification API, accepted through constructors or explicit registration as appropriate. The watcher uses a single union-valued subscription with coherent path payloads. Library event support remains later work; see [conventions](raven-conventions.md) and [watcher design](file-system-watcher.md).
 
 **Author-directed physical watching (2026-10-29):** Add standalone [System.IO.FileSystemWatcher](file-system-watcher.md) first; preserve the WinRT-like System.Storage model. Windows and macOS are the release priorities. Provider-level change notification and automatic configuration reload remain separate work. This bounded slice does not reprioritize the main milestones.

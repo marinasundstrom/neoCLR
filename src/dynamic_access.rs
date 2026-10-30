@@ -1069,7 +1069,7 @@ mod tests {
     }
 
     fn fixture() -> Module {
-        let mut m = crate::assemble(&".module Test\n.type Attr\n.end\n.type Info\n.end\n.type RuntimeInfo\n.end\n.type Model\n.end\n.type Other\n.end\n").unwrap();
+        let mut m = crate::assemble(".module Test\n.type Attr\n.end\n.type Info\n.end\n.type RuntimeInfo\n.end\n.type Model\n.end\n.type Other\n.end\n").unwrap();
         for (i, name) in [
             ATTRIBUTE,
             "System.Introspection.TypeInfo",

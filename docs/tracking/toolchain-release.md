@@ -1,5 +1,9 @@
 # Toolchain and release tracking
 
+## Active release preparation — 2026-10-30
+
+[Preview 19 candidate qualification](../validation/release-preparation-20261030/README.md) owns current release gates. [Draft notes](../next-preview-release-notes.md) define scope and migration. Earlier sections below retain historical checkpoints and do not certify this candidate.
+
 **Consolidated 2026-09-27.** Follow the [platform roadmap](../platform-roadmap.md).
 This page owns shared integration/delivery status. The [HTTP tracker](../http-capabilities.md#finish-this-poc)
 owns whether its packaged sample passes and whether the POC is complete; do not

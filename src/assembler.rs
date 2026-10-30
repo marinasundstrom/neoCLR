@@ -562,9 +562,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .push(parse_function_ref(rest)?);
                 } else if word == ".methodimpl" {
                     if pending.function.impl_flags != 0 {
-                        return Err(Fault::new(
-                            "expected one .methodimpl directive",
-                        ));
+                        return Err(Fault::new("expected one .methodimpl directive"));
                     }
                     if !pending.function.body.is_empty() || !pending.labels.is_empty() {
                         return Err(Fault::new(".methodimpl must precede any body"));
@@ -573,7 +571,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         "InternalCall" => crate::metadata::INTERNAL_CALL,
                         "NoInlining" => crate::metadata::NO_INLINING,
                         "AggressiveInlining" => crate::metadata::AGGRESSIVE_INLINING,
-                        "NoInlining|AggressiveInlining" | "AggressiveInlining|NoInlining" => crate::metadata::INLINING_FLAGS,
+                        "NoInlining|AggressiveInlining" | "AggressiveInlining|NoInlining" => {
+                            crate::metadata::INLINING_FLAGS
+                        }
                         _ => return Err(Fault::new("unsupported method implementation flags")),
                     };
                 } else if word == ".param" || word == ".local" {

@@ -24,7 +24,9 @@ pub(crate) fn encode_library(module: &Module) -> Result<Vec<u8>, Fault> {
         }
     }
     if !matches!(module.format, 5 | 6) {
-        return Err(invalid("unsupported semantic module format (expected 5 or 6)"));
+        return Err(invalid(
+            "unsupported semantic module format (expected 5 or 6)",
+        ));
     }
     if module.name.trim().is_empty() {
         return Err(invalid("native module name must not be empty"));
@@ -40,7 +42,9 @@ pub(crate) fn decode(data: &[u8], library: bool, expanded: bool) -> Result<Modul
     // Deserialize into the runtime model, without a JSON string or serde_json::Value tree.
     let module: Module = ciborium::from_reader(data).map_err(invalid)?;
     if !matches!(module.format, 5 | 6) {
-        return Err(invalid("unsupported semantic module format (expected 5 or 6)"));
+        return Err(invalid(
+            "unsupported semantic module format (expected 5 or 6)",
+        ));
     }
     Ok(module)
 }

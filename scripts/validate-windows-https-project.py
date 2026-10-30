@@ -12,7 +12,7 @@ import tarfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPILER = 'fac4ac736024800151d6b285e68407ded864f655'
+COMPILER = '6ceeb1be8790e105a1394cb99fded41fafad5b4c'
 
 
 def main():

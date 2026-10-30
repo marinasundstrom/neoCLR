@@ -1,5 +1,5 @@
-pub mod dynamic_access;
 mod arrays;
+pub mod dynamic_access;
 // Checked opaque memory views; native backend lowering remains separate.
 mod memory_view_contract;
 mod memory_view_services;
@@ -56,12 +56,12 @@ pub mod library;
 mod math;
 pub mod memory;
 pub mod metadata;
-mod parameter_defaults;
 mod native;
 mod numeric_format_core;
 mod numeric_parse;
 mod object_identity;
 mod object_root;
+mod parameter_defaults;
 mod program;
 mod reachability;
 mod references;

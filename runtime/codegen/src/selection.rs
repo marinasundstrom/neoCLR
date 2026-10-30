@@ -1537,7 +1537,12 @@ ret
         method.is_override = true;
         let (selected, report) = select_validated_inventory(&module, "Main", &[], &[]).unwrap();
         assert!(selected.functions.iter().any(|f| f.name == "Cell.Create"));
-        assert!(selected.functions.iter().any(|f| f.name == "Char.GetHashCode"));
+        assert!(
+            selected
+                .functions
+                .iter()
+                .any(|f| f.name == "Char.GetHashCode")
+        );
         assert_eq!(report["charObjectDispatch"].as_array().unwrap().len(), 1);
 
         // An unreachable box must not retain a primitive override merely because
@@ -1548,9 +1553,7 @@ ret
             .find(|f| f.name == "Main")
             .unwrap()
             .body = vec![
-            Op::Construct(
-                neoclr::assembler::parse_function_ref("instance Cell::.ctor()").unwrap(),
-            ),
+            Op::Construct(neoclr::assembler::parse_function_ref("instance Cell::.ctor()").unwrap()),
             Op::CallVirtual(
                 neoclr::assembler::parse_function_ref("instance System.Object::GetHashCode()")
                     .unwrap(),
@@ -1558,7 +1561,12 @@ ret
             Op::Return,
         ];
         let (selected, report) = select_validated_inventory(&module, "Main", &[], &[]).unwrap();
-        assert!(!selected.functions.iter().any(|f| f.name == "Char.GetHashCode"));
+        assert!(
+            !selected
+                .functions
+                .iter()
+                .any(|f| f.name == "Char.GetHashCode")
+        );
         assert!(report["charObjectDispatch"].as_array().unwrap().is_empty());
     }
 

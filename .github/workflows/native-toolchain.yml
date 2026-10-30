@@ -10,11 +10,11 @@ on:
       raven_revision:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
-        default: 301e668a51beb6ba307d63b6912b144d8ad6a6b0
+        default: 6ceeb1be8790e105a1394cb99fded41fafad5b4c
       package_version:
         description: Internal SDK and VSIX version; does not select or publish a release tag
         required: true
-        default: 0.1.0-dev.20261021
+        default: 0.1.19-neoclr.20261030.1
       delta_only:
         description: Reuse qualified SDK/runtime and check only JSON/editor release deltas
         type: boolean
@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 90
     env:
       PYTHONUTF8: '1'
-      PACKAGE_VERSION: ${{ inputs.package_version || '0.1.0-dev.20261021' }}
+      PACKAGE_VERSION: ${{ inputs.package_version || '0.1.19-neoclr.20261030.1' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,7 +46,7 @@ jobs:
         if: ${{ !inputs.bundle_run }}
         with:
           repository: marinasundstrom/raven
-          ref: ${{ inputs.raven_revision || '301e668a51beb6ba307d63b6912b144d8ad6a6b0' }}
+          ref: ${{ inputs.raven_revision || '6ceeb1be8790e105a1394cb99fded41fafad5b4c' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-dotnet@v4

@@ -1,5 +1,14 @@
 # Development conversation record
 
+## 2026-10-30 — Pursue the next release
+
+- **Author:** “Pursue a new release”.
+- **Assistant action:** Selected Preview 19 as a candidate following published Preview 18, retaining macOS ARM64 and Windows x64 targets. Began committed-source validation, matching SDK packaging, API checks and review of prior hosted failures.
+- **Findings:** The initial macOS source attempt failed because the installed linker could not read the selected macOS 27 SDK; a separate run selects installed SDK 26.5. Prior Windows scalar qualification used an incompatible old Raven pin. Rust formatting gates also required repair.
+- **Author follow-up:** Required syncing local work, then directed proceeding with release checks and fixes before publishing.
+- **Assistant action:** Synced Raven main and codex/neoclr separately; preserved their branch boundary.
+- **Status:** Preparation, not publication or release approval. The [candidate record](validation/release-preparation-20261030/README.md) records results and unresolved gates; [draft notes](next-preview-release-notes.md) distinguish supported scope from experiments. No permanent milestone reprioritization is inferred.
+
 ## 2026-10-29 — Library-owned signals using structural functions
 
 - **Author:** Asked how to implement an event/signal system without an event

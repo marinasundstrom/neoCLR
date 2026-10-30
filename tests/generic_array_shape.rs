@@ -137,7 +137,10 @@ fn reflection_library() -> neoclr::Module {
     // Preserve historical library contracts separately while using ordinary reference
     // iterator declarations for the managed-array profile under test.
     let source = neoclr::library::system_source()
-        .replace(include_str!("../runtime/legacy/bootstrap/System/Array.neoil"), "")
+        .replace(
+            include_str!("../runtime/legacy/bootstrap/System/Array.neoil"),
+            "",
+        )
         .replace("System.Collections.Iterable", "Historical.Iterable")
         .replace("System.Collections.Iterator", "Historical.Iterator");
     assemble(&format!(
