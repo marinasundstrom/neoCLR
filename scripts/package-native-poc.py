@@ -29,7 +29,13 @@ def main():
             raise ValueError('Split bundle owns its core and seed; omit --core and --seed')
         catalog = json.loads((args.libraries / 'bundle.json').read_text())
         core_assemblies = ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']
-        if catalog['assemblyNames'] not in (core_assemblies, core_assemblies + ['System.Data.PostgreSql'],
+        # Neo.Web is an optional final extension; all catalog hashes are still checked.
+        selection = catalog.get('assemblyNames', [])
+        if selection and selection[-1] == 'Neo.Web':
+            if 'Neo.Configuration' not in selection or 'Neo.Logging' not in selection:
+                raise ValueError('Neo.Web requires configuration and logging libraries')
+            selection = selection[:-1]
+        if selection not in (core_assemblies, core_assemblies + ['System.Data.PostgreSql'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'System.Data.PostgreSql'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging'],

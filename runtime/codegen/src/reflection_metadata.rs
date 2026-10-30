@@ -885,6 +885,21 @@ pub fn bind_queries(
         // adding library types does not duplicate every target test per source type.
         let groups = if relationship {
             relationship_groups(&related)
+        } else if shapes {
+            // Shape queries depend only on the flags, not type identity. Keep all
+            // token checks, but share the mask result for identical descriptors.
+            let mut groups: Vec<Vec<usize>> = Vec::new();
+            for (index, descriptor) in descriptors.iter().enumerate() {
+                if let Some(group) = groups
+                    .iter_mut()
+                    .find(|group| descriptors[group[0]].3 == descriptor.3)
+                {
+                    group.push(index);
+                } else {
+                    groups.push(vec![index]);
+                }
+            }
+            groups
         } else {
             (0..descriptors.len()).map(|index| vec![index]).collect()
         };
@@ -1841,6 +1856,76 @@ mod open_query_tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn many_closed_shape_tokens_share_results_without_losing_identity_checks() {
+        let mut text = String::from(".module ManyShapes\n.entry Main\n");
+        for index in 0..720 {
+            text.push_str(&format!(".type class Example.C{index}\n.end\n"));
+        }
+        text.push_str(".type Example.Value\n.field Data Int32\n.end\n.function neoCLR.Runtime.TypeShape(RuntimeTypeHandle,Int32) -> Boolean\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n");
+        let source = neoclr::assemble(&text).unwrap();
+        let mut input = source.clone();
+        let query = &source.functions[0];
+        let call = Op::Call(FunctionRef {
+            definition: query.definition.clone(),
+            name: query.name.clone(),
+            owner: None,
+            instance: false,
+            parameters: query.parameters.clone(),
+            generic_arguments: vec![],
+        });
+        let mut body = Vec::new();
+        let mut failures = Vec::new();
+        // Exercise every shared token, plus a different shape with the opposite result.
+        for index in 0..720 {
+            body.extend([
+                Op::LoadTypeToken(Type::Named(format!("Example.C{index}"))),
+                Op::Int(12),
+                call.clone(),
+                Op::Bool(shape(&source, &Type::Named(format!("Example.C{index}"))).unwrap()[12]),
+                Op::Equal,
+            ]);
+            failures.push(body.len());
+            body.push(Op::BranchFalse(0));
+        }
+        body.extend([
+            Op::LoadTypeToken(Type::Named("Example.Value".into())),
+            Op::Int(12),
+            call,
+            Op::Bool(shape(&source, &Type::Named("Example.Value".into())).unwrap()[12]),
+            Op::Equal,
+        ]);
+        let scalar_check = body.len();
+        body.push(Op::BranchFalse(0));
+        body.extend([Op::Int(42), Op::Return]);
+        let fail = body.len();
+        body.extend([Op::Int(1), Op::Return]);
+        for index in failures {
+            body[index] = Op::BranchFalse(fail);
+        }
+        body[scalar_check] = Op::BranchFalse(fail);
+        input.functions[1].body = body;
+        let report = json!({"functions":[{"compiledIndex":0,"name":query.name,"definition":query.definition}], "sourceMetadata":{"types":source.types.iter().enumerate().map(|(index, ty)| json!({"compiledTypeIndex":index,"name":ty.name,"typeArguments":[]})).collect::<Vec<_>>()}});
+        bind_queries(&mut input, &source, &report).unwrap();
+        assert!(input.functions[0].body.len() < 8192);
+        localize_bound_queries(&mut input);
+        let (selected, _) = crate::selection::prepare(&input, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program
+                .run(neoclr::Limits {
+                    instructions: 2_000_000,
+                    ..neoclr::Limits::default()
+                })
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        // Native reference-class coverage uses the Neo.Web HTTP consumer; the
+        // scalar-only JIT helper does not admit this reference-type inventory.
     }
 
     #[test]

@@ -8,6 +8,22 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
+- Add experimental Neo.Web, a web framework built on System.Web.Http.HttpServer,
+  with WebApplicationBuilder, WebApplication and request-scoped context handlers.
+  Compose configuration and logging, validate and freeze route registration, and
+  support buffered responses, 400/404/405 dispatch and joined shutdown. Provide
+  Neo.Web.HttpContext without requiring transport imports in normal applications.
+  Add an evolving reference app, real HTTP consumer, API reference and website
+  walkthrough. Generic handler injection, streaming and general hosting remain
+  later slices; API and assembly boundaries remain provisional. Record the author's
+  next-slice direction toward HTTP results typed from construction, with response
+  alternatives using a sealed hierarchy or union. The interpreter probe remains
+  blocked at Build; native execution is the default validation path.
+- Share identical closed type-shape reflection result blocks in native codegen,
+  preserving token checks, selector errors and the existing instruction bound.
+  This admits the combined hosting graph without raising backend limits or changing
+  reflection semantics; use a matching development code generator for Neo.Web.
+
 - Publish Preview 19 after final source-asset upload crosses midnight in Stockholm.
   Verify all 12 public asset hashes/sizes and the checksum download; qualified
   payloads remain unchanged. Manual website deployment passes, and four live pages

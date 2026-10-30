@@ -1,0 +1,6 @@
+PASS Builder snapshots options and transfers ownership once
+PASS Invalid options and ambiguous routes fail without registration
+PASS HTTP consumer covers routing scopes cancellation and joined shutdown
+Tests: 3, passed: 3, failed: 0, skipped: 0
+warning: DAM2001: Neo.DependencyInjection.DefaultServiceCollection.Build instruction 37 -> Neo.DependencyInjection.ConstructorPlan.Prepare parameter 0: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention

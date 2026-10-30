@@ -1,0 +1,81 @@
+module Neo.Web
+
+import System.*
+import System.Concurrency.*
+import Neo.DependencyInjection.*
+import System.Web.Http.*
+
+/// Recoverable hosting, registration and handler failures. Runtime Panic remains terminal.
+public union WebError {
+    case InvalidState
+    case InvalidOptions(message: string)
+    case Routing(message: string)
+    case BadRequest(message: string)
+    case Services(error: ServiceError)
+    case Transport(error: HttpError)
+}
+
+/// Explicit listener settings, copied by Build. No implicit configuration binding is performed.
+public class WebServerOptions {
+    /// Listener address; defaults to loopback.
+    var Address: string = "127.0.0.1"
+    /// Listener port; zero requests an ephemeral port. Defaults to 5000.
+    var Port: int = 5000
+    /// Listen backlog; must be positive. Defaults to 128.
+    var Backlog: int = 128
+}
+
+/// A request-owned view with buffered response operations. Do not retain it after the handler settles.
+public class HttpContext {
+    private val response: HttpResponse
+    private var active = true
+    /// The incoming request; content is valid only during this handler.
+    val Request: HttpRequest
+    /// The scope owned by this request. Do not dispose it yourself.
+    val Services: ServiceProvider
+    /// Captured and decoded route parameters.
+    val RouteValues: RouteMatch
+    /// Application shutdown, not client-disconnect cancellation.
+    val ApplicationStopping: CancellationToken
+
+    internal init(request: HttpRequest, response: HttpResponse, services: ServiceProvider, route: RouteMatch, stopping: CancellationToken) {
+        Request = request
+        self.response = response
+        Services = services
+        RouteValues = route
+        ApplicationStopping = stopping
+    }
+
+    private func EnsureActive() {
+        if !active { Panic("Neo.Web.HttpContext handler has completed") }
+    }
+
+    /// Configures independent UTF-8 text/plain response content with status 200.
+    func RespondText(text: string) {
+        EnsureActive()
+        response.Respond(HttpStatusCode.OK, HttpStringContent(text))
+    }
+
+    /// Configures independent UTF-8 text/plain content and an explicit status.
+    func RespondText(statusCode: int, text: string) {
+        EnsureActive()
+        ValidateStatus(statusCode)
+        response.Respond((HttpStatusCode)statusCode, HttpStringContent(text))
+    }
+
+    /// Configures a bodyless response with an explicit status.
+    func Respond(statusCode: int) {
+        EnsureActive()
+        ValidateStatus(statusCode)
+        response.Respond((HttpStatusCode)statusCode)
+    }
+
+    private static func ValidateStatus(statusCode: int) {
+        if statusCode < 100 || statusCode > 599 { Panic("Expected HTTP status 100..599") }
+    }
+
+    internal func Finish() {
+        active = false
+        Services.Dispose()
+    }
+}

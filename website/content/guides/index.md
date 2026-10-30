@@ -13,6 +13,7 @@ Start with a working application, then follow the APIs it uses.
 
 | I want to… | Start here | Then explore |
 | --- | --- | --- |
+| Explore experimental web hosting | [Neo.Web](/features/neo-web/) | [Reference application](/cases/neo-web/) |
 | Call or serve an HTTP API | [Web and HTTP](/features/web/) | [Server and JSON case](/cases/http-server/) |
 | Query a PostgreSQL database | [SQL databases](/features/sql/) | [Runnable PostgreSQL case](/cases/postgresql/) |
 | Read files and text | [Files and storage](/features/files/) | [Streams](/docs/streams.html) |

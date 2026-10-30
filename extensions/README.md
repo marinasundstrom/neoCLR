@@ -23,3 +23,9 @@ Neo.Localization, Neo.Logging and Neo.Configuration use the same structure. See 
 The shared test driver selects these projects with `--suite dependency-injection`
 and `--suite localization` / `--suite logging` / `--suite configuration`; they share tools/testing/NeoCLR.Testing without
 including another suite's test entry point.
+
+`Neo.Web` is an optional experimental hosting extension with a single implementation
+assembly in this first slice. It composes DI/configuration/logging over HttpServer;
+its [reference app](../samples/web/README.md) will evolve toward handlers with
+injected parameters. See [its scope](Neo.Web/README.md). It is built with
+`build-native-class-library.py --with-web`, not added to existing release bundles.

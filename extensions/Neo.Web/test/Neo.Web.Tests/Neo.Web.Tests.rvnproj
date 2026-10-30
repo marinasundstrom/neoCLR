@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Neo.Web.Tests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/*.rvn" />
+    <Compile Include="*.rvn" />
+  </ItemGroup>
+</Project>

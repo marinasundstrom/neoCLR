@@ -1,0 +1,126 @@
+{
+  "tests": {
+    "profile": "macos-arm64-http-v1",
+    "passed": true,
+    "host": "macOS-27.0.1-arm64-arm-64bit",
+    "artifacts": {
+      "app.dll": "b0ecb3816b475a271b9a834d0a5d3f3114473e1d42af31f78df94570333e3529",
+      "app.o": "4ba6563822dc48163d72d1e886206afe8b7c9d2b7bf7f00b1c7a83be679a8193",
+      "app": "1cc563f83abc8fd9a384d599893fa380501a65f77f08ea92c4e110a689dceaac"
+    },
+    "toolchain": {
+      "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "version": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+    },
+    "phases": [
+      {
+        "phase": "toolchain",
+        "elapsedSeconds": 0.026025,
+        "exitCode": 0
+      },
+      {
+        "phase": "toolchain",
+        "elapsedSeconds": 0.019904,
+        "exitCode": 0
+      },
+      {
+        "phase": "toolchain",
+        "elapsedSeconds": 0.018256,
+        "exitCode": 0
+      },
+      {
+        "phase": "source-compilation",
+        "elapsedSeconds": 26.581722,
+        "exitCode": 0
+      },
+      {
+        "phase": "native-compilation",
+        "elapsedSeconds": 52.505832,
+        "exitCode": 0
+      },
+      {
+        "phase": "native-kernel-build",
+        "elapsedSeconds": 0.266776,
+        "exitCode": 0
+      },
+      {
+        "phase": "native-tls-build",
+        "elapsedSeconds": 0.211139,
+        "exitCode": 0
+      },
+      {
+        "phase": "host-compile-link",
+        "elapsedSeconds": 2.212746,
+        "exitCode": 0
+      },
+      {
+        "phase": "dependency-check",
+        "elapsedSeconds": 0.040081,
+        "exitCode": 0
+      }
+    ]
+  },
+  "sample": {
+    "profile": "macos-arm64-http-v1",
+    "passed": true,
+    "host": "macOS-27.0.1-arm64-arm-64bit",
+    "artifacts": {
+      "app.dll": "1c42366f8cbc39bb3299ba1dfa836e684a4e1b69c1daedfdc75bfbf721908e76",
+      "app.o": "661585c4e3db9c925bad0d761093aca470aa2cf165e5bd56d00ab0b75f1cba08",
+      "app": "1448285236bcbf8491b4b747067096ae947cd5de059b2b0fca6865c95c852edc"
+    },
+    "toolchain": {
+      "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "version": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+    },
+    "phases": [
+      {
+        "phase": "toolchain",
+        "elapsedSeconds": 0.012565,
+        "exitCode": 0
+      },
+      {
+        "phase": "toolchain",
+        "elapsedSeconds": 0.009779,
+        "exitCode": 0
+      },
+      {
+        "phase": "toolchain",
+        "elapsedSeconds": 0.012207,
+        "exitCode": 0
+      },
+      {
+        "phase": "source-compilation",
+        "elapsedSeconds": 8.163997,
+        "exitCode": 0
+      },
+      {
+        "phase": "native-compilation",
+        "elapsedSeconds": 27.290397,
+        "exitCode": 0
+      },
+      {
+        "phase": "native-kernel-build",
+        "elapsedSeconds": 0.38814,
+        "exitCode": 0
+      },
+      {
+        "phase": "native-tls-build",
+        "elapsedSeconds": 0.275547,
+        "exitCode": 0
+      },
+      {
+        "phase": "host-compile-link",
+        "elapsedSeconds": 2.907772,
+        "exitCode": 0
+      },
+      {
+        "phase": "dependency-check",
+        "elapsedSeconds": 0.033879,
+        "exitCode": 0
+      }
+    ]
+  }
+}

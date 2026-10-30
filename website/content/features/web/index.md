@@ -3,6 +3,9 @@ title: Web and HTTP
 ---
 # Web and HTTP
 
+For application composition, see [experimental Neo.Web hosting](/features/neo-web/)
+and its [reference app](/cases/neo-web/). The HTTP APIs below remain independently usable.
+
 Raven client and server applications exchange UTF-8 content through neoCLR TCP sockets,
 with DNS on the client. HttpClient, HttpServer, request/response types, content and
 handlers live in System.Web.Http. Use async functions and `await` for application

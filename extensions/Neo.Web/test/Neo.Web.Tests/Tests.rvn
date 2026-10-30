@@ -1,0 +1,200 @@
+module NeoClr.WebTests
+
+import System.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import Neo.Configuration.*
+import Neo.DependencyInjection.*
+import Neo.Web.*
+import Neo.Web.HttpContext
+import NeoClr.Testing.*
+import System.Web.Http.*
+
+class Counts {
+    var Created = 0
+    var Disposed = 0
+}
+
+class ScopedProbe : Disposable {
+    private val counts: Counts
+    var Disposed = false
+    init(counts: Counts) {
+        self.counts = counts
+        counts.Created += 1
+    }
+    func Dispose() {
+        Disposed = true
+        counts.Disposed += 1
+    }
+}
+
+func Empty(context: HttpContext) -> Task<Result<unit, WebError>> {
+    context.RespondText("empty")
+    return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
+}
+
+[Test]
+func `Builder snapshots options and transfers ownership once`() -> Result<unit, TestFailure> {
+    use builder = WebApplication.CreateBuilder()
+    builder.Server.Port = 0
+    _ = builder.Configuration.AddInMemoryCollection([ConfigurationEntry("Name", "web")])
+    let built = builder.Build()
+    _ = Assert.True(built is Ok(_), "Build succeeds")?
+    use app = built!
+    builder.Dispose()
+    _ = Assert.Equal("web", app.Configuration["Name"] ?? "")?
+    _ = Assert.True(builder.Build() is Failure(_), "Builder is consumed")?
+    return Assert.True(app.Services.GetRequiredService<Configuration>() is Ok(_), "Configuration is available through DI")
+}
+
+[Test]
+func `Invalid options and ambiguous routes fail without registration`() -> Result<unit, TestFailure> {
+    use invalid = WebApplication.CreateBuilder()
+    invalid.Server.Port = -1
+    _ = Assert.True(invalid.Build() is Failure(_), "Invalid options fail")?
+    use builder = WebApplication.CreateBuilder()
+    use app = builder.Build()!
+    _ = Assert.True(app.MapContext("GET", "/items/{id}", Empty) is Ok(_), "Capture accepted")?
+    _ = Assert.True(app.MapContext("GET", "/items/{name}", Empty) is Failure(_), "Ambiguity rejected")?
+    _ = Assert.True(app.MapContext("GET", "/items/current", Empty) is Ok(_), "Literal outranks capture")?
+    _ = Assert.True(app.MapContext("POST", "/items/{id}", Empty) is Ok(_), "Distinct method accepted")?
+    _ = Assert.True(app.MapContext("bad method", "/", Empty) is Failure(_), "Invalid method rejected")?
+    return Assert.True(app.MapContext("GET", "/{", Empty) is Failure(_), "Invalid pattern rejected")
+}
+
+class Handlers {
+    val Tracker = Counts()
+    val Entered = Promise<unit>()
+    val Release = Promise<unit>()
+
+    async func Capture(context: HttpContext) -> Task<Result<unit, WebError>> {
+        let probe = context.Services.GetRequiredService<ScopedProbe>()!
+        let value = await Task.Run(() => 42)
+        if probe.Disposed || value != 42 { Panic("Scope ended before await") }
+        context.RespondText(context.RouteValues.Get("id")!)
+        return Ok(())
+    }
+    func Literal(context: HttpContext) -> Task<Result<unit, WebError>> {
+        context.RespondText("literal")
+        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
+    }
+    func Bad(context: HttpContext) -> Task<Result<unit, WebError>> {
+        _ = context.Services.GetRequiredService<ScopedProbe>()!
+        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Failure(WebError.BadRequest("private detail")))
+    }
+    func Failed(context: HttpContext) -> Task<Result<unit, WebError>> {
+        _ = context.Services.GetRequiredService<ScopedProbe>()!
+        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Failure(WebError.InvalidOptions("private detail")))
+    }
+    func Cancelled(context: HttpContext) -> Task<Result<unit, WebError>> {
+        _ = context.Services.GetRequiredService<ScopedProbe>()!
+        let result = Promise<Result<unit, WebError>>()
+        _ = result.Cancel()
+        return result.Task
+    }
+    async func Pending(context: HttpContext) -> Task<Result<unit, WebError>> {
+        let probe = context.Services.GetRequiredService<ScopedProbe>()!
+        _ = Entered.Complete(())
+        _ = await Release.Task
+        if probe.Disposed { Panic("Scope disposed while handler pending") }
+        if !context.ApplicationStopping.IsCancellationRequested { Panic("Missing stop token") }
+        context.RespondText("late")
+        return Ok(())
+    }
+}
+
+async func CheckStatus(client: HttpClient, url: string, status: int) -> Task<Result<unit, TestFailure>> {
+    let response = await client.Get(url)
+    let Ok(value) = response else { return Failure(TestFailure("HTTP request failed", "response", "failure")) }
+    use owned = value
+    return Assert.Equal(status, (int)value.StatusCode)
+}
+
+async func HttpContract() -> Task<Result<unit, TestFailure>> {
+    let handlers = Handlers()
+    use builder = WebApplication.CreateBuilder()
+    builder.Server.Port = 0
+    _ = builder.Services.AddScoped<ScopedProbe>((provider) => Ok(ScopedProbe(handlers.Tracker)))!
+    use app = builder.Build()!
+    builder.Server.Port = -1
+    _ = app.MapContext("GET", "/items/{id}", (context) => handlers.Capture(context))!
+    _ = app.MapContext("GET", "/items/current", (context) => handlers.Literal(context))!
+    _ = app.MapContext("GET", "/bad", (context) => handlers.Bad(context))!
+    _ = app.MapContext("GET", "/failure", (context) => handlers.Failed(context))!
+    _ = app.MapContext("GET", "/cancel", (context) => handlers.Cancelled(context))!
+    _ = app.MapContext("GET", "/pending", (context) => handlers.Pending(context))!
+    use cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    let precancelled = app.RunAsync(cancellation.Token)
+    _ = Assert.True(precancelled.IsCancelled, "Pre-cancel opens no listener")?
+    let lifetime = app.RunAsync()
+    let url = "http://127.0.0.1:" + app.GetLocalPort()!.ToString()
+    use timeout = Timer(() => { app.Stop() })
+    timeout.Start(Duration.FromTicks(200000000L))
+    use client = HttpClient()
+    // Accumulate assertions before shutdown; always stop/join before returning a test failure.
+    let result = await RunningChecks(app, client, url, handlers, lifetime)
+    app.Stop()
+    _ = handlers.Release.Complete(())
+    _ = await lifetime
+    _ = result?
+    use secondBuilder = WebApplication.CreateBuilder()
+    secondBuilder.Server.Port = 0
+    use secondApp = secondBuilder.Build()!
+    use stopSource = CancellationTokenSource()
+    let stopped = secondApp.RunAsync(stopSource.Token)
+    let observed = Promise<unit>()
+    // Outcome observation: a cancelled lifetime cannot be awaited for a normal result.
+    stopped.OnCompleted(() => { _ = observed.Complete(()) })
+    stopSource.Cancel()
+    _ = await observed.Task
+    _ = Assert.True(stopped.IsCancelled, "Caller cancellation remains a cancelled task")?
+    return Assert.True(secondApp.GetLocalPort() is Failure(_), "Cancellation settles the run before disposal")
+}
+
+async func RunningChecks(app: WebApplication, client: HttpClient, url: string, handlers: Handlers,
+    lifetime: Task<Result<unit, WebError>>) -> Task<Result<unit, TestFailure>> {
+    _ = Assert.True(app.MapContext("GET", "/late", Empty) is Failure(_), "Registry frozen")?
+    _ = Assert.True(app.RunAsync().GetResult() is Failure(_), "Duplicate run rejected")?
+    _ = Assert.Equal("literal", (await client.GetString(url + "/items/current"))!)?
+    let first = client.GetString(url + "/items/41")
+    let second = client.GetString(url + "/items/42")
+    _ = Assert.Equal("41", (await first)!)?
+    _ = Assert.Equal("42", (await second)!)?
+    _ = Assert.Equal(2, handlers.Tracker.Created)?
+    _ = Assert.Equal(2, handlers.Tracker.Disposed)?
+    _ = (await CheckStatus(client, url + "/bad", 400))?
+    _ = (await CheckStatus(client, url + "/failure", 500))?
+    _ = (await CheckStatus(client, url + "/absent", 404))?
+    _ = (await CheckStatus(client, url + "/items/%2F", 400))?
+    let request = HttpRequest.Create(HttpMethod.Post, url + "/items/current")!
+    use rejected = (await client.Send(request))!
+    _ = Assert.Equal(405, (int)rejected.StatusCode)?
+    _ = Assert.Equal("GET", rejected.GetHeaderValues("Allow")[0])?
+    let cancelled = await client.Get(url + "/cancel")
+    _ = Assert.True(cancelled is Failure(_), "Cancelled handler closes exchange")?
+    _ = Assert.Equal(5, handlers.Tracker.Disposed)?
+    let pending = client.Get(url + "/pending")
+    _ = await handlers.Entered.Task
+    app.Stop()
+    _ = Assert.True(!lifetime.IsCompleted, "Shutdown waits for started handler")?
+    _ = Assert.Equal(5, handlers.Tracker.Disposed)?
+    _ = handlers.Release.Complete(())
+    _ = await lifetime
+    _ = await pending
+    _ = Assert.Equal(6, handlers.Tracker.Disposed)?
+    return Assert.True(app.GetLocalPort() is Failure(_), "Stopped application has no active port")
+}
+
+async func Main() -> Task<int> {
+    let http = HttpContract()
+    _ = await http
+    let suite = TestSuite()
+    suite.Add("web.builder", "Builder snapshots options and transfers ownership once", `Builder snapshots options and transfers ownership once`)
+    suite.Add("web.routing", "Invalid options and ambiguous routes fail without registration", `Invalid options and ambiguous routes fail without registration`)
+    // Async consumer completes before registration; assertions still use the framework's Result contract.
+    suite.Add("web.http", "HTTP consumer covers routing scopes cancellation and joined shutdown", () => http.GetResult())
+    return TestRunner.Run(suite, [])
+}

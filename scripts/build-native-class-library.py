@@ -27,8 +27,9 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
     parser.add_argument('--with-postgresql', action='store_true', help='Include the optional local PostgreSQL development provider')
+    parser.add_argument('--with-web', action='store_true', help='Include the development Neo.Web hosting extension')
     args = parser.parse_args()
-    names = NAMES + (('System.Data.PostgreSql',) if args.with_postgresql else ())
+    names = NAMES + (('System.Data.PostgreSql',) if args.with_postgresql else ()) + (('Neo.Web',) if args.with_web else ())
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     seed = output / 'System.runtime.neox'

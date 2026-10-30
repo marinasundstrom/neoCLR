@@ -343,6 +343,8 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'NEO_WEB_HOME': ('samples/web/src/WebDemo/Main.rvn', '    async func Home(', '\n    }', True),
+        'NEO_WEB_MAIN': ('samples/web/src/WebDemo/Main.rvn', 'async func Main(', '\n}', True),
         'NATIVE_CALLBACK_IMPORT': ('runtime/System.Runtime/test/NativeCallbackTests/Imports.rvn', 'import System.Runtime.InteropServices.*', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_callback_twice")]', False),
         'NATIVE_RETURN_IMPORT': ('runtime/System.Runtime/test/NativeCallbackTests/Imports.rvn', '[NativeImport("native-callback-fixture", EntryPoint: "native_function_get")]', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_notification_get")]', False),
         'NATIVE_CALLBACK_FUNCTION': ('runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn', 'func AddOne', '\n\n[Test]\nunsafe func `Native callbacks preserve', False),
@@ -465,6 +467,9 @@ def main():
     for name in ('Sample.rvn', 'SampleChecks.rvn', 'Client.rvn', 'Server.rvn', 'HttpPost.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
         shutil.copyfile(ROOT / 'docs/experiments/http-post' / name, post_downloads / name)
     shutil.make_archive(str(downloads / 'http-post'), 'zip', post_downloads)
+    web_downloads = downloads / 'neo-web'
+    shutil.copytree(ROOT / 'samples/web', web_downloads, ignore=shutil.ignore_patterns('bin', 'obj'), dirs_exist_ok=True)
+    shutil.make_archive(str(downloads / 'neo-web'), 'zip', web_downloads)
     http_downloads = downloads / 'http-client'
     http_downloads.mkdir()
     for name in ('Main.rvn', 'Overview.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):

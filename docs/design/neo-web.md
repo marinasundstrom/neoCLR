@@ -13,6 +13,35 @@ This revisits the previously deferred hosting layer in the
 broader structural-type work. All Neo.Web declarations and examples below are
 **uncompiled proposal notation**, not public APIs or executable samples.
 
+## First experimental implementation
+
+Neo.Web is an experimental web framework built on top of
+`System.Web.Http.HttpServer`. The author selected the context-handler hosting
+slice on 2026-10-31. Its concrete
+contract is documented in [Neo.Web API](../../api-docs/neo-web.md), with an evolving
+[reference application](../../samples/web/README.md). The author clarified that the
+web-facing context should be named `Neo.Web.HttpContext`, normal applications
+should not need `System.Web.Http` imports, and Neo.Web remains experimental.
+
+Long-term direction (author clarification, 2026-10-31): improve the underlying
+primitives, especially HttpServer, and let WebApplication benefit through composition.
+Keep connection ownership, transport scheduling and server completion policy below
+Neo.Web; do not duplicate them in the application layer.
+
+The intended experience is ASP.NET Core-like minimal APIs with services injected
+into handler parameters. Explicit `context.Services` lookup in this first slice
+establishes request-scope lifetime; it is not the final handler-binding experience.
+The next handler slice should qualify mixed route/service parameters and preserve
+scoped dependencies across awaited work before expanding binding convenience.
+
+The first implementation uses a single optional Neo.Web assembly, a default owned
+LoggerFactory, explicit listener options, MapContext returning Result<unit, WebError>,
+and a shared WebError union. It does not introduce the proposed abstraction split,
+WebLoggingBuilder, RouteHandlerBuilder or configuration-to-listener binding yet.
+Internally it uses HttpServer's response callback so 405 responses can carry Allow
+through existing public APIs; no transport extension or friend grant is needed.
+The remaining sketches below preserve the broader proposal, not the implemented API.
+
 ## Baseline and deliberate differences
 
 ASP.NET Core's [WebApplication and WebApplicationBuilder](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication?view=aspnetcore-10.0)
@@ -268,6 +297,29 @@ metadata separate from structural signature equality and record its provenance.
 
 ## Results and asynchronous handlers
 
+**Author direction, 2026-10-31:** Typed handler results are next-slice work toward
+the C# minimal API experience. The representation may be either a sealed hierarchy
+or a union; neither is selected by this first slice. Preserve the declared response
+alternatives and their payload types through registration and result adaptation,
+rather than requiring applications to erase them to an untyped response object.
+HTTP result objects should themselves be typed at construction, including their
+payload and response contract. A handler's sealed hierarchy or union describes the
+alternatives among those already-typed results; registration does not retrospectively
+add types to an untyped result object. Keep concrete result types through factories
+and handler returns, even if execution eventually uses a uniform internal adapter.
+The context-handler `Result<unit, WebError>` below remains the implemented contract;
+it does not implement this richer response model.
+
+The next result-adapter slice should qualify a concrete multi-result handler and its
+awaited counterpart, define each alternative's status/body policy, and diagnose
+unsupported alternatives at registration. Exhaustive handling and response metadata
+must follow the chosen representation's actual compiler/runtime capabilities.
+Nominal sealed result classes can use the existing reference invocation path;
+union carriers or generalized closed result families need separate invocation and
+async-adapter qualification. Do not equate an existing union declaration with
+support for arbitrary union payloads through boxed reflection. This direction
+supersedes treating the initial WebResult reference sketch as the final result model.
+
 Return-shape adaptation is library policy. Inspecting a return type does not make
 an open F's result statically awaitable or provide an existential `Task<T>` await.
 Start with a finite set of concrete result adapters:
@@ -376,6 +428,10 @@ repositories' bridge/compiler docs and changelogs. Current projected signatures 
 native format 6; CLI executable and neoIL text export are unsupported. CLI reference
 documentation must use linked manual entries for unrepresentable signatures.
 No new transport carrier or Runtime Contract capability is specified by this proposal.
+The first hosting consumer exposed a native codegen capacity limit: type-shape
+reflection duplicated equal flag-result bodies per token. Sharing those bodies
+retains token checks, selector validation and the existing per-method bound; it
+does not change Raven metadata or the reflection contract.
 
 ## Alternatives and tradeoffs
 

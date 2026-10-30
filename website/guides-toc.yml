@@ -4,12 +4,16 @@
   href: who-its-for/index.md
 - name: Cases
   items:
+    - name: "Experimental Neo.Web application"
+      href: cases/neo-web/index.md
     - name: "Query PostgreSQL objects"
       href: cases/postgresql/index.md
     - name: "Building a Http server app"
       href: cases/http-server/index.md
 - name: Build applications
   items:
+    - name: "Neo.Web experimental hosting"
+      href: features/neo-web/index.md
     - name: "Web and HTTP"
       href: features/web/index.md
     - name: "SQL databases"
@@ -202,3 +206,6 @@
 
 - name: Configuration (development)
   href: docs/configuration.md
+
+- name: "Neo.Web API (experimental)"
+  href: docs/neo-web.md

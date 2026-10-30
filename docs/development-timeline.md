@@ -1,5 +1,51 @@
 # Development conversation record
 
+## 2026-10-31 — First experimental Neo.Web hosting slice
+
+- **Author:** Requested implementation of WebApplicationBuilder, WebApplication
+  and context handlers over HttpServer, validation with a real HTTP consumer and
+  a commit. Added a reference sample app for continued development and requested
+  documentation and website updates.
+- **Author clarifications:** Suggested calling the web-facing context HttpContext
+  with qualification where needed; said normal applications should not have to
+  import System.Web.Http. Subsequently emphasized that Neo.Web remains experimental
+  and API details can be worked out later. Clarified the intended experience as
+  ASP.NET Core-like minimal APIs with dependencies injected into handler parameters.
+  Directed focusing this slice on the foundations/API working, with refinement in
+  the next slice. Clarified the long-term direction: improve underlying primitives
+  such as HttpServer so WebApplication benefits from those improvements.
+  Specified the description “experimental web framework built on top of
+  System.Web.Http.HttpServer” and clarified that an explicit
+  `import Neo.Web.HttpContext` resolves the name alongside HTTP wildcard imports.
+- **Assistant response/action:** Implemented the bounded hosting layer in an optional
+  Neo.Web assembly, retaining generic binding as the next slice. Adopted
+  Neo.Web.HttpContext with integer-status buffered response methods; the reference
+  app imports only Neo.Web for web operations. Request scopes span awaited handlers;
+  explicit outcome adapters observe cancellation and joined shutdown. Used the
+  existing response-returning Serve callback internally to emit Allow headers through
+  public APIs. Added framework assertions with a real HttpClient and an independent
+  peer against the reference app; validation outcomes are recorded separately.
+- **Further author direction:** “We will support typed result unions in ways that C#
+  can't,” then clarified “Either sealed hiearchy or union.” The assistant recorded
+  both representations as open alternatives for typed response choices. The author
+  then clarified that HTTP result objects can be typed from the start; the assistant
+  recorded concrete types at construction, preserved through handler return types, with
+  per-alternative adaptation and async/invocation qualification deferred. No richer
+  result model was implemented in the context-handler slice.
+- **Outcome:** Native and eager-JIT framework contracts and the independent HTTP
+  consumer pass on macOS ARM64. The larger graph required shared native TypeShape
+  result blocks; five focused lowering tests pass. Interpreter execution still fails
+  at Build and is recorded as an open gap. Public API snapshots and website content
+  are refreshed. The author explicitly confirmed typed HTTP results belong to the
+  next slice; this change only records that direction.
+- **Scope:** Context.Services lookup is foundational, not the final minimal API
+  experience. The sample and design track a later migration to injected handler
+  parameters. No permanent roadmap reprioritization, generic binding, middleware,
+  streaming contract or general hosting framework is inferred from this slice.
+  [API contract](../api-docs/neo-web.md), [sample](../samples/web/README.md) and
+  [validation](validation/neo-web-20261031/README.md) own the concrete details.
+
+
 ## 2026-10-31 — Preview 19 publication
 
 - **Author direction:** Continue after the remaining release checks and license-notice

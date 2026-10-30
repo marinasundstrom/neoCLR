@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Experimental Neo.Web slice (author direction, 2026-10-31):** Implement the first
+builder/application/context-handler layer over HttpServer, with a real HTTP consumer,
+an evolving reference app and API/website documentation. Keep Neo.Web provisional;
+the next handler goal is ASP.NET Core-like dependency injection into parameters.
+See the [API contract](../api-docs/neo-web.md), [reference app](../samples/web/README.md)
+and [validation record](validation/neo-web-20261031/README.md). This bounded task
+does not permanently reprioritize the roadmap.
+
 **Neo.Web design proposal (2026-10-30):** At the author's request, the
 [concrete proposal](design/neo-web.md) revisits WebApplicationBuilder and
 WebApplication over HttpServer and the extension frameworks, using structural

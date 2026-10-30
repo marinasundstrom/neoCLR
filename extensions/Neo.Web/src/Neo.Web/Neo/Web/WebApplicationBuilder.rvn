@@ -1,0 +1,73 @@
+module Neo.Web
+
+import System.*
+import System.Result.*
+import Neo.Configuration.*
+import Neo.DependencyInjection.*
+import Neo.Logging.*
+
+/// Composes an application without opening a listener. Build consumes this builder, even on failure.
+public class WebApplicationBuilder : Disposable {
+    private var consumed = false
+    private var transferred = false
+    private val services = DefaultServiceCollection()
+    private val configuration = DefaultConfigurationBuilder()
+    private val logging = DefaultLoggerFactory()
+    private val server = WebServerOptions()
+
+    /// Mutable service registrations; Build snapshots them. Supplied instances remain caller-owned.
+    val Services: ServiceCollection => services
+    /// Explicit configuration sources. No files or environment providers are loaded implicitly.
+    val Configuration: ConfigurationBuilder => configuration
+    /// Builder-owned default factory. Add providers before Build; the application takes ownership.
+    val Logging: LoggerFactory => logging
+    /// Explicit listener settings copied at Build; later mutations do not affect the application.
+    val Server: WebServerOptions => server
+
+    /// Builds configuration and DI. Default logging/configuration registrations preserve caller overrides.
+    /// Returns invalid options, service registration/build failure, or InvalidState after consumption.
+    func Build() -> Result<WebApplication, WebError> {
+        if consumed { return Failure(WebError.InvalidState) }
+        consumed = true
+        if server.Address == "" || server.Port < 0 || server.Port > 65535 || server.Backlog < 1 {
+            logging.Dispose()
+            return Failure(WebError.InvalidOptions("Expected address, port 0..65535 and positive backlog"))
+        }
+        let root = configuration.Build()
+        if let Failure(error) = services.AddConfiguration(root) {
+            root.Dispose()
+            logging.Dispose()
+            return Failure(WebError.Services(error))
+        }
+        if let Failure(loggingError) = services.TryAdd(ServiceDescriptor(typeof(LoggerFactory), ServiceSource.Instance(logging), ServiceLifetime.Singleton)) {
+            root.Dispose()
+            logging.Dispose()
+            return Failure(WebError.Services(loggingError))
+        }
+        let result = services.Build()
+        if let Ok(provider) = result {
+            let selected = provider.GetRequiredService<LoggerFactory>()
+            if let Ok(factory) = selected {
+                transferred = true
+                return Ok(WebApplication(provider, root, logging, factory.CreateLogger("Neo.Web"),
+                    server.Address, server.Port, server.Backlog))
+            }
+            provider.Dispose()
+            root.Dispose()
+            logging.Dispose()
+            if let Failure(resolutionError) = selected {
+                return Failure(WebError.Services(resolutionError))
+            }
+        }
+        root.Dispose()
+        logging.Dispose()
+        if let Failure(buildError) = result { return Failure(WebError.Services(buildError)) }
+        return Failure(WebError.InvalidOptions("LoggerFactory resolution failed"))
+    }
+
+    /// Releases the default factory unless ownership has transferred to a built application.
+    func Dispose() {
+        consumed = true
+        if !transferred { logging.Dispose() }
+    }
+}

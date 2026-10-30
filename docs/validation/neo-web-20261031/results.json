@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "sources": {
+    "extensions/Neo.Web/test/Neo.Web.Tests/Tests.rvn": "52732f14fd900583e13f17e774780ed7f4fe9b98a6257985f07108b571facc30",
+    "extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.rvnproj": "446c7a4dfa88a4304a6a80b70509d75649d0e624578f5a613c6a7d972a2f1e05",
+    "extensions/Neo.Web/src/Neo.Web/Neo.Web.rvnproj": "31b4f79d827ba8d77370402503283adc3971e3e234d5fb1ae1a2c8e594e4e628",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplication.rvn": "a971ab30109c2d62256f0779312cb183ec484117903aa435dc1a9f8ed37afb4d",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplicationBuilder.rvn": "0046d159cac2a02e5535ba0d10a429feb384db926a14abb8e2dcd2a4880298dd",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebContracts.rvn": "44ba50419816c128bb2e13ee44aa64cbe980bcfb371179159e9ff2527cb264ab",
+    "samples/web/src/WebDemo/Main.rvn": "99ddf308a2f4e9f6f8759a22760cc6a1bd06677cbe24cddd6bd54e6571aea1c5",
+    "samples/web/src/WebDemo/WebDemo.rvnproj": "a9431831c15b0838158cf1fb604b7bad57b4468392054302f90ba153485e0dbb"
+  },
+  "commands": [
+    {
+      "name": "library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/Neo.Web.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "tests-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/bundle",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.rvnproj",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/bundle/bin/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/tests"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "tests-native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/tests/app"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "sample-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/bundle",
+        "--project",
+        "/Users/robert/Projects/neoclr/samples/web/src/WebDemo/WebDemo.rvnproj",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/bundle/bin/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/neo-web-20261031/validated/sample"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "tests",
+      "mode": "native",
+      "stdout": "PASS Builder snapshots options and transfers ownership once\nPASS Invalid options and ambiguous routes fail without registration\nPASS HTTP consumer covers routing scopes cancellation and joined shutdown\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "sample",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "LISTENING http://127.0.0.1:54840\ninfo: WebDemo[0] Recorded visit 1\ninfo: WebDemo[0] Recorded visit 2\nSTOPPED\n",
+      "stderr": "",
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/",
+          "status": 200,
+          "body": "Hello, neoCLR!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/Ada",
+          "status": 200,
+          "body": "Hello, Ada!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/current",
+          "status": 200,
+          "body": "The current visitor is neoCLR"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 1"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 2"
+        }
+      ]
+    }
+  ],
+  "codegenSha256": "3ee6d371ff97616399a669e44687ddcfeacfb5665f677e1a4bae68d4df863eda",
+  "originalManifestSha256": "83bc62f0fc3d89bef1b8d14548c935acabee0387cc439093d3ea31c4669157f9",
+  "compilerSha256": "475c330a7ecf0c5496679d1404825cc9b1969818b0306ad8b8f568e303974770"
+}

@@ -1,0 +1,14 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.82s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-998c8f9905fce89d)
+
+running 5 tests
+test reflection_metadata::open_query_tests::partial_generic_arguments_use_the_selected_nominal_identity ... ok
+test reflection_metadata::open_query_tests::open_argument_results_extend_the_inventory_and_coexist_with_closed_tokens ... ok
+test reflection_metadata::open_query_tests::open_queries_preserve_source_metadata_without_executable_types ... ok
+test reflection_metadata::open_query_tests::open_queries_preserve_invalid_selector_and_argument_faults ... ok
+test reflection_metadata::open_query_tests::many_closed_shape_tokens_share_results_without_losing_identity_checks has been running for over 60 seconds
+test reflection_metadata::open_query_tests::many_closed_shape_tokens_share_results_without_losing_identity_checks ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 253 filtered out; finished in 60.92s

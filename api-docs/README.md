@@ -3128,3 +3128,14 @@ removed. Text/gzip factory ownership, watcher filter and fractional time ticks u
 constant defaults. Existing selected types cover every changed member; there are no
 new omissions. The aggregate compiler reference and native rendering are refreshed,
 and snapshot/source-link checks pass. See [migration and qualification](../docs/parameter-defaults.md#runtime-api-consolidation-2026-10-30).
+
+### Experimental Neo.Web foundation 2026-10-31
+
+The optional Neo.Web native assembly is selected by the native audit renderer when
+present. Its WebApplicationBuilder, WebApplication, HttpContext, WebServerOptions
+and WebError types have native type/member pages, generated source summaries and
+an explicit [API contract](neo-web.md). No public type is excluded. The CLI aggregate
+bridge retains its existing inventory; the unified native snapshot supplies this
+extension's assembly ownership and navigation, as with other Neo extensions.
+Reference snippets are extracted from the compiled samples/web application.
+API names are provisional; arbitrary generic minimal API binding remains deferred.

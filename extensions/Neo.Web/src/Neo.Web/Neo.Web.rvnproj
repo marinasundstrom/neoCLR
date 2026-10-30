@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../runtime/NativeLibrary.props" />
+  <PropertyGroup><AssemblyName>Neo.Web</AssemblyName></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Neo/**/*.rvn" />
+    <ProjectReference Include="../../../../runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
+    <ProjectReference Include="../../../../runtime/System.Web/src/System.Web/System.Web.rvnproj" />
+    <ProjectReference Include="../../../Neo.DependencyInjection/src/Neo.DependencyInjection/Neo.DependencyInjection.rvnproj" />
+    <ProjectReference Include="../../../Neo.Logging/src/Neo.Logging/Neo.Logging.rvnproj" />
+    <ProjectReference Include="../../../Neo.Configuration/src/Neo.Configuration/Neo.Configuration.rvnproj" />
+  </ItemGroup>
+</Project>

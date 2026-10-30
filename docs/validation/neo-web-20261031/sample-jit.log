@@ -1,0 +1,6 @@
+LISTENING http://127.0.0.1:54877
+info: WebDemo[0] Recorded visit 1
+info: WebDemo[0] Recorded visit 2
+STOPPED
+warning: DAM2001: Neo.DependencyInjection.DefaultServiceCollection.Build instruction 37 -> Neo.DependencyInjection.ConstructorPlan.Prepare parameter 0: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention

@@ -1,0 +1,242 @@
+module Neo.Web
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Optional.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import Neo.Configuration.*
+import Neo.DependencyInjection.*
+import Neo.Logging.*
+import System.Web.Http.*
+import Neo.Web.HttpContext
+
+/// A single-run, cooperative HTTP application. Stop and await RunAsync before disposal.
+public class WebApplication : Disposable {
+    private var endpoints = ArrayList<WebEndpoint>()
+    private val validator: RoutePattern
+    private val ownedLogging: LoggerFactory
+    private val logger: Logger
+    private val address: string
+    private val port: int
+    private val backlog: int
+    private val stopping = CancellationTokenSource()
+    private var server: HttpServer? = null
+    private var started = false
+    private var running = false
+    private var disposed = false
+
+    /// Root service provider; request handlers should resolve scoped services from Neo.Web.HttpContext.Services.
+    val Services: ServiceProvider
+    /// Application-owned live configuration root, disposed after services.
+    val Configuration: ConfigurationRoot
+
+    internal init(services: ServiceProvider, configuration: ConfigurationRoot, logging: LoggerFactory,
+        logger: Logger, address: string, port: int, backlog: int) {
+        Services = services
+        Configuration = configuration
+        ownedLogging = logging
+        self.logger = logger
+        self.address = address
+        self.port = port
+        self.backlog = backlog
+        validator = RoutePattern.Parse("/")!
+    }
+
+    /// Creates an empty configuration/default-DI builder with an empty Information-level logger factory.
+    static func CreateBuilder() -> WebApplicationBuilder => WebApplicationBuilder()
+
+    /// Registers a context callback. Invalid methods/patterns and equal-precedence overlaps are rejected atomically.
+    /// Registration freezes on RunAsync; literal segments outrank captures, independent of registration order.
+    func MapContext(method: string, pattern: string,
+        handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError> {
+        if started || disposed { return Failure(WebError.InvalidState) }
+        let parsedMethod = HttpMethod.Parse(method)
+        if let Failure(error) = parsedMethod { return Failure(WebError.Transport(error)) }
+        let parsed = RoutePattern.Parse(pattern)
+        if let Failure(patternError) = parsed { return Failure(WebError.Routing(patternError)) }
+        let endpoint = WebEndpoint(parsedMethod!, parsed!, pattern, handler)
+        for existing in endpoints {
+            if existing.Method.Equals(endpoint.Method) && existing.Priority == endpoint.Priority && existing.Pattern.Overlaps(endpoint.Pattern) {
+                return Failure(WebError.Routing("Ambiguous route: " + pattern))
+            }
+        }
+        endpoints.Add(endpoint)
+        return Ok(())
+    }
+
+    /// Gets the listener's assigned port while running, including when configured with port zero.
+    func GetLocalPort() -> Result<int, WebError> {
+        if !running { return Failure(WebError.InvalidState) }
+        if server is HttpServer active {
+            if let Ok(value) = active.GetLocalPort() { return Ok(value) }
+        }
+        return Failure(WebError.InvalidState)
+    }
+
+    /// Freezes routes, opens the listener and returns its joined lifetime. Caller cancellation cancels the task.
+    /// Pre-cancellation opens no socket and leaves registration available. A listen attempt consumes the application.
+    func RunAsync(cancellationToken: CancellationToken = default) -> Task<Result<unit, WebError>> {
+        if started || disposed {
+            return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Failure(WebError.InvalidState))
+        }
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, WebError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        started = true
+        let listening = HttpServer.Listen(address, port, backlog)
+        if let Failure(error) = listening {
+            return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Failure(WebError.Transport(error)))
+        }
+        let active = listening!
+        server = active
+        running = true
+        let registration = cancellationToken.Register(self.Stop)
+        let pending = active.Serve(self.Dispatch, cancellationToken)
+        let result = Promise<Result<unit, WebError>>()
+        // Outcome adapter: cancellation must clear running and release registration too.
+        pending.OnCompleted(() => {
+            registration.Dispose()
+            stopping.Cancel()
+            running = false
+            if pending.IsCancelled {
+                _ = result.Cancel()
+            } else {
+                if let Failure(error) = pending.GetResult() {
+                    _ = result.Complete(Result<unit, WebError>.Failure(WebError.Transport(error)))
+                } else {
+                    _ = result.Complete(Result<unit, WebError>.Ok(()))
+                }
+            }
+        })
+        return result.Task
+    }
+
+    /// Closes connections and requests cooperative application cancellation; RunAsync joins started handlers.
+    /// Calling Stop before RunAsync has no effect.
+    func Stop() {
+        if !running { return }
+        stopping.Cancel()
+        if server is HttpServer active { active.Close() }
+    }
+
+    private func Dispatch(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(""))
+        if let Failure(_) = validator.Match(request.Target) {
+            response.Respond(HttpStatusCode.BadRequest, HttpStringContent("Bad request"))
+            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+        }
+        var selected: WebEndpoint? = null
+        var captured: RouteMatch? = null
+        let allowed = ArrayList<string>()
+        for endpoint in endpoints {
+            let matched = endpoint.Pattern.Match(request.Target)!
+            if let Some(route) = matched {
+                var present = false
+                for method in allowed {
+                    if method == endpoint.Method.Method { present = true }
+                }
+                if !present { allowed.Add(endpoint.Method.Method) }
+                if endpoint.Method.Equals(request.Method) {
+                    var choose = true
+                    if selected is WebEndpoint previous { choose = endpoint.Priority > previous.Priority }
+                    if choose {
+                        selected = endpoint
+                        captured = route
+                    }
+                }
+            }
+        }
+        if selected is WebEndpoint chosen {
+            if captured is RouteMatch route {
+                return Invoke(chosen, request, response, route)
+            }
+        }
+        if allowed.Count == 0 {
+            response.Respond(HttpStatusCode.NotFound, HttpStringContent("Not found"))
+        } else {
+            let headers = ArrayList<HttpHeader>()
+            let methods: string[] = [for index in 0..allowed.Count => allowed[index]]
+            headers.Add(HttpHeader("Allow", String.Join(", ", methods)))
+            response.Dispose()
+            let rejection = HttpResponse(405, headers, HttpStringContent("Method not allowed"))
+            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(rejection))
+        }
+        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+    }
+
+    private func Invoke(chosen: WebEndpoint, request: HttpRequest, response: HttpResponse,
+        route: RouteMatch) -> Task<Result<HttpResponse, HttpError>> {
+        let scope = Services.CreateScope()
+        if let Failure(_) = scope {
+            logger.LogError("Request scope creation failed")
+            response.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))
+            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+        }
+        let view = Neo.Web.HttpContext(request, response, scope!, route, stopping.Token)
+        let pending = chosen.Handler(view)
+        let result = Promise<Result<HttpResponse, HttpError>>()
+        // Outcome adapter: release the scope on success, typed failure and cancellation.
+        // All exposed response operations own buffered data before this callback settles.
+        pending.OnCompleted(() => {
+            view.Finish()
+            if pending.IsCancelled {
+                response.Dispose()
+                _ = result.Cancel()
+            } else {
+                if let Failure(error) = pending.GetResult() {
+                    if error is WebError.BadRequest(_) {
+                        response.Respond(HttpStatusCode.BadRequest, HttpStringContent("Bad request"))
+                    } else {
+                        logger.LogError("Request handler failed")
+                        response.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))
+                    }
+                }
+                _ = result.Complete(Result<HttpResponse, HttpError>.Ok(response))
+            }
+        })
+        return result.Task
+    }
+
+    /// Disposes services, the default logger factory and configuration, in that order. Active disposal faults.
+    func Dispose() {
+        if disposed { return }
+        if running { Panic("Stop and await RunAsync before disposing WebApplication") }
+        disposed = true
+        endpoints = ArrayList<WebEndpoint>()
+        Services.Dispose()
+        ownedLogging.Dispose()
+        Configuration.Dispose()
+        stopping.Dispose()
+        server = null
+    }
+}
+
+internal class WebEndpoint {
+    val Method: HttpMethod
+    val Pattern: RoutePattern
+    val Priority: int
+    val Handler: (HttpContext) -> Task<Result<unit, WebError>>
+
+    init(method: HttpMethod, pattern: RoutePattern, source: string,
+        handler: (HttpContext) -> Task<Result<unit, WebError>>) {
+        Method = method
+        Pattern = pattern
+        Handler = handler
+        // The validated grammar has at most sixteen segments. A literal at the first
+        // differing position wins. Raw '{' starts a capture; escaped braces are literals.
+        let bytes = source.Utf8Bytes
+        var priority = 0
+        var segment = 0
+        for index in 1..bytes.Length {
+            if index == 1 || bytes[index - 1] == 47 {
+                if bytes[index] != 123 { priority += 1 << (15 - segment) }
+                segment += 1
+            }
+        }
+        Priority = priority
+    }
+}

@@ -342,7 +342,13 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         catalog_path = lib / 'bundle.json'
         catalog = json.loads(catalog_path.read_text())
         core_assemblies = ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']
-        if catalog.get('version') != 1 or catalog.get('assemblyNames') not in (
+        # Neo.Web is an optional final extension; all catalog hashes are still checked.
+        selection = catalog.get('assemblyNames', [])
+        if selection and selection[-1] == 'Neo.Web':
+            if 'Neo.Configuration' not in selection or 'Neo.Logging' not in selection:
+                raise ValueError('Neo.Web requires configuration and logging libraries')
+            selection = selection[:-1]
+        if catalog.get('version') != 1 or selection not in (
                 core_assemblies, core_assemblies + ['System.Data.PostgreSql'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'System.Data.PostgreSql'],

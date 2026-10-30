@@ -16299,3 +16299,21 @@ compiler configuration, semantic/emission behavior, metadata or native ABI, so n
 Raven branch integration is required. neoCLR owns this presentation fix; native
 origin/debug metadata should eventually replace transport-based fallback naming.
 See [the contract and validation](stack-traces.md#compact-fault-name-correction-2026-10-30).
+
+## Neo.Web foundation qualification 2026-10-31
+
+Neo.Web is an experimental web framework over System.Web.Http.HttpServer. Its
+ordinary library classes, context callbacks, Result errors and DI factories use
+existing structural-function and native metadata contracts. It introduces no new
+Raven Runtime Contract setting or CLI carrier representation. Generic minimal API
+binding and whole-signature handler adaptation remain separate work.
+
+The combined HTTP/DI consumer exposed the native code generator's bounded
+TypeShape dispatch body. Equal closed shape-flag results now share a generated
+body while retaining every token test, selector validation and the existing
+instruction bound. This changes native lowering only, not source signatures,
+metadata identity or interpreter semantics. A development code generator containing
+that fix is required; published Preview 19 binaries are unchanged. The native
+metadata/query implementation remains the owner of this lowering; it is not a
+permanent API limit or a Neo.Web-specific runtime operation. See the
+[focused qualification](validation/neo-web-20261031/README.md).
