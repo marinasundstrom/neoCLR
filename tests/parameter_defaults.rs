@@ -47,3 +47,19 @@ fn instance_defaults_exclude_the_receiver() {
     assert_eq!(loaded.functions[0].parameter_defaults.len(), 1);
     assert_eq!(run(&loaded, Limits::default()).unwrap().output, ["42"]);
 }
+
+#[test]
+fn nominal_value_defaults_are_metadata_not_null_arguments() {
+    let source = format!(
+        "{}\n.function Probe(Counter value) -> Int32\nldc.i4 0\nret\n.end\n",
+        include_str!("../examples/value_initialization.neoil")
+    );
+    let module = assemble(&source).unwrap();
+    let mut json = serde_json::to_value(module).unwrap();
+    let methods = json["functions"].as_array_mut().unwrap();
+    let probe = methods.iter_mut().find(|f| f["name"] == "Probe").unwrap();
+    probe["parameter_defaults"] = json!([{"kind":"Null","value":""}]);
+    let loaded = load(&json.to_string()).unwrap();
+    let probe = loaded.functions.iter().find(|f| f.name == "Probe").unwrap();
+    assert_eq!(probe.parameter_defaults[0].as_ref().unwrap().kind, "Null");
+}

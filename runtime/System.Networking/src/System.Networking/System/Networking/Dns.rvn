@@ -10,18 +10,14 @@ import System.Runtime.CompilerServices.*
 public class Dns {
     private init() { }
 
-    static func GetHostAddresses(hostName: string) -> Task<Result<Sequence<IPAddress>, DnsError>> {
-        return GetHostAddresses(hostName, CancellationToken.None)
-    }
-
     /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
-    static func GetHostAddresses(hostName: string, cancellationToken: CancellationToken) -> Task<Result<Sequence<IPAddress>, DnsError>> {
+    static func GetHostAddresses(hostName: string, cancellationToken: CancellationToken = default) -> Task<Result<Sequence<IPAddress>, DnsError>> {
         return GetHostAddressesUntil(hostName, 0, cancellationToken)
     }
 
     /// <summary>Resolves within a shared deadline without renewing its budget.</summary>
     /// <remarks>Pre-requested cancellation takes precedence over an expired deadline; expiry otherwise returns TimedOut.</remarks>
-    static func GetHostAddressesUntil(hostName: string, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<Sequence<IPAddress>, DnsError>> {
+    static func GetHostAddressesUntil(hostName: string, deadline: NetworkDeadline, cancellationToken: CancellationToken = default) -> Task<Result<Sequence<IPAddress>, DnsError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<Sequence<IPAddress>, DnsError>>()
             _ = source.Complete(Failure(DnsError.TimedOut))
@@ -30,11 +26,7 @@ public class Dns {
         return GetHostAddressesUntil(hostName, deadline.Stamp, cancellationToken)
     }
 
-    internal static func GetHostAddressesUntil(hostName: string, deadline: long) -> Task<Result<Sequence<IPAddress>, DnsError>> {
-        return GetHostAddressesUntil(hostName, deadline, CancellationToken.None)
-    }
-
-    internal static func GetHostAddressesUntil(hostName: string, deadline: long, cancellationToken: CancellationToken) -> Task<Result<Sequence<IPAddress>, DnsError>> {
+    internal static func GetHostAddressesUntil(hostName: string, deadline: long, cancellationToken: CancellationToken = default) -> Task<Result<Sequence<IPAddress>, DnsError>> {
         let source = Promise<Result<Sequence<IPAddress>, DnsError>>()
         let completion = DnsCompletion(source, cancellationToken)
         completion.StartUntil(hostName, deadline)

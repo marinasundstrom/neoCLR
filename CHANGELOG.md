@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-30
 
+- Support nominal value-type parameter defaults, including CancellationToken = default,
+  through native and CLI metadata. Consolidate runtime stream, socket, DNS, TLS and
+  HTTP forwarding overloads; declare defaults on stream interfaces and concrete views.
+  Use false ownership defaults on text/gzip factories, a wildcard watcher filter and
+  zero fractional time ticks. Refresh the API reference and migration docs. Rebuild
+  binary consumers and implementations; removed method arities are not delegate adapters.
+
 - Qualify direct native synchronous/asynchronous Result entry points: unit/integer
   successes determine exit status; failures write their normal display to stderr
   and exit one. Cover error conversions, Error interfaces and concrete structural
@@ -26,8 +33,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   arguments across native assembly boundaries; full call arity is unchanged. Enable
   opt-in JSON configuration reload with a 250 ms debounce, live DI reads, typed
   background errors and disposal. Consolidate JSON registration/provider/source
-  overloads using false defaults; binary consumers must rebuild. Arbitrary value-type
-  defaults and runtime overload cleanup remain a separate slice. Share identical
+  overloads using false defaults; binary consumers must rebuild. Nominal struct
+  defaults are added by the runtime API slice above. Share identical
   generated reflection relationship checks so the integrated reload sample stays
   within the existing native method instruction bound.
 

@@ -328,7 +328,7 @@ Import `System.Web.Http.Json.*` to use
 same buffered mapping rules as `JsonContent.Read<T>`. `PostAsJson<T>` serializes a
 model before sending and returns `HttpResponse`, preserving non-success statuses
 and content for the application to inspect. Both accept string or Uri addresses,
-with optional CancellationToken overloads, and honor BaseUri and DefaultRequestHeaders.
+with a final `cancellationToken: CancellationToken = default`, and honor BaseUri and DefaultRequestHeaders.
 
 Development failures return `HttpError | JsonError` directly: HttpError retains
 HTTP/transport/status errors; JsonError retains mapping, syntax, UTF-8 and limit

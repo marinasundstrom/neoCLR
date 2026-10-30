@@ -44,11 +44,8 @@ public class SslStream : InputStream, OutputStream, Disposable {
     val IsAuthenticated: bool => authenticated && !failed && !closed
 
     /// Authenticates the server using explicit trust and the expected DNS name (also used for SNI).
-    func AuthenticateAsClient(options: SslClientAuthenticationOptions, targetHost: string) -> Task<Result<unit, SslError>> {
-        return AuthenticateAsClient(options, targetHost, CancellationToken.None)
-    }
     /// Cancellation before entry preserves state; cancellation after starting aborts the session.
-    async func AuthenticateAsClient(options: SslClientAuthenticationOptions, targetHost: string, cancellationToken: CancellationToken) -> Task<Result<unit, SslError>> {
+    async func AuthenticateAsClient(options: SslClientAuthenticationOptions, targetHost: string, cancellationToken: CancellationToken = default) -> Task<Result<unit, SslError>> {
         if cancellationToken.IsCancellationRequested {
             return await CancelAuthentication()
         }
@@ -65,11 +62,8 @@ public class SslStream : InputStream, OutputStream, Disposable {
         return await Authenticate(cancellationToken)
     }
     /// Authenticates as a server using an owned certificate chain and private key.
-    func AuthenticateAsServer(options: SslServerAuthenticationOptions) -> Task<Result<unit, SslError>> {
-        return AuthenticateAsServer(options, CancellationToken.None)
-    }
     /// Cancellation after starting aborts the session; no client certificate is requested.
-    async func AuthenticateAsServer(options: SslServerAuthenticationOptions, cancellationToken: CancellationToken) -> Task<Result<unit, SslError>> {
+    async func AuthenticateAsServer(options: SslServerAuthenticationOptions, cancellationToken: CancellationToken = default) -> Task<Result<unit, SslError>> {
         if cancellationToken.IsCancellationRequested {
             return await CancelAuthentication()
         }
@@ -155,12 +149,8 @@ public class SslStream : InputStream, OutputStream, Disposable {
             }
         }
     }
-    /// Reads with CancellationToken.None.
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
-    }
     /// Reads authenticated plaintext. Zero count is a no-op; positive-count zero means close-notify.
-    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<int, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let promise = Promise<Result<int, StreamError>>()
             _ = promise.Cancel()
@@ -188,12 +178,8 @@ public class SslStream : InputStream, OutputStream, Disposable {
         operation.Complete()
         return Ok(read)
     }
-    /// Writes with CancellationToken.None.
-    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
-        return Write(buffer, offset, count, CancellationToken.None)
-    }
     /// Encrypts and writes the complete range. Success does not imply peer receipt.
-    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             return await CancelWrite()
         }
@@ -228,10 +214,8 @@ public class SslStream : InputStream, OutputStream, Disposable {
         _ = promise.Cancel()
         return promise.Task
     }
-    /// Flushes the underlying output with CancellationToken.None.
-    func Flush() -> Task<Result<unit, StreamError>> { return Flush(CancellationToken.None) }
     /// Flushes the underlying output; no TLS application data remains buffered after Write.
-    async func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    async func Flush(cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             return await CancelWrite()
         }
@@ -250,10 +234,8 @@ public class SslStream : InputStream, OutputStream, Disposable {
         operation.Complete()
         return Ok(())
     }
-    /// Sends close-notify without closing the input side or underlying transport.
-    func Shutdown() -> Task<Result<unit, StreamError>> { return Shutdown(CancellationToken.None) }
     /// Gracefully closes local writes. Idempotent; cancellation after entry aborts the session.
-    async func Shutdown(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    async func Shutdown(cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             return await CancelWrite()
         }

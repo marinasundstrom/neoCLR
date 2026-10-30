@@ -10,7 +10,7 @@ known-length `HttpStreamContent.Create` source.
 ## Receive a client response
 
 Pass `HttpCompletionOption.ResponseHeadersRead` to `HttpClient.Send(request,
-completionOption)` or its overload with a cancellation token. The default
+completionOption, cancellationToken = default)`. The default
 `ResponseContentRead` and existing Get/Send overloads still buffer the whole body.
 
 Use `response.Content.TryGetStream()` to obtain `Some(InputStream)` for incoming
@@ -80,9 +80,8 @@ Windows and streaming-over-TLS qualification remain open.
 
 ## Copy a body to an output stream (development)
 
-`HttpContent.CopyTo(destination: OutputStream)` and
-`CopyTo(destination: OutputStream, cancellationToken: CancellationToken)` return
-`Task<Result<unit, HttpError>>`. They accept buffered content and incoming or
+`HttpContent.CopyTo(destination: OutputStream, cancellationToken: CancellationToken = default)` returns
+`Task<Result<unit, HttpError>>`. It accepts buffered content and incoming or
 known-length source streams. The loopback consumer in
 [the copy experiment](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/http-content-copy)
 copies headers-first responses into a MemoryStream.

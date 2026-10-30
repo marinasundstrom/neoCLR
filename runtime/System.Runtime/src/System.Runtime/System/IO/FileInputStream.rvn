@@ -22,12 +22,8 @@ public class FileInputStream : InputStream, SeekableStream {
         return Ok(FileInputStream(neoCLR.Runtime.UnpackValue<int>(payload)))
     }
 
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
-    }
-
     /// Returns an inline-completed operation over the current blocking provider.
-    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<int, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<int, StreamError>>()
             _ = source.Cancel()

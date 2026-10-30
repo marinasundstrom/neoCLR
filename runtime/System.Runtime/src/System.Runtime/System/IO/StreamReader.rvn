@@ -20,25 +20,15 @@ public class StreamReader : TextReader {
         self.leaveOpen = leaveOpen
     }
 
-    /// <summary>Creates a reader with asynchronous operations text wrapper using UTF-8, without transferring bytes.</summary>
-    static func Create(input: InputStream) -> Result<StreamReader, TextReadError> {
-        return Create(input, Encodings.Utf8, false)
-    }
-
     /// <summary>Creates a UTF-8 wrapper with explicit ownership of the underlying stream.</summary>
-    static func Create(input: InputStream, leaveOpen: bool) -> Result<StreamReader, TextReadError> {
+    static func Create(input: InputStream, leaveOpen: bool = false) -> Result<StreamReader, TextReadError> {
         return Create(input, Encodings.Utf8, leaveOpen)
-    }
-
-    /// <summary>Creates a wrapper using the supplied encoding without transferring bytes.</summary>
-    static func Create(input: InputStream, encoding: Encoding) -> Result<StreamReader, TextReadError> {
-        return Create(input, encoding, false)
     }
 
     /// <summary>Creates a wrapper with the supplied encoding and ownership policy.</summary>
     /// <remarks>Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
     /// No input is read or output written. Use one buffering wrapper per stream direction.</remarks>
-    static func Create(input: InputStream, encoding: Encoding, leaveOpen: bool) -> Result<StreamReader, TextReadError> {
+    static func Create(input: InputStream, encoding: Encoding, leaveOpen: bool = false) -> Result<StreamReader, TextReadError> {
         return Ok(StreamReader(input, encoding, leaveOpen))
     }
 

@@ -20,9 +20,9 @@ AsyncInputStream/AsyncOutputStream interfaces, which have been removed.
 - [OutputStream](xref:System.IO.OutputStream): `Write(buffer, offset, count)` returns
   `Task<Result<unit, StreamError>>`. Success covers the entire requested range.
   `Flush()` returns `Task<Result<unit, StreamError>>`.
-- Read, Write and Flush also accept a final
+- Read, Write and Flush declare a final optional
   [CancellationToken](xref:System.Concurrency.CancellationToken). Omitted tokens
-  mean CancellationToken.None. Cancellation produces a cancelled Task, not a
+  use `cancellationToken: CancellationToken = default`, equivalent to CancellationToken.None. Cancellation produces a cancelled Task, not a
   StreamError or a successful short write.
 - Both interfaces expose immediate, idempotent `Close()`. Close disposes resources;
   it does not implicitly flush, finalize an encoder or perform graceful TLS shutdown.
@@ -176,3 +176,12 @@ cannot safely project. This manual entry covers that interim reference gap.
 Console now exposes these synchronous byte capabilities. Separate SyncStreamReader
 and SyncStreamWriter wrappers adapt them to direct text results; see the
 [factory and capability reference](console.md#separate-text-capabilities-and-factories-development).
+
+## Optional arguments (development, 2026-10-30)
+
+InputStream and OutputStream now declare one token-taking method per operation,
+with a default token. Concrete implementations carry the same defaults. The
+zero-token overloads were removed; rebuild consumers and interface implementations.
+Text reader/writer Create factories and GZipStream creation default `leaveOpen` to
+false. Encoding-selection overloads remain, and `leaveOpen: true` still borrows the
+underlying stream. See [the defaults and migration contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/parameter-defaults.md#runtime-api-consolidation-2026-10-30).

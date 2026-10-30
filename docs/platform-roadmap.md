@@ -7338,9 +7338,10 @@ and [qualification evidence](validation/generic-function-methods-20261030/README
 
 Opt-in JSON file reload and native scalar parameter defaults are implemented and
 qualified in the [Configuration reload receipt](validation/configuration-reload-20261030/README.md).
-This bounded author request does not reorder the roadmap. Runtime overload review
-and arbitrary value-type defaults, including CancellationToken = default, are the
-next requested slice and remain open.
+This bounded author request does not reorder the roadmap. The requested runtime
+overload review now consolidates token forwarding and selected scalar defaults,
+including CancellationToken = default; [qualification](validation/runtime-defaults-20261030/README.md).
+Bare generic-parameter and union defaults remain outside this bounded profile.
 
 The related native Result entrypoint gap is now closed, including concrete structural
 error alternatives, without widening whole-union boxing or bare-generic composition

@@ -30,35 +30,20 @@ public class GZipStream : InputStream, OutputStream {
         self.leaveOpen = leaveOpen
     }
 
-    /// Creates a compressor that owns and closes the output stream.
-    static func CreateCompressor(output: OutputStream) -> GZipStream {
-        return CreateCompressor(output, false)
-    }
-
     /// <summary>Creates an incremental compressor using fixed Huffman DEFLATE with LZ77 matching.</summary>
     /// <param name="output">Destination receiving complete gzip framing after Finish.</param>
     /// <param name="leaveOpen">Preserve the underlying stream when Close is called.</param>
     /// <returns>An output-mode wrapper; Read returns WrongAccess.</returns>
-    static func CreateCompressor(output: OutputStream, leaveOpen: bool) -> GZipStream {
+    static func CreateCompressor(output: OutputStream, leaveOpen: bool = false) -> GZipStream {
         return GZipStream(None, Some(output), leaveOpen)
-    }
-
-    /// Creates a decompressor that owns and closes the input stream.
-    static func CreateDecompressor(input: InputStream) -> GZipStream {
-        return CreateDecompressor(input, false)
     }
 
     /// <summary>Creates a decoder for stored, fixed and dynamic DEFLATE blocks and concatenated gzip members.</summary>
     /// <param name="input">A gzip-only source ending at EOF; optional headers, CRC32 and sizes are checked.</param>
     /// <param name="leaveOpen">Preserve the underlying stream when Close is called.</param>
     /// <returns>An input-mode wrapper; Write, Flush and Finish return WrongAccess.</returns>
-    static func CreateDecompressor(input: InputStream, leaveOpen: bool) -> GZipStream {
+    static func CreateDecompressor(input: InputStream, leaveOpen: bool = false) -> GZipStream {
         return GZipStream(Some(input), None, leaveOpen)
-    }
-
-    /// Reads with CancellationToken.None.
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
     }
 
     /// <summary>Validates the complete bounded gzip input before exposing decompressed bytes.</summary>
@@ -67,7 +52,7 @@ public class GZipStream : InputStream, OutputStream {
     /// <param name="count">Maximum bytes; zero does not consume input.</param>
     /// <param name="cancellationToken">Pre-cancellation preserves state. Cancellation after input begins poisons the wrapper.</param>
     /// <returns>Bytes read, zero at EOF, or Closed, WrongAccess, InvalidRange, InvalidData, LimitExceeded or an underlying error. Later calls after failure return IoFailure.</returns>
-    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<int, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let promise = Promise<Result<int, StreamError>>()
             _ = promise.Cancel()
@@ -136,18 +121,13 @@ public class GZipStream : InputStream, OutputStream {
         return Ok(copied)
     }
 
-    /// Writes with CancellationToken.None.
-    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
-        return Write(buffer, offset, count, CancellationToken.None)
-    }
-
     /// <summary>Compresses the full range in bounded 16384-byte blocks without retaining caller bytes after completion.</summary>
     /// <param name="buffer">Initialized source bytes, unchanged until the operation settles.</param>
     /// <param name="offset">First source index.</param>
     /// <param name="count">Bytes to compress; zero emits nothing.</param>
     /// <param name="cancellationToken">Cancellation propagates through the destination; interrupted output cannot be retried.</param>
     /// <returns>Success or Closed, WrongAccess, InvalidRange, IoFailure or an underlying output error.</returns>
-    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let promise = Promise<Result<unit, StreamError>>()
             _ = promise.Cancel()
@@ -206,15 +186,10 @@ public class GZipStream : InputStream, OutputStream {
         return Ok(())
     }
 
-    /// Finalizes compression with CancellationToken.None.
-    func Finish() -> Task<Result<unit, StreamError>> {
-        return Finish(CancellationToken.None)
-    }
-
     /// <summary>Writes the final DEFLATE block, CRC32 and modulo-2^32 input size exactly once, including for empty input.</summary>
     /// <param name="cancellationToken">Cancellation for trailer output.</param>
     /// <returns>Success after destination acceptance, or a stream error. Successful repetition is a no-op. Does not flush or close the destination.</returns>
-    async func Finish(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    async func Finish(cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let promise = Promise<Result<unit, StreamError>>()
             _ = promise.Cancel()
@@ -257,15 +232,10 @@ public class GZipStream : InputStream, OutputStream {
         return Ok(())
     }
 
-    /// Flushes the destination with CancellationToken.None.
-    func Flush() -> Task<Result<unit, StreamError>> {
-        return Flush(CancellationToken.None)
-    }
-
     /// <summary>Flushes output already accepted; does not finalize gzip or emit a trailer.</summary>
     /// <param name="cancellationToken">Cancellation for the destination flush.</param>
     /// <returns>Destination completion or a stream error. A failed/cancelled flush poisons the wrapper.</returns>
-    async func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    async func Flush(cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let promise = Promise<Result<unit, StreamError>>()
             _ = promise.Cancel()

@@ -7,15 +7,13 @@ import System.Concurrency.*
 /// <summary>Asynchronous byte input without requiring synchronous or seek operations.</summary>
 /// <remarks>Keep the destination range available and unmodified until the task settles. Implementations document concurrency and ownership.</remarks>
 public interface InputStream {
-    /// Reads with CancellationToken.None.
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>>
     /// <summary>Reads up to count bytes; a positive-count read returns zero only at EOF.</summary>
     /// <param name="buffer">Destination whose bytes outside the requested range are preserved.</param>
     /// <param name="offset">First destination index.</param>
     /// <param name="count">Maximum bytes to read; zero completes without consuming input.</param>
     /// <param name="cancellationToken">Cancellation produces a cancelled task, not a StreamError.</param>
     /// <returns>A byte count or stream error. Short reads are successful.</returns>
-    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>>
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<int, StreamError>>
     /// <summary>Closes this stream; repeated closure has no additional effect.</summary>
     /// <remarks>Close is disposal, not an awaited flush or TLS shutdown.</remarks>
     func Close()

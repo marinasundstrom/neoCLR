@@ -49,11 +49,7 @@ internal class HttpBodyInput : InputStream {
         }
     }
 
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
-    }
-
-    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<int, StreamError>> {
         let result = Promise<Result<int, StreamError>>()
         if cancellationToken.IsCancellationRequested {
             _ = result.Cancel()

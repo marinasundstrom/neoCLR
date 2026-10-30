@@ -1,0 +1,11 @@
+   Compiling neoclr v0.1.0-preview.18 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.55s
+     Running tests/parameter_defaults.rs (target/debug/deps/parameter_defaults-ee5c37b5ba7ccf31)
+
+running 4 tests
+test nominal_value_defaults_are_metadata_not_null_arguments ... ok
+test instance_defaults_exclude_the_receiver ... ok
+test defaults_round_trip_without_changing_execution_arity ... ok
+test malformed_defaults_are_rejected_at_load ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.04s

@@ -42,7 +42,7 @@ or verification failures currently collapse to AuthenticationFailed.
 ## Transfers and lifetime
 
 Read and Write have the same buffer/offset/count overloads as the base stream
-contracts, with optional explicit CancellationToken. Read returns authenticated
+contracts, with `cancellationToken: CancellationToken = default`. Read returns authenticated
 plaintext and zero for authenticated EOF; missing close-notify is InvalidData.
 Write completes after the whole range is accepted by the underlying output.
 Zero-count reads consume nothing. Invalid ranges return InvalidRange. Operations

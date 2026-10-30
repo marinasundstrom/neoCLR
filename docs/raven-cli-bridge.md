@@ -16252,11 +16252,16 @@ capability as a separate extension; no event metadata or Task adaptation is adde
 
 ## Native parameter defaults (2026-10-30)
 
-Raven codex/neoclr now exports/imports scalar and reference-null parameter defaults.
+Raven codex/neoclr exports/imports scalar, reference-null and ordinary nominal
+struct zero defaults, including CancellationToken. Interface declarations use the
+same explicit capability as class methods.
 Native metadata carries explicit aligned defaults; the CLI projection uses Param
 Optional/HasDefault flags and Constant records, without custom attributes. Caller
 binding inserts omitted arguments; runtime arity is unchanged. No Runtime Contract
-entry is added. Value-type/default(T), enum, decimal, char and Optional.None support
+entry is added. A Null constant on a nominal value parameter denotes zero
+initialization. The general caller-binding correction was developed on Raven main
+as 83e700ab6 and carried deliberately as 049c9fbd7; native admission follows in
+6ceeb1be8. Bare generic-parameter defaults, enum/decimal/char constants and Optional.None
 remain separate qualification work. See [contract, ownership and validation](parameter-defaults.md).
 
 Execution qualification: the signal consumers pass in the interpreter. The native

@@ -144,21 +144,9 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
         return Ok(())
     }
 
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
-    }
-
-    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
-        return Write(buffer, offset, count, CancellationToken.None)
-    }
-
-    func Flush() -> Task<Result<unit, StreamError>> {
-        return Flush(CancellationToken.None)
-    }
-
     /// <summary>Reads memory synchronously and returns a settled task; no worker is scheduled.</summary>
     /// <remarks>Pre-cancellation wins before validation or mutation. Other errors match Read. This shared-cursor stream is not thread-safe.</remarks>
-    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<int, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<int, StreamError>>()
             _ = source.Cancel()
@@ -169,7 +157,7 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     /// <summary>Writes the full range to memory and returns a settled task.</summary>
     /// <remarks>Pre-cancellation wins before validation or mutation. Range, closed-state and quota errors preserve storage and cursor, as with Write.</remarks>
-    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<unit, StreamError>>()
             _ = source.Cancel()
@@ -184,7 +172,7 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     /// <summary>Returns settled success for open memory storage; no data needs flushing.</summary>
     /// <remarks>Pre-cancellation wins over Closed. Does not change position or length.</remarks>
-    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    func Flush(cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<unit, StreamError>>()
             _ = source.Cancel()

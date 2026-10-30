@@ -69,3 +69,10 @@ until completion; sends preserve the existing snapshot behavior. See the
 TLS plaintext handling now retains selected managed memory windows across awaits
 and borrows slices for synchronous copy/control operations. The TLS staging buffers
 remain owned arrays; public stream signatures still await coordinated migration.
+
+### Default arguments (development)
+
+Cancellation-aware operations now use `cancellationToken: CancellationToken = default`
+in place of redundant forwarding overloads. Omitting it uses a non-cancellable token;
+passing an explicit token keeps the existing cancellation behavior. Rebuild binary
+consumers against matching libraries. See [parameter defaults and migration](https://github.com/marinasundstrom/neoCLR/blob/main/docs/parameter-defaults.md#runtime-api-consolidation-2026-10-30).

@@ -1,0 +1,51 @@
+http-lifetime (native):
+PASS NeoClr.RuntimeTests.HTTP borrowed clients cancel only their own pending sends
+PASS NeoClr.RuntimeTests.HTTP borrowed delegating pipeline remains reusable
+PASS NeoClr.RuntimeTests.HTTP borrowed handler survives one client and serves another
+PASS NeoClr.RuntimeTests.HTTP caller cancellation propagates without disposing the handler
+PASS NeoClr.RuntimeTests.HTTP client use disposes its owned handler exactly once
+PASS NeoClr.RuntimeTests.HTTP completed responses survive disposal and retain request association
+PASS NeoClr.RuntimeTests.HTTP delegating handlers run outward and unwind inward
+PASS NeoClr.RuntimeTests.HTTP disposal requests cancellation and waits for handler acknowledgement
+PASS NeoClr.RuntimeTests.HTTP disposed requests are rejected before invoking a custom handler
+PASS NeoClr.RuntimeTests.HTTP pre-cancellation skips custom handlers
+PASS NeoClr.RuntimeTests.HTTP socket handler disposal is idempotent through Disposable
+Tests: 11, passed: 11, failed: 0, skipped: 0
+http-lifetime (interpreter):
+PASS NeoClr.RuntimeTests.HTTP borrowed clients cancel only their own pending sends
+PASS NeoClr.RuntimeTests.HTTP borrowed delegating pipeline remains reusable
+PASS NeoClr.RuntimeTests.HTTP borrowed handler survives one client and serves another
+PASS NeoClr.RuntimeTests.HTTP caller cancellation propagates without disposing the handler
+PASS NeoClr.RuntimeTests.HTTP client use disposes its owned handler exactly once
+PASS NeoClr.RuntimeTests.HTTP completed responses survive disposal and retain request association
+PASS NeoClr.RuntimeTests.HTTP delegating handlers run outward and unwind inward
+PASS NeoClr.RuntimeTests.HTTP disposal requests cancellation and waits for handler acknowledgement
+PASS NeoClr.RuntimeTests.HTTP disposed requests are rejected before invoking a custom handler
+PASS NeoClr.RuntimeTests.HTTP pre-cancellation skips custom handlers
+PASS NeoClr.RuntimeTests.HTTP socket handler disposal is idempotent through Disposable
+Tests: 11, passed: 11, failed: 0, skipped: 0
+memory-stream (native):
+PASS NeoClr.RuntimeTests.MemoryStream async cancellation and rejected ranges preserve storage
+PASS NeoClr.RuntimeTests.MemoryStream async interfaces preserve complete writes short reads and EOF
+PASS NeoClr.RuntimeTests.MemoryStream closure is shared across interfaces and idempotent
+PASS NeoClr.RuntimeTests.MemoryStream gap writes zero-fill while empty writes preserve length
+PASS NeoClr.RuntimeTests.MemoryStream overwrites preserve length and untouched bytes
+PASS NeoClr.RuntimeTests.MemoryStream quota errors preserve length and position
+PASS NeoClr.RuntimeTests.MemoryStream rejects invalid buffer and seek ranges without moving
+PASS NeoClr.RuntimeTests.Omitted interface tokens are non cancellable while explicit tokens still cancel
+PASS NeoClr.RuntimeTests.Text and gzip factory defaults retain ownership and explicit encoding choices
+PASS NeoClr.RuntimeTests.Watcher and time creation preserve omitted and explicit scalar defaults
+Tests: 10, passed: 10, failed: 0, skipped: 0
+memory-stream (interpreter):
+PASS NeoClr.RuntimeTests.MemoryStream async cancellation and rejected ranges preserve storage
+PASS NeoClr.RuntimeTests.MemoryStream async interfaces preserve complete writes short reads and EOF
+PASS NeoClr.RuntimeTests.MemoryStream closure is shared across interfaces and idempotent
+PASS NeoClr.RuntimeTests.MemoryStream gap writes zero-fill while empty writes preserve length
+PASS NeoClr.RuntimeTests.MemoryStream overwrites preserve length and untouched bytes
+PASS NeoClr.RuntimeTests.MemoryStream quota errors preserve length and position
+PASS NeoClr.RuntimeTests.MemoryStream rejects invalid buffer and seek ranges without moving
+PASS NeoClr.RuntimeTests.Omitted interface tokens are non cancellable while explicit tokens still cancel
+PASS NeoClr.RuntimeTests.Text and gzip factory defaults retain ownership and explicit encoding choices
+PASS NeoClr.RuntimeTests.Watcher and time creation preserve omitted and explicit scalar defaults
+Tests: 10, passed: 10, failed: 0, skipped: 0
+Runtime library tests: PASS

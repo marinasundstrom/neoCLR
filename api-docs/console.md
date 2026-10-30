@@ -245,8 +245,9 @@ reference snapshots are unchanged by this host-only foundation.
 | SyncStreamReader | SyncInputStream | SyncTextReader | Result |
 | SyncStreamWriter | SyncOutputStream | SyncTextWriter | Result |
 
-All four expose static Create(stream), Create(stream, leaveOpen),
-Create(stream, encoding), and Create(stream, encoding, leaveOpen). The result is
+All four expose static `Create(stream, leaveOpen: bool = false)` and
+`Create(stream, encoding, leaveOpen: bool = false)`. Both ownership arguments
+may be omitted; the encoding-selection overload remains distinct. The result is
 Result of the concrete wrapper and TextReadError (readers) or StreamError (writers).
 Constructors are private. UTF-8 and leaveOpen=false are defaults. Creation performs
 no reads, writes or asynchronous work; valid providers currently initialize

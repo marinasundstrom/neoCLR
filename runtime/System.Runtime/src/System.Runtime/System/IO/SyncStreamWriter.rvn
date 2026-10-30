@@ -17,25 +17,15 @@ public class SyncStreamWriter : SyncTextWriter {
         self.leaveOpen = leaveOpen
     }
 
-    /// <summary>Creates a synchronous text wrapper using UTF-8, without transferring bytes.</summary>
-    static func Create(output: SyncOutputStream) -> Result<SyncStreamWriter, StreamError> {
-        return Create(output, Encodings.Utf8, false)
-    }
-
     /// <summary>Creates a UTF-8 wrapper with explicit ownership of the underlying stream.</summary>
-    static func Create(output: SyncOutputStream, leaveOpen: bool) -> Result<SyncStreamWriter, StreamError> {
+    static func Create(output: SyncOutputStream, leaveOpen: bool = false) -> Result<SyncStreamWriter, StreamError> {
         return Create(output, Encodings.Utf8, leaveOpen)
-    }
-
-    /// <summary>Creates a wrapper using the supplied encoding without transferring bytes.</summary>
-    static func Create(output: SyncOutputStream, encoding: Encoding) -> Result<SyncStreamWriter, StreamError> {
-        return Create(output, encoding, false)
     }
 
     /// <summary>Creates a wrapper with the supplied encoding and ownership policy.</summary>
     /// <remarks>Current initialization is infallible for valid providers; decoding and I/O errors occur during operations.
     /// No input is read or output written. Use one buffering wrapper per stream direction.</remarks>
-    static func Create(output: SyncOutputStream, encoding: Encoding, leaveOpen: bool) -> Result<SyncStreamWriter, StreamError> {
+    static func Create(output: SyncOutputStream, encoding: Encoding, leaveOpen: bool = false) -> Result<SyncStreamWriter, StreamError> {
         return Ok(SyncStreamWriter(output, encoding, leaveOpen))
     }
 

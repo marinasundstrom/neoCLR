@@ -16,10 +16,7 @@ internal class HttpSocketStream : InputStream, OutputStream {
     internal var Deadline: Optional<NetworkDeadline> = None()
     internal var LastError: Optional<SocketError> = None()
     internal init(socket: Socket) { self.socket = socket }
-    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
-        return Read(buffer, offset, count, CancellationToken.None)
-    }
-    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<int, StreamError>> {
         let destination: Memory<byte> = buffer
         let window = destination.Slice(offset, count)
         let pending = if let Some(deadline) = Deadline {
@@ -31,10 +28,7 @@ internal class HttpSocketStream : InputStream, OutputStream {
         if let Failure(error) = pending.GetResult() { LastError = Some(error) }
         return Failure(StreamError.IoFailure)
     }
-    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
-        return Write(buffer, offset, count, CancellationToken.None)
-    }
-    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         let source: ReadOnlyMemory<byte> = buffer
         let window = source.Slice(offset, count)
         var sent = 0
@@ -55,8 +49,7 @@ internal class HttpSocketStream : InputStream, OutputStream {
         }
         return Ok(())
     }
-    func Flush() -> Task<Result<unit, StreamError>> { return Flush(CancellationToken.None) }
-    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+    func Flush(cancellationToken: CancellationToken = default) -> Task<Result<unit, StreamError>> {
         let source = Promise<Result<unit, StreamError>>()
         if cancellationToken.IsCancellationRequested { _ = source.Cancel() }
         else { _ = source.Complete(Ok(())) }

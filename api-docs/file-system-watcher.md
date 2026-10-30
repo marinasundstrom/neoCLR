@@ -8,8 +8,7 @@ its provider-resolved File/Directory model; this API uses native filesystem path
 
 | Type/member | Contract |
 | --- | --- |
-| `FileSystemWatcher(path: string)` | Constructs a stopped watcher; Filter is `*`, IncludeSubdirectories is false. No I/O. |
-| `FileSystemWatcher(path: string, filter: string)` | Constructs a stopped watcher with a basename filter. |
+| `FileSystemWatcher(path: string, filter: string = "*")` | Constructs a stopped watcher with a basename filter; omission matches all names. IncludeSubdirectories is false. No I/O. |
 | `Path: string` | Read/write physical directory path. Relative paths resolve at TryStart. Change only while stopped. |
 | `Filter: string` | Read/write basename pattern, supporting `*` and `?`. Empty and `*.*` match all names. No directory separators or recursive glob syntax. |
 | `IncludeSubdirectories: bool` | Read/write recursive watching, configurable while stopped. |

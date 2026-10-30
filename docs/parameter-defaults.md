@@ -21,7 +21,9 @@ Kinds are Boolean, SByte, Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Sin
 Double, String and Null. Integers use canonical invariant decimal; Boolean uses
 true/false. Single/Double encode IEEE bits as 8/16 lowercase hex digits, preserving
 negative zero and nonfinite constants without JSON number ambiguity. Strings retain
-their contents; Null requires an empty payload and a reference parameter. Loaders
+their contents; Null requires an empty payload and a reference or nominal value-type
+parameter. On a nominal value type it denotes zero initialization, not a null value.
+Raven currently admits ordinary non-union struct defaults, including CancellationToken. Loaders
 validate alignment, kind, range, canonical spelling and type compatibility.
 The optional field extends current native metadata; older readers need updating
 before consuming assemblies that carry defaults.
@@ -45,11 +47,10 @@ calls. Native metadata already replaces any need for a CLI default-attribute enc
 The comparison is with ECMA-335 II.22.9 (Constant) and II.22.33 (Param), not a claim
 that ordinary .NET scalar defaults require attributes.
 
-Arbitrary value-type defaults (including CancellationToken = default), enum/char/
-decimal defaults, generic defaults and Optional.None are not enabled by this slice.
+Enum/char/decimal constants, bare generic-parameter defaults and Optional.None
+remain outside the native optional-parameter profile.
 They remain diagnosed by the native callable capability and require separate semantic
-and representation qualification. Runtime overload migration is the next author-
-directed slice, not performed here. No language-service or grammar change is needed.
+and representation qualification. No language-service or grammar change is needed.
 
 ## Focused validation
 
@@ -61,3 +62,32 @@ directed slice, not performed here. No language-service or grammar change is nee
 - `scripts/validate-configuration-reload.py` qualifies real file edits, malformed
   JSON, atomic replacement, required/optional deletion, DI live sections and disposal
   in native and interpreter execution. See the dated validation receipt.
+
+## Runtime API consolidation (2026-10-30)
+
+`CancellationToken = default` now survives source binding, native library import and
+CLI projection. The existing Null constant plus the declared value type describes
+zero initialization; no custom attribute, constructor call or runtime arity shortcut
+is needed. This follows the typed CLI Constant convention rather than introducing
+an ambiguous boxed struct literal. The runtime validates nominal value storage;
+Raven main fixes null-constant binding before the target capability admits it.
+
+Default arguments are declared on InputStream/OutputStream interfaces as well as
+concrete stream views, so calls use the static receiver's contract. Stream, socket,
+DNS, TLS and HTTP operations remove forwarding overloads whose only difference was
+CancellationToken.None. Selected text/gzip factories use `leaveOpen: bool = false`,
+FileSystemWatcher uses `filter: string = "*"`, and TimeOfDay.Create uses
+`fractionTicks: int = 0`. Encoding-selection overloads and values computed from
+current culture, runtime state or a nonconstant factory remain distinct.
+
+This changes method identities and interface slots in the development libraries:
+rebuild all binary consumers and implementations together. Ordinary omitted-argument
+source calls continue to bind. Method-group/delegate bindings that depended on a
+removed arity need a lambda that supplies or omits the optional argument. Defaults
+are inserted by the caller; they do not create additional callable signatures.
+As with .NET, changing a default requires recompiling callers. Unlike maintaining
+old .NET binary overloads, this author-directed development cleanup removes them.
+
+[Focused runtime qualification](validation/runtime-defaults-20261030/README.md)
+covers omission, explicit/named tokens, pre-cancellation, scalar defaults and stream
+ownership through both native and interpreted consumers.

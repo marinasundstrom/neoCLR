@@ -1,0 +1,18 @@
+module DefaultServerCalls
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+func RequestHandler(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Failure(HttpError.InvalidRequest("compile-only probe")))
+}
+func ContextHandler(context: HttpContext) -> Task<Result<(), HttpError>> {
+    return Task.FromResult<Result<(), HttpError>>(Result<(), HttpError>.Ok(()))
+}
+func BindRequestHandler(server: HttpServer) {
+    _ = server.Serve(RequestHandler)
+}
+func BindContextHandler(server: HttpServer) {
+    _ = server.Serve(ContextHandler)
+}

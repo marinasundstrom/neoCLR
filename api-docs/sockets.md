@@ -161,8 +161,9 @@ bounds above; this adds no configurable Socket timeout overload. Token overloads
 ## Per-operation cancellation
 
 Dns.GetHostAddresses, all Socket.Connect overloads, Accept, Receive and Send accept
-an optional-by-overload `System.Concurrency.CancellationToken`. Existing overloads
-behave as if passed CancellationToken.None. A token already requested returns a
+a final `cancellationToken: System.Concurrency.CancellationToken = default`.
+Omission behaves as if passed CancellationToken.None; redundant forwarding overloads
+have been removed in development, so rebuild consumers. A token already requested returns a
 cancelled Task before validation or native admission. For pending work, Cancel only
 requests cancellation: observe task completion before reusing receive storage.
 Cancellation is a Task outcome, separate from Result errors. Native results already
@@ -197,9 +198,9 @@ has no typed-deadline mapping. Existing duration/default overloads remain availa
 ## Development memory-window migration (2026-10-19)
 
 Receive now takes `Memory<byte>`; Send takes `ReadOnlyMemory<byte>`. Each has
-an overload with `CancellationToken`. The deadline forms are
-`ReceiveUntil(buffer: Memory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken)`
-and `SendUntil(buffer: ReadOnlyMemory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken)`;
+a final `cancellationToken: CancellationToken = default`. The deadline forms are
+`ReceiveUntil(buffer: Memory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken = default)`
+and `SendUntil(buffer: ReadOnlyMemory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken = default)`;
 both return `Task<Result<int, SocketError>>`. Array/range overloads are removed.
 Pass a whole array directly through implicit conversion, or select a persistent
 window before calling. No AsSlice/AsMemory adapter is required.

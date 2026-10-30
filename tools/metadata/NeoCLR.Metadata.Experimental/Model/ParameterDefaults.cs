@@ -4,10 +4,10 @@ using System.Text.Json;
 
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An explicitly supplied, immutable parameter constant; null differs from no default.</summary>
+/// <summary>An explicitly supplied, immutable parameter constant; null differs from no default and denotes zero initialization for a nominal value type.</summary>
 public sealed class ParameterDefaultValue
 {
-    /// <summary>The scalar value, or null for an explicit null default.</summary>
+    /// <summary>The scalar value, or null for a reference-null or nominal value-type default.</summary>
     public object? Value { get; }
     /// <summary>Constructs a supported scalar default without invoking application code.</summary>
     public ParameterDefaultValue(object? value)
@@ -65,9 +65,9 @@ public sealed class ParameterDefaultValue
     {
         bool valid = Value is null
             ? type.Primitive == PrimitiveType.String || type.ArrayElement is not null ||
-                type.ImportedType is { IsValueType: false } || type.ClassType is { IsValueType: false } || type.GenericInstance?.Definition is { IsValueType: false } ||
-                type.ReferencedType?.Resolve() is { IsValueType: false } ||
-                type.ReferencedGenericInstance?.Definition.Resolve() is { IsValueType: false } || type.FunctionSignature is not null
+                type.ImportedType is not null || type.ClassType is not null || type.GenericInstance?.Definition is not null ||
+                type.ReferencedType?.Resolve() is not null ||
+                type.ReferencedGenericInstance?.Definition.Resolve() is not null || type.FunctionSignature is not null
             : type.Primitive?.ToString() == Kind;
         if (!valid) throw new InvalidDataException("parameter default does not match its by-value type");
     }

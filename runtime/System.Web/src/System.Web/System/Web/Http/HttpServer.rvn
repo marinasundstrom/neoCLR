@@ -192,22 +192,14 @@ public class HttpServer {
     }
 
     /// Accepts request headers, transferring the exchange and unread body to the caller.
-    func Accept() -> Task<Result<HttpContext, HttpError>> {
-        return Accept(CancellationToken.None)
-    }
-
     /// Cancellation covers acceptance and headers; pass a token to later body reads.
-    func Accept(cancellationToken: CancellationToken) -> Task<Result<HttpContext, HttpError>> {
+    func Accept(cancellationToken: CancellationToken = default) -> Task<Result<HttpContext, HttpError>> {
         return AcceptCore(cancellationToken, true)
     }
 
     /// Returns after valid headers; the caller reads Request.Content's stream on demand.
-    func AcceptHeaders() -> Task<Result<HttpContext, HttpError>> {
-        return AcceptHeaders(CancellationToken.None)
-    }
-
     /// Cancellation covers acceptance and headers. Pass a token to later body reads.
-    func AcceptHeaders(cancellationToken: CancellationToken) -> Task<Result<HttpContext, HttpError>> {
+    func AcceptHeaders(cancellationToken: CancellationToken = default) -> Task<Result<HttpContext, HttpError>> {
         return AcceptCore(cancellationToken, true)
     }
 
@@ -240,24 +232,16 @@ public class HttpServer {
 
     /// Starts server-managed concurrent request handling. The returned task represents server lifetime.
     /// Up to 16 exchanges run concurrently; request failures are recorded and do not stop serving.
-    func Serve(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) -> Task<Result<System.Void, HttpError>> {
-        return Serve(handler, CancellationToken.None)
-    }
-
     /// Cancellation closes the server. Completion waits for every started handler task to settle.
     /// Close completes normally; caller cancellation cancels the lifetime task; listener failure returns Error.
-    func Serve(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+    func Serve(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
         return StartServing(HttpResponseCallback(handler), cancellationToken)
     }
 
     /// Runs a context callback, then sends its configured response after successful completion.
     /// Serve owns completion and cleanup; the callback must not call Complete or retain the context.
-    func Serve(handler: (HttpContext) -> Task<Result<System.Void, HttpError>>) -> Task<Result<System.Void, HttpError>> {
-        return StartServing(HttpContextCallback(handler), CancellationToken.None)
-    }
-
     /// Cancellation closes exchanges and waits for context callbacks before releasing their content.
-    func Serve(handler: (HttpContext) -> Task<Result<System.Void, HttpError>>, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+    func Serve(handler: (HttpContext) -> Task<Result<System.Void, HttpError>>, cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
         return StartServing(HttpContextCallback(handler), cancellationToken)
     }
 
@@ -276,12 +260,8 @@ public class HttpServer {
     }
 
     /// Handles one accepted context and sends the callback's buffered or known-length stream response.
-    func ServeOne(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) -> Task<Result<System.Void, HttpError>> {
-        return ServeOne(handler, CancellationToken.None)
-    }
-
     /// Cancellation ends this exchange, including an outstanding handler wait.
-    func ServeOne(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+    func ServeOne(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
         return HttpServeOperation(self, HttpResponseCallback(handler), cancellationToken).Start()
     }
 
@@ -569,12 +549,8 @@ public class HttpContext : Disposable {
     }
 
     /// Snapshots response headers and sends buffered bytes or a known-length stream, then closes the exchange.
-    func Complete() -> Task<Result<System.Void, HttpError>> {
-        return Complete(CancellationToken.None)
-    }
-
     /// Reports validation/send errors or acknowledged cancellation; all end the exchange.
-    func Complete(cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+    func Complete(cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
         return Send(response, cancellationToken)
     }
 

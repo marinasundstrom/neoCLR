@@ -74,10 +74,8 @@ public class FileSystemWatcher : Disposable {
     private var timer: Timer? = null
     private val notifications = FileWatchHandlers()
 
-    /// Creates a stopped watcher for all names in path.
-    init(path: string) { self.path = path; filter = "*" }
-    /// Creates a stopped watcher with a filename filter supporting * and ?.
-    init(path: string, filter: string) { self.path = path; self.filter = filter }
+    /// Creates a stopped watcher with a filename filter supporting * and ?; omitted filter matches all names.
+    init(path: string, filter: string = "*") { self.path = path; self.filter = filter }
 
     /// Physical directory path. Change settings while stopped; relative paths resolve at Start.
     var Path: string {

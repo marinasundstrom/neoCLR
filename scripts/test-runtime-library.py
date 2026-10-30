@@ -258,6 +258,9 @@ JSON_STREAM_NAMES = [
     'NeoClr.RuntimeTests.JSON stream writes reject zero progress without looping',
 ]
 MEMORY_STREAM_NAMES = [
+    'NeoClr.RuntimeTests.Omitted interface tokens are non cancellable while explicit tokens still cancel',
+    'NeoClr.RuntimeTests.Text and gzip factory defaults retain ownership and explicit encoding choices',
+    'NeoClr.RuntimeTests.Watcher and time creation preserve omitted and explicit scalar defaults',
     'NeoClr.RuntimeTests.MemoryStream async cancellation and rejected ranges preserve storage',
     'NeoClr.RuntimeTests.MemoryStream async interfaces preserve complete writes short reads and EOF',
     'NeoClr.RuntimeTests.MemoryStream quota errors preserve length and position',

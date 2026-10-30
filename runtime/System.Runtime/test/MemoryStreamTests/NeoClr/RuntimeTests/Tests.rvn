@@ -6,6 +6,9 @@ import System.Optional.*
 import NeoClr.Testing.*
 
 import System.IO.*
+import System.IO.Compression.*
+import System.Text.*
+import System.Time.*
 import System.Concurrency.Tasks.*
 import System.Concurrency.Tasks.TaskOutcome.*
 import System.Concurrency.*
@@ -169,4 +172,74 @@ func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
         Panic("Expected an immediately completed fixture operation")
     }
     return value
+}
+
+
+[Test]
+func `Omitted interface tokens are non cancellable while explicit tokens still cancel`() -> Result<(), TestFailure> {
+    let stream = MemoryStream()
+    let input: InputStream = stream
+    let output: OutputStream = stream
+    let bytes: byte[] = [(byte)42]
+    _ = Assert.True(CompletedValue(output.Write(bytes, 0, 1)) is Ok(_), "Default output token")?
+    _ = Assert.True(CompletedValue(output.Flush()) is Ok(_), "Default flush token")?
+    _ = stream.Seek(0)
+    let received: byte[] = [(byte)0]
+    _ = Assert.True(CompletedValue(input.Read(received, offset: 0, count: 1)) is Ok(1), "Named call with omitted token")?
+    _ = Assert.True(received[0] == 42, "Bytes survive default-token calls")?
+    use cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    _ = Assert.True(input.Read(received, 0, 1, cancellationToken: cancellation.Token).IsCancelled, "Explicit input cancellation")?
+    _ = Assert.True(output.Flush(cancellationToken: cancellation.Token).IsCancelled, "Explicit output cancellation")?
+    stream.Close()
+    return Ok(())
+}
+
+[Test]
+func `Text and gzip factory defaults retain ownership and explicit encoding choices`() -> Result<(), TestFailure> {
+    let owned = MemoryStream()
+    let Ok(writer) = StreamWriter.Create(owned, Encodings.Utf8) else {
+        return Assert.True(false, "Create encoded writer with omitted ownership")
+    }
+    writer.Close()
+    _ = Assert.True(owned.GetLength() is Failure(StreamError.Closed), "Default writer owns its output")?
+    let borrowed = MemoryStream()
+    let Ok(reader) = StreamReader.Create(borrowed, leaveOpen: true) else {
+        return Assert.True(false, "Create reader with explicit ownership")
+    }
+    reader.Close()
+    _ = Assert.True(borrowed.GetLength() is Ok(0L), "Explicit leaveOpen is retained")?
+    let Ok(syncReader) = SyncStreamReader.Create(borrowed, Encodings.Ascii, leaveOpen: true) else {
+        return Assert.True(false, "Create explicit synchronous decoder")
+    }
+    syncReader.Close()
+    let Ok(syncWriter) = SyncStreamWriter.Create(borrowed) else {
+        return Assert.True(false, "Create synchronous writer with defaults")
+    }
+    syncWriter.Close()
+    _ = Assert.True(borrowed.GetLength() is Failure(StreamError.Closed), "Default synchronous writer owns output")?
+    let compressed = MemoryStream()
+    GZipStream.CreateCompressor(compressed).Close()
+    _ = Assert.True(compressed.GetLength() is Failure(StreamError.Closed), "Default compressor owns output")?
+    let source = MemoryStream()
+    GZipStream.CreateDecompressor(source, leaveOpen: true).Close()
+    _ = Assert.True(source.GetLength() is Ok(0L), "Decompressor can borrow input")?
+    source.Close()
+    return Ok(())
+}
+
+[Test]
+func `Watcher and time creation preserve omitted and explicit scalar defaults`() -> Result<(), TestFailure> {
+    use all = FileSystemWatcher(path: ".")
+    use json = FileSystemWatcher(".", filter: "*.json")
+    _ = Assert.Equal("*", all.Filter)?
+    _ = Assert.Equal("*.json", json.Filter)?
+    let Ok(whole) = TimeOfDay.Create(1, 2, 3) else {
+        return Assert.True(false, "Create whole-second time")
+    }
+    let Ok(fractional) = TimeOfDay.Create(1, 2, 3, fractionTicks: 7) else {
+        return Assert.True(false, "Create fractional time")
+    }
+    _ = Assert.Equal(0, whole.FractionTicks)?
+    return Assert.Equal(7, fractional.FractionTicks)
 }

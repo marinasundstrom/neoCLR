@@ -10649,11 +10649,12 @@ double, string and explicit null constants. Other values throw ArgumentException
 `Value` returns the immutable value. `MethodDefinition.ParameterDefaults` is a read-
 only position-to-default map excluding the receiver. `SetParameterDefault(position,
 value)` (also on MethodBuilder) sets or clears a default on authored definitions;
-null clears, `new ParameterDefaultValue(null)` stores explicit null. Invalid position
+null clears, `new ParameterDefaultValue(null)` stores explicit null for references
+or zero initialization for a nominal value-type parameter. No constructor runs. Invalid position
 throws ArgumentOutOfRangeException; incompatible types throw InvalidDataException;
 loaded definitions reject mutation with InvalidOperationException.
 
 `ParameterInfo.HasDefaultValue` distinguishes absence from explicit null; DefaultValue
 returns the constant or null. Native and CLI snapshots preserve these values. CLI
 projection uses Param flags and Constant rows. See the [native default contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/parameter-defaults.md)
-for supported kinds, validation and remaining value-type gaps.
+for supported kinds, typed null/default semantics, validation and remaining gaps.

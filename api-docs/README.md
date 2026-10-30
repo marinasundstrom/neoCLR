@@ -3119,3 +3119,12 @@ cannot faithfully display the open Emit: T signature or func constraint; these a
 explicit renderer exclusions pending native dependent-signature rendering. No public
 API is silently omitted. Source fingerprints include the extension sources; regenerate
 the bridge snapshot before committing changes. No website publication is implied.
+
+### Runtime optional parameters (2026-10-30 development)
+
+The native reference now shows `CancellationToken = default` on stream interfaces,
+concrete streams and networking/HTTP operations. Redundant forwarding overloads are
+removed. Text/gzip factory ownership, watcher filter and fractional time ticks use
+constant defaults. Existing selected types cover every changed member; there are no
+new omissions. The aggregate compiler reference and native rendering are refreshed,
+and snapshot/source-link checks pass. See [migration and qualification](../docs/parameter-defaults.md#runtime-api-consolidation-2026-10-30).

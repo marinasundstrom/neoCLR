@@ -533,7 +533,7 @@ internal class HttpResponseDecoder {
 public abstract class HttpHandler : Disposable {
     protected init() { }
 
-    abstract func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>>
+    abstract func Send(request: HttpRequest, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>>
 
     /// Releases resources owned by the handler. Stateless handlers need no override.
     virtual func Dispose() { }
@@ -566,7 +566,7 @@ public abstract class DelegatingHandler : HttpHandler {
     }
 
     /// Forwards to the inner handler, freezing pipeline configuration.
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         if disposed {
             Panic("HTTP handler is disposed")
         }
@@ -654,19 +654,12 @@ public abstract class HttpContent : Disposable {
         return None()
     }
 
-    /// <summary>Copies this body to a destination stream with no cancellation request.</summary>
-    /// <param name="destination">Borrowed output; never flushed or closed by this operation.</param>
-    /// <returns>Completion or a content/stream failure. Output may be partial on failure.</returns>
-    func CopyTo(destination: OutputStream) -> Task<Result<unit, HttpError>> {
-        return CopyTo(destination, CancellationToken.None)
-    }
-
     /// <summary>Copies buffered or streaming content with bounded staging and backpressure.</summary>
     /// <param name="destination">Borrowed output; keep it open until completion.</param>
     /// <param name="cancellationToken">Cancellation propagates as a cancelled task, including before empty copies.</param>
     /// <returns>Success after the body is written, or HttpError.Content preserving the stream error. A reused streaming body returns InvalidRequest.</returns>
     /// <remarks>Never flushes or closes either stream. Stream content is consumed once, including after failure or cancellation once started. Known lengths stop exactly at that length and reject early EOF; unknown incoming lengths end at EOF. Do not concurrently read, copy, upload or mutate the body. Array bodies are written directly; other sources use at most 1024 staging bytes. This operation does not add HTTP framing.</remarks>
-    async func CopyTo(destination: OutputStream, cancellationToken: CancellationToken) -> Task<Result<unit, HttpError>> {
+    async func CopyTo(destination: OutputStream, cancellationToken: CancellationToken = default) -> Task<Result<unit, HttpError>> {
         if cancellationToken.IsCancellationRequested {
             return await CancelledCopy()
         }
@@ -1630,22 +1623,14 @@ public class HttpClient : Disposable {
         }
     }
 
-    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        return Send(request, CancellationToken.None)
-    }
-
     /// Sends a prepared request, forwarding the token through the handler pipeline.
-    func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Send(request: HttpRequest, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         return Send(request, HttpCompletionOption.ResponseContentRead, cancellationToken)
     }
 
     /// Selects buffered completion or ownership transfer at final response headers.
-    func Send(request: HttpRequest, completionOption: HttpCompletionOption) -> Task<Result<HttpResponse, HttpError>> {
-        return Send(request, completionOption, CancellationToken.None)
-    }
-
     /// Headers-only completion ends the client timeout; body reads require their own token.
-    func Send(request: HttpRequest, completionOption: HttpCompletionOption, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Send(request: HttpRequest, completionOption: HttpCompletionOption, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if completionOption != HttpCompletionOption.ResponseContentRead && completionOption != HttpCompletionOption.ResponseHeadersRead {
             return FailedResponse(HttpError.InvalidRequest("Unknown HTTP completion option"))
@@ -1671,12 +1656,8 @@ public class HttpClient : Disposable {
     }
 
     /// Sends an absolute URL without a base, or a relative URL when BaseUri is set.
-    func Get(url: string) -> Task<Result<HttpResponse, HttpError>> {
-        return Get(url, CancellationToken.None)
-    }
-
     /// Uses the same address rules, with cooperative cancellation.
-    func Get(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Get(url: string, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1693,12 +1674,8 @@ public class HttpClient : Disposable {
     }
 
     /// Uses the same base-resolution rules as the string overload.
-    func Get(uri: Uri) -> Task<Result<HttpResponse, HttpError>> {
-        return Get(uri, CancellationToken.None)
-    }
-
     /// Uses the same address rules, with cooperative cancellation.
-    func Get(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Get(uri: Uri, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1715,12 +1692,8 @@ public class HttpClient : Disposable {
     }
 
     /// Posts buffered content using the same BaseUri and handler rules as Get.
-    func Post(url: string, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
-        return Post(url, content, CancellationToken.None)
-    }
-
     /// Posts content with cooperative exchange cancellation.
-    func Post(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Post(url: string, content: HttpContent, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1737,12 +1710,8 @@ public class HttpClient : Disposable {
     }
 
     /// Posts content to a URI using the same base-resolution rules as Get.
-    func Post(uri: Uri, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
-        return Post(uri, content, CancellationToken.None)
-    }
-
     /// Posts content through Send, forwarding the cancellation token unchanged.
-    func Post(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Post(uri: Uri, content: HttpContent, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1763,12 +1732,8 @@ public class HttpClient : Disposable {
     }
 
     /// Sends PUT buffered content using the same BaseUri and handler rules as Get.
-    func Put(url: string, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
-        return Put(url, content, CancellationToken.None)
-    }
-
     /// Sends PUT content with cooperative exchange cancellation.
-    func Put(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Put(url: string, content: HttpContent, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1785,12 +1750,8 @@ public class HttpClient : Disposable {
     }
 
     /// Sends PUT content to a URI using the same base-resolution rules as Get.
-    func Put(uri: Uri, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
-        return Put(uri, content, CancellationToken.None)
-    }
-
     /// Sends PUT content through Send, forwarding the cancellation token unchanged.
-    func Put(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Put(uri: Uri, content: HttpContent, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1811,12 +1772,8 @@ public class HttpClient : Disposable {
     }
 
     /// Sends PATCH buffered content using the same BaseUri and handler rules as Get.
-    func Patch(url: string, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
-        return Patch(url, content, CancellationToken.None)
-    }
-
     /// Sends PATCH content with cooperative exchange cancellation.
-    func Patch(url: string, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Patch(url: string, content: HttpContent, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1833,12 +1790,8 @@ public class HttpClient : Disposable {
     }
 
     /// Sends PATCH content to a URI using the same base-resolution rules as Get.
-    func Patch(uri: Uri, content: HttpContent) -> Task<Result<HttpResponse, HttpError>> {
-        return Patch(uri, content, CancellationToken.None)
-    }
-
     /// Sends PATCH content through Send, forwarding the cancellation token unchanged.
-    func Patch(uri: Uri, content: HttpContent, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Patch(uri: Uri, content: HttpContent, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1859,12 +1812,8 @@ public class HttpClient : Disposable {
     }
 
     /// Sends DELETE without content to an absolute URL without a base, or a relative URL when BaseUri is set.
-    func Delete(url: string) -> Task<Result<HttpResponse, HttpError>> {
-        return Delete(url, CancellationToken.None)
-    }
-
     /// Uses the same address rules, with cooperative cancellation.
-    func Delete(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Delete(url: string, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1881,12 +1830,8 @@ public class HttpClient : Disposable {
     }
 
     /// Uses the same base-resolution rules as the string overload.
-    func Delete(uri: Uri) -> Task<Result<HttpResponse, HttpError>> {
-        return Delete(uri, CancellationToken.None)
-    }
-
     /// Uses the same address rules, with cooperative cancellation.
-    func Delete(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Delete(uri: Uri, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1907,12 +1852,8 @@ public class HttpClient : Disposable {
     }
 
     /// Sends HEAD without content to an absolute URL without a base, or a relative URL when BaseUri is set.
-    func Head(url: string) -> Task<Result<HttpResponse, HttpError>> {
-        return Head(url, CancellationToken.None)
-    }
-
     /// Uses the same address rules, with cooperative cancellation.
-    func Head(url: string, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Head(url: string, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1929,12 +1870,8 @@ public class HttpClient : Disposable {
     }
 
     /// Uses the same base-resolution rules as the string overload.
-    func Head(uri: Uri) -> Task<Result<HttpResponse, HttpError>> {
-        return Head(uri, CancellationToken.None)
-    }
-
     /// Uses the same address rules, with cooperative cancellation.
-    func Head(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    func Head(uri: Uri, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1955,12 +1892,8 @@ public class HttpClient : Disposable {
     }
 
     /// Fetches a bounded response and decodes its buffered body as strict UTF-8.
-    func GetString(url: string) -> Task<Result<string, HttpError>> {
-        return GetString(url, CancellationToken.None)
-    }
-
     /// Fetches UTF-8 text, preserving HTTP failures and acknowledged task cancellation.
-    func GetString(url: string, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
+    func GetString(url: string, cancellationToken: CancellationToken = default) -> Task<Result<string, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1972,12 +1905,8 @@ public class HttpClient : Disposable {
     }
 
     /// Fetches a bounded response and decodes its buffered body as strict UTF-8.
-    func GetString(uri: Uri) -> Task<Result<string, HttpError>> {
-        return GetString(uri, CancellationToken.None)
-    }
-
     /// Fetches UTF-8 text, preserving HTTP failures and acknowledged task cancellation.
-    func GetString(uri: Uri, cancellationToken: CancellationToken) -> Task<Result<string, HttpError>> {
+    func GetString(uri: Uri, cancellationToken: CancellationToken = default) -> Task<Result<string, HttpError>> {
         EnsureUsable()
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -2072,12 +2001,8 @@ public class HttpSocketHandler : HttpHandler {
         lifetime.Dispose()
     }
 
-    func Send(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        return Send(request, CancellationToken.None)
-    }
-
     /// Uses one token across lookup, connect and transfers, closing before cancellation completes.
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpRequest, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError>> {
         if disposed {
             Panic("HTTP handler is disposed")
         }

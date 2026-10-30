@@ -9,26 +9,30 @@ internal static class ParameterDefaultChecks
     internal static void Run()
     {
         var graph = new AssemblyBuilder(new("Defaults", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
+        var token = graph.AddValueType("Example", "Token");
+        token.AddField("Requested", PrimitiveType.Boolean);
         var method = graph.AddClass("Example", "Defaults").AddMethod("Read",
-            new(PrimitiveType.Int32, [PrimitiveType.Int32, PrimitiveType.Boolean, PrimitiveType.String, PrimitiveType.String, PrimitiveType.Double]));
+            new(PrimitiveType.Int32, [PrimitiveType.Int32, PrimitiveType.Boolean, PrimitiveType.String, PrimitiveType.String, PrimitiveType.Double, token]));
         method.GetILGenerator().LoadArgument(0); method.GetILGenerator().Return();
         method.SetParameterDefault(0, new(42));
         method.SetParameterDefault(1, new(false));
         method.SetParameterDefault(2, new("héllo"));
         method.SetParameterDefault(3, new(null));
         method.SetParameterDefault(4, new(-0.0d));
+        method.SetParameterDefault(5, new(null));
         foreach (var snapshot in new[] {
             AssemblyDefinition.ReadAssembly(graph.Write(), false),
             AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph)),
             AssemblyDefinition.ReadAssembly(NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly()).CreateReferenceAssembly(graph.CoreLibrary), false) })
         {
             var loaded = snapshot.MainModule.Types.Single(t => t.Name == "Defaults").Methods.Single();
-            Check(loaded.ParameterDefaults.Count == 5, "default presence lost");
+            Check(loaded.ParameterDefaults.Count == 6, "default presence lost");
             Check(Equals(loaded.ParameterDefaults[0].Value, 42), "integer default lost");
             Check(Equals(loaded.ParameterDefaults[1].Value, false), "false default lost");
             Check(Equals(loaded.ParameterDefaults[2].Value, "héllo"), "text default lost");
             Check(loaded.ParameterDefaults[3].Value is null, "explicit null default lost");
             Check(BitConverter.DoubleToUInt64Bits((double)loaded.ParameterDefaults[4].Value!) == 0x8000000000000000, "negative zero bits lost");
+            Check(loaded.ParameterDefaults[5].Value is null, "value-type default lost");
             try { loaded.SetParameterDefault(0, null); throw new Exception("mutable snapshot"); } catch (InvalidOperationException) { }
         }
         var context = new MetadataLoadContext([AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph))]);
@@ -42,7 +46,7 @@ internal static class ParameterDefaultChecks
         Check(NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(corrupt.ToJsonString())).CreateReferenceAssembly(graph.CoreLibrary).Length > 0, "empty defaults should be absent");
         corrupt["functions"]![0]!["parameter_defaults"] = new JsonArray((JsonNode?)null);
         try { NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(corrupt.ToJsonString())); throw new Exception("misaligned defaults accepted"); } catch (InvalidDataException) { }
-        Console.WriteLine("PASS parameter defaults: native/CLI/projection roundtrip, facade, explicit null, exact float bits and malformed rejection");
+        Console.WriteLine("PASS parameter defaults: native/CLI/projection roundtrip, facade, explicit null/value-type default, exact float bits and malformed rejection");
     }
     private static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }
 }

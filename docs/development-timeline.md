@@ -23910,3 +23910,24 @@ Evidence: [design and implemented profile](design/generic-function-methods.md),
 - **Author next direction:** introduce default arguments where appropriate to remove
   redundant runtime overloads, after this entrypoint slice. Runtime overload cleanup
   remains a separate commit; computed defaults require separate consideration.
+
+## 2026-10-30 — Runtime optional arguments after entrypoint qualification
+
+- **Author direction:** after finishing Result entry points, introduce default
+  arguments where appropriate so redundant runtime overloads can be removed.
+- **Assistant action:** first qualified and committed entry points separately.
+  Then admitted ordinary struct defaults and interface parameter defaults, enabling
+  CancellationToken = default. The underlying null-constant binder correction was
+  developed on Raven main (83e700ab6), validated with 13 focused checks and carried
+  to codex/neoclr separately (049c9fbd7); native capability changes are 6ceeb1be8.
+- **Scope:** consolidate stream, DNS, socket, TLS and HTTP token forwarding;
+  use constant ownership/filter/fraction defaults. Keep encoding-selection and
+  computed/ambient-value overloads. Native metadata retains typed Null constants
+  for zero initialization, with CLI Param/Constant projection and no attributes.
+- **Compatibility:** source calls can omit arguments; binary consumers and interface
+  implementations must rebuild. A removed arity no longer serves as a method-group
+  adapter. Bare generic-parameter, union, enum/char/decimal constant and Optional.None
+  defaults remain separate qualification work.
+- **Outcome:** all 14 libraries build; focused SDK/runtime/compiler checks and
+  native/interpreter stream and HTTP tests pass. The refreshed API reference displays
+  the actual defaults. [Evidence](validation/runtime-defaults-20261030/README.md).

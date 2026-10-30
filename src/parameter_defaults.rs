@@ -1,7 +1,7 @@
 //! Optional-argument metadata is a caller contract, never a runtime arity change.
 use crate::{
     Fault, Module,
-    metadata::{Function, Type},
+    metadata::{Function, Representation, Type},
 };
 
 pub(crate) fn validate(module: &Module, function: &Function) -> Result<(), Fault> {
@@ -26,7 +26,14 @@ pub(crate) fn validate(module: &Module, function: &Function) -> Result<(), Fault
         }
         let valid = match (default.kind.as_str(), ty) {
             ("Null", Type::String | Type::Array(_) | Type::Function(_)) => text.is_empty(),
-            ("Null", _) => text.is_empty() && module.is_reference_type(ty),
+            ("Null", _) => {
+                text.is_empty()
+                    && (module.is_reference_type(ty)
+                        || module.type_definition(ty).is_some_and(|definition| {
+                            !definition.is_reference_type
+                                && definition.representation == Representation::Record
+                        }))
+            }
             ("Boolean", Type::Boolean) => matches!(text, "true" | "false"),
             ("String", Type::String) => true,
             ("SByte", Type::SByte) => number!(i8),

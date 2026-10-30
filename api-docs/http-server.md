@@ -17,7 +17,7 @@ Development after Preview 16 adds:
 
 Serve accepts either `(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`
 (the same callback as ServeOne) or `(HttpContext) -> Task<Result<unit, HttpError>>`.
-Both have overloads with a CancellationToken. A context handler configures
+Both accept an optional CancellationToken defaulting to the non-cancellable token. A context handler configures
 `context.Response` or calls `context.Respond(...)`, then returns `Ok(())`.
 Serve sends that configured response after successful callback completion. An Error
 or cancelled task closes the exchange without sending it. Do not call Complete or

@@ -8,19 +8,17 @@ async byte streams to the RFC 1952 gzip format. See the
 
 | Member | Contract |
 | --- | --- |
-| `CreateCompressor(output: OutputStream)` | Owns the output stream. |
-| `CreateCompressor(output: OutputStream, leaveOpen: bool)` | Creates a compressor; preserves output on Close when requested. |
-| `CreateDecompressor(input: InputStream)` | Owns the input stream. |
-| `CreateDecompressor(input: InputStream, leaveOpen: bool)` | Creates a bounded decoder; preserves input on Close when requested. |
-| `Read(buffer: byte[], offset: int, count: int[, cancellationToken: CancellationToken])` | Task of `Result<int, StreamError>`; checks complete gzip before returning bytes, then zero at EOF. Zero count does not read input. |
-| `Write(buffer: byte[], offset: int, count: int[, cancellationToken: CancellationToken])` | Task of `Result<unit, StreamError>`; incrementally compresses and writes the complete range. Zero count emits nothing. |
-| `Finish([cancellationToken: CancellationToken])` | Task of `Result<unit, StreamError>`; emits final block and checksum/size trailer, including empty input. Idempotent after success. |
-| `Flush([cancellationToken: CancellationToken])` | Task of `Result<unit, StreamError>`; flushes the destination without finishing gzip. |
+| `CreateCompressor(output: OutputStream, leaveOpen: bool = false)` | Creates a compressor; preserves output on Close when requested. |
+| `CreateDecompressor(input: InputStream, leaveOpen: bool = false)` | Creates a bounded decoder; preserves input on Close when requested. |
+| `Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default)` | Task of `Result<int, StreamError>`; checks complete gzip before returning bytes, then zero at EOF. Zero count does not read input. |
+| `Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken = default)` | Task of `Result<unit, StreamError>`; incrementally compresses and writes the complete range. Zero count emits nothing. |
+| `Finish(cancellationToken: CancellationToken = default)` | Task of `Result<unit, StreamError>`; emits final block and checksum/size trailer, including empty input. Idempotent after success. |
+| `Flush(cancellationToken: CancellationToken = default)` | Task of `Result<unit, StreamError>`; flushes the destination without finishing gzip. |
 | `Close()` | Idempotent disposal; never writes a trailer or flushes. |
 
 Await Finish before closing compressed output, and Flush if required by the consumer.
 Writes after Finish and wrong-direction operations return WrongAccess. Close defaults
-to closing the underlying stream; leaveOpen is explicit. No seeking or level selector
+to closing the underlying stream; `leaveOpen: true` borrows it. No seeking or level selector
 is provided. Do not overlap operations or mutate borrowed buffers until completion.
 
 Pre-cancellation cancels the Task before mutation or validation. Invalid ranges return

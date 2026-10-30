@@ -26,11 +26,7 @@ public struct TimeOfDay : ComparableTo<TimeOfDay>, EquatableTo<TimeOfDay>, Forma
         StoredTicks = ticks
     }
 
-    static func Create(hour: int, minute: int, second: int) -> Result<TimeOfDay, InvalidTimeError> {
-        return Create(hour, minute, second, 0)
-    }
-
-    static func Create(hour: int, minute: int, second: int, fractionTicks: int) -> Result<TimeOfDay, InvalidTimeError> {
+    static func Create(hour: int, minute: int, second: int, fractionTicks: int = 0) -> Result<TimeOfDay, InvalidTimeError> {
         if hour < 0 {
             return Failure(InvalidTimeError())
         }

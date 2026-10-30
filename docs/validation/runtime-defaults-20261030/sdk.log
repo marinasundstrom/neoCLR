@@ -1,0 +1,1 @@
+PASS parameter defaults: native/CLI/projection roundtrip, facade, explicit null/value-type default, exact float bits and malformed rejection
