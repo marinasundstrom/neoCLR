@@ -18,6 +18,13 @@ sys.path.insert(0, str(ROOT / 'benchmarks/framework'))
 from process import Guest
 
 BODY = 'Café 🌍'.encode()
+RETENTION_WARNING = 'warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n'
+
+
+def expected_diagnostics(stderr, mode):
+    """Keep the known JIT retention warning visible without accepting other errors."""
+    return not stderr or (mode == 'jit' and stderr == RETENTION_WARNING)
+
 
 class Peer(http.server.BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
@@ -131,7 +138,7 @@ def main():
                         worker.start()
                         try:
                             result = run(command, input=f'http://localhost:{peer.server_port}/greeting\nnormal\n')
-                            assert result.stdout.strip() == BODY.decode() and not result.stderr, f'Unexpected client output: stdout={result.stdout!r}, stderr={result.stderr!r}'
+                            assert result.stdout.strip() == BODY.decode() and expected_diagnostics(result.stderr, mode), f'Unexpected client output: stdout={result.stdout!r}, stderr={result.stderr!r}'
                         finally:
                             peer.shutdown()
                             worker.join(timeout=5)
@@ -140,7 +147,7 @@ def main():
                     if name == 'fault':
                         assert 'UserFault: runtime async sample terminal fault' in result.stderr and not result.stdout
                     else:
-                        assert result.stdout.startswith('PASS ') and not result.stderr
+                        assert result.stdout.startswith('PASS ') and expected_diagnostics(result.stderr, mode)
                 report['cases'].append(dict(name=name, mode=mode, passed=True, command=command))
                 print('PASS', name, mode, flush=True)
         for path, digest in report['inputs'].items():

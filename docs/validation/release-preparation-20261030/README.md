@@ -129,3 +129,26 @@ builds the SDK, libraries and default-JIT archive, then fails the old collection
 validator on the same DAM2004 warning (exit zero, exact expected stdout). Its
 [failed receipt](windows-package-warning-failure.log.gz) remains separate from
 future qualification; watcher/reload/editor stages did not execute in that run.
+
+
+## Continued qualification
+
+Canonical source CI passes on [c1b817ce6](https://github.com/marinasundstrom/neoCLR/actions/runs/40989617699)
+and the subsequently synced [bb631c0e8](https://github.com/marinasundstrom/neoCLR/actions/runs/41034240950).
+These supersede the earlier pending CI status above; the failed local baseline
+remains preserved. The website workflow on ef334fa1d also passes.
+
+[macOS installed editor acceptance](macos-editor.json.gz) passes all 26 checks,
+including reference replacement/recovery, unsaved edits, task execution and await.
+[HTTPS acceptance](macos-https.json.gz) passes with Homebrew Python/OpenSSL,
+including TLS 1.2/1.3, malformed connections, cancellation and credential rejection.
+The system Python lacks TLS 1.3 and cannot run this gate. Separate editor inlay,
+repeated configuration recovery and cleartext isolation remain to be checked.
+
+[Windows run 40989683340](https://github.com/marinasundstrom/neoCLR/actions/runs/40989683340)
+passes extracted package acceptance and GC, then stops at async cleanup JIT:
+[the receipt](windows-await-warning-failure.json.gz) records exit zero and expected
+PASS output with only DAM2004. The async validator now accepts that exact warning
+only for JIT, retaining raw stderr; its focused test rejects other diagnostics and
+rejects the warning for AOT/interpreter. Remaining Windows stages require a rerun
+against the same packaged artifacts with this validator repair.
