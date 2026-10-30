@@ -153,12 +153,17 @@ def compile_scalar_interop(aot, assembly, context, output, profile, clang, sdk, 
         raise
 
 
+def native_host_sources():
+    return sorted(p for p in (ROOT / 'runtime/native').rglob('*')
+                  if p.is_file() and p.suffix in ('.c', '.h', '.inc'))
+
+
 def support_files():
     base = ROOT / 'docs/experiments'
     return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c', ROOT / 'tools/native/interop-host.c', ROOT / 'tools/native/entry-arguments.c',
             ROOT / 'benchmarks/native-web/http-host.c', ROOT / 'benchmarks/native-web/http-session-host.c',
             base / 'aot-console/native-session.c',
-            *sorted((ROOT / 'runtime/native').rglob('*.[ch]')),
+            *native_host_sources(),
             *sorted((ROOT / 'tools/native').glob('windows-*.h')),
             *[ROOT / 'tools/native' / name for name in
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
@@ -384,7 +389,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if not windows:
             adapters.append(base / 'file-input.c')
         adapters.append(ROOT / 'tools/native/entry-arguments.c')
-        inputs = [ROOT / 'tools/native/interop-host.c', *sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
+        inputs = [ROOT / 'tools/native/interop-host.c', *native_host_sources(), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
                   *compiler.parent.glob('*.dll'), *compiler.parent.glob('*.json')]

@@ -176,3 +176,29 @@ The shared subprocess checker now accepts an explicitly supplied exact stderr se
 with empty stderr still the default, and returns raw diagnostics for receipts.
 Only header and async JIT consumers opt into the exact warning. Focused subprocess
 controls verify unexpected diagnostics and nonzero exits still fail.
+
+
+[All 132 header contracts](macos-header-contracts.json.gz) now pass across
+AOT/interpreter/JIT. The [second editor recovery run](macos-editor-configuration-2.json.gz)
+also passes ten cycles. [PostgreSQL qualification](macos-postgresql.json.gz) passes
+contracts, live queries in all three modes and all ten protocol cases; the disposable
+loopback-only database was removed afterward.
+
+The [initial extracted kit failure](macos-kit-missing-include.json.gz) identifies a
+missing `heap-adoption.inc` during hello compilation. Package support selection and
+build fingerprints now include `.inc` files alongside C sources/headers, covering
+all three current native fragments. A rebuilt kit requires fresh extracted acceptance.
+One concurrent [async attempt](macos-async-source-drift.json.gz) stopped because
+this builder edit changed its inputs during compilation, after nine passing cases;
+it is not a passing complete run. A fresh run starts after the source edit settles.
+
+Fresh fetches verify zero ahead/behind commits for neoCLR main, Raven main and
+Raven codex/neoclr. Windows run 41113298319 was superseded by
+[41113778505](https://github.com/marinasundstrom/neoCLR/actions/runs/41113778505)
+with the streamed diagnostic fix; package binaries remain unchanged.
+
+
+The [repaired extracted kit](macos-build-kit.json.gz) passes console/HTTP execution,
+HTTP fault propagation and all four tamper controls, with Cargo absent from PATH,
+no checkout inputs and standalone execution in an empty environment. The fix changes
+packaging/fingerprinting only; native runtime fragments themselves are unchanged.
