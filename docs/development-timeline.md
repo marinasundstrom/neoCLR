@@ -7,6 +7,7 @@
 - **Findings:** The initial macOS source attempt failed because the installed linker could not read the selected macOS 27 SDK; a separate run selects installed SDK 26.5. Prior Windows scalar qualification used an incompatible old Raven pin. Rust formatting gates also required repair.
 - **Author follow-up:** Required syncing local work, then directed proceeding with release checks and fixes before publishing.
 - **Assistant action:** Synced Raven main and codex/neoclr separately; preserved their branch boundary.
+- **Assistant findings/actions:** Release checks passed the Windows watcher but exposed missing native Windows file input for configuration reload. Implemented a bounded Win32 adapter behind the existing explicit ReadAllText binding and selected the existing watcher binding for default JIT. Added cleanup/error-precedence tests and three-mode watcher/reload qualification. Cross-host checks pass; fresh Windows package execution remains required. This is a release-gap repair, with no new Raven metadata contract or wider Windows file-output claim.
 - **Status:** Preparation, not publication or release approval. The [candidate record](validation/release-preparation-20261030/README.md) records results and unresolved gates; [draft notes](next-preview-release-notes.md) distinguish supported scope from experiments. No permanent milestone reprioritization is inferred.
 
 ## 2026-10-29 — Library-owned signals using structural functions

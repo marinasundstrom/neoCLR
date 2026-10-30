@@ -24,6 +24,9 @@ qualification remain release gates. See [configuration](configuration.md),
 
 ## API and compiler migration
 
+- Replace older Windows bundles to obtain native bounded UTF-8 file reads and
+  matching default-JIT file-input/watcher bindings. This target extension preserves
+  the existing FileText error/byte-limit contract; file output remains separate.
 - Rebuild libraries, applications and interface implementations with the matching
   compiler/runtime bundle. Moved service types have new assembly identities and no
   type forwarders; update project references and imports.
@@ -62,7 +65,7 @@ standard packaged class-library selection. Broader structural work stays parked.
 
 ## Qualification and distribution
 
-Planned matching SDK/editor version: `0.1.19-neoclr.20261030.1`, Raven
+Candidate matching SDK/editor version: `0.1.19-neoclr.20261030.1`, Raven
 `6ceeb1be8790e105a1394cb99fded41fafad5b4c`. Source validation, extracted packages,
 editor, HTTPS, Windows watcher/reload behavior and release measurements must pass
 before publication. Preserve optional PostgreSQL on macOS only if the matching

@@ -98,7 +98,7 @@ def main():
                                 capture_output=True, text=True, cwd=ROOT, timeout=600)
         (out / 'build.log').write_text(result.stdout + result.stderr)
         if result.returncode:
-            raise RuntimeError('Build failed; see ' + str(out / 'build.log'))
+            raise RuntimeError('Build failed; see ' + str(out / 'build.log') + '\n' + (result.stdout + result.stderr)[-12000:])
         native = [str(build / ('app.exe' if os.name == 'nt' else 'app'))]
         report['cases']['native'] = execute(native, out / 'native-files', env)
         lib = bundle / 'lib'
@@ -107,6 +107,7 @@ def main():
         for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web', 'Neo.DependencyInjection.Abstractions', 'Neo.DependencyInjection', 'Neo.Configuration.Abstractions', 'Neo.Configuration', 'Neo.Configuration.Json'):
             interpreter += ['--module', str(lib / (name + '.dll'))]
         report['cases']['interpreter'] = execute([*interpreter, '--'], out / 'interpreter-files', env)
+        report['cases']['jit'] = execute([str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--'], out / 'jit-files', env)
         report['passed'] = True
     finally:
         (out / 'results.json').write_text(json.dumps(report, indent=2) + '\n')

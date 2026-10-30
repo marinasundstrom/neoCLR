@@ -15,6 +15,21 @@
       "path": "/tmp/neoclr-preview19-sdk-20261030/raven-vscode.vsix",
       "bytes": 10899935,
       "sha256": "c511a6cf1bdf45cc3147bb1a740ca1b9dc711504e3b749a69f6b2a5e2d065f26"
+    },
+    {
+      "path": "/tmp/neoclr-preview19-review-assets/neoclr-source-c964d8488.tar.gz",
+      "bytes": 460834056,
+      "sha256": "3c382ae20e94705a8d60cb864a457fb1370f56b9351a669a95364032c0ed1bd7"
+    },
+    {
+      "path": "/tmp/neoclr-preview19-review-assets/raven-tool-notices-candidate.tar.gz",
+      "bytes": 135797,
+      "sha256": "d5a7050fcbc9538ec5f8a4410426ac04835fb86d8ec1f33d4ee5f5061f1a680e"
+    },
+    {
+      "path": "/tmp/neoclr-preview19-sdk-20261030/raven-sdk-0.1.19-neoclr.20261030.1-osx-arm64.tar.gz",
+      "bytes": 33381095,
+      "sha256": "1ed2452b145e64ca19a341f34d905e27a7631865273fdac5c0500e57cedb12e1"
     }
   ]
 }

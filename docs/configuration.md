@@ -110,7 +110,10 @@ matching the default delay in
 [FileConfigurationSource](https://source.dot.net/Microsoft.Extensions.Configuration.FileExtensions/FileConfigurationSource.cs.html).
 Setup uses public System.IO.FileSystemWatcher and System.Concurrency.Timer APIs;
 notifications and reads are serialized on the runtime owner thread. Windows and
-macOS use their existing watcher backends; this slice is qualified on macOS only.
+macOS use their existing watcher backends. Preview 19 qualification now covers
+Windows watcher ownership/lifecycle; Windows reload additionally needs the newly
+implemented [native file-input binding](windows-native-host.md#bounded-utf-8-file-input-2026-10-30-development).
+The refreshed Windows package remains under qualification.
 
 Background failures retain the last valid data and are exposed by LastReloadError;
 optional deletion instead clears data. This deliberately avoids an unobserved
@@ -123,6 +126,6 @@ current values; already constructed settings/services are not automatically rebo
 The native compiler now emits/imports scalar and reference-null parameter defaults
 in native metadata. Omitted arguments are inserted at the call site; runtime arity
 is unchanged. This consolidates JSON provider/source/registration overloads. Rebuild
-binary consumers. Arbitrary value-type defaults such as CancellationToken = default
-remain for the next runtime API slice; they are not implied by scalar support.
+binary consumers. Nominal value defaults, including CancellationToken = default, are now supported
+by the matching compiler/runtime bundle; consumers must rebuild.
 See [default-argument contract and validation](parameter-defaults.md).

@@ -100,7 +100,10 @@ this entry explains its write and error contract.
 
 Development native coverage: FileText.WriteAllText is available through the ARM64
 POC's explicit file-output binding. FileText.ReadAllText also has a bounded strict
-UTF-8 binding. Byte bounds, preflight preservation and Result contracts are unchanged;
+UTF-8 binding. Development Windows console/HTTP profiles now admit that existing
+input binding, with wide native paths and handle closure before decoding; target
+package qualification is tracked in the [Windows host record](https://github.com/marinasundstrom/neoCLR/blob/main/docs/windows-native-host.md#bounded-utf-8-file-input-2026-10-30-development).
+Windows native file output remains unsupported by those profiles. Byte bounds, preflight preservation and Result contracts are unchanged;
 these are synchronous host operations, not a general stream/provider backend.
 [Native validation and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/file-output.md#native-compilation-development-2026-10-08).
 

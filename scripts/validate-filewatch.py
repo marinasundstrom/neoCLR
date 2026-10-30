@@ -110,7 +110,7 @@ def main():
                                 capture_output=True, text=True, cwd=ROOT, timeout=600)
         (out / 'build.log').write_text(result.stdout + result.stderr)
         if result.returncode:
-            raise RuntimeError('Build failed; see ' + str(out / 'build.log'))
+            raise RuntimeError('Build failed; see ' + str(out / 'build.log') + '\n' + (result.stdout + result.stderr)[-12000:])
         receipt = json.loads((build / 'build.json').read_text())
         command = next(item['command'] for item in receipt['commands']
                        if item['phase'] == 'host-compile-link')[:]
@@ -133,6 +133,7 @@ def main():
         for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
             interpreter += ['--module', str(lib / (name + '.dll'))]
         report['cases']['interpreter'] = execute([*interpreter, '--'], out / 'interpreter-files', env)
+        report['cases']['jit'] = execute([str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--'], out / 'jit-files', env)
         report['passed'] = True
     finally:
         (out / 'results.json').write_text(json.dumps(report, indent=2) + '\n')

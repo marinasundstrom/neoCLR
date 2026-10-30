@@ -386,8 +386,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if bootstrap_root:
             adapters = [ROOT / 'benchmarks/native-web/http-session-host.c' if p == ROOT / 'benchmarks/native-web/http-host.c' else p for p in adapters]
             adapters += [base / 'native-session.c']
-        if not windows:
-            adapters.append(base / 'file-input.c')
+        adapters.append(base / 'file-input.c')
         adapters.append(ROOT / 'tools/native/entry-arguments.c')
         inputs = [ROOT / 'tools/native/interop-host.c', *native_host_sources(), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
@@ -451,8 +450,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         flags += ['--bind-tls']
         flags += ['--bind-scheduler', '--bind-task-queue', '--bind-timers', '--bind-file-watch']
         flags += ['--bind-runtime-async']
-        if not windows:
-            flags += ['--bind-file-input']
+        flags += ['--bind-file-input']
         if http:
             flags += [
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']

@@ -1,11 +1,64 @@
 #include "file-input.h"
-#include <errno.h>
-#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <limits.h>
+typedef HANDLE input_handle;
+#define INVALID_INPUT INVALID_HANDLE_VALUE
+static int32_t io_status(DWORD code) {
+    switch (code) {
+        case ERROR_FILE_NOT_FOUND: case ERROR_PATH_NOT_FOUND: return 3;
+        case ERROR_ACCESS_DENIED: case ERROR_SHARING_VIOLATION: return 4;
+        case ERROR_INVALID_NAME: case ERROR_BAD_PATHNAME:
+        case ERROR_FILENAME_EXCED_RANGE: case ERROR_INVALID_PARAMETER: return 2;
+        default: return 6;
+    }
+}
+static input_handle open_input(const neoclr_aot_text *path, int32_t *error, int32_t *fault) {
+    if (path->length > (uint64_t)INT_MAX) { *error = 2; return INVALID_INPUT; }
+    int count = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+        (const char *)path->bytes, (int)path->length, NULL, 0);
+    if (!count) { *error = 2; return INVALID_INPUT; }
+    wchar_t *name = malloc(((size_t)count + 1) * sizeof(wchar_t));
+    if (!name) { *fault = 5; return INVALID_INPUT; }
+    if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+        (const char *)path->bytes, (int)path->length, name, count) != count) {
+        free(name); *error = 2; return INVALID_INPUT;
+    }
+    name[count] = 0;
+    HANDLE file = CreateFileW(name, GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+        OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    DWORD code = GetLastError();
+    free(name);
+    if (file == INVALID_INPUT) *error = io_status(code);
+    return file;
+}
+static int32_t regular_input(input_handle file) {
+    BY_HANDLE_FILE_INFORMATION info;
+    SetLastError(NO_ERROR);
+    DWORD type = GetFileType(file);
+    if (type == FILE_TYPE_UNKNOWN && GetLastError() != NO_ERROR) return io_status(GetLastError());
+    if (type != FILE_TYPE_DISK) return 5;
+    if (!GetFileInformationByHandle(file, &info)) return io_status(GetLastError());
+    return (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? 5 : 0;
+}
+static int64_t read_input(input_handle file, unsigned char *bytes, size_t size, int32_t *error) {
+    DWORD count = 0;
+    if (!ReadFile(file, bytes, (DWORD)size, &count, NULL)) {
+        *error = io_status(GetLastError()); return -1;
+    }
+    return (int64_t)count;
+}
+static void close_input(input_handle file) { (void)CloseHandle(file); }
+#else
+#include <errno.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+typedef int input_handle;
+#define INVALID_INPUT (-1)
 static int32_t io_status(int code) {
     switch (code) {
         case ENOENT: return 3;
@@ -14,6 +67,32 @@ static int32_t io_status(int code) {
         default: return 6;
     }
 }
+static input_handle open_input(const neoclr_aot_text *path, int32_t *error, int32_t *fault) {
+    char *name = malloc((size_t)path->length + 1);
+    if (!name) { *fault = 5; return INVALID_INPUT; }
+    memcpy(name, path->bytes, (size_t)path->length);
+    name[path->length] = 0;
+    int file;
+    do { file = open(name, O_RDONLY); } while (file < 0 && errno == EINTR);
+    int code = errno;
+    free(name);
+    if (file < 0) *error = io_status(code);
+    return file;
+}
+static int32_t regular_input(input_handle file) {
+    struct stat info;
+    if (fstat(file, &info)) return io_status(errno);
+    return S_ISREG(info.st_mode) ? 0 : 5;
+}
+static int64_t read_input(input_handle file, unsigned char *bytes, size_t size, int32_t *error) {
+    ssize_t count;
+    do { count = read(file, bytes, size); } while (count < 0 && errno == EINTR);
+    if (count < 0) *error = io_status(errno);
+    return (int64_t)count;
+}
+static void close_input(input_handle file) { (void)close(file); }
+#endif
+
 static int32_t publish_error(void *output, uint64_t error) {
     uint32_t tag = 2;
     memcpy(output, &tag, sizeof(tag));
@@ -28,29 +107,19 @@ static int32_t file_read_utf8(const neoclr_aot_text *path, int32_t limit,
     if (path->length > SIZE_MAX - 1) return 5;
     if (!path->length || memchr(path->bytes, 0, (size_t)path->length))
         return publish_error(output, 2);
-    char *name = malloc((size_t)path->length + 1);
-    if (!name) return 5;
-    memcpy(name, path->bytes, (size_t)path->length);
-    name[path->length] = 0;
-    int fd;
-    do { fd = open(name, O_RDONLY); } while (fd < 0 && errno == EINTR);
-    int saved_error = errno;
-    free(name);
-    if (fd < 0) return publish_error(output, (uint64_t)io_status(saved_error));
-    struct stat info;
     int32_t error = 0, fault = 0;
+    input_handle file = open_input(path, &error, &fault);
+    if (file == INVALID_INPUT) return fault ? fault : publish_error(output, (uint64_t)error);
     unsigned char *bytes = NULL;
     size_t length = 0, capacity = 0;
-    if (fstat(fd, &info)) error = io_status(errno);
-    else if (!S_ISREG(info.st_mode)) error = 5;
-    else {
+    error = regular_input(file);
+    if (!error) {
         unsigned char chunk[8192];
         for (;;) {
             size_t remaining = (size_t)limit - length;
             size_t requested = remaining < sizeof(chunk) ? remaining + 1 : sizeof(chunk);
-            ssize_t count = read(fd, chunk, requested);
-            if (count < 0 && errno == EINTR) continue;
-            if (count < 0) { error = io_status(errno); break; }
+            int64_t count = read_input(file, chunk, requested, &error);
+            if (count < 0) break;
             if (!count) break;
             if ((size_t)count > remaining) { error = 7; break; }
             size_t needed = length + (size_t)count;
@@ -67,7 +136,7 @@ static int32_t file_read_utf8(const neoclr_aot_text *path, int32_t limit,
             length = needed;
         }
     }
-    (void)close(fd);
+    close_input(file);
     if (fault || error) {
         free(bytes);
         return fault ? fault : publish_error(output, (uint64_t)error);

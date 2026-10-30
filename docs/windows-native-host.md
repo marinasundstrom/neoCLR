@@ -278,3 +278,38 @@ reuses existing verifier/lowering restrictions; unsupported methods still fail
 compilation. File/path, task/socket, character and extended integer service switches
 are rejected. This is not general hosting, native unwind/SEH interoperability or
 suspendable/green-thread support. No Raven semantic or CLI bridge contract changes.
+
+
+## Bounded UTF-8 file input (2026-10-30 development)
+
+Preview 19 qualification found that JSON configuration reload could watch files on
+Windows but could not compile the whole-file read used by the provider. This was a
+native backend gap, not a different configuration contract. The existing explicit
+`--bind-file-input` contract is now admitted by Windows console/HTTP profiles.
+Project/JIT host builders include its adapter; default JIT selects file input and
+watcher bindings. Matching runtime, compiler and helper binaries must be rebuilt.
+File output and path-service bindings remain outside these Windows profiles.
+
+The adapter retains FileText's existing bounded, strict UTF-8/Result contract and
+shares limit checking, buffering and decoding with POSIX. Windows converts the
+validated UTF-8 path using [MultiByteToWideChar with MB_ERR_INVALID_CHARS](https://learn.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar)
+and opens it with [CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew).
+Read/write/delete sharing permits editor replacement while a handle is open,
+matching the existing POSIX reader; all handles close before managed decoding.
+Directories and non-disk devices return NotRegularFile. Sharing violations map to
+AccessDenied; other documented input failures retain the existing status mapping.
+
+This closes target coverage for the existing API; it does not add a new .NET
+semantic divergence. The existing differences from File.ReadAllText remain explicit
+in [the API comparison](../api-docs/storage-items.md): bounded UTF-8 bytes, typed
+recoverable errors and preserved BOM text. Wide-path conversion costs one temporary
+allocation; no performance improvement is claimed. Host path resolution and OS
+access controls still apply; no new long-path, asynchronous-file or general
+stream/provider guarantee is made.
+
+The C contract fixture checks multibyte/non-BMP names, BOM/NUL/CRLF preservation,
+empty/exact/oversized input, invalid UTF-8, invalid/missing/directory paths,
+allocation failure and cleanup. Windows adds device/sharing errors and handle-count
+checks. COFF admission and real reload consumers provide independent coverage.
+Target execution is tracked in the [release record](validation/release-preparation-20261030/README.md);
+implementation alone does not qualify the refreshed Windows package.

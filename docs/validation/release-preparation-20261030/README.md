@@ -32,10 +32,10 @@ historical evidence only.
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar controls, seven HTTP readiness/diagnostic controls, bundle diagnostic control and async diagnostic control pass. |
 | macOS SDK | Matching SDK/VSIX and all 14 libraries built. Extracted default-JIT/HTTP package, watcher/reload, async (24), headers (132), PostgreSQL and standalone build-kit checks pass. |
-| Windows | Prior scalar run fails at compiler build; stale pins updated. Fresh host/package execution remains required. The workflow now includes real-file watcher and configuration reload checks against extracted package binaries, retaining their reports even on failure. |
+| Windows | Scalar, HTTPS, security and watcher checks pass on the revisions documented below. Configuration reload exposes a missing native file-input binding; a bounded implementation now awaits a freshly rebuilt package and target-host checks. Editor acceptance remains open. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
 | Editor / HTTPS | macOS editor acceptance (26 checks), inlays, two ten-cycle configuration recovery runs and all 15 HTTPS/cleartext cases pass. Windows acceptance remains open. |
-| Performance | Fresh package release measurements required; existing development experiments are not release measurements. |
+| Performance | Five-round macOS stages pass as loaded-host qualification only (see stage index below). Windows measurements await a passing package. No controlled performance gain is claimed. |
 | Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. NuGet and npm notice audits pass. Candidate archive/VSIX hashes are recorded; published asset identities remain unset. |
 | Publication | No tag, GitHub release, upload or website deployment. Publication date unset. |
 
@@ -287,3 +287,34 @@ Only the HTTP entry is now substituted; the console adapter stays linked. Two
 focused command-construction tests pass, including missing/duplicate entry rejection.
 The workflow moves watcher/reload/editor gates before repeated runtime contracts;
 all gates are still required, with unchanged package binaries.
+
+
+## Windows file-input release gap
+
+Package [41118644109](https://github.com/marinasundstrom/neoCLR/actions/runs/41118644109)
+passes [watcher native/interpreter/ownership checks](windows-watcher-fixed.json.gz),
+then fails configuration reload because Windows does not bind Runtime.ReadAllText.
+This is a real native capability gap, not a diagnostic-policy failure.
+The reader now uses strict UTF-8 path conversion, shared Win32 file handles and
+the existing bounded regular-file/error/decode contract. File output remains
+unsupported. The default JIT selects file input on both platforms and the existing
+file-watcher binding; matching runtime, compiler and native hosts must be rebuilt
+together. Watcher/reload validators now require native, interpreter and JIT execution.
+
+[Local C contract checks](macos-file-input-c.log.gz) pass for rooted/unrooted
+reads, Unicode paths, BOM/NUL preservation, byte limits, error precedence, allocation
+failure and cleanup. [Windows-target codegen checks](macos-windows-file-input-codegen.log.gz)
+pass ten cross-host cases including opt-in enforcement and the expected COFF import;
+four Windows execution tests are correctly ignored on macOS. The C fixture also
+contains Windows device, sharing-denial and handle-count checks, which remain
+pending target-host execution. Old package receipts do not qualify these new binaries.
+
+The Windows job in [security run 41118644286](https://github.com/marinasundstrom/neoCLR/actions/runs/41118644286)
+passes [cryptography](windows-security-crypto-fixed.json.gz) and
+[TLS bindings](windows-security-tls-fixed.json.gz) after the fixture export repair.
+The macOS job was cancelled; this is explicitly Windows evidence, not an all-platform
+workflow pass.
+
+[Six interpreter file-input cases and the default-JIT binding test](macos-file-input-root.log.gz)
+pass, as do [both native/interpreter parity and exact opt-in tests](macos-file-input-parity.log.gz).
+The API snapshot and Rust formatting checks pass.

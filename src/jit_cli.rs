@@ -154,10 +154,8 @@ pub(crate) fn run(
         "--bind-socket-transfer",
         "--bind-socket-client",
     ]);
-    command.arg("--bind-runtime-async");
-    if !windows {
-        command.arg("--bind-file-input");
-    }
+    command.args(["--bind-runtime-async", "--bind-file-watch"]);
+    command.arg("--bind-file-input");
     if let Some(collector) = garbage_collector {
         command.args(["--gc", collector.name()]);
     }

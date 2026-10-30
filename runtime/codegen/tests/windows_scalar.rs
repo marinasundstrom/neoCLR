@@ -429,3 +429,48 @@ fn assert_windows_program(fixture: &[u8], marker: &str, expected_stdout: &[u8]) 
     }
     save(&outcomes, true);
 }
+
+#[test]
+fn windows_file_input_requires_and_emits_explicit_native_binding() {
+    let dir = Temp::new();
+    let source = ".module App\n.function Calculate() -> Int32\nldstr \"input.json\"\nldc.i4 4096\ncall neoCLR.Runtime.ReadAllText(String, Int32)\npop\nldc.i4 0\nret\n.end";
+    let seed = ".module System\n.references ()\n.function neoCLR.Runtime.ReadAllText(String, Int32) -> Value\n.methodimpl InternalCall\n.end";
+    fs::write(dir.0.join("app.neoil"), source).unwrap();
+    fs::write(dir.0.join("System.neoil"), seed).unwrap();
+    fs::write(
+        dir.0.join("Helpers.neoil"),
+        ".module Helpers\n.references ()\n",
+    )
+    .unwrap();
+    for enabled in [false, true] {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+        command
+            .arg("--closed-world")
+            .arg(dir.0.join("app.neoil"))
+            .arg("Calculate")
+            .arg(dir.0.join("app.obj"))
+            .arg("--system")
+            .arg(dir.0.join("System.neoil"))
+            .arg("--module")
+            .arg(dir.0.join("Helpers.neoil"))
+            .args([
+                "--target",
+                "x86_64-pc-windows-msvc",
+                "--windows-console-experiment",
+                "--compile-system",
+                "--reference-arena",
+                "--native-gc",
+                "--native-stack-budget",
+            ]);
+        if enabled {
+            command.arg("--bind-file-input");
+        }
+        let result = command.output().unwrap();
+        assert_eq!(result.status.success(), enabled, "{result:?}");
+        assert_eq!(dir.0.join("app.obj").exists(), enabled);
+    }
+    let bytes = fs::read(dir.0.join("app.obj")).unwrap();
+    let object = object::File::parse(bytes.as_slice()).unwrap();
+    assert!(object.symbols().any(|symbol| symbol.is_undefined()
+        && symbol.name().ok() == Some("neoclr_file_read_utf8_rooted_v1")));
+}

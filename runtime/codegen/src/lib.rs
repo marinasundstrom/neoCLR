@@ -646,7 +646,6 @@ fn run_internal(
     }
     if windows_console
         && (bind_paths
-            || bind_file_input
             || bind_file_output
             || bind_socket_listener
             || bind_socket_accept
@@ -654,7 +653,8 @@ fn run_internal(
             || bind_socket_client)
     {
         return Err(
-            "Windows console experiment does not support file, path or socket services".into(),
+            "Windows console experiment does not support file-output, path or socket services"
+                .into(),
         );
     }
     if windows_http
@@ -670,8 +670,8 @@ fn run_internal(
     {
         return Err("Windows HTTP experiment requires Windows x64, --compile-system, --reference-arena, --native-gc, --native-stack-budget and task/listener/accept/transfer bindings".into());
     }
-    if windows_http && (bind_paths || bind_file_input || bind_file_output) {
-        return Err("Windows HTTP experiment does not support file or path services".into());
+    if windows_http && (bind_paths || bind_file_output) {
+        return Err("Windows HTTP experiment does not support file-output or path services".into());
     }
     if (windows_stack || windows_heap)
         && (target != compiler::Target::WindowsX64

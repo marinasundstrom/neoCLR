@@ -263,7 +263,6 @@ fn http_experiment_requires_complete_windows_service_contract() {
     }
     for extra in [
         "--bind-paths",
-        "--bind-file-input",
         "--bind-file-output",
         "--bind-character-text",
         "--windows-console-experiment",
