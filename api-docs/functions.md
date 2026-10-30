@@ -192,8 +192,8 @@ are supported when the signature admits reference values.
 Validation does not enter the target. Exact scalar boxes and assignable references
 are supported; numeric coercion, optional arguments, ref/out copyback and arbitrary
 value record/tuple/union marshalling are not. **Faults raised by the function itself
-propagate**, rather than becoming `ReflectionError`. Generic overloads remain future
-work; this provisional API does not infer a return type from an Object reference.
+propagate**, rather than becoming `ReflectionError`. The Object overload does not
+infer a return type; the generic overload below retains the signature explicitly.
 
 The library uses `neoCLR.Runtime.InvokeFunctionCheck` followed by the checked
 `InvokeFunction` primitive. The check returns a status without calling the function;
@@ -226,3 +226,30 @@ functions with different parameter or return types do not match. The source cons
 compares `obj is () -> T` with `typeof(() -> T).IsInstanceOfType(obj)` for closed
 generic instantiations, including mismatches and null. This qualification uses the
 existing reflection API; it adds no coercion or function variance conversions.
+
+
+<a id="typed-invocation-and-method-signatures-development"></a>
+## Typed invocation and method signatures (development)
+
+```raven
+static func Invoke<T>(function: T, arguments: Object?[]) -> ReturnType<T> where T: func
+```
+
+`System.Runtime.Reflection.FunctionReflection.Invoke<T>` retains the structural
+signature and returns its projected result. `arguments` must be a non-null array
+of the exact arity, containing compatible references/nulls or exact scalar boxes.
+The same marshalling limits as the Object overload apply. Successful no-result or
+unit-returning invocation produces unit. Other supported results are cast/unboxed
+to the projected type. Validation failures call Panic through carrier extraction;
+target faults propagate. Task results are returned unchanged. The helper does not
+aggregate multiple results or schedule work.
+
+`System.Introspection.MethodInfo.FunctionType: TypeInfo` describes the complete
+public signature. An unresolved whole-signature method returns its function-constrained
+generic parameter descriptor. A closed method returns `FunctionTypeInfo` and exposes
+ordinary `GetParameters()` and `ReturnType`. Those two queries call Panic when the
+whole signature remains unresolved. The receiver is not part of the function shape.
+
+The legacy CLI documentation bridge cannot encode a return-type projection; this
+manual member entry is the reference for the typed overload. The new signature forms
+require the matching native compiler/runtime. See [Generics](../features/generics/).

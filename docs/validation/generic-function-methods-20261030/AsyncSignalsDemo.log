@@ -1,0 +1,2 @@
+signals: asynchronous callback observed through Promise
+=> Int32(0)

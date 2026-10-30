@@ -38,8 +38,8 @@ pub(crate) fn link_modules_with_object_root(
             "expected a System library module without an entry point",
         ));
     }
-    if library.format != 5 {
-        return Err(Fault::new("unsupported module format (expected 5)"));
+    if !matches!(library.format, 5 | 6) {
+        return Err(Fault::new("unsupported module format (expected 5 or 6)"));
     }
     if object_root.is_some_and(|root| root.module == application.name) {
         return Err(Fault::new("runtime Object root must belong to a library"));
@@ -60,8 +60,8 @@ pub(crate) fn link_modules_with_object_root(
         if module.name.is_empty() || !names.insert(module.name.as_str()) {
             return Err(Fault::new("empty or duplicate module name in load set"));
         }
-        if module.format != 5 {
-            return Err(Fault::new("unsupported module format (expected 5)"));
+        if !matches!(module.format, 5 | 6) {
+            return Err(Fault::new("unsupported module format (expected 5 or 6)"));
         }
         if index > 0 && !module.entry.is_empty() {
             return Err(Fault::new(
@@ -80,6 +80,11 @@ pub(crate) fn link_modules_with_object_root(
         crate::references::validate_list(&library, &supplied)?;
     }
     let mut linked = application.clone();
+    linked.format = supplied
+        .iter()
+        .map(|module| module.format)
+        .max()
+        .unwrap_or(application.format);
     linked.object_root = object_root.cloned();
     linked.normalize_definition_ids()?;
     crate::metadata_origin::merge(&mut linked, &library)?;

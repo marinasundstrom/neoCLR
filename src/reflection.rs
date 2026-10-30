@@ -343,6 +343,7 @@ impl Query {
                         }),
                     Type::String
                     | Type::Intersection(_)
+                    | Type::FunctionReturn(_)
                     | Type::Function(_)
                     | Type::ByRef(_)
                     | Type::ReadOnlyByRef(_)
@@ -1265,7 +1266,7 @@ fn parameters(
             if type_contract(module) == "System.Introspection.TypeInfo" {
                 let f = function
                     .ok_or_else(|| Fault::new("parameter snapshot requires declaring member"))?;
-                let synthesized = !has_method_metadata(module, f);
+                let synthesized = f.function_type.is_some() || !has_method_metadata(module, f);
                 fields.push(Value::Int32(if synthesized {
                     0
                 } else {
@@ -1310,6 +1311,24 @@ fn method(
     arguments: &[Type],
     limits: &Limits,
 ) -> Result<Value, Fault> {
+    let projected;
+    let f = if let Some(signature) = &f.function_type {
+        let mut value = f.clone();
+        let signature = signature.substitute_type_parameters(arguments)?;
+        value.function_type = Some(signature.clone());
+        if matches!(signature, Type::Function(_)) {
+            value.materialize_function_signature()?;
+        } else {
+            value.parameters.clear();
+            value.parameter_names.clear();
+            value.returns = Type::function_return(signature)?;
+            value.no_result = false;
+        }
+        projected = value;
+        &projected
+    } else {
+        f
+    };
     let owner_descriptor = member_owner(module, owner, f)?;
     let is_generic = !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty();
     let is_definition = is_generic && f.generic_arguments.is_empty();
@@ -1441,6 +1460,21 @@ fn method(
                 )
                 .into(),
             ));
+            let signature = f.function_type.clone().unwrap_or_else(|| {
+                Type::Function(Box::new(crate::metadata::FunctionType {
+                    parameters: f.parameters.clone(),
+                    returns: f.returns.clone(),
+                    no_result: f.no_result,
+                    out_parameters: f.out_parameters.clone(),
+                    out_when_true: f.out_when_true.clone(),
+                }))
+            });
+            fields.push(member_type_value(
+                module,
+                &signature.substitute_type_parameters(arguments)?,
+                owner_descriptor.as_ref(),
+                f,
+            )?);
         }
     }
     Ok(result)
@@ -1583,6 +1617,7 @@ pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<
             }
             Type::MethodTypeParameter(*index)
         }
+        TypeIdentity::FunctionReturn(t) => Type::function_return(*nested(t)?)?,
         TypeIdentity::ByRef(t) => Type::ByRef(nested(t)?),
         TypeIdentity::ReadOnlyByRef(t) => Type::ReadOnlyByRef(nested(t)?),
         TypeIdentity::Array(t) => Type::Array(nested(t)?),

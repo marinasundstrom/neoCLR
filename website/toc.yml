@@ -16,5 +16,7 @@
       href: docs/intersections.md
 - name: Memory views (development)
   href: docs/memory-views.md
+- name: Signals (development)
+  href: docs/signals.md
 - name: API reference
   href: api/

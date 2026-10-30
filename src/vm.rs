@@ -202,6 +202,7 @@ fn resolve_candidates(
                 Ok(ty.clone())
             })?;
         }
+        crate::function_interop::lower(module, &mut candidate)?;
         candidate.generic_arguments = target.generic_arguments.clone();
         candidate.definition = Some(identity);
         if candidate.parameters == target.parameters {
@@ -365,8 +366,8 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
     if module.name.is_empty() {
         return Err(Fault::new("module name must not be empty"));
     }
-    if module.format != 5 {
-        return Err(Fault::new("unsupported module format (expected 5)"));
+    if !matches!(module.format, 5 | 6) {
+        return Err(Fault::new("unsupported module format (expected 5 or 6)"));
     }
     for def in &module.types {
         crate::enums::validate(module, def)?;
@@ -543,6 +544,11 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
             {
                 return Err(Fault::new("invalid static field declaration"));
             }
+            crate::constraints::validate_function_returns(
+                &field.ty,
+                &def.generic_constraints,
+                &[],
+            )?;
             check_type_context(&field.ty, module, def.generic_parameters.len(), 0)?;
         }
         let mut fields = HashSet::new();
@@ -577,6 +583,83 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
         })
         .collect();
     for function in &module.functions {
+        let owner_constraints = function
+            .owner
+            .as_ref()
+            .and_then(|owner| module.type_definition(owner))
+            .map(|owner| owner.generic_constraints.as_slice())
+            .unwrap_or(&[]);
+        function.map_types(|ty| {
+            crate::constraints::validate_function_returns(
+                ty,
+                owner_constraints,
+                &function.generic_constraints,
+            )?;
+            Ok(ty.clone())
+        })?;
+        if let Some(object) = &function.boxed_arguments {
+            if function.function_type.is_none()
+                || object != &Type::Named("System.Object".into())
+                || !module.is_object_reference_type(object)
+            {
+                return Err(Fault::new(
+                    "boxed argument adapter requires a function signature and System.Object",
+                ));
+            }
+        }
+        if let Some(signature) = &function.function_type {
+            if module.format != 6 {
+                return Err(Fault::new("dependent method signatures require format 6"));
+            }
+            let constrained = match signature {
+                Type::TypeParameter(index) => function
+                    .owner
+                    .as_ref()
+                    .and_then(|owner| module.type_definition(owner))
+                    .is_some_and(|owner| {
+                        owner.generic_constraints.iter().any(|c| {
+                            c.parameter == *index
+                                && c.kind == crate::metadata::ConstraintKind::FunctionType
+                        })
+                    }),
+                Type::MethodTypeParameter(index) => function.generic_constraints.iter().any(|c| {
+                    c.parameter == *index && c.kind == crate::metadata::ConstraintKind::FunctionType
+                }),
+                Type::Function(shape) => {
+                    shape.validate()?;
+                    shape.parameters == function.parameters
+                        && shape.returns == function.returns
+                        && shape.no_result == function.no_result
+                        && shape.out_parameters == function.out_parameters
+                        && shape.out_when_true == function.out_when_true
+                }
+                _ => false,
+            };
+            if !constrained {
+                return Err(Fault::new(
+                    "invalid method function type or missing function constraint",
+                ));
+            }
+            if matches!(
+                signature,
+                Type::TypeParameter(_) | Type::MethodTypeParameter(_)
+            ) && ((if let Some(object) = &function.boxed_arguments {
+                function.parameters != [Type::ArrayRef(Box::new(object.clone()))]
+                    || function.returns != *object
+                    || function.no_result
+            } else {
+                !function.parameters.is_empty()
+                    || function.returns != Type::Void
+                    || !function.no_result
+            }) || !function.parameter_names.is_empty()
+                || !function.out_parameters.is_empty()
+                || !function.readonly_parameters.is_empty())
+            {
+                return Err(Fault::new(
+                    "dependent method signature has conflicting explicit parameters",
+                ));
+            }
+        }
         if function
             .definition
             .as_ref()
@@ -1585,6 +1668,13 @@ fn check_type_context_seen(
         }
         Type::Union(_) | Type::Intersection(_) => {
             crate::compositions::validate_in_context(module, ty, arity)
+        }
+        Type::FunctionReturn(operand) => {
+            if module.format < 6 {
+                return Err(Fault::new("return-type projection requires format 6"));
+            }
+            Type::function_return(operand.as_ref().clone())?;
+            nested(operand)
         }
         Type::Function(shape) => {
             shape.validate()?;

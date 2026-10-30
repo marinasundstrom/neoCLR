@@ -7325,3 +7325,11 @@ Rename the public System.Fail function to System.Panic and prefer imported Panic
 calls. This naming change retains existing terminal fault behavior and does not
 reprioritize runtime unwinding or thread/task semantics. Those decisions remain
 open; see [the contract and migration](system-fault.md).
+
+### Author-directed function-generics slice (2026-10-30)
+
+General whole-function method signatures and return-type projection support the
+separate experimental Neo.Signals library. The author requested this bounded slice;
+it does not reprioritize broader structural work or the Rx proposal. Runtime inclusion
+of Signals remains undecided. See the [implemented profile](design/generic-function-methods.md)
+and [qualification evidence](validation/generic-function-methods-20261030/README.md).

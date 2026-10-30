@@ -95,3 +95,7 @@ Index/Range extension and list contracts, copy semantics and safe alternatives.
 Development: [TLS stream APIs and HTTP integration](ssl-streams.md).
 
 - [Key/value pair equality and hashing](key-value-pair.md): development generic record contracts and current limits.
+
+The separate development [Neo.Signals extension](signals.html) documents its
+subscription-only view and signature-dependent publishing method. See also
+[typed function invocation](functions.html#typed-invocation-and-method-signatures-development).

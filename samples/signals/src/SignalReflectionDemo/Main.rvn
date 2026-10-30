@@ -1,0 +1,24 @@
+import System.*
+import Neo.Signals.*
+
+func Main() -> int {
+    CheckReflection()
+    Console.WriteLine("signals: closed method reflection passed")
+    return 0
+}
+
+func CheckReflection() {
+    var found = false
+    for method in typeof(SignalSource<(int, string?) -> unit>).GetMethods() {
+        if method.Name == "Emit" {
+            found = true
+            if !method.FunctionType.Equals(typeof((int, string?) -> unit)) {
+                Panic("Materialized method must expose its function type")
+            }
+            if method.GetParameters().Count != 2 || !method.ReturnType.Equals(typeof(unit)) {
+                Panic("Materialized method must expose ordinary parameters and result")
+            }
+        }
+    }
+    if !found { Panic("Materialized Emit method was not reflected") }
+}

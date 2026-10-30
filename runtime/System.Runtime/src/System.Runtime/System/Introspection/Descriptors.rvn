@@ -37,6 +37,8 @@ public sealed interface MethodInfo : MemberInfo {
     val IsGenericMethodDefinition: bool { get }
     /// True when this method or its declaring type contains unbound parameters.
     val ContainsGenericParameters: bool { get }
+    /// Structural signature or a function-constrained parameter for an open method.
+    val FunctionType: TypeInfo { get }
     val ReturnType: TypeInfo { get }
     val IsStatic: bool { get }
     val IsPublic: bool { get }
@@ -208,6 +210,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     private val StoredIsGenericMethodDefinition: bool
     private val StoredContainsGenericParameters: bool
     private field StoredIdentity: string
+    private val StoredFunctionType: TypeInfo
 
     private init(
         name: string, declaringType: TypeInfo, metadataToken: int,
@@ -217,7 +220,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         definitionIndex: int, parameters: ParameterSnapshot,
         isReadOnly: bool, isVirtual: bool,
         isOverride: bool, isAbstract: bool,
-        isGenericMethod: bool, isGenericMethodDefinition: bool, containsGenericParameters: bool): base(name, declaringType, metadataToken) {
+        isGenericMethod: bool, isGenericMethodDefinition: bool, containsGenericParameters: bool, functionType: TypeInfo): base(name, declaringType, metadataToken) {
         StoredReturnType = returnType
         StoredIsStatic = isStatic
         StoredIsPublic = isPublic
@@ -234,12 +237,19 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         StoredIsGenericMethodDefinition = isGenericMethodDefinition
         StoredContainsGenericParameters = containsGenericParameters
         StoredIdentity = ""
+        StoredFunctionType = functionType
     }
 
     val IsGenericMethod: bool => StoredIsGenericMethod
     val IsGenericMethodDefinition: bool => StoredIsGenericMethodDefinition
     val ContainsGenericParameters: bool => StoredContainsGenericParameters
-    val ReturnType: TypeInfo => StoredReturnType
+    val FunctionType: TypeInfo => StoredFunctionType
+    val ReturnType: TypeInfo {
+        get {
+            if StoredFunctionType is FunctionTypeInfo { return StoredReturnType }
+            Panic("Method signature requires a materialized function type")
+        }
+    }
     val IsStatic: bool => StoredIsStatic
     val IsPublic: bool => StoredIsPublic
     val IsPrivate: bool => StoredIsPrivate
@@ -248,6 +258,9 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     val DefinitionIndex: Optional<int> => if StoredDefinitionIndex < 0 { None } else { Some(StoredDefinitionIndex) }
 
     func GetParameters() -> Sequence<ParameterInfo> {
+        if !(StoredFunctionType is FunctionTypeInfo) {
+            Panic("Method signature requires a materialized function type")
+        }
         let count = StoredParameters.Length
         let result = CheckedStorage.Reserve<ParameterInfo>(count)
         var index = 0

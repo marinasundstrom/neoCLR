@@ -1,0 +1,10 @@
+import System.*
+import System.Runtime.Reflection.*
+
+func Add(left: int, right: int) -> int => left + right
+
+func Main() -> int {
+    let handler: (int, int) -> int = Add
+    let args: Object?[] = [20, 22]
+    return FunctionReflection.Invoke<(int, int) -> int>(handler, args)
+}

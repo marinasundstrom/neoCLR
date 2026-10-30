@@ -32,6 +32,8 @@
       href: features/outcomes/index.md
     - name: "Error handling"
       href: features/error-handling/index.md
+    - name: "Generics"
+      href: features/generics/index.md
     - name: "Function types"
       href: features/functions/index.md
     - name: "Arrays"

@@ -1,0 +1,3 @@
+PASS: all API snapshot inputs and reference assembly checksum match staged content.
+Working-tree check was stale only for concurrent Neo.Configuration JSON source changes, which are excluded from this commit.
+Previous matching bridge refresh and public type inventory check passed.

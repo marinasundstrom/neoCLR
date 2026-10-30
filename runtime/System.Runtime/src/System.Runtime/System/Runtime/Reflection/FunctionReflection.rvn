@@ -28,4 +28,18 @@ public static class FunctionReflection {
         }
         return Failure(ReflectionError.UnsupportedType)
     }
+
+    /// <summary>Invokes a structural function with the result type projected from its signature.</summary>
+    /// <param name="function">The function value, including its receiver or captures.</param>
+    /// <param name="arguments">Nullable references and boxed values in signature order.</param>
+    /// <returns>The typed result, or unit after a successful no-result invocation.</returns>
+    /// <remarks>Development interop overload. Reflection validation failure terminates through
+    /// carrier extraction; handler failures propagate. Task results are returned unchanged.</remarks>
+    static func Invoke<T>(function: T, arguments: Object?[]) -> ReturnType<T> where T: func {
+        let result = Invoke((Object?)function, arguments)!
+        if typeof(ReturnType<T>).Equals(typeof(unit)) {
+            return default(ReturnType<T>)
+        }
+        return (ReturnType<T>)result
+    }
 }

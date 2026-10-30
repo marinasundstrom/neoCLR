@@ -1,0 +1,123 @@
+   Compiling neoclr v0.1.0-preview.18 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 50s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-a302a122a4cd4a3f)
+
+running 1 test
+test reflection_snapshots::catalog_tests::dependent_function_descriptors_are_not_closed_runtime_tokens ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 255 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/neoclr_codegen-59250fd438cde339)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/console.rs (target/debug/deps/console-5f2c20bdaefec848)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 184 filtered out; finished in 0.00s
+
+     Running tests/entry_arguments.rs (target/debug/deps/entry_arguments-3dda43b48f1a1699)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/fault_details.rs (target/debug/deps/fault_details-19e9f07e431acf60)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/friend_assemblies.rs (target/debug/deps/friend_assemblies-e11a42cf7ec2e57d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/gc_selection.rs (target/debug/deps/gc_selection-1f6c442eae4276c9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/hosting.rs (target/debug/deps/hosting-d40f4ebdd0a3187d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/inspection.rs (target/debug/deps/inspection-7ba07696e6c36a36)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/linking.rs (target/debug/deps/linking-414c62b0ccb0b696)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+     Running tests/native_gc.rs (target/debug/deps/native_gc-4f8850f381e16fde)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.00s
+
+     Running tests/native_imports.rs (target/debug/deps/native_imports-491532909adb326b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.00s
+
+     Running tests/root_probes.rs (target/debug/deps/root_probes-fdb1de46d7b2829d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/scalar.rs (target/debug/deps/scalar-a96b105217a15d4a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.00s
+
+     Running tests/sql_linking.rs (target/debug/deps/sql_linking-61448fa1f9b6d5a3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/static_storage.rs (target/debug/deps/static_storage-84adbf9f3a844a1e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/type_initialization.rs (target/debug/deps/type_initialization-fa79758988e40a8d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/values.rs (target/debug/deps/values-a219c5189ec898fb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 75 filtered out; finished in 0.00s
+
+     Running tests/windows_scalar.rs (target/debug/deps/windows_scalar-5aee6d991d9feca7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/windows_stack.rs (target/debug/deps/windows_stack-1252fdd16404c599)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s

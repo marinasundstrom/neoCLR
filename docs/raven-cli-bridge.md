@@ -16235,3 +16235,31 @@ native union metadata. No new bridge encoding is introduced. Library event suppo
 is deferred by design, rather than a compatibility requirement on this API.
 Provider-neutral watching and general compiled FFI string/buffer marshalling remain
 gaps. Preserve subscription and invocation ownership if event helpers are added later.
+
+
+### Function-dependent methods (development, 2026-10-30)
+
+Raven's neoCLR target supports `func name: T with args` and `ReturnType<T>` for
+function-constrained generics. Native format 6 retains the whole signature and its
+boxed-array body transport separately. Closed materialization produces an ordinary
+typed entry, while the implementation receives `object?[]`. The runtime's
+`FunctionReflection.Invoke<T>` returns the projected result. Ordinary .NET/CLI
+function metadata cannot encode these dependencies; no nominal delegate shim is
+introduced. Use native emission with matching compiler/runtime revisions.
+Current restrictions and validation are in `generic-function-methods.md` (compiler)
+and neoCLR's `docs/design/generic-function-methods.md`. Neo.Signals consumes the
+capability as a separate extension; no event metadata or Task adaptation is added.
+
+## Native parameter defaults (2026-10-30)
+
+Raven codex/neoclr now exports/imports scalar and reference-null parameter defaults.
+Native metadata carries explicit aligned defaults; the CLI projection uses Param
+Optional/HasDefault flags and Constant records, without custom attributes. Caller
+binding inserts omitted arguments; runtime arity is unchanged. No Runtime Contract
+entry is added. Value-type/default(T), enum, decimal, char and Optional.None support
+remain separate qualification work. See [contract, ownership and validation](parameter-defaults.md).
+
+Execution qualification: the signal consumers pass in the interpreter. The native
+compiler builds and shares signature specialization, but the signal JIT probe stops
+at unsupported boxing of inhabited unit (`Void`). JIT/AOT execution of this library
+is not qualified; unit boxing/unboxing support remains follow-up work.

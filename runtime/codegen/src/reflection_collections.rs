@@ -28,7 +28,22 @@ pub fn bind(
         match t {
             Type::TypeParameter(_) | Type::MethodTypeParameter(_) => false,
             Type::Constructed { arguments, .. } => arguments.iter().all(concrete),
-            Type::ArrayRef(t) => concrete(t),
+            Type::Array(t)
+            | Type::ArrayRef(t)
+            | Type::ByRef(t)
+            | Type::ReadOnlyByRef(t)
+            | Type::Ptr(t)
+            | Type::InterfaceRef(t)
+            | Type::FunctionReturn(t) => concrete(t),
+            Type::Function(shape) => shape
+                .parameters
+                .iter()
+                .chain([&shape.returns])
+                .all(concrete),
+            Type::Tuple(parts) => parts.iter().all(concrete),
+        Type::Union(parts) | Type::Intersection(parts) => {
+                parts.iter().all(concrete)
+            }
             _ => true,
         }
     }

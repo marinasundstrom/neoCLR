@@ -146,3 +146,9 @@ and scale 0–28. It uses ordinary value-type semantics and the existing `Number
 scale differences; general formatting preserves them. Arithmetic uses value-type
 scratch storage rather than temporary arrays. See the
 [Decimal API and current limits](/docs/text-numbers.html#decimal-development).
+
+## Generic capabilities
+
+See [Generics](../generics/) for type parameters, function constraints,
+return-type projection and methods whose whole signature materializes from a
+function-constrained generic argument. These are development capabilities.

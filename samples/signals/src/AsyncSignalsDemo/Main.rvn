@@ -1,0 +1,32 @@
+import System.*
+import System.Time.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import Neo.Signals.*
+
+class Observation {
+    private val source = SignalSource<(int) -> unit>()
+    private val completion = Promise<int>()
+
+    val Signal: Signal<(int) -> unit> => source.Signal
+    val Result: Task<int> => completion.Task
+    func Publish() { source.Emit(42) }
+    func Observe(value: int) { _ = completion.Complete(value) }
+    func Timeout() { _ = completion.Complete(-1) }
+}
+
+async func Main() -> Task<int> {
+    let observation = Observation()
+    let subscription = observation.Signal.Subscribe(observation.Observe)
+    let delivery = Timer(observation.Publish)
+    let timeout = Timer(observation.Timeout)
+    timeout.Start(Duration.FromTicks(50000000L))
+    delivery.Start(Duration.FromTicks(10000L))
+    let result = await observation.Result
+    delivery.Dispose()
+    timeout.Dispose()
+    subscription.Dispose()
+    if result != 42 { Panic("Timed out waiting for a signal callback") }
+    Console.WriteLine("signals: asynchronous callback observed through Promise")
+    return 0
+}

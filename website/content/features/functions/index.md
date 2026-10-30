@@ -122,3 +122,9 @@ overloads accept the same constructed callback type. A function returning
 `Task<T>` selects Task.Run's async-unwrapping overload without an explicit result
 type, matching ordinary .NET delegate selection. Conflicting specificity remains
 ambiguous. See the [compiler qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/task-overload-20261028/README.md).
+
+## Generic capabilities
+
+See [Generics](../generics/) for type parameters, function constraints,
+return-type projection and methods whose whole signature materializes from a
+function-constrained generic argument. These are development capabilities.

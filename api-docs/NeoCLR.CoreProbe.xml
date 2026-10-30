@@ -4324,5 +4324,6 @@ A method remains in metadata; an omitted call evaluates neither its receiver nor
     <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicEvents"><summary>NonPublicEvents member category. Not yet supported by native analysis; requests are rejected.</summary></member>
     <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces"><summary>Interfaces member category. Not yet supported by native analysis; requests are rejected.</summary></member>
     <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All"><summary>All member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="P:System.Introspection.MethodInfo.FunctionType"><summary>Gets the structural function signature, or a function-constrained parameter for an unresolved whole-signature method.</summary><remarks>Development API. Closed materialization exposes ordinary parameter and result reflection.</remarks></member>
 </members>
 </doc>

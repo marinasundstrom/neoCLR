@@ -94,6 +94,7 @@ pub(crate) fn bounds(constraints: &[GenericConstraint]) -> impl Iterator<Item = 
 
 pub(crate) fn symbolic(ty: &Type) -> bool {
     match ty {
+        Type::FunctionReturn(operand) => symbolic(operand),
         Type::Function(shape) => shape.parameters.iter().any(symbolic) || symbolic(&shape.returns),
         Type::TypeParameter(_) | Type::MethodTypeParameter(_) | Type::SelfType => true,
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
@@ -392,7 +393,8 @@ fn check_known_type_seen(
                 check_known_type_seen(module, argument, depth + 1, seen)?;
             }
         }
-        Type::ByRef(ty)
+        Type::FunctionReturn(ty)
+        | Type::ByRef(ty)
         | Type::ReadOnlyByRef(ty)
         | Type::InterfaceRef(ty)
         | Type::Array(ty)
@@ -460,4 +462,71 @@ pub(crate) fn permits_view(
         }
         guarantees(module, bound, source, target, interface)
     })
+}
+
+/// Validate result-projection operands against their declaration's generic proof.
+pub(crate) fn validate_function_returns(
+    ty: &Type,
+    types: &[GenericConstraint],
+    methods: &[GenericConstraint],
+) -> Result<(), Fault> {
+    validate_function_returns_at_depth(ty, types, methods, 0)
+}
+
+fn validate_function_returns_at_depth(
+    ty: &Type,
+    types: &[GenericConstraint],
+    methods: &[GenericConstraint],
+    depth: usize,
+) -> Result<(), Fault> {
+    if depth > 32 {
+        return Err(Fault::new("return-type projection nesting exceeds limit"));
+    }
+    let nested = |ty| validate_function_returns_at_depth(ty, types, methods, depth + 1);
+    match ty {
+        Type::FunctionReturn(operand) => {
+            let proof = match operand.as_ref() {
+                Type::Function(_) => true,
+                Type::TypeParameter(index) => types
+                    .iter()
+                    .any(|c| c.parameter == *index && c.kind == ConstraintKind::FunctionType),
+                Type::MethodTypeParameter(index) => methods
+                    .iter()
+                    .any(|c| c.parameter == *index && c.kind == ConstraintKind::FunctionType),
+                _ => false,
+            };
+            if !proof {
+                return Err(Fault::new(
+                    "return-type projection requires a function-constrained operand",
+                ));
+            }
+            nested(operand)?;
+        }
+        Type::Function(shape) => {
+            for part in shape.parameters.iter().chain([&shape.returns]) {
+                nested(part)?;
+            }
+        }
+        Type::Constructed { arguments, .. }
+        | Type::Scoped { arguments, .. }
+        | Type::Union(arguments)
+        | Type::Intersection(arguments) => {
+            for argument in arguments {
+                nested(argument)?;
+            }
+        }
+        Type::Tuple(parts) => {
+            for part in parts {
+                nested(part)?;
+            }
+        }
+        Type::ByRef(t)
+        | Type::ReadOnlyByRef(t)
+        | Type::Array(t)
+        | Type::ArrayRef(t)
+        | Type::Ptr(t)
+        | Type::InterfaceRef(t) => nested(t)?,
+        _ => {}
+    }
+    Ok(())
 }

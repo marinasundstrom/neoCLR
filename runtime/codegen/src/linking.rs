@@ -108,6 +108,11 @@ pub fn prepare(
         .map_err(|e| e.to_string())?;
 
     let mut joined = app.clone();
+    joined.format = inputs
+        .iter()
+        .map(|module| module.format)
+        .max()
+        .unwrap_or(app.format);
     joined.types.clear();
     joined.functions.clear();
     joined.assemblies.clear();

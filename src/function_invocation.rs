@@ -72,6 +72,7 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
             .iter()
             .all(|t| crate::reflection_properties::supported_value(module, t))
             && (shape.no_result
+                || shape.returns == Type::Void
                 || crate::reflection_properties::supported_value(module, &shape.returns));
         if supported && check {
             let count_ok = body.len() + 8;
@@ -146,7 +147,10 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
                 generic_arguments: vec![],
                 parameters: shape.parameters.clone(),
             }));
-            if shape.no_result {
+            if shape.no_result || shape.returns == Type::Void {
+                if !shape.no_result {
+                    body.push(Op::Pop);
+                }
                 body.extend([
                     Op::LocalAddress(0),
                     Op::InitializeObject(object.clone()),

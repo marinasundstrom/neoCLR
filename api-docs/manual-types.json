@@ -18,5 +18,23 @@
     "members": {
       "M:System.Runtime.CompilerServices.IsReadOnlyAttribute.#ctor": "constructor"
     }
+  },
+  "Neo.Signals.Signal`1": {
+    "source": "signals.md",
+    "output": "docs/signals.html",
+    "reason": "The CLI documentation bridge cannot faithfully encode a function-constrained whole method signature; native renderer support for Emit: T is pending.",
+    "members": {
+      "M:Neo.Signals.Signal`1.Subscribe(`0)": "subscribe"
+    }
+  },
+  "Neo.Signals.SignalSource`1": {
+    "source": "signals.md",
+    "output": "docs/signals.html",
+    "reason": "The CLI documentation bridge cannot faithfully encode a function-constrained whole method signature; native renderer support for Emit: T is pending.",
+    "members": {
+      "M:Neo.Signals.SignalSource`1.#ctor": "constructor",
+      "P:Neo.Signals.SignalSource`1.Signal": "view",
+      "M:Neo.Signals.SignalSource`1.Emit": "emit"
+    }
   }
 }

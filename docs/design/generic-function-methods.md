@@ -6,11 +6,43 @@ Signals, forwarding wrappers, interceptors and adapters are consumers; none owns
 the language or runtime mechanism. The original investigation below is retained;
 implementation progress and qualification are recorded here.
 
-The metadata foundation now supports native format 6, `MethodInfo.FunctionType`,
-whole-signature substitution and general `FunctionReturn` expressions. The SDK
-roundtrip checks open and closed reflection; runtime adapter tests cover typed
-argument packing/result adaptation and malformed declarations. Raven syntax,
-cross-library consumers and the signal extension are being qualified separately.
+The development implementation now supports native format 6,
+`MethodInfo.FunctionType`, whole-signature substitution and general `FunctionReturn`
+expressions. Raven `codex/neoclr` binds `func name: T with args` and `ReturnType<T>`;
+`System.Runtime.Reflection.FunctionReflection.Invoke<T>` supplies typed forwarding.
+The separate `Neo.Signals` extension uses this mechanism through an ordinary
+subscription-only property. See [its README](../../extensions/Neo.Signals/README.md),
+[the generics guide](../../website/content/features/generics/index.md) and the
+[qualification record](../validation/generic-function-methods-20261030/README.md).
+
+## Implemented profile
+
+- Whole method signatures use a function-constrained parameter of the declaring
+  type; initial Raven bodies are nonvirtual, non-async and have no method type
+  parameters. Abstract declarations carry no argument binding/body.
+- `args` is an owned `object?[]`, with null references, boxed values and no receiver.
+  The native format retains the boxed implementation ABI separately from the public
+  signature; materialization generates a typed adapter. This is general function
+  support, not a signal-specific runtime hook.
+- `ReturnType<T>` is a target-specific type expression. Open bodies must return that
+  opaque type, forward a matching projected result, or explicitly use its default;
+  an arbitrary int/unit does not satisfy every possible T.
+- Reflection's Object overload retains `Result<Object?, ReflectionError>`. The typed
+  overload extracts it and returns the projected result; validation failures call
+  Panic and target faults propagate. Unit-valued and no-result callbacks produce
+  unit for the typed caller. No Task processing is added.
+- `SignalSource<T>` checks unit return policy at construction. `Signal<T>` exposes
+  subscriptions only. Dispatch is ordered, synchronous and uses a registration
+  snapshot; duplicate registrations have independent idempotent disposal handles.
+  Concurrent access needs external synchronization. Completion, reactive error
+  channels, operators and schedulers remain separate proposed library work.
+- Initial argument marshalling covers exact scalar boxes and compatible references;
+  ref/out, arbitrary value aggregates and rich signature constraints remain gaps.
+  CLI executable export and neoIL text export of the new signature forms remain
+  unsupported. Use native metadata and a matching toolchain.
+
+The remainder preserves the original design discussion; proposed broader APIs and
+alternatives below do not expand this implemented profile.
 
 The author specifies that `func Invoke: T`, with any method name, belongs to an
 open generic definition. Its signature materializes with generic arguments. On a
@@ -26,7 +58,7 @@ parameter. Name, declaration identity, accessibility, owner, static/instance
 status and method generic parameters remain ordinary method metadata.
 
 ```text
-// Proposed Raven syntax, not executable today.
+// Development Raven syntax for the neoCLR target.
 class Forwarder<T> where T: func {
     private val target: T
 
@@ -43,7 +75,7 @@ class Forwarder<T> where T: func {
 The author-selected syntax is `func name: T with args`. The binding `args` has
 static type `object?[]`: an owned array of boxed arguments, preserving null values
 and excluding the receiver. This is initially an interop capability. The helper
-name above is proposed, not an existing API. It returns T's result; multicast
+name above is now the implementation home. It returns T's result; multicast
 result aggregation is a separate library policy.
 
 The proposed metadata meaning is:
@@ -359,3 +391,8 @@ API, and executable signal qualification are not yet claimed complete.
 The author subsequently selected `FunctionReflection` for the typed overload,
 placing it beside the existing dynamic reflection method rather than introducing
 a separate helpers class. Explicit generic arity selects the typed contract.
+
+Execution qualification: the signal consumers pass in the interpreter. The native
+compiler builds and shares signature specialization, but the signal JIT probe stops
+at unsupported boxing of inhabited unit (`Void`). JIT/AOT execution of this library
+is not qualified; unit boxing/unboxing support remains follow-up work.

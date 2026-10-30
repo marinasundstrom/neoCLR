@@ -3104,3 +3104,18 @@ The native snapshot includes all five public types and their actual members.
 2026-10-30: the watcher reference replaces separate callbacks and event arguments
 with Subscribe and a standard Raven union. The union is projected from its source
 into the aggregate reference; native rendering covers all five cases and payloads.
+
+
+### Dependent function signatures and Neo.Signals (2026-10-30)
+
+MethodInfo.FunctionType is included in the matching CLI bridge reference and XML.
+The pinned native archive predates it; its manual-member route currently points to
+[the function reference](functions.md). FunctionReflection.Invoke<T> has a native
+ReturnType<T> result that the CLI bridge cannot encode; that overload is explicitly
+covered by the same manual reference, without inventing an Object-returning signature.
+The [Neo.Signals reference](signals.md) covers both public types and all public
+members, registered in manual-types.json and the API TOC. The bridge/RavenDoc model
+cannot faithfully display the open Emit: T signature or func constraint; these are
+explicit renderer exclusions pending native dependent-signature rendering. No public
+API is silently omitted. Source fingerprints include the extension sources; regenerate
+the bridge snapshot before committing changes. No website publication is implied.

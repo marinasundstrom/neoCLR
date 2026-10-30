@@ -1,0 +1,95 @@
+module Neo.Signals
+
+import System.*
+import System.Optional.*
+import System.Collections.*
+import System.Runtime.Reflection.*
+
+/// <summary>A subscription-only view of an ordered synchronous notification source.</summary>
+/// <remarks>Development API. Each registration has its own disposable lifetime.
+/// The view exposes no publishing operation. Handlers must return unit.</remarks>
+public class Signal<T> where T: func {
+    private val subscribe: (T) -> Disposable
+
+    internal init(subscribe: (T) -> Disposable) {
+        self.subscribe = subscribe
+    }
+
+    /// <summary>Registers a handler and returns an idempotent removal handle.</summary>
+    /// <param name="handler">The handler, including its receiver or captures.</param>
+    /// <returns>A handle that removes exactly this registration.</returns>
+    /// <remarks>Duplicates are separate registrations. Removing a registration does
+    /// not retract it from a notification snapshot already being dispatched.</remarks>
+    func Subscribe(handler: T) -> Disposable => subscribe(handler)
+}
+
+/// <summary>Owns a signal's publishing authority and registration list.</summary>
+/// <remarks>Development API for synchronous, unit-returning structural functions.
+/// Dispatch is ordered and snapshots registrations. Reentrant changes affect the
+/// next dispatch; concurrent access requires caller synchronization. Handler faults
+/// propagate and stop delivery. No Task processing or reactive terminal states are implied.</remarks>
+public class SignalSource<T> where T: func {
+    private var handlers = ArrayList<SignalHandler<T>>()
+    private var nextId = 0
+    private val view: Signal<T>
+
+    /// <summary>Creates a source for a unit-returning function signature.</summary>
+    /// <remarks>A non-unit result signature terminates with Panic in this initial interop profile.</remarks>
+    init() {
+        if !typeof(ReturnType<T>).Equals(typeof(unit)) {
+            Panic("Signal handlers must return unit")
+        }
+        view = Signal<T>(Subscribe)
+    }
+
+    /// <summary>Gets the stable subscription view suitable for exposing through a property.</summary>
+    val Signal: Signal<T> => view
+
+    private func Subscribe(handler: T) -> Disposable {
+        let id = nextId
+        if id == 2147483647 { Panic("Signal registration identity exhausted") }
+        nextId += 1
+        let updated = ArrayList<SignalHandler<T>>(handlers)
+        updated.Add(SignalHandler<T>(id, handler))
+        handlers = updated
+        return SignalSubscription(() => Remove(id))
+    }
+
+    private func Remove(id: int) {
+        let updated = ArrayList<SignalHandler<T>>()
+        for entry in handlers {
+            if entry.Id != id { updated.Add(entry) }
+        }
+        handlers = updated
+    }
+
+    /// <summary>Invokes the current registration snapshot using T's parameters.</summary>
+    /// <remarks>Arguments are packed into object?[] by the general interop method adapter.
+    /// An empty registration list is a successful no-op.</remarks>
+    func Emit: T with args {
+        let snapshot = handlers
+        for entry in snapshot {
+            FunctionReflection.Invoke<T>(entry.Handler, args)
+        }
+        return default(ReturnType<T>)
+    }
+}
+
+internal class SignalHandler<T> where T: func {
+    val Id: int
+    val Handler: T
+    init(id: int, handler: T) {
+        Id = id
+        Handler = handler
+    }
+}
+
+internal class SignalSubscription : Disposable {
+    private var dispose: Optional<() -> unit>
+    init(dispose: () -> unit) { self.dispose = Some(dispose) }
+    func Dispose() {
+        let current = dispose
+        dispose = None
+        if current is Some(let action) { action() }
+    }
+}

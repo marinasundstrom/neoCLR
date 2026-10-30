@@ -4,10 +4,11 @@
 [signal and Rx discussion](../development-timeline.md#2026-10-29--library-owned-signals-using-structural-functions).
 This proposes ordinary library APIs over structural function types. It adds no
 event metadata, nominal function type or multicast function representation.
-Signature projection and argument representation are proposed compiler facilities;
-boxed forwarding can reuse the existing runtime invocation operation.
-API names and policies below are proposed contracts,
-not implemented capabilities or a change to milestone priority.
+The 2026-10-30 development slice implements general signature projection and boxed
+argument representation, plus a separate synchronous Neo.Signals extension. See
+[its README](../../extensions/Neo.Signals/README.md) for the implemented contract.
+The broader Rx APIs and policies below remain proposals, not implemented capabilities
+or a change to milestone priority.
 
 Signals provide named subscription points on objects. An Rx-like layer represents
 values over time and composes subscriptions through operators. Both share lifetime

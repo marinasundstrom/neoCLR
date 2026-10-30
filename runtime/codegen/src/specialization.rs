@@ -207,6 +207,16 @@ impl Specializer<'_> {
                         .map_err(|e| e.to_string())?,
                 ));
             }
+            Type::FunctionReturn(operand) => {
+                let resolved =
+                    Type::function_return(operand.as_ref().clone()).map_err(|e| e.to_string())?;
+                if matches!(resolved, Type::FunctionReturn(_)) {
+                    return Err(
+                        "unresolved return-type projection at executable specialization".into(),
+                    );
+                }
+                return self.lower(&resolved);
+            }
             Type::Function(shape) => {
                 let mut shape = shape.as_ref().clone();
                 shape.parameters = shape
@@ -508,12 +518,24 @@ impl Specializer<'_> {
                 .map(|t| substitute(t, &arguments, &target.generic_arguments))
                 .transpose()
                 .map_err(|e| e.to_string())?;
-            let parameters = f
-                .parameters
-                .iter()
-                .map(|t| substitute(t, &arguments, &target.generic_arguments))
-                .collect::<Result<Vec<_>, _>>()
-                .map_err(|e| e.to_string())?;
+            let parameters = if let Some(signature) = &f.function_type {
+                match substitute(signature, &arguments, &target.generic_arguments)
+                    .map_err(|e| e.to_string())?
+                {
+                    Type::Function(shape) => shape.parameters,
+                    _ => {
+                        return Err(
+                            "dependent method signature did not resolve to a function".into()
+                        );
+                    }
+                }
+            } else {
+                f.parameters
+                    .iter()
+                    .map(|t| substitute(t, &arguments, &target.generic_arguments))
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|e| e.to_string())?
+            };
             if owner == target.owner && parameters == target.parameters {
                 candidates.push(i);
             }
@@ -596,6 +618,18 @@ impl Specializer<'_> {
             })
             .transpose()?;
         result.name = lowered_member_name(f, result.owner.as_ref());
+        if let Some(signature) = &f.function_type {
+            result.function_type =
+                Some(substitute(signature, arguments, methods).map_err(|e| e.to_string())?);
+            result
+                .materialize_function_signature()
+                .map_err(|e| e.to_string())?;
+            if !matches!(result.function_type, Some(Type::Function(_))) {
+                return Err("executable method signature remains dependent".into());
+            }
+        }
+        neoclr::function_interop::lower(self.conformance, &mut result)
+            .map_err(|e| e.to_string())?;
         for t in result
             .parameters
             .iter_mut()
@@ -603,6 +637,15 @@ impl Specializer<'_> {
             .chain([&mut result.returns])
         {
             *t = self.lower(&substitute(t, arguments, methods).map_err(|e| e.to_string())?)?;
+        }
+        if result.function_type.is_some() {
+            result.function_type = Some(Type::Function(Box::new(neoclr::metadata::FunctionType {
+                parameters: result.parameters.clone(),
+                returns: result.returns.clone(),
+                no_result: result.no_result,
+                out_parameters: result.out_parameters.clone(),
+                out_when_true: result.out_when_true.clone(),
+            })));
         }
         for target in &mut result.interface_implementations {
             let mut closed = target.clone();

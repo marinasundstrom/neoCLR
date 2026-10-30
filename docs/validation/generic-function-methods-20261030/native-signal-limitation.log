@@ -1,0 +1,2 @@
+warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention
+neoclr-codegen: boxing requires a supported primitive or a local closed value record; found Void in NeoMetadata_414AB9E76E470FE1908D8F51B69AD822D9D3A585994D7D3D61E471F97A5EDFFD.T_4E656F2E5369676E616C73_5369676E616C536F757263656031$aot_shape_517.M_456D6974 at instruction 32

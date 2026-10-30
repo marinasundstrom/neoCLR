@@ -23796,3 +23796,42 @@ and the testing guides now record the author clarification. See the
   await for asynchronous operations; the direction concerns notifications.
 - **Validation:** See [the focused watcher union receipt](validation/file-system-watcher-union-20261030/README.md); Windows execution remains
   unqualified. Concurrent compiler/reflection work is outside this slice.
+
+## 2026-10-30 — General function-dependent methods and separate signal library
+
+The author continued the design discussion about library-based Event/Signal views
+and sources, requiring structural function types and no event metadata. They chose
+`MethodInfo.FunctionType: TypeInfo`, allowing either a function type or a constrained
+parameter, with the complete ordinary method signature materialized on closed types.
+They allowed experimental compatibility breaks and requested implementation through
+Raven's neoCLR target, general return-type projection and typed reflection invocation.
+The selected `func Invoke: T with args` binding uses `object?[]`; Task handling stays
+separate. The author requested commits for each slice and continuation through a
+working library event pattern.
+
+The author suggested `FunctionReflection` as the helper home. The assistant used
+that existing class, implemented native signature/projection metadata and a boxed-body
+adapter, and added Raven parsing, binding, substitution and emission. The SDK slice
+was committed as `67809b3fa`. Cross-library execution exposed premature open-arity
+queries and a missing inhabited-unit reflection result case; these were corrected
+and given focused coverage. The assistant reports passing synchronous and timer-driven
+interpreter consumers; final qualification is linked below.
+
+The author requested documentation and a generics feature page, then corrected its
+initial emphasis: the page should explain generics broadly while highlighting function
+arguments. The assistant added sections on generic types/methods, constraints, inference,
+variance and reflection, plus the new function-dependent capability. The author
+approved keeping Signals separate for now, with runtime inclusion undecided, and
+requested an extension README. The assistant added README/API/sample documentation
+for the separate Neo.Signals assembly.
+
+The author proposed a ManualResetEvent-like aid for asynchronous callback tests.
+The assistant found the existing Promise<T>/Task API and used it for a one-shot
+observation with a timeout; a reusable reset event remains unimplemented and needs
+its own reset/thread-safety contract. This did not add async dispatch or Task unwrapping
+to signals. The author reiterated committing when done.
+
+Evidence: [design and implemented profile](design/generic-function-methods.md),
+[qualification](validation/generic-function-methods-20261030/README.md),
+[extension README](../extensions/Neo.Signals/README.md),
+[generics feature page](../website/content/features/generics/index.md).

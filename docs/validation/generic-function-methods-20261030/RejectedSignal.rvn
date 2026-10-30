@@ -1,0 +1,6 @@
+import Neo.Signals.*
+
+func Main() -> int {
+    let source = SignalSource<() -> int>()
+    return 0
+}

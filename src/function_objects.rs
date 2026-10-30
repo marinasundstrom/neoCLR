@@ -77,6 +77,8 @@ pub(crate) fn structural_contract(ty: &Type) -> Result<Function, Fault> {
         shape.validate()?;
         return Ok(Function {
             native_interface_slot: None,
+            function_type: None,
+            boxed_arguments: None,
             value_default_slot: None,
             origin: None,
             sequence_points: vec![],

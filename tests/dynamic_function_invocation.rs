@@ -88,3 +88,18 @@ fn invocation_check_returns_errors_without_entering_target() {
         assert_eq!(run(&source).unwrap().value, Value::Int32(expected));
     }
 }
+
+#[test]
+fn unit_value_result_invokes_and_returns_null() {
+    let source = SOURCE
+        .replace(
+            ".method instance Set() -> void",
+            ".method instance Set() -> Void",
+        )
+        .replace(
+            "stfld Counter::Value\nret\n.end\n.method instance Add",
+            "stfld Counter::Value\nldvoid\nret\n.end\n.method instance Add",
+        )
+        .replace("function.bind fn<void>", "function.bind fn<Void>");
+    assert_eq!(run(&source).unwrap().value, Value::Int32(42));
+}

@@ -47,6 +47,7 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
                     candidate
                 }
             }
+            Type::FunctionReturn(operand) => Type::function_return(nested(operand)?)?,
             Type::Function(shape) => Type::Function(Box::new(shape.map_types(nested)?)),
             Type::Scoped {
                 module,

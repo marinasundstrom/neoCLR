@@ -15,7 +15,20 @@ fn concrete(t: &Type) -> bool {
     match t {
         Type::TypeParameter(_) | Type::MethodTypeParameter(_) => false,
         Type::Constructed { arguments, .. } => arguments.iter().all(concrete),
-        Type::ArrayRef(t) => concrete(t),
+        Type::Array(t)
+        | Type::ArrayRef(t)
+        | Type::ByRef(t)
+        | Type::ReadOnlyByRef(t)
+        | Type::Ptr(t)
+        | Type::InterfaceRef(t)
+        | Type::FunctionReturn(t) => concrete(t),
+        Type::Function(shape) => shape
+            .parameters
+            .iter()
+            .chain([&shape.returns])
+            .all(concrete),
+        Type::Tuple(parts) => parts.iter().all(concrete),
+        Type::Union(parts) | Type::Intersection(parts) => parts.iter().all(concrete),
         _ => true,
     }
 }
@@ -1486,6 +1499,30 @@ fn bind_attributes(
 #[cfg(test)]
 mod catalog_tests {
     use super::*;
+
+    #[test]
+    fn dependent_function_descriptors_are_not_closed_runtime_tokens() {
+        let open = Type::FunctionReturn(Box::new(Type::MethodTypeParameter(0)));
+        assert!(!concrete(&open));
+        let shape = Type::Function(Box::new(neoclr::metadata::FunctionType {
+            parameters: vec![Type::TypeParameter(0)],
+            returns: Type::Int32,
+            no_result: false,
+            out_parameters: vec![],
+            out_when_true: vec![],
+        }));
+        assert!(!concrete(&shape));
+        assert!(concrete(
+            &Type::function_return(Type::Function(Box::new(neoclr::metadata::FunctionType {
+                parameters: vec![],
+                returns: Type::Int32,
+                no_result: false,
+                out_parameters: vec![],
+                out_when_true: vec![],
+            })))
+            .unwrap()
+        ));
+    }
 
     #[test]
     fn method_retention_projects_open_and_observed_closed_owners_without_invocation() {

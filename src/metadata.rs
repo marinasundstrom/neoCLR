@@ -28,6 +28,8 @@ pub enum Type {
     RuntimeTypeHandle,
     /// Structural managed invocation contract, independent of any named declaration.
     Function(Box<FunctionType>),
+    /// Result-type projection; retained while the function operand is open.
+    FunctionReturn(Box<Type>),
     /// Experimental reference union; requires explicit runtime feature admission.
     Union(Vec<Type>),
     /// Experimental reference intersection; requires explicit runtime feature admission.
@@ -562,6 +564,12 @@ pub struct Function {
     pub owner: Option<Type>,
     #[serde(default)]
     pub instance: bool,
+    /// Authoritative dependent method signature; materialization expands a function shape.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub function_type: Option<Type>,
+    /// Object type of the boxed interop implementation, cleared after body expansion.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub boxed_arguments: Option<Type>,
     #[serde(default)]
     pub parameters: Vec<Type>,
     /// Optional names aligned with declared parameters (excluding the receiver).
@@ -727,6 +735,29 @@ pub const AGGRESSIVE_INLINING: u16 = 0x0100;
 pub const INLINING_FLAGS: u16 = NO_INLINING | AGGRESSIVE_INLINING;
 
 impl Function {
+    /// Resolve a dependent signature after generic substitution, preserving open references.
+    pub fn materialize_function_signature(&mut self) -> Result<(), crate::Fault> {
+        match &self.function_type {
+            Some(Type::Function(shape)) => {
+                shape.validate()?;
+                self.parameters = shape.parameters.clone();
+                self.returns = shape.returns.clone();
+                self.no_result = shape.no_result;
+                self.out_parameters = shape.out_parameters.clone();
+                self.out_when_true = shape.out_when_true.clone();
+                self.readonly_parameters.clear();
+                self.parameter_names.clear();
+            }
+            Some(Type::TypeParameter(_) | Type::MethodTypeParameter(_)) | None => {}
+            Some(_) => {
+                return Err(crate::Fault::new(
+                    "method function type must be a function or function-constrained parameter",
+                ));
+            }
+        }
+        Ok(())
+    }
+
     pub fn argument_types(&self) -> Vec<Type> {
         let mut types = Vec::new();
         if let (true, Some(owner)) = (self.instance, &self.owner) {
@@ -1296,6 +1327,19 @@ impl Instruction {
 }
 
 impl Type {
+    /// Resolve a known function result, retaining open operands for later substitution.
+    pub fn function_return(function: Type) -> Result<Type, crate::Fault> {
+        match function {
+            Type::Function(shape) => Ok(shape.returns.clone()),
+            operand @ (Type::TypeParameter(_) | Type::MethodTypeParameter(_)) => {
+                Ok(Type::FunctionReturn(Box::new(operand)))
+            }
+            _ => Err(crate::Fault::new(
+                "return-type projection requires a function type",
+            )),
+        }
+    }
+
     pub fn substitute_type_parameters(&self, arguments: &[Type]) -> Result<Type, crate::Fault> {
         self.substitute_parameters(Some(arguments), None)
     }
@@ -1317,7 +1361,8 @@ impl Type {
             Self::Function(shape) => {
                 shape.parameters.iter().any(Self::contains_self) || shape.returns.contains_self()
             }
-            Self::ByRef(t)
+            Self::FunctionReturn(t)
+            | Self::ByRef(t)
             | Self::ReadOnlyByRef(t)
             | Self::Array(t)
             | Self::ArrayRef(t)
@@ -1362,6 +1407,7 @@ impl Type {
                 }
                 Type::SelfType if implementing_type.is_some() => implementing_type.unwrap().clone(),
                 Type::Function(shape) => Type::Function(Box::new(shape.map_types(nested)?)),
+                Type::FunctionReturn(function) => Type::function_return(nested(function)?)?,
                 Type::TypeParameter(index) if types.is_some() => types
                     .unwrap()
                     .get(*index as usize)
@@ -1453,6 +1499,12 @@ impl Function {
         if let Some(owner) = &mut result.owner {
             *owner = map(owner, false)?;
         }
+        if let Some(signature) = &self.function_type {
+            result.function_type = Some(map(signature, false)?);
+        }
+        if let Some(object) = &self.boxed_arguments {
+            result.boxed_arguments = Some(map(object, false)?);
+        }
         for ty in result
             .parameters
             .iter_mut()
@@ -1461,6 +1513,7 @@ impl Function {
         {
             *ty = map(ty, false)?;
         }
+        result.materialize_function_signature()?;
         crate::constraints::map_types(&mut result.generic_constraints, &mut |ty: &Type| {
             map(ty, false)
         })?;
@@ -1741,4 +1794,81 @@ pub(crate) fn valid_revision(revision: &str) -> bool {
         && revision
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | '-'))
+}
+
+#[cfg(test)]
+mod function_return_tests {
+    use super::{FunctionType, Type};
+
+    fn function(result: Type) -> Type {
+        Type::Function(Box::new(FunctionType {
+            parameters: vec![Type::Int32],
+            returns: result,
+            no_result: false,
+            out_parameters: vec![],
+            out_when_true: vec![],
+        }))
+    }
+
+    #[test]
+    fn result_projection_substitutes_both_generic_scopes() {
+        let owner = Type::function_return(Type::TypeParameter(0)).unwrap();
+        let method = Type::function_return(Type::MethodTypeParameter(0)).unwrap();
+        assert_eq!(
+            owner
+                .substitute_type_parameters(&[function(Type::Boolean)])
+                .unwrap(),
+            Type::Boolean
+        );
+        assert_eq!(
+            method
+                .substitute_method_parameters(&[function(Type::String)])
+                .unwrap(),
+            Type::String
+        );
+        assert_eq!(
+            owner
+                .substitute_method_parameters(&[function(Type::String)])
+                .unwrap(),
+            owner
+        );
+    }
+
+    #[test]
+    fn projection_preserves_partially_closed_result() {
+        let projection = Type::function_return(Type::TypeParameter(0)).unwrap();
+        let partial = projection
+            .substitute_type_parameters(&[function(Type::MethodTypeParameter(0))])
+            .unwrap();
+        assert_eq!(partial, Type::MethodTypeParameter(0));
+        assert_eq!(
+            partial
+                .substitute_method_parameters(&[Type::Int32])
+                .unwrap(),
+            Type::Int32
+        );
+    }
+
+    #[test]
+    fn projection_works_inside_an_ordinary_signature() {
+        let projection = Type::function_return(Type::MethodTypeParameter(0)).unwrap();
+        let helper = function(Type::ArrayRef(Box::new(projection)));
+        assert_eq!(
+            helper
+                .substitute_method_parameters(&[function(Type::String)])
+                .unwrap(),
+            function(Type::ArrayRef(Box::new(Type::String)))
+        );
+    }
+
+    #[test]
+    fn non_function_substitution_is_rejected() {
+        let projection = Type::function_return(Type::TypeParameter(0)).unwrap();
+        assert!(
+            projection
+                .substitute_type_parameters(&[Type::Int32])
+                .is_err()
+        );
+        assert!(Type::function_return(Type::String).is_err());
+    }
 }

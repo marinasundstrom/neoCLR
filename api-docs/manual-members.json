@@ -130,5 +130,13 @@
   "M:System.Collections.KeyValuePair`2.op_Inequality(System.Collections.KeyValuePair{`0,`1},System.Collections.KeyValuePair{`0,`1})": {
     "output": "docs/key-value-pair.html#equality",
     "reason": "Pinned RavenDoc maps == and != to the same operator route. The linked manual entry documents both signatures and behavior."
+  },
+  "M:System.Runtime.Reflection.FunctionReflection.Invoke``1(``0,System.Object[])": {
+    "output": "docs/functions.html#typed-invocation-and-method-signatures-development",
+    "reason": "The CLI documentation bridge cannot encode the ReturnType<T> result projection."
+  },
+  "P:System.Introspection.MethodInfo.FunctionType": {
+    "output": "docs/functions.html#typed-invocation-and-method-signatures-development",
+    "reason": "The pinned native API archive predates the property; the matching CLI reference and manual entry document the development contract."
   }
 }

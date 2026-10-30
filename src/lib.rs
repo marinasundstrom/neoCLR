@@ -179,9 +179,9 @@ pub fn load(source: &str) -> Result<Module, Fault> {
 pub(crate) fn decode_module(source: &str) -> Result<Module, Fault> {
     let value: serde_json::Value = serde_json::from_str(source)
         .map_err(|error| Fault::new(format!("invalid module: {error}")))?;
-    if value.get("format").and_then(|v| v.as_u64()) != Some(5) {
+    if !matches!(value.get("format").and_then(|v| v.as_u64()), Some(5 | 6)) {
         return Err(Fault::new(
-            "unsupported module format (expected 5); reassemble source",
+            "unsupported module format (expected 5 or 6); reassemble source",
         ));
     }
     serde_json::from_value(value).map_err(|error| Fault::new(format!("invalid module: {error}")))
@@ -247,3 +247,6 @@ mod string_lines;
 mod string_search;
 
 mod environment_platform;
+
+/// Materialization of boxed argument implementations for dependent function methods.
+pub mod function_interop;

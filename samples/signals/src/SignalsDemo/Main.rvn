@@ -1,0 +1,72 @@
+import System.*
+import Neo.Signals.*
+
+class Publisher {
+    private val source = SignalSource<(int, string?) -> unit>()
+    val Changed: Signal<(int, string?) -> unit> => source.Signal
+    func Change(value: int, label: string?) { source.Emit(value, label) }
+}
+
+class Counter {
+    var Total = 0
+    func Handle(value: int, label: string?) {
+        Total += value
+        if label != null {
+            Total += 100
+        }
+    }
+}
+
+func Main() -> int {
+    let publisher = Publisher()
+    publisher.Change(1, null)
+    let counter = Counter()
+    let handler: (int, string?) -> unit = counter.Handle
+    let first = publisher.Changed.Subscribe(handler)
+    let second = publisher.Changed.Subscribe(handler)
+    publisher.Change(2, null)
+    first.Dispose()
+    first.Dispose()
+    publisher.Change(3, "label")
+    second.Dispose()
+    publisher.Change(1000, null)
+    if counter.Total != 107 { Panic("Signal subscription/removal contract failed") }
+    SnapshotProbe().Run()
+    Console.WriteLine("signals: ordered subscriptions, duplicate handles, nullable arguments and removal passed")
+    return 0
+}
+
+class SnapshotProbe {
+    private val source = SignalSource<() -> unit>()
+    private var second: Disposable? = null
+    private var added = false
+    var Trace = ""
+
+    func Run() {
+        source.Emit()
+        let first = source.Signal.Subscribe(First)
+        second = source.Signal.Subscribe(Second)
+        source.Emit()
+        if Trace != "AB" {
+            Panic("Removal must not alter an active signal snapshot")
+        }
+        source.Emit()
+        if Trace != "ABAC" {
+            Panic("Registration changes must affect the next signal snapshot")
+        }
+        first.Dispose()
+    }
+
+    private func First() {
+        Trace += "A"
+        if !added {
+            added = true
+            _ = source.Signal.Subscribe(Third)
+            if second is Disposable handle {
+                handle.Dispose()
+            }
+        }
+    }
+    private func Second() { Trace += "B" }
+    private func Third() { Trace += "C" }
+}

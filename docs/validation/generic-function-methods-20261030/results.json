@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-30",
+  "ravenCommit": "4b33ecd0e",
+  "metadataCommit": "67809b3fa",
+  "runtimeSource": "staged changes in this receipt commit; tests ran in shared workspace with unrelated parameter-default changes present",
+  "checks": {
+    "ravenStructuralFunctions": {
+      "passed": 17
+    },
+    "dependentFunctionMethods": {
+      "passed": 3
+    },
+    "dynamicFunctionInvocation": {
+      "passed": 6
+    },
+    "nativeOpenDescriptor": {
+      "passed": 1
+    },
+    "sdkDependentSignatures": "passed",
+    "SignalsDemo": "interpreter passed, exit 0",
+    "SignalReflectionDemo": "interpreter passed, exit 0",
+    "AsyncSignalsDemo": "interpreter passed, exit 0",
+    "RejectedSignal": "expected UserFault: Signal handlers must return unit, exit 1",
+    "typedHelper": "interpreter Int32(42)",
+    "nativeSignal": "blocked: unsupported BoxValue(Void); no JIT/AOT execution claim",
+    "apiSnapshot": "staged source checksums and reference assembly verified; public inventory validated during refresh"
+  },
+  "sha256": {
+    "target/debug/neoclr": "555f0945f00f553c0ccc5e421ee638a3f3a066aa7b3b7af3e2c96a3c024c2a6c",
+    "target/debug/neoclr-codegen": "1de5d6d7c6278baecad53f45aa6c146f1d0b6b56f6f09960fbf4e9916668d918",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "fc4e6d4bff3910574a4bf96ef88f2ef15cdefac45fef36dc052de9206448353b",
+    "runtime/System.Runtime/src/System.Runtime/bin/neoclr/System.Runtime.dll": "77e1c996c42289f1c03688f78350df6d41fab107c4c98dc831a7b7edecbdc420",
+    "extensions/Neo.Signals/src/Neo.Signals/bin/neoclr/Neo.Signals.dll": "31fa805a3f45ff60efe1b8d021d5166b940742e1bd93581b6a6105c529145fbd",
+    "samples/signals/src/SignalsDemo/bin/neoclr/SignalsDemo.dll": "fad4592daa1c66c1c677653665d40fdad4fe0e41e4017d5546c02b4c19191de6",
+    "samples/signals/src/SignalReflectionDemo/bin/neoclr/SignalReflectionDemo.dll": "913feb6b60626932117c7c031e57c7aa1dd68f14e691b7134b1512ae608dc5be",
+    "samples/signals/src/AsyncSignalsDemo/bin/neoclr/AsyncSignalsDemo.dll": "202646323e20b36bfbea5b23bf485aee8a78c232d050265cb3d6631f8d5dbaf3"
+  }
+}

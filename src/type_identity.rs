@@ -13,6 +13,7 @@ pub enum TypeIdentity {
     Union(Vec<TypeIdentity>),
     /// Experimental intersection identity; distinct from nominal inheritance.
     Intersection(Vec<TypeIdentity>),
+    FunctionReturn(Box<TypeIdentity>),
     Function {
         parameters: Vec<TypeIdentity>,
         returns: Box<TypeIdentity>,
@@ -60,7 +61,8 @@ impl TypeIdentity {
                 parameters.iter().any(Self::contains_generic_parameters)
                     || returns.contains_generic_parameters()
             }
-            Self::ByRef(element)
+            Self::FunctionReturn(element)
+            | Self::ByRef(element)
             | Self::ReadOnlyByRef(element)
             | Self::Array(element)
             | Self::ArrayRef(element)
@@ -375,6 +377,11 @@ pub(crate) fn describe_member(
                     .join(",")
             );
         }
+        Type::FunctionReturn(operand) => {
+            let operand = nested(operand)?;
+            result.name = format!("ReturnType<{}>", operand.name);
+            result.identity = TypeIdentity::FunctionReturn(Box::new(operand.identity));
+        }
         Type::Function(shape) => {
             let parameters = many(&shape.parameters)?;
             let returns = nested(&shape.returns)?;
@@ -594,6 +601,7 @@ pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
                 .join(",")
         ),
         Type::SelfType => "Self".into(),
+        Type::FunctionReturn(operand) => format!("ReturnType<{}>", signature_name(operand)?),
         Type::Function(shape) => {
             let mut parts = shape
                 .parameters

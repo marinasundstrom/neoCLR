@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../runtime/NativeLibrary.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>SignalReflectionDemo</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Main.rvn" />
+    <ProjectReference Include="../../../../extensions/Neo.Signals/src/Neo.Signals/Neo.Signals.rvnproj" />
+    <ProjectReference Include="../../../../runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
+  </ItemGroup>
+</Project>
