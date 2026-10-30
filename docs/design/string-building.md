@@ -29,6 +29,53 @@ choice is fluent Append, keeping ordinary construction concise. A future TryAppe
 may supply recoverable quota errors if a real consumer needs them; it is not added
 speculatively. Allocation failures remain runtime faults.
 
+### Result-returning appends reconsidered — 2026-10-30 (proposal)
+
+The author reopened the return-type choice now that propagation (`?`) and carrier
+unwrap-or-fail (`!`) can work with unions and error conversions. The assistant initially
+recommended considering `Result<StringBuilder, StringBuilderError>` for Append and
+AppendLine, with success carrying the same builder and a typed quota error on
+failure. Clear and ToString need not become fallible solely for consistency.
+This is a proposal, not an implemented API change or a roadmap reprioritization.
+
+The author clarified that recoverability determines whether an API should return
+Result. Operator convenience alone does not justify a recoverable error contract.
+An overflow may represent a rare terminal limit violation; it does not inherently
+require Result. Conversely, an explicit caller-controlled quota may warrant a
+recoverable outcome when a consumer can reject input, truncate output or select
+another strategy. Frequency alone does not decide recoverability.
+
+The revised recommendation is to retain the current direct fluent API and terminal
+quota failure unless a concrete recovery requirement justifies changing it or
+adding a recoverable operation. TryAppend would express that distinct contract,
+not merely preserve source compatibility. The proposed Result shape remains a
+conditional design option rather than the preferred default.
+
+At the call site, each Result-returning append would require propagation or unwrapping
+before the next member call. Propagation requires a compatible enclosing carrier;
+error-union injection or a supported implicit error conversion can connect the
+builder error to the caller's error contract. Arbitrary error unions do not acquire
+conversions automatically. Carrier `!` terminates instead of propagating and
+currently reports the generic `Carrier unwrap failed` message, losing the quota
+fault's specific diagnostic. See [native carrier qualification](../raven-cli-bridge.md#carrier-unwrap-or-fail--2026-10-29).
+
+Preserve per-operation preflight: a rejected append leaves the builder unchanged,
+and AppendLine checks text plus LF together. Earlier successful appends in a chain
+remain; a chain is not a transaction. Allocation failure remains a runtime fault.
+Compared with [.NET Append](https://learn.microsoft.com/en-us/dotnet/api/system.text.stringbuilder.append?view=net-10.0)
+(primary documentation checked 2026-10-30), the proposed option would replace an implicit
+exception path with a recoverable typed return and explicit caller policy. Costs
+include source/binary migration, result handling, diagnostic loss through `!`, and
+possible carrier overhead that must be measured before claiming efficiency.
+
+Before adoption, establish the intended recovery scenario, then compile and execute
+actual builder chains with both operators,
+error-union propagation and application-error conversion; test byte-boundary and
+AppendLine atomicity, and inspect generated formatting consumers and bridge
+bindings that currently assume the direct builder return. Refresh API reference
+and relevant website examples with any implementation. A separate TryAppend remains
+an option when callers need both terminal and recoverable operations.
+
 [String.Join](https://learn.microsoft.com/dotnet/api/system.string.join?view=net-10.0)
 provides the second .NET baseline: separators occur only between elements, including
 empty elements; an empty array produces empty text. The first neoCLR overload is

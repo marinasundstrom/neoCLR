@@ -564,6 +564,37 @@ attribute-description contract fixtures are retained. See the
 [migration inventory and focused checks](validation/descriptive-test-names-20261029/README.md). See [testing](../api-docs/testing.md) and
 [benchmarking](../api-docs/benchmarking.md) for the development-only contract.
 
+## Recoverable failures versus terminal failure (2026-10-30)
+
+Author direction: choose Result when the API should signal a recoverable failure
+that callers can handle or propagate. Use terminal failure when the failure is
+outside the operation's supported recovery contract. Decide from the meaning of
+the failure and realistic caller responses, not merely from the availability of
+`?`, `!`, error unions or implicit error conversions.
+
+An overflow does not automatically require Result: exceeding an internal bound
+may be a terminal failure, while exceeding a caller-controlled quota may warrant
+recovery such as rejecting input or choosing another strategy. Rarity alone does
+not determine recoverability. Do not make every potentially failing operation
+return Result, or convert recoverable failures into terminal failures merely for
+shorter call sites.
+
+For a recoverable API, document the error cases and the state left after failure,
+including partial progress or mutation guarantees. Operators and error conversions
+help consume that contract; they do not establish it. A caller may deliberately
+choose `!` when its own context treats a recoverable failure as terminal. Add a
+separate recoverable operation only when a concrete use case warrants it; this
+convention does not mandate Try variants or a blanket migration of existing APIs.
+See the [StringBuilder discussion](design/string-building.md#result-returning-appends-reconsidered--2026-10-30-proposal).
+
+Console input is a concrete use case: a small interactive program may choose `!`
+on a Result-returning read when it cannot usefully continue after an I/O failure,
+while reusable code can propagate or handle the same error. ReadLine returns
+`Result<Optional<string>, TextReadError>`; unwrapping its Result still leaves Optional
+and preserves EOF as a separate outcome to handle. Do not automatically unwrap
+both layers or make EOF terminal. Console Write/WriteLine currently return directly;
+this guidance does not add Result returns or unwrap operators to those calls.
+
 ## Terminal panic calls
 
 Prefer `import System.*` and `Panic("diagnostic")` for an unrecoverable error.

@@ -23858,3 +23858,32 @@ Evidence: [design and implemented profile](design/generic-function-methods.md),
   overloads. Arbitrary struct defaults, including CancellationToken, remain open for
   the next slice; no runtime API overload migration was performed. See the
   [contract](parameter-defaults.md) and [qualification](validation/configuration-reload-20261030/README.md).
+
+## 2026-10-30 — Reconsidering StringBuilder result chaining
+
+- **Author proposal:** reconsider Result-returning StringBuilder chaining now that
+  Raven has propagation (`?`), unwrap-or-fail (`!`), unions and error conversions.
+- **Assistant assessment:** recommend exploring typed Result returns for Append and
+  AppendLine, carrying the same builder on success; keep Clear and ToString direct.
+  Propagation needs compatible residual conversion. Failure atomicity applies to
+  each append, not the whole chain; `!` currently loses the specific quota message.
+- **Action and status:** reviewed the current builder source and native carrier
+  qualification and recorded the [proposal and migration checks](design/string-building.md#result-returning-appends-reconsidered--2026-10-30-proposal).
+  No API change or builder-specific execution validation was performed. Adoption
+  and the concrete error contract remain open; prior fluent-append direction is
+  preserved as historical context.
+- **Author clarification:** Result should signal recoverable failures. Some errors,
+  including overflows in some contexts, may be rare terminal failures; the presence
+  of propagation and unwrap operators does not decide the API contract.
+- **Assistant revision:** retain direct fluent appends and terminal quota failure
+  pending a concrete recovery requirement. Distinguish a recoverable quota operation
+  from a terminal limit violation; rarity alone does not determine recoverability.
+  Updated the proposal accordingly, without changing runtime behavior.
+- **Author follow-up:** requested placing this principle in the conventions.
+  **Assistant action:** added the recoverability rule to Raven conventions and
+  AGENTS.md, including context-dependent overflow handling and failure-state
+  documentation; no blanket API migration is implied.
+- **Author observation:** unwrap-or-fail can simplify Console API use in some cases.
+  **Assistant action:** recorded Console input as a concrete caller-selected terminal
+  policy in the conventions, retaining recoverable API errors and separate EOF
+  handling. Current Write/WriteLine return directly; no Console API was changed.

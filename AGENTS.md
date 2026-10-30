@@ -51,6 +51,12 @@
   test IDs, name filters and discovery order; update active expectations and callers
   without rewriting historical validation evidence.
 
+- Choose `Result` when an API should signal recoverable failures; use terminal
+  failure for errors outside its supported recovery contract. Overflow and rarity
+  alone do not determine that choice. Propagation, unwrap-or-fail and error
+  conversions are consumption tools, not reasons to make an API fallible. Follow
+  [the failure convention](docs/raven-conventions.md#recoverable-failures-versus-terminal-failure-2026-10-30).
+
 - Use `await` by default for asynchronous work, including async `Main`. Reserve
   explicit `OnCompleted` for a documented adapter, outcome-observation or callback-test purpose.
 
