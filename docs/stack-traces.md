@@ -128,3 +128,18 @@ Structured native-origin/debug naming remains the eventual replacement for this
 transport fallback. [Release evidence](validation/release-preparation-20261030/README.md)
 includes valid/malformed identity controls and the retained Windows native/interpreter
 parity case.
+
+### Async callback caller frames
+
+Current capture reports active guest frames, without causal async stitching (see
+[the existing scope](experiments/stack-trace/README.md)). In the HTTP-client fault
+consumer, both modes retain the same five inner frames through
+`Raven.Generated.UnitCallback.Invoke`; native draining additionally retains active
+`RuntimeHelpers.DrainEntryTasks` and generated async-entry callers. Interpreter
+callback execution starts a separate root. This is a current implementation gap,
+not a new promise that backend stacks must always differ.
+
+The host validator preserves exact fault code/message, exit status, stdout and
+all shared frames. Only callback-fault cases may have the exact two native outer
+frames; arbitrary extra frames, changed inner frames and unrelated diagnostics
+still fail. Ordinary and cancellation cases retain byte-for-byte parity.

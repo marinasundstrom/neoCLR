@@ -22,7 +22,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   GC state, workspace membership, record semantics, synchronous slice streams and documented JIT retention
   diagnostics; interpreter controls select their mode explicitly and unexpected errors remain failures.
   Development bundles include the source-matched runtime and reflection-root helper.
-  Runtime-library JIT checks accept only the exact documented dynamic-dispatch warning. Console/HTTPS checks require
+  Runtime-library JIT checks accept only the exact documented dynamic-dispatch warning.
+  HTTP callback-fault checks preserve shared frames while allowing the two active native
+  entry callers documented by the current async-stack limitation. Console/HTTPS checks require
   a successfully qualified matching package, while development-bootstrap imports remain available.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.

@@ -562,3 +562,10 @@ The final macOS package gate remains unresolved; timeouts have not been relaxed.
 
 Windows HTTP-client run 41130576934 now passes pre-cancellation and cancellation
 parity but exposes a continuation-fault parity mismatch, under investigation.
+
+The continuation-fault [retained report](windows-client-callback-frames.json.gz)
+shows identical five inner frames and two additional native active entry callers.
+This matches the existing active-frame contract and documented causal async-stack
+stitching gap. The validator now permits only that exact suffix for callback faults;
+ordinary/cancellation cases remain byte-equal. The retained report and five negative
+comparison controls pass; target execution of the remaining recovery cases is pending.

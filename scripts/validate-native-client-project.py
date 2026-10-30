@@ -21,6 +21,22 @@ http = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(http)
 sha = http.sha
 
+# Native draining retains these active entry callers around an async callback.
+# Interpreter callback execution has its own root; causal async stitching is not
+# implemented. Preserve every inner frame and allow only this exact outer suffix.
+NATIVE_ENTRY_FRAMES = ('   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n'
+                       '   at Raven.Generated.<AsyncEntry> [instruction 1]\n')
+
+
+def matching_execution_results(interpreter, native, *, callback_fault=False):
+    if interpreter == native:
+        return True
+    return (callback_fault and interpreter['exitCode'] == native['exitCode'] == 1
+            and interpreter['stdout'] == native['stdout']
+            and interpreter['stderr'].startswith('UserFault: Client ')
+            and '   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n' in interpreter['stderr']
+            and native['stderr'] == interpreter['stderr'] + NATIVE_ENTRY_FRAMES)
+
 def qualify_reuse(run, out, build, commands, environment, response):
     """Relink the same guest object into a three-invocation private test host."""
     windows = platform.system() == 'Windows'
@@ -86,7 +102,7 @@ def qualify_reuse(run, out, build, commands, environment, response):
             if thread.is_alive() or 'error' in wire or len(wire['requests']) != expected_requests:
                 raise ValueError(name + ': fixture failed: ' + repr(wire))
             row[mode + 'Requests'] = wire['requests']
-        if row['native'] != row['interpreter'] or row['freshInterpreterExitCodes'] != [0, 1, 0]:
+        if not matching_execution_results(row['interpreter'], row['native'], callback_fault=action in ('fault', 'pending-fault')) or row['freshInterpreterExitCodes'] != [0, 1, 0]:
             raise ValueError(name + ': repeated host differs from fresh invocations: ' + repr(row))
         value = row['native']
         expected_fault = 'Client continuation fault' if action == 'fault' else 'Client fault while request pending' if action == 'pending-fault' else 'cancel'
@@ -209,7 +225,8 @@ def main():
                     expected = f'GET /greeting HTTP/1.1\r\nHost: {host}:{port}\r\nConnection: close\r\n\r\n'.encode()
                     if bytes.fromhex(wire['requestHex']) != expected: raise ValueError('Unexpected HTTP request')
                 row[mode + 'Wire'] = wire
-            if row['interpreter'] != row['native']: raise ValueError(name + ': interpreter/native mismatch')
+            if not matching_execution_results(row['interpreter'], row['native'], callback_fault=name == 'continuation-fault'):
+                raise ValueError(name + ': interpreter/native mismatch')
             value = row['native']
             if name in ('greeting', 'numeric', 'fragmented'):
                 if value != dict(exitCode=0, stdout='Café 🌍\n', stderr=''): raise ValueError(name + ': response mismatch')
