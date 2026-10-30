@@ -21,10 +21,14 @@ spec = importlib.util.spec_from_file_location('http_workbench', ROOT/'benchmarks
 workbench = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(workbench)
 sha = workbench.sha
+validation_path = ROOT / 'scripts/verify-native-http-json.py'
+validation_spec = importlib.util.spec_from_file_location('native_http_validation', validation_path)
+validation = importlib.util.module_from_spec(validation_spec)
+validation_spec.loader.exec_module(validation)
 from host import target, cpu_description, load_average, process_snapshot
 
 
-def server_sample(command, workload, mode=None):
+def server_sample(command, workload, mode=None, explicit_roots=False):
     guest = workbench.Guest(command)
     try:
         port, ready = guest.line()
@@ -61,7 +65,12 @@ def server_sample(command, workload, mode=None):
                 samples.append(time.perf_counter()-start)
         guest.line(b'DONE')
         from process import RETENTION_WARNING
-        stderr = guest.finish(allowed_stderr=(b'', RETENTION_WARNING) if mode == 'jit' else (b'',))
+        allowed = (b'', RETENTION_WARNING) if mode == 'jit' else (b'',)
+        guest.process.wait(timeout=guest.timeout)
+        diagnostics = guest.errors()
+        if validation.expected_retention_diagnostics(diagnostics.decode(), mode, explicit_roots):
+            allowed += (diagnostics,)
+        stderr = guest.finish(allowed_stderr=allowed)
         return dict(stderr=stderr.decode(), startupSeconds=ready-guest.started, requestSeconds=samples,
                     measuredSeconds=sum(samples), requestsPerSecond=24/sum(samples))
     finally:
@@ -125,7 +134,7 @@ def main():
                   limitations=['Short fixed-count baseline, not saturation or sustained throughput.',
                                'p99 is a nearest-rank estimate from 120 measured requests per mode at five rounds.',
                                'No RSS/CPU profile, HTTPS, keep-alive or cross-runtime comparison.'])
-    inputs=[*project.glob('*.rvn'), Path(__file__).resolve(), ROOT/'benchmarks/jit-http/benchmark.py', ROOT/'benchmarks/framework/process.py',ROOT/'benchmarks/framework/host.py',source,bundle/'manifest.json']
+    inputs=[validation_path, *project.glob('*.rvn'), Path(__file__).resolve(), ROOT/'benchmarks/jit-http/benchmark.py', ROOT/'benchmarks/framework/process.py',ROOT/'benchmarks/framework/host.py',source,bundle/'manifest.json']
     report['inputHashes']={str(p):sha(p) for p in inputs}
     try:
         native=out/'native'
@@ -203,7 +212,7 @@ def main():
         for index in range(-1,args.rounds):
             offset=max(index,0)%3
             for mode in modes[offset:]+modes[:offset]:
-                row=server_sample(report['commands'][mode],args.workload,mode=mode)
+                row=server_sample(report['commands'][mode],args.workload,mode=mode,explicit_roots=bool(roots))
                 row.update(mode=mode,round=index)
                 report['warmups' if index<0 else 'samples'].append(row)
                 (out/'results.json').write_text(json.dumps(report,indent=2)+'\n')

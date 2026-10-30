@@ -219,3 +219,25 @@ callers now explicitly admit only that exact warning in JIT mode and retain stde
 in every sample. Shared subprocess controls still reject nonzero exits and unknown
 messages; timing/workload/output checks are unchanged. A fresh five-round measurement
 run uses this harness repair; the failed attempt is not performance evidence.
+
+
+Windows run 41113778505 passes package acceptance, GC, [all 24 async cases](windows-runtime-await.json.gz),
+JSON and all 132 headers. Watcher compilation/linking succeeds, but
+[dependency admission](windows-watcher-dependencies.log.gz) rejects the Rust provider's
+Windows system DLLs. The builder now allows `bcryptprimitives.dll`,
+`api-ms-win-core-synch-l1-2-0.dll` and `ntdll.dll` when file watching is linked, as it
+already does for security providers; unrelated DLLs remain rejected. Runtime source
+and provider binaries are unchanged. Watcher/reload/editor execution remains open.
+
+Windows HTTPS [41115276438](https://github.com/marinasundstrom/neoCLR/actions/runs/41115276438)
+uses the matching candidate archive. Its [JIT diagnostic failure](windows-https-warning-failure.log.gz)
+has a successful TLS 1.3 protocol exchange, exit zero and exact output. The HTTPS
+validator now admits only DAM2004 in JIT mode, with focused negative controls.
+The earlier automatic workflow used an older default archive without `System.Panic`;
+that mismatched run does not qualify this candidate.
+
+MacOS measurement stages execution, longer native CPU and plain HTTP pass five
+rounds. JSON HTTP stops on [documented DAM2001/2004 diagnostics](macos-http-json-warning-failure.log.gz).
+Its harness now reuses the existing bounded HTTP diagnostic policy only when explicit
+reflection roots are supplied, hashes that policy source, and preserves per-sample
+stderr. Only the JSON HTTP stage is repeated; passing measurement stages are retained.

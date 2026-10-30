@@ -30,3 +30,13 @@ class RuntimeAwaitDiagnosticsTests(unittest.TestCase):
                 else:
                     with self.assertRaises(RuntimeError): guest.finish(allowed_stderr=allowed)
             finally: guest.close()
+
+    def test_https_warning_allowance_is_limited_to_jit(self):
+        spec = importlib.util.spec_from_file_location('https_validation',
+            Path(__file__).resolve().parents[1] / 'docs/experiments/https-server/validate.py')
+        https = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(https)
+        for mode in ('aot', 'aot-project', 'jit'):
+            self.assertTrue(https.expected_diagnostics('', mode))
+            self.assertEqual(https.expected_diagnostics(module.RETENTION_WARNING, mode), mode == 'jit')
+            self.assertFalse(https.expected_diagnostics(module.RETENTION_WARNING + 'fault', mode))

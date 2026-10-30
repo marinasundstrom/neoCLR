@@ -24,6 +24,11 @@ read_port = http_json.read_port
 sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def expected_diagnostics(stderr, mode):
+    warning = 'warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n'
+    return not stderr or (mode == 'jit' and stderr == warning)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--recipe', type=Path, default=HERE.parent / 'runtime-async/collector-walk-showcase.json')
@@ -216,7 +221,7 @@ def main():
                                 if data: raise RuntimeError('unexpected plaintext response')
                         valid(port)
                         stdout, stderr = process.communicate(timeout=10)
-                        good = process.returncode == 0 and not stderr and stdout.strip() == 'PASS HTTPS server and recovery'
+                        good = process.returncode == 0 and expected_diagnostics(stderr, mode) and stdout.strip() == 'PASS HTTPS server and recovery'
                         report['cases'].append(dict(mode=mode, case=case, passed=good, protocol=protocol,
                                                     exitCode=process.returncode, stdout=stdout, stderr=stderr))
                         print(mode, case, 'PASS' if good else 'FAIL', flush=True)
