@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-30
 
-- Begin Preview 19 preparation for macOS ARM64 and Windows x64: draft themed release notes and migration guidance, track exact candidate evidence, align toolchain/scalar qualification with Raven 6ceeb1be8 and repair Rust formatting/Clippy gates and the stale HTTP Serve documentation expectation. Publication and fresh package acceptance remain pending.
+- Begin Preview 19 preparation for macOS ARM64 and Windows x64: draft themed release notes and migration guidance, track exact candidate evidence, align toolchain/scalar qualification with Raven 6ceeb1be8 and repair Rust formatting/Clippy gates and the stale HTTP Serve documentation expectation. Add extracted Windows package gates for real filesystem notifications and configuration reload. Publication and fresh package acceptance remain pending.
 
 - Support nominal value-type parameter defaults, including CancellationToken = default,
   through native and CLI metadata. Consolidate runtime stream, socket, DNS, TLS and

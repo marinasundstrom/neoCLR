@@ -18,8 +18,10 @@ historical evidence only.
   `docs/experiments/runtime-handoff/dotnet/obj/`; source archives exclude it.
 - At preparation start, neoCLR main was 11 commits ahead of origin/main and the
   remote Raven branch was `34f14c8ce`. At the author’s request, Raven main `83e700ab6` and codex/neoclr `6ceeb1be8`
-  were pushed separately. neoCLR preparation is being committed and synced; old
-  green runs do not qualify the candidate.
+  were pushed separately. neoCLR `d590e9f7a` is committed and synced.
+  [Canonical/host CI](https://github.com/marinasundstrom/neoCLR/actions/runs/40986852173)
+  and [Windows toolchain qualification](https://github.com/marinasundstrom/neoCLR/actions/runs/40986852134)
+  are running; old green runs do not qualify the candidate.
 
 ## Gates
 
@@ -30,7 +32,7 @@ historical evidence only.
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar evidence tests and six HTTP readiness/process cleanup tests pass. |
 | macOS SDK | Fresh matching SDK packaging started; no extracted package qualification yet. |
-| Windows | Prior scalar run fails at compiler build; stale pins updated. Fresh host/package execution, watcher and configuration reload remain required. |
+| Windows | Prior scalar run fails at compiler build; stale pins updated. Fresh host/package execution remains required. The workflow now includes real-file watcher and configuration reload checks against extracted package binaries, retaining their reports even on failure. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
 | Editor / HTTPS | Matching extracted SDK/VSIX completion, hover, recovery and HTTPS acceptance required on both targets. |
 | Performance | Fresh package release measurements required; existing development experiments are not release measurements. |
