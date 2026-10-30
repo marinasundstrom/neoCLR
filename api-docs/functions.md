@@ -228,7 +228,6 @@ generic instantiations, including mismatches and null. This qualification uses t
 existing reflection API; it adds no coercion or function variance conversions.
 
 
-<a id="typed-invocation-and-method-signatures-development"></a>
 ## Typed invocation and method signatures (development)
 
 ```raven

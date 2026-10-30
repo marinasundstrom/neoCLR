@@ -73,7 +73,8 @@ def build(path: Path) -> str:
             '.field private StoredIsLiteral Boolean\n'
             '.field private StoredConstantValue System.Object\n'
             '.property instance FieldType()', 1)
-        # Generic method flags precede Identity in the current Raven provider.
+        # Generic method flags precede Identity; FunctionType follows it in the
+        # current Raven provider.
         # Keep this archived test profile aligned with the runtime snapshot ABI.
         anchor = '.field private IsAbstract Boolean\n.field private Identity String'
         if text.count(anchor) != 1:
@@ -83,7 +84,8 @@ def build(path: Path) -> str:
             '.field private StoredIsGenericMethod Boolean\n'
             '.field private StoredIsGenericMethodDefinition Boolean\n'
             '.field private StoredContainsGenericParameters Boolean\n'
-            '.field private Identity String', 1)
+            '.field private Identity String\n'
+            '.field private StoredFunctionType System.Introspection.TypeInfo', 1)
     if path == ROOT / 'runtime/legacy/bootstrap/System/Collections/Iterator.neoil':
         return build(ROOT / 'runtime/legacy/raven/Iterator.neoil')
     if path.stem in COLLECTIONS | {'Disposable'}:

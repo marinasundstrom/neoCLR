@@ -345,7 +345,7 @@ def main():
     samples = {
         'NATIVE_CALLBACK_IMPORT': ('runtime/System.Runtime/test/NativeCallbackTests/Imports.rvn', 'import System.Runtime.InteropServices.*', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_callback_twice")]', False),
         'NATIVE_RETURN_IMPORT': ('runtime/System.Runtime/test/NativeCallbackTests/Imports.rvn', '[NativeImport("native-callback-fixture", EntryPoint: "native_function_get")]', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_notification_get")]', False),
-        'NATIVE_CALLBACK_FUNCTION': ('runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn', 'func AddOne', '\n\n[Test("Native callbacks preserve', False),
+        'NATIVE_CALLBACK_FUNCTION': ('runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn', 'func AddOne', '\n\n[Test]\nunsafe func `Native callbacks preserve', False),
         'NEOIL_TOUR': ('samples/neoil-tour/main.neoil', '.module ILTour', '\n.end', True),
         'NEOIL_FUNCTION': ('samples/neoil-tour/main.neoil', '.function Main', '\n.end', True),
         'NEOIL_VOID': ('samples/neoil-tour/main.neoil', '.function Identity', '\n.function Main', False),
@@ -601,13 +601,15 @@ def main():
                 for source in sorted((ROOT / 'api-docs').glob('*.md')) if source.name != 'README.md']
     sources += [(ROOT / 'api-docs' / entry['source'], Path(entry['output']))
                 for entry in json.loads((ROOT / 'api-docs/manual-types.json').read_text()).values()]
+    # Several manual types can share one authored page already in the guide list.
+    sources = list(dict.fromkeys(sources))
     # Source sections select RavenDoc's sidebar independently of published URLs.
     # Existing /features/ and /docs/ guide links stay valid after the menu split.
     guide_toc = (SOURCE / 'guides-toc.yml').read_text()
     guide_paths = {Path(path) for path in re.findall(r'^\s*href: (.+)$', guide_toc, re.M)}
     guide_outputs = []
     structural_reference = {"structural-types.md", "arrays.md", "functions.md",
-                            "tuples.md", "unions.md", "intersections.md", "memory-views.md"}
+                            "tuples.md", "unions.md", "intersections.md", "memory-views.md", "signals.md"}
     for source, relative in sources:
         template = source.read_text().replace('{{TOUR_OUTPUT}}', output_text).replace('{{ARRAY_OUTPUT}}', array_output)
         markdown = render(template, samples, html=source.suffix == '.html')

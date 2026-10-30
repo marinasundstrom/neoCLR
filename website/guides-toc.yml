@@ -118,6 +118,8 @@
       href: docs/compression.md
     - name: "Storage"
       href: docs/storage-items.md
+    - name: "File system watching"
+      href: docs/file-system-watcher.md
     - name: "Transitional async compiler protocol"
       href: docs/async-builders.md
     - name: "Task callback methods"

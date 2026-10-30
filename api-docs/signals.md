@@ -6,13 +6,13 @@ has not been decided. It uses structural function types and ordinary properties;
 there is no event metadata and no nominal delegate requirement.
 
 <a id="signal"></a>
-## Signal<T> where T: func
+## `Signal<T> where T: func`
 
 A subscription-only view. Applications obtain it from `SignalSource<T>.Signal`;
 its constructor is internal, and it exposes no publishing operation.
 
 <a id="subscribe"></a>
-### Subscribe(handler: T) -> Disposable
+### `Subscribe(handler: T) -> Disposable`
 
 Registers the supplied function object, retaining its receiver/captures. Returns
 an idempotent handle that removes exactly this registration. Duplicate function
@@ -21,25 +21,25 @@ an already active dispatch snapshot. The handle can be retained for explicit
 lifetime management or disposed through the normal scope-disposal contract.
 
 <a id="source"></a>
-## SignalSource<T> where T: func
+## `SignalSource<T> where T: func`
 
 Owns the registration list and publishing authority.
 
 <a id="constructor"></a>
-### init()
+### `init()`
 
 Constructs an empty source and its stable subscription view. `ReturnType<T>` must
 be unit; another result type calls `Panic` in this initial profile. This runtime
 policy is specific to this library, not to the `func` constraint.
 
 <a id="view"></a>
-### val Signal: Signal<T>
+### `val Signal: Signal<T>`
 
 Returns the same subscription-only view on each access. Expose it through a public
 read-only property while keeping the source private.
 
 <a id="emit"></a>
-### func Emit: T with args
+### `func Emit: T with args`
 
 The closed method has T's parameter list and result. For `(int, string?) -> unit`,
 call `source.Emit(value, label)`. For `() -> unit`, call `source.Emit()`.
@@ -49,7 +49,7 @@ Delivery is synchronous in registration order, using a snapshot. No handlers is 
 successful no-op. Reentrant changes affect later dispatches, including a nested
 one started after the change. Handler faults propagate and stop the active delivery.
 Argument marshalling has the same scalar/reference limits as
-[FunctionReflection.Invoke<T>](functions.html#typed-invocation-and-method-signatures-development).
+[`FunctionReflection.Invoke<T>`](functions.html#typed-invocation-and-method-signatures-development).
 Concurrent access requires caller synchronization. There is no completion/error
 channel, scheduler, Task handling or `+=`/`-=` operator in this slice.
 

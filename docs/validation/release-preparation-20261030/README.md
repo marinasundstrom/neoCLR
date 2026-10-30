@@ -31,12 +31,12 @@ historical evidence only.
 | Format / strict Clippy | Formatting repaired; needless test borrows repaired after Clippy diagnostics. Strict Clippy and formatting now pass; seven lookup tests pass. |
 | API reference | `build-api-docs.py --check` and four native snapshot tests pass on the candidate inputs. |
 | Validator controls | Four Windows scalar evidence tests and six HTTP readiness/process cleanup tests pass. |
-| macOS SDK | Fresh matching SDK packaging started; no extracted package qualification yet. |
+| macOS SDK | Matching SDK and VSIX built; all 14 libraries including PostgreSQL build. Fresh watcher native/interpreter ownership and lifecycle checks pass. Default-JIT bundle assembled; archive/extract qualification follows. |
 | Windows | Prior scalar run fails at compiler build; stale pins updated. Fresh host/package execution remains required. The workflow now includes real-file watcher and configuration reload checks against extracted package binaries, retaining their reports even on failure. |
 | Libraries / consumers | Reuse [optional-argument source evidence](../runtime-defaults-20261030/README.md) and other linked feature receipts as focused evidence only. Fresh package consumers remain required. |
 | Editor / HTTPS | Matching extracted SDK/VSIX completion, hover, recovery and HTTPS acceptance required on both targets. |
 | Performance | Fresh package release measurements required; existing development experiments are not release measurements. |
-| Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass; release website review/build, complete bundled dependency notices and final artifact hashes remain required. |
+| Website / notices | 25 of 26 website tests pass; stale Serve sidecar expectation repaired and its focused rerun passes. Two package archive tests pass. The repaired full website build checks 6,714 pages. Complete bundled dependency notice review and final artifact hashes remain required. |
 | Publication | No tag, GitHub release, upload or website deployment. Publication date unset. |
 
 ## Preserved failures and repairs
@@ -73,3 +73,30 @@ Follow [source validation](../../next-preview-validation.md) and the
 [package procedure](../../experiments/raven-target/RELEASING.md). Use exact fresh
 artifact identities and retain failures separately. Do not promote development
 claims or close gates solely because source builds or packaging complete.
+
+## Subsequent gate repairs
+
+The full local source run exposes seven archived Raven reflection failures with
+`reflection snapshot field count mismatch`. The test-only adapter now includes
+RuntimeMethodInfo's function-signature field; generated historical snapshots and
+production runtime behavior are unchanged. [All 26 reflection tests pass](reflection-fixed.log.gz)
+with the repair. Preserve the original full-run failures; the final committed-source
+CI must still pass.
+
+Hosted canonical Clippy rejects the newly deprecated `AtomicI64::fetch_update`.
+A statement-local allowance retains Rust 1.85 support, whose standard library lacks
+its replacement. [Provider Clippy passes](watcher-clippy.log.gz); no allocation,
+ordering or overflow behavior changes. All three hosted minimum-Rust jobs pass on
+`1f22baee9`; hosted macOS host checks also pass.
+
+Website repairs align the callback excerpt with backtick names, deduplicate shared
+manual pages, keep Signals in reference navigation, add watcher guide navigation,
+remove a duplicate function-reflection anchor and escape generic signatures in
+Signals headings/link labels. [The final full build](website-build-clean.log.gz)
+checks 6,714 pages. Existing description-coverage warnings remain visible; a website
+build is not publication.
+
+[Fresh macOS watcher evidence](macos-filewatch.json.gz) uses the packaged compiler
+and rebuilt libraries. Both native and interpreter lifecycle consumers and the
+native ownership harness pass. This is a focused base-package check; default-JIT
+archive/extract, editor, HTTPS and release measurements remain separate gates.

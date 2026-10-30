@@ -207,6 +207,8 @@ pub fn open(path: &str, filter: &str, recursive: bool) -> Result<i64, i32> {
             },
         )
         .map_err(|_| IO)?;
+    // try_update is unavailable on the supported Rust 1.85 toolchain.
+    #[allow(deprecated)]
     let id = NEXT
         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
         .map_err(|_| IO)?;
