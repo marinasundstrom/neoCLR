@@ -1,0 +1,128 @@
+diff --git a/runtime/codegen/src/type_initialization.rs b/runtime/codegen/src/type_initialization.rs
+index 73dfe3fa0..4589f48dc 100644
+--- a/runtime/codegen/src/type_initialization.rs
++++ b/runtime/codegen/src/type_initialization.rs
+@@ -13,6 +13,27 @@ pub(super) fn initializer(input: &Module, owner: &Type) -> Option<usize> {
+ pub(super) fn needs_storage(input: &Module, owner: &TypeDef) -> bool {
+     !owner.static_fields.is_empty() || initializer(input, &owner_type(owner)).is_some()
+ }
++
++/// Dense storage identities for one immutable selected module. Field lowering
++/// and initializer guards must share the same source-order owner inventory.
++pub(super) struct StorageLayout {
++    pub owners: Vec<usize>,
++    pub ordinals: Vec<usize>,
++}
++
++impl StorageLayout {
++    pub fn new(input: &Module) -> Self {
++        let mut owners = Vec::new();
++        let mut ordinals = Vec::with_capacity(input.types.len());
++        for (index, owner) in input.types.iter().enumerate() {
++            ordinals.push(owners.len());
++            if needs_storage(input, owner) {
++                owners.push(index);
++            }
++        }
++        Self { owners, ordinals }
++    }
++}
+ pub(super) fn entry_owner<'a>(input: &Module, f: &'a Function) -> Option<&'a Type> {
+     if f.name.ends_with("..cctor") {
+         return None;
+@@ -38,3 +59,36 @@ pub(super) fn owner_type(owner: &TypeDef) -> Type {
+         }
+     }
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn storage_layout_keeps_field_and_initializer_owners_in_source_order() {
++        let mut input = neoclr::assemble(
++            ".module Storage\n.type class Empty\n.end\n.type class Fields\n.end\n\
++             .type class Initializer\n.method private static .cctor() -> void\nret\n.end\n.end\n\
++             .type class Gap\n.end\n.type class Both\n.method private static .cctor() -> void\nret\n.end\n.end\n\
++             .function Main() -> Int32\nldc.i4 0\nret\n.end\n",
++        ).unwrap();
++        for index in [1, 4] {
++            input.types[index]
++                .static_fields
++                .push(neoclr::metadata::StaticField {
++                    name: "Value".into(),
++                    ty: Type::Int32,
++                    readonly: false,
++                    visibility: neoclr::metadata::Visibility::Public,
++                });
++        }
++        let layout = StorageLayout::new(&input);
++        assert_eq!(layout.owners, [1, 2, 4]);
++        assert_eq!(layout.ordinals, [0, 0, 1, 2, 2]);
++        // A fresh profile after a module change cannot reuse earlier ordinals.
++        input.types[1].static_fields.clear();
++        let layout = StorageLayout::new(&input);
++        assert_eq!(layout.owners, [2, 4]);
++        assert_eq!(layout.ordinals, [0, 0, 0, 1, 1]);
++    }
++}
+diff --git a/runtime/codegen/src/values.rs b/runtime/codegen/src/values.rs
+index 00d3f5aa3..83c35b14e 100644
+--- a/runtime/codegen/src/values.rs
++++ b/runtime/codegen/src/values.rs
+@@ -2207,9 +2207,11 @@ fn compile_with_driver<M: Module>(
+         None
+     };
+     let mut live_bodies = Vec::new();
++    let static_storage = crate::type_initialization::StorageLayout::new(input);
+     let initialization_guards = compile_initialization_guards(
+         module,
+         &p,
++        &static_storage,
+         &ids,
+         static_service,
+         stack_budget,
+@@ -5643,15 +5645,8 @@ fn compile_with_driver<M: Module>(
+                             let (owner_index, ty, offset, bytes) = p.static_field(owner, *index)?;
+                             // Dense static-owner ordinals avoid retaining/scanning empty
+                             // slots for every unrelated selected type on each collection.
+-                            let type_index = input.types[..owner_index]
+-                                .iter()
+-                                .filter(|t| crate::type_initialization::needs_storage(input, t))
+-                                .count();
+-                            let static_count = input
+-                                .types
+-                                .iter()
+-                                .filter(|t| crate::type_initialization::needs_storage(input, t))
+-                                .count();
++                            let type_index = static_storage.ordinals[owner_index];
++                            let static_count = static_storage.owners.len();
+                             // Warm static access neither allocates nor calls managed code.
+                             // Publish the pending operands only on the cold allocation path.
+                             let cold = b.create_block();
+@@ -7153,6 +7148,7 @@ fn finish_value_body(
+ fn compile_initialization_guards(
+     module: &mut impl Module,
+     p: &Profile<'_>,
++    static_storage: &crate::type_initialization::StorageLayout,
+     ids: &[cranelift_module::FuncId],
+     allocator: Option<cranelift_module::FuncId>,
+     stack_budget: bool,
+@@ -7160,13 +7156,9 @@ fn compile_initialization_guards(
+     mut live_bodies: Option<&mut Vec<(cranelift_module::FuncId, cranelift_codegen::Context)>>,
+ ) -> Result<std::collections::HashMap<String, cranelift_module::FuncId>, Error> {
+     let mut guards = std::collections::HashMap::new();
+-    let owners: Vec<_> = p
+-        .input
+-        .types
+-        .iter()
+-        .filter(|t| crate::type_initialization::needs_storage(p.input, t))
+-        .collect();
+-    for (ordinal, owner) in owners.iter().enumerate() {
++    let owners = &static_storage.owners;
++    for (ordinal, &owner_index) in owners.iter().enumerate() {
++        let owner = &p.input.types[owner_index];
+         let ty = crate::type_initialization::owner_type(owner);
+         let Some(initializer) = crate::type_initialization::initializer(p.input, &ty) else {
+             continue;

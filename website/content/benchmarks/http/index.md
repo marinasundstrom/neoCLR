@@ -1,5 +1,32 @@
 # HTTP request-processing benchmarks
 
+## Development: standalone HttpServer screen — 31 October 2026
+
+The primary throughput baseline now uses `System.Web.Http.HttpServer` directly,
+without Neo.Web or DI setup. A two-byte response, fresh sequential loopback
+connections, twenty warmups and 1,000 measured requests per launch; two launches
+per cell on macOS ARM64:
+
+| Mode / GC | Ready s | First request ms | Warm req/s |
+| --- | ---: | ---: | ---: |
+| Eager / sync | 6.99 | 9.2 | 1549.4 |
+| Eager / concurrent | 9.93 | 4.4 | 1508.5 |
+| Lazy / sync | 5.18 | 1170.6 | 1953.9 |
+| Lazy / concurrent | 5.46 | 2367.4 | 1437.2 |
+
+All 8,168 responses pass. These **experimental owned-heap hosts** share 32 MiB heap
+and 4 MiB array budgets, with standard paced synchronous/concurrent policies and
+instrumentation. They are not the installed defaults or a maximum-capacity test.
+Lazy compilation shifts work into the first request. The small workload does not
+establish how concurrent services perform under sustained heavy traffic.
+
+The [HTTP throughput roadmap](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/http-throughput-roadmap.md)
+targets sustained thousands of completed requests/s, competitive direct-server
+performance, and execution continuity within latency/resource bounds. Matched
+ASP.NET Core comparisons and heavy-load qualification remain planned. Neo.Web
+framework overhead will be measured separately.
+[Exact configurations, failures and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/neo-web-jit-layout-20261031).
+
 ## Preview 19 — 31 October 2026
 
 Five-round release measurements pass on macOS ARM64 and Windows x64 using the

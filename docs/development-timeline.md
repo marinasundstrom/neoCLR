@@ -24396,3 +24396,63 @@ screen. Allocation/span validation becomes prominent in the paced profile, while
 interpreter cost and JIT startup remain separate investigations. The
 [recorded evidence](validation/neo-web-performance-20261031/README.md) distinguishes
 short comparisons, longer characterization, samples and remaining qualification.
+
+
+### 2026-10-31 — Investigate JIT startup separately from request execution
+
+The author requested continued investigation of the JIT performance gap and startup
+time, a bounded fix, validation with Neo.Web benchmarks and a commit. The assistant
+separated startup and sustained-request samples. Early startup exposed metadata and
+interface work; a later sample exposed repeated static-owner layout scans during
+lowering. Request-time samples instead emphasized allocation and heap-span checks,
+and the longer sampled run served much more traffic than the earlier short spot
+check implied. The assistant did not attribute that difference to an implemented
+runtime optimization.
+
+The selected bounded change precomputes one dense static-owner layout for the immutable selected module
+during lowering, shared by field accesses and initialization guards. Focused
+layout and static initialization consumers pass, and the rebuilt Neo.Web native
+object matches the baseline byte for byte. The
+[paired evidence](validation/neo-web-jit-layout-20261031/README.md) records startup,
+throughput and unresolved costs. No GC policy, compilation mode or public contract
+was changed. Broader metadata preparation and runtime allocation costs remain
+separate follow-ups rather than implied completion of the JIT performance work.
+
+
+### 2026-10-31 — Throughput roadmap, concurrent services and primitive baseline
+
+During the JIT investigation the author asked about lazy JIT and concurrent GC,
+then described lazy compilation and concurrent services as a possible future for
+heavy server loads, emphasizing that runtime services should not throttle execution.
+The assistant distinguished background compilation from GC and noted that the
+current lazy resolver makes its requesting execution path wait. The author directed
+research into other collectors/runtimes and their interaction before tuning.
+
+The author then requested a roadmap whose main outcome is more completed HTTP
+requests. After emphasizing that neoCLR need not perform worse than established
+runtimes (including “vi behöver inte vara sämre”), the author clarified that the
+primary benchmark must use the HTTP server API, with the expected Neo.Web overhead
+measured separately. The assistant adopted sustained throughput in the thousands as
+an explicit target, within stated latency and resource constraints, and proposed
+matched ASP.NET Core comparisons rather than rankings from unlike workloads.
+
+Actions: add a standalone HttpServer-only fixture; investigate eager/lazy and
+synchronous/concurrent host configurations; retain unsupported-provider failures;
+and write the [throughput roadmap](design/http-throughput-roadmap.md) with primary
+CoreCLR, HotSpot and Go sources. The initial primitive fixture unnecessarily exposed
+process arguments, which the private live-store compiler rejects. Removing that
+unused benchmark dependency does not implement process-argument admission. Current
+measurements remain short sequential screens, not heavy-load or cross-runtime
+qualification. Adaptive service budgets, nonblocking cold compilation, a scalable
+load generator and the sustained-capacity gates remain open.
+
+
+The author then directed lazy JIT as the default, kept synchronous GC, and asked
+for paced heaps in the upcoming release. They clarified that favorable experimental
+changes should be enabled when throughput evidence supports them: neoCLR itself is
+experimental. Concurrent GC remains a research experiment into this implementation
+or alternatives. The assistant therefore retained the non-winning static-layout
+candidate as an experiment, and moved release selection toward matched lazy/eager
+and owned/external paced synchronous-host qualification. Default promotion and
+release preparation are a subsequent implementation slice, not implied by the
+original exploratory numbers or this documentation commit.

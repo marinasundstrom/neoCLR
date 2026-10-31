@@ -84,3 +84,22 @@ correctness configuration rather than silently replacing it in old results.
 
 [Raw evidence and reproduction](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/neo-web-performance-20261031)
 · [Historical stress-host results](/benchmarks/neo-web/)
+
+
+## JIT startup follow-up
+
+A subsequent investigation separates metadata/backend preparation from request-time
+allocation and heap-span validation. A shared JIT/AOT candidate computes the dense
+static-owner layout once during lowering instead of rescanning it for each
+static-field access. It remains unselected because no decisive startup gain was
+established. The rebuilt Neo.Web native object is byte-for-byte identical;
+this change targets preparation cost and does not promise faster request execution.
+
+[Paired JIT measurements, static initialization tests and remaining work](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/neo-web-jit-layout-20261031)
+record the bounded fix. GC policy and execution-mode defaults remain unchanged.
+
+The final repeated layout comparison records median readiness of 56.09 s before
+and 56.47 s after, with overlapping ranges: no decisive whole-process startup gain
+is established. Warm throughput is about 578 versus 587 req/s; the emitted native
+object is unchanged. The [standalone HttpServer baseline](/benchmarks/http/) now
+owns the primitive-server performance question; framework overhead is separate.

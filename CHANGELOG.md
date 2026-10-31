@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
+- Investigate Neo.Web JIT startup and steady execution with matched hosts. Retain
+  a static-layout candidate and its code-equivalence tests as an unselected
+  experiment: repeated trials did not establish a decisive startup gain.
+  Add a standalone HttpServer-only benchmark and a research-backed HTTP throughput
+  roadmap, separating framework overhead and cold-compilation/GC coordination
+  from primitive server capacity.
+
 - Add matched Neo.Web collector-policy profiling and layered HTTP benchmark cases
   for context callbacks, scopes, middleware, service/query binding and cancellation.
   Separate the default native stress collector from the existing opt-in paced

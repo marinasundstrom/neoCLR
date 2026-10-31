@@ -1,0 +1,19 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("42"))
+    return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+}
+
+// The external consumer validates responses and owns benchmark termination.
+async func Main() -> Task<int> {
+    let server = HttpServer.Listen("127.0.0.1", 0, 128)!
+    let lifetime = server.Serve(Respond)
+    Console.WriteLine("LISTENING http://127.0.0.1:" + server.GetLocalPort()!.ToString())
+    _ = await lifetime
+    server.Close()
+    return 0
+}

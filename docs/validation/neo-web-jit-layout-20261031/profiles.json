@@ -1,0 +1,14 @@
+{
+  "startup": {
+    "sha256": "b931554043595a6de571ea1f7173e59288d827571f762b37e93b88194205ae40",
+    "bytes": 1028630
+  },
+  "startup-late": {
+    "sha256": "6816e33d27b332909b50eab5857b43a07ee2fb2fac1cd0214c4574ec3cb415bf",
+    "bytes": 586964
+  },
+  "execution": {
+    "sha256": "3feba3a701379ff9f0b20aa240f9e71c911cc1a96051aed4c06083c9b3523ea3",
+    "bytes": 578169
+  }
+}

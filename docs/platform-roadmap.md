@@ -1,5 +1,20 @@
 # neoCLR platform roadmap
 
+**HTTP throughput and execution continuity (author direction, 2026-10-31):**
+Make direct `System.Web.Http.HttpServer` request/response throughput the primary
+baseline, with competitive modern-runtime performance and sustained thousands of
+successful requests/s as explicit goals. Measure Neo.Web overhead separately.
+The [bounded roadmap and runtime research](design/http-throughput-roadmap.md)
+prioritize an isolated primitive/load-generator baseline, profile-backed allocation
+and scheduling/I/O work, then cold-compilation continuity and coordinated compiler/GC
+budgets. Compare completed requests within stated latency/CPU/memory bounds; neither
+short sequential screens nor faster internal operations establish capacity.
+The author retains lazy JIT and concurrent services as promising for heavy loads,
+with execution continuity central; current lazy compilation still blocks the
+requesting execution path. Study CoreCLR, HotSpot and Go mechanisms before tuning.
+This is an author-directed HTTP workstream, not a GC-default promotion or a wholesale
+reordering of unrelated platform milestones.
+
 **Experimental Neo.Web follow-on (author direction, 2026-10-31):** Build on the
 committed builder/application/context foundation with structural generic handlers,
 cached registration-time binding, typed `HttpResult<T>` alternatives and separate
@@ -36,6 +51,12 @@ identifies forced native collection as the dominant cost in the earlier benchmar
 Matched opt-in pacing and layer screens are now recorded; default promotion still
 requires the existing broader collector qualification. Allocation/span validation,
 interpreter execution and JIT startup remain separate profiling targets.
+The [JIT startup follow-up](validation/neo-web-jit-layout-20261031/README.md)
+evaluates precomputed dense static-owner layouts during shared JIT/AOT lowering,
+preserving the Neo.Web native object byte for byte. No decisive startup gain was
+established, so the candidate remains unselected. Paired measurements separate
+preparation from runtime allocation costs;
+metadata selection and remaining backend work are still open.
 The author also directed a later review of System.Web.Http/Neo.Web responsibility
 boundaries (including System.Networking), primitives and higher abstractions.
 Keep .NET API ergonomics as the baseline with justified architectural adaptations.

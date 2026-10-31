@@ -1,0 +1,84 @@
+{
+  "scope": "Correctness smoke only; excluded from performance comparison.",
+  "cases": [
+    {
+      "mode": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/neo-web-jit-investigation/primitive-noargs/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "1000000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.DependencyInjection.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.DependencyInjection.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Localization.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Localization.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Logging.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Logging.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Configuration.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Configuration.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Configuration.Json.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/System.Data.PostgreSql.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-abort/validation7/bundle/lib/Neo.Web.dll"
+      ],
+      "readySeconds": 3.8064985,
+      "firstRequestSeconds": 0.1587303750000002,
+      "warmup": 0,
+      "requests": 3,
+      "elapsedSeconds": 0.5043111659999999,
+      "requestsPerSecond": 5.948708262390527,
+      "medianSeconds": 0.16672175000000067,
+      "p95Seconds": 0.17276783299999998,
+      "latenciesSeconds": [
+        0.16481145900000005,
+        0.16672175000000067,
+        0.17276783299999998
+      ]
+    },
+    {
+      "mode": "aot-stress",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-jit-investigation/primitive-noargs/app"
+      ],
+      "readySeconds": 0.3730063750000001,
+      "firstRequestSeconds": 0.03395275000000009,
+      "warmup": 0,
+      "requests": 3,
+      "elapsedSeconds": 0.10513041699999981,
+      "requestsPerSecond": 28.535984975689818,
+      "medianSeconds": 0.03539683300000007,
+      "p95Seconds": 0.03553570900000036,
+      "latenciesSeconds": [
+        0.03553570900000036,
+        0.03539683300000007,
+        0.03419024999999998
+      ]
+    }
+  ],
+  "passed": true
+}

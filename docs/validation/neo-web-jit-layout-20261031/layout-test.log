@@ -1,0 +1,8 @@
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `release` profile [optimized] target(s) in 48.27s
+     Running unittests src/lib.rs (target/release/deps/neoclr_codegen-982024ac869629b2)
+
+running 1 test
+test type_initialization::tests::storage_layout_keeps_field_and_initializer_owners_in_source_order ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 263 filtered out; finished in 0.04s
