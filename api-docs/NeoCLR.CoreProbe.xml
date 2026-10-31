@@ -2006,7 +2006,7 @@
     <member name="P:System.Web.Http.HttpHeader.Value"><summary>The stored header value.</summary></member>
     <member name="M:System.Web.Http.HttpResponse.#ctor(System.Int32,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Web.Http.HttpContent)"><summary>Creates a response without validating HTTP framing.</summary><param name="statusCode">Numeric status supplied by the handler; the socket parser admits final statuses 200–599.</param><param name="headers">Retained when content has no media type. Otherwise a new header list preserves other fields and replaces all Content-Type fields with the content metadata; the supplied list is not mutated.</param><param name="content">The retained content producer. Construction neither reads a stream nor copies the body. Keep borrowed memory stable until sending completes.</param><remarks>Framing and length are validated by the transport. Pass HttpMemoryContent, HttpStringContent or HttpStreamContent explicitly; no Sequence body conversion is performed.</remarks></member>
     <member name="P:System.Web.Http.HttpResponse.StatusCode"><summary>The response status as HttpStatusCode; unnamed numeric values remain representable.</summary></member>
-    <member name="P:System.Web.Http.HttpResponse.Headers"><summary>The response header sequence.</summary></member>
+    <member name="P:System.Web.Http.HttpResponse.Headers"><summary>The read-only response header collection; named lookup preserves repeated values.</summary></member>
     <member name="P:System.Web.Http.HttpResponse.Content"><summary>The response buffered content.</summary></member>
     <member name="M:System.Web.Http.HttpContent.CopyTo(System.IO.OutputStream)"><summary>Copies buffered or streaming content with no cancellation request.</summary><param name="destination">Borrowed output, never flushed or closed.</param><returns>Completion or a typed HTTP content error; output may be partial on failure.</returns></member>
     <member name="M:System.Web.Http.HttpContent.CopyTo(System.IO.OutputStream,System.Concurrency.CancellationToken)"><summary>Copies the body with bounded staging and backpressure.</summary><param name="destination">Borrowed output kept open through completion.</param><param name="cancellationToken">Cancellation propagates as a cancelled task, including for empty bodies.</param><returns>Completion, Content preserving a stream error, or InvalidRequest for a reused streaming body.</returns><remarks>Does not flush or close either stream or add HTTP framing. Arrays are written directly; other sequences and streams use at most 1024 staging bytes. Streaming content is one-shot once started, including after failure or cancellation. Known lengths reject early EOF and stop without overreading. Unknown incoming bodies end at EOF. Do not concurrently read, copy, upload or mutate the body. Disposed content returns Content(Closed). Pre-cancellation does not consume the body.</remarks></member>
@@ -4333,5 +4333,89 @@ A method remains in metadata; an omitted call evaluates neither its receiver nor
     <member name="P:System.Introspection.MethodInfo.FunctionType"><summary>Gets the structural function signature, or a function-constrained parameter for an unresolved whole-signature method.</summary><remarks>Development API. Closed materialization exposes ordinary parameter and result reflection.</remarks></member>
     <member name="P:System.Web.Http.HttpContext.RequestAborted"><summary>Gets the transport-owned request cancellation token.</summary><remarks>Monitoring starts on first access. Observed TCP EOF or error, explicit Close and server shutdown cancel it. Successful response completion stops monitoring without cancellation. Unread socket bytes delay EOF detection, including queued TLS records. This read-only development contract does not expose ASP.NET Core's token override.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.WaitForReadClosure(System.Concurrency.CancellationToken)"><summary>Waits for TCP receive EOF or a transport error without consuming bytes.</summary><param name="cancellationToken">Cancels only the observer after provider acknowledgement; preserves the socket.</param><returns>Ok on receive EOF, or SocketError on admission or transport failure. Cancellation cancels the task.</returns><remarks>One observer per socket, alongside ordinary send/receive. Shares the 64-operation budget. No implicit timeout; unread socket bytes delay EOF observation. Does not interpret TLS close_notify.</remarks></member>
+    <member name="M:System.Web.Http.HttpHeaderCollection.#ctor">
+      <summary>Creates an empty collection.</summary>
+    </member>
+    <member name="M:System.Web.Http.HttpHeaderCollection.#ctor(System.Collections.Sequence{System.Web.Http.HttpHeader})">
+      <summary>Copies fields in order. Subsequent changes to the source sequence do not affect this collection.
+Validation of outgoing field names, values and framing remains the transport's responsibility.</summary>
+    </member>
+    <member name="M:System.Web.Http.HttpHeaderCollection.Contains(System.String)">
+      <summary>Whether a field with this name exists. Invalid or absent names return false.
+Does not materialize entries or allocate a matching-value list.</summary>
+    </member>
+    <member name="M:System.Web.Http.HttpHeaderCollection.GetIterator">
+      <summary>Iterates field entries in their stored order.</summary>
+    </member>
+    <member name="M:System.Web.Http.HttpHeaderCollection.GetSingle(System.String)">
+      <summary>Returns a single raw value, None for an absent field, or Protocol for an invalid name or repeated field.
+An empty field value is Some(""). This does not allocate a matching-value list.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderCollection.Count">
+      <summary>Number of field entries, including repeated names.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderCollection.Item(System.Int32)">
+      <summary>Gets a field by position. An out-of-range index is a terminal failure.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderCollection.Item(System.String)">
+      <summary>Returns all matching values as an independent snapshot, in field order.
+Names use ASCII case-insensitive matching. Missing or invalid names return an empty sequence.
+Values are neither comma-split nor joined, including Set-Cookie fields.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.Accept">
+      <summary>The Accept field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.AcceptEncoding">
+      <summary>The AcceptEncoding field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.Authorization">
+      <summary>The Authorization field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.CacheControl">
+      <summary>The CacheControl field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.Connection">
+      <summary>The Connection field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.ContentEncoding">
+      <summary>The ContentEncoding field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.ContentLength">
+      <summary>The ContentLength field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.ContentType">
+      <summary>The ContentType field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.Cookie">
+      <summary>The Cookie field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.Expect">
+      <summary>The Expect field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.Host">
+      <summary>The Host field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.SetCookie">
+      <summary>The Set-Cookie field name. Repeated values must remain separate.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.TransferEncoding">
+      <summary>The TransferEncoding field name.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderNames.UserAgent">
+      <summary>The UserAgent field name.</summary>
+    </member>
+    <member name="T:System.Web.Http.HttpHeaderCollection">
+      <summary>Read-only HTTP fields in original order, preserving repeated names and unsplit values.
+Public construction snapshots its input. Message views preserve the message's retained storage.
+No mutation or synchronization is provided; use message WithHeader methods to derive messages.</summary>
+    </member>
+    <member name="T:System.Web.Http.HttpHeaderNames">
+      <summary>Common HTTP field names. Values are canonical lowercase strings; field lookup is ASCII case-insensitive.
+Custom field names remain supported as strings. Only this fixed catalog is interned.</summary>
+    </member>
+    <member name="P:System.Web.Http.HttpHeaderCollection.Empty">
+      <summary>A reusable read-only empty collection, cached within the runtime invocation.
+No mutable implementation is exposed. Public construction remains available for independent snapshots.</summary>
+    </member>
 </members>
 </doc>

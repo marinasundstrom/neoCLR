@@ -4,7 +4,7 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "DelegatingHandler", "HttpRequest", "HttpMethod", "HttpVersion", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
+    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "DelegatingHandler", "HttpRequest", "HttpMethod", "HttpVersion", "HttpResponse", "HttpContent", "HttpHeader", "HttpHeaderCollection", "HttpHeaderNames", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
     public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation";
     public static string? Type(TypeReference type) => RuntimeSignatures.IsCore(type.Scope) && !type.IsValueType && IsName(type.FullName) ? type.FullName : null;
@@ -93,6 +93,34 @@ static class HttpBindings
                 public string Value => default;
                 public static Collections.Sequence<string> FindValues(Collections.Sequence<HttpHeader> headers, string name) => default;
             }
+            public sealed class HttpHeaderCollection : Collections.Sequence<HttpHeader> {
+                public static HttpHeaderCollection Empty => default;
+                public HttpHeaderCollection() { }
+                public HttpHeaderCollection(Collections.Sequence<HttpHeader> headers) { }
+                public int Count => default;
+                public HttpHeader this[int index] => default;
+                public Collections.Sequence<string> this[string name] => default;
+                public Collections.Iterator<HttpHeader> GetIterator() => default;
+                public bool Contains(string name) => default;
+                public Result<Optional<string>, HttpError> GetSingle(string name) => default;
+                // MediaType and its accessor remain native-reference APIs.
+            }
+            public static class HttpHeaderNames {
+                public static string Host => default;
+                public static string Connection => default;
+                public static string ContentLength => default;
+                public static string TransferEncoding => default;
+                public static string Expect => default;
+                public static string ContentEncoding => default;
+                public static string ContentType => default;
+                public static string Accept => default;
+                public static string AcceptEncoding => default;
+                public static string Authorization => default;
+                public static string Cookie => default;
+                public static string UserAgent => default;
+                public static string CacheControl => default;
+                public static string SetCookie => default;
+            }
             public sealed class HttpMethod : EquatableTo<HttpMethod> {
                 public HttpMethod(string method) { }
                 public string Method => default;
@@ -144,7 +172,7 @@ static class HttpBindings
                 public static Result<HttpRequest, HttpError> Delete(Uri uri) => default;
                 public static Result<HttpRequest, HttpError> Head(Uri uri) => default;
                 public HttpContent Content => default;
-                public Collections.Sequence<HttpHeader> Headers => default;
+                public HttpHeaderCollection Headers => default;
                 public Collections.Sequence<string> GetHeaderValues(string name) => default;
                 public Result<HttpRequest, HttpError> WithHeader(string name, string value) => default;
                 public Result<HttpRequest, HttpError> WithDefaults(Collections.Sequence<HttpHeader> defaults) => default;
@@ -168,7 +196,7 @@ static class HttpBindings
                 public Result<PropagationUnit, HttpError> SetHeader(string name, string value) => default;
                 public HttpStatusCode StatusCode => default;
                 public bool IsSuccessStatusCode => default;
-                public Collections.Sequence<HttpHeader> Headers => default;
+                public HttpHeaderCollection Headers => default;
                 public Collections.Sequence<string> GetHeaderValues(string name) => default;
                 public HttpContent Content => default;
             }
@@ -316,7 +344,7 @@ static class HttpBindings
             ("HttpRequest", "FromIncoming") when library => ($"String,String,String,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpHeader", "FindValues") when library => ($"System.Collections.Sequence<{Prefix}HttpHeader>,String", "System.Collections.Sequence<String>", true),
             ("HttpRequest" or "HttpResponse", "GetHeaderValues") => ("String", "System.Collections.Sequence<String>", false),
-            ("HttpRequest", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
+            ("HttpRequest", "get_Headers") => ("", Prefix + "HttpHeaderCollection", false),
             ("HttpRequestDecoder", ".ctor") when library => ("", "void", false),
             ("HttpRequestDecoder", "get_Complete") when library => ("", "Boolean", false),
             ("HttpRequestDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
@@ -389,7 +417,7 @@ static class HttpBindings
             ("HttpResponse", ".ctor") => ($"{(definition.Parameters[0].ParameterType.FullName == Prefix + "HttpStatusCode" ? Prefix + "HttpStatusCode" : "Int32")},System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", "void", false),
             ("HttpResponse", "get_IsSuccessStatusCode") => ("", "Boolean", false),
             ("HttpResponse", "get_StatusCode") => ("", Prefix + "HttpStatusCode", false),
-            ("HttpResponse", "get_Headers") => ("", $"System.Collections.Sequence<{Prefix}HttpHeader>", false),
+            ("HttpResponse", "get_Headers") => ("", Prefix + "HttpHeaderCollection", false),
             ("HttpResponse", "get_Content") => ("", Prefix + "HttpContent", false),
             ("HttpContent", ".ctor") => (args.Length == 2 ? "System.Collections.Sequence<Byte>,String" : "System.Collections.Sequence<Byte>", "void", false),
             ("HttpContent", "get_Bytes") => ("", "System.Collections.Sequence<Byte>", false),

@@ -65,3 +65,17 @@ replaces matching fields without replacing the response or its content. Names ar
 HTTP tokens; prohibited controls return InvalidRequest without mutation. Response
 framing/content validation still happens on send. Neo.Web uses this to preserve
 response identity while configuring a 405 Allow header.
+
+### Header domain views (development)
+
+Requests and responses expose `HttpHeaderCollection`. Use
+`headers[HttpHeaderNames.ContentType]` for all raw values, `Contains(name)` for
+presence, and `GetSingle(name)` or `GetContentType()` for checked access.
+Missing names return an empty value sequence; repeated values remain separate.
+The existing canonical `HttpHeaderNames` catalog is now public.
+
+Parsed fields retain compact name/value storage. Named access avoids constructing
+`HttpHeader` entries; positional access and iteration project entries on demand.
+The view is read-only, and existing message mutation/ownership behavior remains.
+See the [header collection contract](/docs/http-headers.html) for exact errors,
+snapshot behavior and allocation tradeoffs.

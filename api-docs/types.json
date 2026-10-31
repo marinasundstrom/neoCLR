@@ -524,6 +524,8 @@
   "System.Web.Http.HttpError.Unsupported",
   "System.Web.Http.HttpHandler",
   "System.Web.Http.HttpHeader",
+  "System.Web.Http.HttpHeaderCollection",
+  "System.Web.Http.HttpHeaderNames",
   "System.Web.Http.HttpMemoryContent",
   "System.Web.Http.HttpMethod",
   "System.Web.Http.HttpRequest",

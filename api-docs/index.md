@@ -35,6 +35,7 @@ Media type structure, typed presets and Content-Type parsing are available in th
 | Logging | [Structured state, factories and providers](logging.md) · Neo.Logging / Neo.Logging.Abstractions |
 | Localization | [Catalogue loading and fallback](localization.md) · Neo.Localization / Neo.Localization.Abstractions |
 | Dates and globalization | [System.Time](xref:System.Time) · [System.Globalization](xref:System.Globalization) |
+| HTTP header views | [Header collection, names and safe lookup](http-headers.md) |
 | Experimental web hosting | [Neo.Web builders, context handlers and lifetime](neo-web.md) |
 | Networking and HTTP | [System.Networking](xref:System.Networking) · [System.Web.Http](xref:System.Web.Http) · [Sockets](sockets.md) · [HTTP server](http-server.md) · [Body streams](http-body-streams.md) · [Routes](routes.md) |
 | Cryptography | [Hashing and secure random bytes](cryptography.md) · System.Security.Cryptography |

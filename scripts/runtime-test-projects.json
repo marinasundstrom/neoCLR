@@ -23,6 +23,7 @@
   "globalization": "runtime/System.Runtime/test/GlobalizationTests/GlobalizationTests.rvnproj",
   "gzip": "runtime/System.Runtime/test/GZipTests/GZipTests.rvnproj",
   "http-content-copy": "runtime/System.Web/test/HttpContentCopyTests/HttpContentCopyTests.rvnproj",
+  "http-header-allocations": "runtime/System.Web/test/HttpHeaderAllocationTests/HttpHeaderAllocationTests.rvnproj",
   "http-header-values": "runtime/System.Web/test/HttpHeaderValuesTests/HttpHeaderValuesTests.rvnproj",
   "http-lifetime": "runtime/System.Web/test/HttpLifetimeTests/HttpLifetimeTests.rvnproj",
   "http-memory": "runtime/System.Web/test/HttpMemoryTests/HttpMemoryTests.rvnproj",

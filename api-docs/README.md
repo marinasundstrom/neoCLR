@@ -3184,3 +3184,16 @@ XML/Markdown remarks for exact boxed owned-record arguments; that documentation-
 refresh reuses the System.Runtime binary and records its source/provenance separately.
 The invocation guide retains the borrowed-view/coercion/ref-out exclusions. No new
 public API or signature is excluded from the renderer.
+
+## Header collection view (development, 2026-10-31)
+
+System.Web exposes HttpHeaderCollection and promotes the existing HttpHeaderNames
+catalog to public. Request/response Headers now return the collection. Both types
+and every public member are included in the unified native snapshot; the
+[manual contract](http-headers.md) covers ownership, positional projections,
+multiple-value snapshots and checked single-value/Content-Type lookup.
+The legacy aggregate bridge includes the collection and names, but omits
+HttpHeaderCollection.GetContentType because MediaType remains native-only there,
+as do the existing message/content media-type accessors. This is a legacy bridge
+coverage limit, not an omission from the on-site native API reference. No new
+native renderer exclusion is introduced. Rebuild System.Web and consumers together.

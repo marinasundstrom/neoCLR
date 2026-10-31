@@ -1,0 +1,7 @@
+PASS Typed results preserve content and exhaustively describe response alternatives
+PASS Builder snapshots options and transfers ownership once
+PASS Invalid options and ambiguous routes fail without registration
+PASS HTTP consumer covers routing scopes cancellation and joined shutdown
+PASS Middleware wraps routing and retains one scope through completion
+PASS Peer disconnect cancels the injected request token while normal completion does not
+Tests: 6, passed: 6, failed: 0, skipped: 0

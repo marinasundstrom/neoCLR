@@ -341,7 +341,7 @@ internal class HttpRequestDecoder {
         var length = 0
         var host = ""
         var hasLength = false
-        let headers = ArrayList<HttpHeader>()
+        let headers = HttpHeaderFields()
         while end + 1 < head.Count {
             if head[end] != 13 || head[end + 1] != 10 {
                 end += 1
@@ -451,7 +451,7 @@ internal class HttpRequestDecoder {
                         cursor += 1
                     }
                 }
-                headers.Add(HttpHeader(name, value))
+                headers.Add(name, value)
             }
             line += 1
             start = end + 2

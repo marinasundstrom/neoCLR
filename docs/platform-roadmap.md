@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**HTTP header domain views (author direction, 2026-10-31):** Expose friendly named
+lookup through HttpHeaderCollection while hiding allocation-oriented storage.
+Reuse the existing HttpHeaderNames catalog. Parsed name/value storage defers entry
+objects until positional access; see the [contract](../api-docs/http-headers.md) and
+[qualification](validation/http-header-collection-20261031/README.md). This bounded
+HTTP follow-up does not change the selected release JIT/collector direction.
+The author now directs separate client/server request and response surfaces as the
+next boundary task; the [migration plan](http-server-design.md#separate-client-and-server-message-surfaces-author-direction-2026-10-31)
+is recorded separately from the implemented header view.
+
 **HTTP throughput and execution continuity (author direction, 2026-10-31):**
 Make direct `System.Web.Http.HttpServer` request/response throughput the primary
 baseline, with competitive modern-runtime performance and sustained thousands of

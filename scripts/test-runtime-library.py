@@ -489,15 +489,19 @@ HTTP_METHOD_VALUES_NAMES = [
     'NeoClr.RuntimeTests.HTTP URI request factories support custom methods and empty content',
 ]
 HTTP_HEADER_VALUES_NAMES = [
+    'NeoClr.RuntimeTests.Empty header collections are reusable read only message inputs',
+    'NeoClr.RuntimeTests.HTTP header lookup preserves repeated values without splitting commas',
     'NeoClr.RuntimeTests.HTTP header lookup distinguishes empty values from absent fields',
     'NeoClr.RuntimeTests.HTTP header lookup rejects invalid names',
-    'NeoClr.RuntimeTests.HTTP header lookup preserves repeated values without splitting commas',
-    'NeoClr.RuntimeTests.HTTP request lookup exposes content headers without inventing provider headers',
     'NeoClr.RuntimeTests.HTTP header lookup snapshots remain independent of later additions',
-    'NeoClr.RuntimeTests.HTTP messages expose HTTP 1.1 and dispose owned content without reading',
+    'NeoClr.RuntimeTests.HTTP request lookup exposes content headers without inventing provider headers',
     'NeoClr.RuntimeTests.HTTP response constructors retain memory content and replace only content type metadata',
     'NeoClr.RuntimeTests.HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation',
     'NeoClr.RuntimeTests.HTTP response construction never reads or changes stream ownership',
+    'NeoClr.RuntimeTests.HTTP messages expose HTTP 1.1 and dispose owned content without reading',
+    'NeoClr.RuntimeTests.Header collections expose named snapshots and ordered fields',
+    'NeoClr.RuntimeTests.Single header access distinguishes absence empty duplicate and invalid names',
+    'NeoClr.RuntimeTests.Message header views retain source behavior and follow replacement on next access',
 ]
 HTTP_ROUTE_MATCHING_NAMES = [
     'NeoClr.RuntimeTests.Route matching preserves case segment and trailing-slash distinctions',
@@ -547,7 +551,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'configuration', 'logging', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'media-type-values', 'media-type-allocations', 'uri-path-allocations', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'configuration', 'logging', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-header-allocations', 'http-method-values', 'media-type-values', 'media-type-allocations', 'uri-path-allocations', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -555,7 +559,7 @@ def main():
     parser.add_argument('--jit-host', type=Path, help='Matching trusted native helper library for JIT')
     args = parser.parse_args()
     modes = args.mode or ['jit']
-    if args.suite and any(name in args.suite for name in ('record-allocations', 'media-type-allocations', 'uri-path-allocations')) and set(modes) != {'interpreter'}:
+    if args.suite and any(name in args.suite for name in ('record-allocations', 'media-type-allocations', 'uri-path-allocations', 'http-header-allocations')) and set(modes) != {'interpreter'}:
         parser.error('allocation suites require --mode interpreter; native/JIT GC counters are not bound')
     bundled_bin = args.bundle.resolve() / 'bin'
     if (bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')).is_file():
@@ -638,6 +642,7 @@ def main():
         ('media-type-values', 0, ''.join('PASS ' + n + '\n' for n in MEDIA_TYPE_VALUES_NAMES) + f'Tests: {len(MEDIA_TYPE_VALUES_NAMES)}, passed: {len(MEDIA_TYPE_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('media-type-allocations', 0, 'PASS NeoClr.RuntimeTests.Warm media type access performs no managed allocations\nPASS NeoClr.RuntimeTests.Raw media type validation performs no managed allocations\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),
         ('http-method-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_METHOD_VALUES_NAMES) + f'Tests: {len(HTTP_METHOD_VALUES_NAMES)}, passed: {len(HTTP_METHOD_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
+        ('http-header-allocations', 0, 'PASS Single header lookup and cached views allocate no managed objects\nPASS Parsed HTTP fields materialize entries only for positional access\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),
         ('http-header-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_HEADER_VALUES_NAMES) + f'Tests: {len(HTTP_HEADER_VALUES_NAMES)}, passed: {len(HTTP_HEADER_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-route-matching', 0, ''.join('PASS ' + n + '\n' for n in HTTP_ROUTE_MATCHING_NAMES) + f'Tests: {len(HTTP_ROUTE_MATCHING_NAMES)}, passed: {len(HTTP_ROUTE_MATCHING_NAMES)}, failed: 0, skipped: 0\n'),
         ('ip-address-values', 0, ''.join('PASS ' + n + '\n' for n in sorted('NeoClr.RuntimeTests.' + name for name in IP_ADDRESS_VALUES_NAMES)) + f'Tests: {len(IP_ADDRESS_VALUES_NAMES)}, passed: {len(IP_ADDRESS_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
@@ -651,7 +656,7 @@ def main():
     ]
     # Manual async entry points and intentional-failure contracts retain their
     # explicit registration/report order. All ordinary suites use discovery.
-    expected = [(name, code, output if name in ('memory-lifetimes', 'http-content-copy', 'discovery-contract', 'runner-contract')
+    expected = [(name, code, output if name in ('memory-lifetimes', 'http-content-copy', 'http-header-allocations', 'discovery-contract', 'runner-contract')
                  else discovery_order(output)) for name, code, output in expected]
     try:
         if 'native' not in modes:
@@ -668,7 +673,7 @@ def main():
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
         # Only explicitly qualified suites enter the default release gate.
         selected = [case for case in expected
-                    if (not args.suite and case[0] not in ('record-allocations', 'media-type-allocations', 'uri-path-allocations', 'native-pointers', 'native-buffers', 'native-callbacks')) or (args.suite and case[0] in args.suite)]
+                    if (not args.suite and case[0] not in ('record-allocations', 'media-type-allocations', 'uri-path-allocations', 'http-header-allocations', 'native-pointers', 'native-buffers', 'native-callbacks')) or (args.suite and case[0] in args.suite)]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')
@@ -703,7 +708,7 @@ def main():
                 fixture_environment['NeoClrNativeBufferImports'] = str(imports.resolve())
                 environment.update(fixture_environment)
                 report['nativeBufferFixtureSha256'] = sha(fixture)
-            if name not in ('runner-contract', 'memory-lifetimes', 'http-content-copy'):
+            if name not in ('runner-contract', 'memory-lifetimes', 'http-content-copy', 'http-header-allocations'):
                 started = time.perf_counter()
                 registry = DISCOVERY.discover(suite_project(name), bundle, out / (name + '-discovery'), fixture_environment)
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
@@ -793,7 +798,7 @@ def main():
                     raise RuntimeError('Raven did not report a valid project assembly')
                 shutil.copy2(paths[-1], build / 'app.dll')
                 report['phases'][-1].update(command=list(map(str,command)), assemblySha256=sha(build / 'app.dll'))
-            if name not in ('runner-contract', 'memory-lifetimes', 'http-content-copy'):
+            if name not in ('runner-contract', 'memory-lifetimes', 'http-content-copy', 'http-header-allocations'):
                 started = time.perf_counter()
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='registration-verification', elapsedSeconds=round(time.perf_counter() - started, 6)))

@@ -5,17 +5,17 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "96f47b6abd947850b37e1d429fc450133ef3dafbb8127a752881dca48969d4af",
+  "sha256": "2b179506b0edd7fcac269d25a81a061da0f0df1c7cd6ef3e530b5f6ed2c4557d",
   "librarySourceRevision": "6228d0be91564fc7b320d8e5bf0b7c750ce23be6",
   "compilerRevision": "4f7619fd8-working",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "9340a899bb9bc0f123cb403e92dcfa654c4927194552fb6745fb8fc0ed7935a9"
+    "sha256": "001d028c0bee048d2daa40275293d714918f142a3ad42fe18324ff23dccf50eb"
   },
-  "rendererRevision": "813dad20c",
+  "rendererRevision": "977eda4d5247df44a5078bc45c12c12783b2f9a2",
   "libraryArtifacts": {
-    "System.Web.dll": "926a884f641bc7445e760b65cdbc6a10b214679871868bb7104f50fc173f933f",
-    "Neo.Web.dll": "31790765d162dd07afa22f1a4c4196d6cb6f1499ce55346db078816835eb20fc",
+    "System.Web.dll": "4b5e7a60c2180f671f3c5e297d7e4f45a130b4b73c9c044a309355ad2967ee22",
+    "Neo.Web.dll": "d8d00b3f5fcd2593826b0316d496d327a92b11713bb8685f0341319c273002af",
     "Neo.DependencyInjection.Abstractions.dll": "3428f0dc49cad595e33d95a7fd4c8df583be697c3dc107261aab4056b3c492a6",
     "Neo.DependencyInjection.dll": "3af89fec3a573938624f38f5a2a356bc5c56b618c8b3cd5deefad107e5fee7fc",
     "Neo.Logging.Abstractions.dll": "742e2fdb3adf0f046e37ad1afa086818c75025a1754e16fd24821879eebbf7fd",
@@ -33,7 +33,7 @@
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "f64e2d2bce6661687da43414020fffdc7cba469e85d3f280e624ccaf1704013c",
-    "restored-xml-comments.json": "66a4cb236c672b36d0da3a335a631019b3fa5f8eec26560cb729c77b8a923e93"
+    "restored-xml-comments.json": "6b537f2d9dac34ada60ebf897e02dbc633adfc423ca1af776a3fa5ea1ce9e1c1"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

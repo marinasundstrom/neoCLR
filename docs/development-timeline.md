@@ -24456,3 +24456,46 @@ candidate as an experiment, and moved release selection toward matched lazy/eage
 and owned/external paced synchronous-host qualification. Default promotion and
 release preparation are a subsequent implementation slice, not implied by the
 original exploratory numbers or this documentation commit.
+
+
+## 2026-10-31 — HTTP header domain views and delayed materialization
+
+The author questioned exposing ArrayList<HttpHeader>, proposing collection behavior
+such as `headers[HttpHeaders.ContentType]` and safe accessors. The assistant found
+Sequence<HttpHeader> as the current message surface and proposed a read-only domain
+view retaining existing ownership semantics. The author emphasized hiding
+performance-oriented implementation details and avoiding premature HttpHeader
+materialization. The assistant extended the slice to compact parsed name/value
+storage with entry objects projected on positional access, and direct named lookup.
+
+The author then corrected the proposed naming class: an existing header-name API
+should be reused. HttpHeaderNames was internal; the assistant made that catalog
+public and removed the redundant HttpHeaders class. The resulting expression is
+`headers[HttpHeaderNames.ContentType]`. This follows the author's existing guidance
+that useful domain values belong at the consumer boundary without forcing wrappers
+onto internal hot paths. Strings are still decoded during parsing; lazy decoding,
+general mutable collection behavior and further storage strategies remain open.
+Validation and implementation outcomes are recorded in the
+[header collection qualification](validation/http-header-collection-20261031/README.md).
+
+The author also asked whether a header-values class already existed. The assistant
+confirmed that lookup returns Sequence<string>, and proposed a future zero/one/many
+HttpHeaderValues view while distinguishing repeated field values from comma-separated
+items. No separate values type was implemented in this slice.
+
+The author subsequently directed separate HTTP client and server request/response
+surfaces because the existing types mix both sets of cases. The assistant agreed,
+identified the four opposite incoming/outgoing lifecycles, and proposed sharing
+names/grammar/media primitives without requiring identical storage or mutation APIs.
+The current header change is completed first; the
+[boundary plan](http-server-design.md#separate-client-and-server-message-surfaces-author-direction-2026-10-31)
+records the next implementation task and open naming/migration decisions. The split
+has not been implemented in this commit.
+
+The author selected HttpRequestMessage/HttpResponseMessage for HttpClient and
+HttpServerRequest/HttpServerResponse for HttpServer, and proposed read-only
+HttpHeaderCollection plus MutableHttpHeaderCollection interfaces. The author also
+requested a shared `HttpHeaderCollection.Empty`. The assistant adopted the selected
+names for the next split and added Empty to the current provisional concrete
+collection. Interface conversion and the message-type migration remain subsequent
+work, not completed API claims.

@@ -28,43 +28,15 @@ public class HttpHeader {
 
     internal static func FindValues(headers: Sequence<HttpHeader>, name: string) -> Sequence<string> {
         let values = ArrayList<string>()
-        let query = HttpText.Encode(name)
-        if query.Count == 0 {
+        if !HttpHeaderCollection.ValidName(name) {
             return values
         }
         var index = 0
-        while index < query.Count {
-            let value = query[index]
-            if !((value >= 48 && value <= 57) || (value >= 65 && value <= 90) ||
-                (value >= 97 && value <= 122) || value == 33 || value == 35 || value == 36 ||
-                value == 37 || value == 38 || value == 39 || value == 42 || value == 43 ||
-                value == 45 || value == 46 || value == 94 || value == 95 || value == 96 ||
-                value == 124 || value == 126) {
-                return values
+        while index < headers.Count {
+            if HttpHeaderCollection.Matches(HttpHeaderCollection.NameAt(headers, index), name) {
+                values.Add(HttpHeaderCollection.ValueAt(headers, index))
             }
             index += 1
-        }
-        for header in headers {
-            let candidate = HttpText.Encode(header.Name)
-            if candidate.Count == query.Count {
-                var matches = true
-                index = 0
-                while index < query.Count && matches {
-                    var left = (int)candidate[index]
-                    var right = (int)query[index]
-                    if left >= 65 && left <= 90 {
-                        left += 32
-                    }
-                    if right >= 65 && right <= 90 {
-                        right += 32
-                    }
-                    matches = left == right
-                    index += 1
-                }
-                if matches {
-                    values.Add(header.Value)
-                }
-            }
         }
         return values
     }
@@ -130,7 +102,18 @@ public class HttpResponse : Disposable {
     /// Whether the response status is in the successful 200–299 range.
     val IsSuccessStatusCode: bool => storedStatusCode >= 200 && storedStatusCode <= 299
     private var storedHeaders: Sequence<HttpHeader>
-    val Headers: Sequence<HttpHeader> => storedHeaders
+    /// Read-only header view with case-insensitive named lookup. Created lazily and retained.
+    /// Existing retained input sequences remain visible; named lookup returns independent snapshots.
+    val Headers: HttpHeaderCollection {
+        get {
+            if storedHeaders is HttpHeaderCollection cached {
+                return cached
+            }
+            let collection = HttpHeaderCollection.Retain(storedHeaders)
+            storedHeaders = collection
+            return collection
+        }
+    }
 
     /// Gets all matching field values in order using ASCII case-insensitive names.
     /// Returns an empty snapshot for absent or invalid names; does not split or join values.
@@ -145,12 +128,11 @@ public class HttpResponse : Disposable {
         var text: string? = null
         var index = 0
         while index < storedHeaders.Count {
-            let header = storedHeaders[index]
-            if String.CompareOrdinalIgnoreCase(header.Name, "content-type") == 0 {
+            if HttpHeaderCollection.Matches(HttpHeaderCollection.NameAt(storedHeaders, index), "content-type") {
                 if text is string {
                     return Failure(HttpError.Protocol("Duplicate Content-Type"))
                 }
-                text = header.Value
+                text = HttpHeaderCollection.ValueAt(storedHeaders, index)
             }
             index += 1
         }
@@ -275,7 +257,7 @@ internal class HttpResponseDecoder {
     private var ended: bool = false
     private var head: ArrayList<byte> = ArrayList<byte>()
     private var body: ArrayList<byte> = ArrayList<byte>()
-    private var headers: ArrayList<HttpHeader> = ArrayList<HttpHeader>()
+    private var headers: HttpHeaderFields = HttpHeaderFields()
     private var expected: int = -1
     private var statusCode: int = 0
     private var reasonEnd: int = 13
@@ -353,7 +335,7 @@ internal class HttpResponseDecoder {
                     return Failure(HttpError.LimitExceeded("Informational response limit exceeded"))
                 }
                 head = ArrayList<byte>()
-                headers = ArrayList<HttpHeader>()
+                headers = HttpHeaderFields()
                 statusCode = 0
             } else {
                 expected = length
@@ -528,7 +510,7 @@ internal class HttpResponseDecoder {
                     }
                     length = number
                 }
-                headers.Add(HttpHeader(name, value))
+                headers.Add(name, value)
             }
             line += 1
             start = end + 2
@@ -911,7 +893,18 @@ public class HttpRequest : Disposable {
     /// Request body content. Incoming nonempty bodies are consumed asynchronously on demand.
     val Content: HttpContent => storedContent
     private var storedHeaders: Sequence<HttpHeader>
-    val Headers: Sequence<HttpHeader> => storedHeaders
+    /// Read-only header view with case-insensitive named lookup. Created lazily and retained.
+    /// Existing retained input sequences remain visible; named lookup returns independent snapshots.
+    val Headers: HttpHeaderCollection {
+        get {
+            if storedHeaders is HttpHeaderCollection cached {
+                return cached
+            }
+            let collection = HttpHeaderCollection.Retain(storedHeaders)
+            storedHeaders = collection
+            return collection
+        }
+    }
 
     /// Gets all matching field values in order using ASCII case-insensitive names.
     /// Returns an empty snapshot for absent or invalid names; does not split or join values.
@@ -926,12 +919,11 @@ public class HttpRequest : Disposable {
         var text: string? = null
         var index = 0
         while index < storedHeaders.Count {
-            let header = storedHeaders[index]
-            if String.CompareOrdinalIgnoreCase(header.Name, "content-type") == 0 {
+            if HttpHeaderCollection.Matches(HttpHeaderCollection.NameAt(storedHeaders, index), "content-type") {
                 if text is string {
                     return Failure(HttpError.Protocol("Duplicate Content-Type"))
                 }
-                text = header.Value
+                text = HttpHeaderCollection.ValueAt(storedHeaders, index)
             }
             index += 1
         }
@@ -990,10 +982,12 @@ public class HttpRequest : Disposable {
         request.storedHeaders = headers
         request.storedMethod = method
         request.storedContent = HttpMemoryContent(HttpText.Snapshot(body))
-        for header in headers {
-            if header.Name == "content-type" {
-                request.storedContent = HttpMemoryContent(HttpText.Snapshot(body), header.Value)
+        var index = 0
+        while index < headers.Count {
+            if HttpHeaderCollection.NameAt(headers, index) == "content-type" {
+                request.storedContent = HttpMemoryContent(HttpText.Snapshot(body), HttpHeaderCollection.ValueAt(headers, index))
             }
+            index += 1
         }
         return Ok(request)
     }

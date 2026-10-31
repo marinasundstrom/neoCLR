@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
+- Expose read-only HttpHeaderCollection on request/response Headers and publish the
+  existing HttpHeaderNames catalog. Add reusable Empty, multiple-value lookup, Contains, checked
+  GetSingle and typed GetContentType. Parsers retain compact name/value strings;
+  named access avoids eager HttpHeader objects and temporary name encodings.
+  Positional access/iteration projects entries on demand. Existing input aliases,
+  message mutation and lookup snapshots remain supported; rebuild System.Web
+  consumers for the changed Headers return type. Update WebDemo, tests and API docs.
+
 - Investigate Neo.Web JIT startup and steady execution with matched hosts. Retain
   a static-layout candidate and its code-equivalence tests as an unselected
   experiment: repeated trials did not establish a decisive startup gain.

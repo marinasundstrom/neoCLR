@@ -1,0 +1,10 @@
+{
+  "compilerRevision": "813dad20c",
+  "rendererRevision": "977eda4d5247df44a5078bc45c12c12783b2f9a2",
+  "artifacts": {
+    "target/release/neoclr": "5be73280f599186f92a1d10ad7475c3bb4e7e30582a2428896d7a94cddb6b8d4",
+    "target/release/neoclr-codegen": "69967678f6c6e55c0548507d0d2b7e1c153a3bc0cb45431daf92bc2fa3ff94a4",
+    "target/http-header-collection/inputs7/bundle/sdk/tools/rvnc/rvnc.dll": "cc19c56d15c6ea3692e641551d4e0a3708ce853e5e57433d30bd7b0d2983030a",
+    "/Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net10.0/RavenDoc.dll": "4dae6850858ae16bdf13a132ce12032698b31ef81512dc2100f6eab1c447459f"
+  }
+}

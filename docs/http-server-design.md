@@ -553,3 +553,42 @@ replacement. [Ownership tests and allocation evidence](../benchmarks/http-server
 record interpreter/JIT/AOT coverage, default-budget interpreter failures reproduced
 on baseline, and the longer correctness-fixture budget. Allocation savings are
 measured separately from sustained throughput.
+
+## Separate client and server message surfaces (author direction, 2026-10-31)
+
+During the header-collection slice the author identified that HttpRequest and
+HttpResponse now mix client and server cases, and directed separate API surfaces,
+representations and implementations. This is the next boundary-design task, not
+implemented by the header collection change.
+
+The assistant proposes four lifecycle-specific contracts: outgoing client request,
+incoming client response, incoming server request, and outgoing server response.
+The client surface needs destination/defaults/handler-pipeline and response-consumption
+ownership. The server surface needs accepted-request lifetime, request-abort binding,
+response configuration and commitment rules. Names and namespace placement remain
+open; do not lock them in through internal carrier classes.
+
+.NET already distinguishes HttpClient message types from the request/response
+surfaces on [ASP.NET Core HttpContext](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/use-http-context?view=aspnetcore-10.0).
+Use that separation as the ergonomic baseline, without copying storage or forcing
+shared inheritance. Keep HTTP names, media types, grammar and wire primitives
+shared where their contracts agree. Distinct incoming read-only header views and
+outgoing writable surfaces may share storage machinery without exposing identical
+mutation APIs. The planned HttpHeaderValues discussion belongs at this boundary too.
+
+The first implementation slice should inventory current public members by lifecycle,
+define an explicit migration map, and adapt HttpClient and HttpServer/Neo.Web together.
+Validate body ownership, cancellation, header replacement, response commitment and
+real HTTP in interpreter/JIT/AOT. Re-measure primitive-server allocation/throughput
+before claiming the split improves performance. Benefits are clearer contracts and
+room for specialized representations; costs include migration and more public types.
+
+The author then selected the names: client `HttpClient`, `HttpRequestMessage`,
+`HttpResponseMessage`; server `HttpServer`, `HttpServerRequest`,
+`HttpServerResponse`. Use these in the migration plan. The author also proposed
+`HttpHeaderCollection` as a read-only interface and
+`MutableHttpHeaderCollection : HttpHeaderCollection` for writable surfaces.
+Implementations can remain internal, with `HttpHeaderCollection.Empty` exposing a
+shared immutable empty view. The current slice adds Empty to the provisional
+concrete collection; the interface conversion belongs with the message split so
+construction and mutation contracts migrate together.

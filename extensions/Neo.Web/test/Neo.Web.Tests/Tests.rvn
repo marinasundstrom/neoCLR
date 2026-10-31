@@ -2,6 +2,7 @@ module NeoClr.WebTests
 
 import System.*
 import System.Collections.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.*
 import System.Concurrency.Tasks.*
@@ -12,6 +13,26 @@ import Neo.Web.*
 import Neo.Web.HttpContext
 import NeoClr.Testing.*
 import System.Web.Http.*
+
+func CheckParsedHeaderView(headers: HttpHeaderCollection) -> Result<unit, TestFailure> {
+    let missing = "x-absent-for-allocation-test"
+    let host = HttpHeaderNames.Host
+    _ = headers.Contains(host)
+    var valid = true
+    var index = 0
+    while index < 32 {
+        valid = valid && !headers.Contains(missing)
+        valid = valid && (headers.GetSingle(missing) is Ok(None))
+        _ = headers.Contains(host)
+        index += 1
+    }
+    _ = Assert.True(valid, "Parsed lookup")?
+    if headers.Count > 0 {
+        let entry = headers[0]
+        _ = Assert.Equal(entry.Value, headers[entry.Name][0])?
+    }
+    return Assert.True(true, "Parsed collection contract")
+}
 
 public class Counts {
     var Created = 0
@@ -110,6 +131,7 @@ class Handlers {
         if !Object.ReferenceEquals(request, context.Request) || !Object.ReferenceEquals(response, context.Response) {
             Panic("Framework parameter identity differs from context")
         }
+        _ = CheckParsedHeaderView(request.Headers)!
         let value = await Task.Run(() => id)
         if probe.Disposed { Panic("Injected scope ended before await") }
         if context.RouteValues.Get("id")! != id.ToString() { Panic("Context and route binding disagree") }
@@ -178,6 +200,7 @@ async func CheckStatus(client: HttpClient, url: string, status: int) -> Task<Res
     let response = await client.Get(url)
     let Ok(value) = response else { return Failure(TestFailure("HTTP request failed: " + url, "response", "failure")) }
     use owned = value
+    _ = CheckParsedHeaderView(value.Headers)?
     return Assert.Equal(status, (int)value.StatusCode)
 }
 

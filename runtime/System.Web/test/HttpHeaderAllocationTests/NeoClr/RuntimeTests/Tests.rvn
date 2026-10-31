@@ -1,0 +1,81 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Optional.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+[Test]
+func `Single header lookup and cached views allocate no managed objects`() -> Result<unit, TestFailure> {
+    let headers = HttpHeaderCollection([HttpHeader("X-Test", "value"), HttpHeader("Other", "ignored")])
+    let response = HttpResponse(200, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let name = "x-TEST"
+    let missing = "missing"
+    _ = response.Headers.GetSingle(name)
+    let empty = HttpHeaderCollection.Empty
+    let before = System.Runtime.GC.AllocatedObjectCount
+    var index = 0
+    var correct = true
+    while index < 128 {
+        correct = correct && Object.ReferenceEquals(empty, HttpHeaderCollection.Empty)
+        correct = correct && response.Headers.Contains(name) && !response.Headers.Contains(missing)
+        correct = correct && (response.Headers.GetSingle(name) is Ok(Some(_)))
+        correct = correct && (response.Headers.GetSingle(missing) is Ok(None))
+        index += 1
+    }
+    let allocated = System.Runtime.GC.AllocatedObjectCount - before
+    _ = Assert.True(correct, "Lookup results")?
+    return Assert.True(allocated == 0, String.Concat("Managed allocations: ", allocated.ToString()))
+}
+
+func CheckParsed(headers: HttpHeaderCollection) -> Result<unit, TestFailure> {
+    let missing = "x-absent-for-allocation-test"
+    let host = HttpHeaderNames.Host
+    _ = headers.Contains(host)
+    let before = System.Runtime.GC.AllocatedObjectCount
+    var valid = true
+    var index = 0
+    while index < 32 {
+        valid = valid && !headers.Contains(missing)
+        valid = valid && (headers.GetSingle(missing) is Ok(None))
+        _ = headers.Contains(host)
+        index += 1
+    }
+    let allocated = System.Runtime.GC.AllocatedObjectCount - before
+    _ = Assert.True(valid, "Parsed lookup")?
+    _ = Assert.True(allocated == 0, String.Concat("Parsed lookup allocations: ", allocated.ToString()))?
+    _ = Assert.True(headers.Count > 0, "Parsed fields exist")?
+    let entryBefore = System.Runtime.GC.AllocatedObjectCount
+    let entry = headers[0]
+    let entryAllocations = System.Runtime.GC.AllocatedObjectCount - entryBefore
+    _ = Assert.True(entryAllocations == 1, "Positional access materializes one header")?
+    return Assert.Equal(entry.Value, headers[entry.Name][0])
+}
+
+class HeaderProbe {
+    var Check: Result<unit, TestFailure> = Ok(())
+    func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        Check = CheckParsed(request.Headers)
+        let response = HttpResponse(200, HttpHeaderCollection(), HttpStringContent("headers"))
+        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+    }
+}
+
+[Test]
+async func `Parsed HTTP fields materialize entries only for positional access`() -> Task<Result<unit, TestFailure>> {
+    let server = HttpServer.Listen("127.0.0.1", 0, 8)!
+    let probe = HeaderProbe()
+    let serving = server.Serve(probe.Respond)
+    use client = HttpClient()
+    let received = await client.Get("http://127.0.0.1:" + server.GetLocalPort()!.ToString() + "/")
+    server.Close()
+    _ = await serving
+    _ = probe.Check?
+    let Ok(response) = received else {
+        return Assert.True(false, "HTTP response received")
+    }
+    use owned = response
+    return CheckParsed(response.Headers)
+}

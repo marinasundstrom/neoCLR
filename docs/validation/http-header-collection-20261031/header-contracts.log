@@ -1,0 +1,46 @@
+http-header-values (interpreter):
+PASS NeoClr.RuntimeTests.Empty header collections are reusable read only message inputs
+PASS NeoClr.RuntimeTests.HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation
+PASS NeoClr.RuntimeTests.HTTP header lookup distinguishes empty values from absent fields
+PASS NeoClr.RuntimeTests.HTTP header lookup preserves repeated values without splitting commas
+PASS NeoClr.RuntimeTests.HTTP header lookup rejects invalid names
+PASS NeoClr.RuntimeTests.HTTP header lookup snapshots remain independent of later additions
+PASS NeoClr.RuntimeTests.HTTP messages expose HTTP 1.1 and dispose owned content without reading
+PASS NeoClr.RuntimeTests.HTTP request lookup exposes content headers without inventing provider headers
+PASS NeoClr.RuntimeTests.HTTP response construction never reads or changes stream ownership
+PASS NeoClr.RuntimeTests.HTTP response constructors retain memory content and replace only content type metadata
+PASS NeoClr.RuntimeTests.Header collections expose named snapshots and ordered fields
+PASS NeoClr.RuntimeTests.Message header views retain source behavior and follow replacement on next access
+PASS NeoClr.RuntimeTests.Single header access distinguishes absence empty duplicate and invalid names
+Tests: 13, passed: 13, failed: 0, skipped: 0
+http-header-values (native):
+PASS NeoClr.RuntimeTests.Empty header collections are reusable read only message inputs
+PASS NeoClr.RuntimeTests.HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation
+PASS NeoClr.RuntimeTests.HTTP header lookup distinguishes empty values from absent fields
+PASS NeoClr.RuntimeTests.HTTP header lookup preserves repeated values without splitting commas
+PASS NeoClr.RuntimeTests.HTTP header lookup rejects invalid names
+PASS NeoClr.RuntimeTests.HTTP header lookup snapshots remain independent of later additions
+PASS NeoClr.RuntimeTests.HTTP messages expose HTTP 1.1 and dispose owned content without reading
+PASS NeoClr.RuntimeTests.HTTP request lookup exposes content headers without inventing provider headers
+PASS NeoClr.RuntimeTests.HTTP response construction never reads or changes stream ownership
+PASS NeoClr.RuntimeTests.HTTP response constructors retain memory content and replace only content type metadata
+PASS NeoClr.RuntimeTests.Header collections expose named snapshots and ordered fields
+PASS NeoClr.RuntimeTests.Message header views retain source behavior and follow replacement on next access
+PASS NeoClr.RuntimeTests.Single header access distinguishes absence empty duplicate and invalid names
+Tests: 13, passed: 13, failed: 0, skipped: 0
+http-header-values (jit):
+PASS NeoClr.RuntimeTests.Empty header collections are reusable read only message inputs
+PASS NeoClr.RuntimeTests.HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation
+PASS NeoClr.RuntimeTests.HTTP header lookup distinguishes empty values from absent fields
+PASS NeoClr.RuntimeTests.HTTP header lookup preserves repeated values without splitting commas
+PASS NeoClr.RuntimeTests.HTTP header lookup rejects invalid names
+PASS NeoClr.RuntimeTests.HTTP header lookup snapshots remain independent of later additions
+PASS NeoClr.RuntimeTests.HTTP messages expose HTTP 1.1 and dispose owned content without reading
+PASS NeoClr.RuntimeTests.HTTP request lookup exposes content headers without inventing provider headers
+PASS NeoClr.RuntimeTests.HTTP response construction never reads or changes stream ownership
+PASS NeoClr.RuntimeTests.HTTP response constructors retain memory content and replace only content type metadata
+PASS NeoClr.RuntimeTests.Header collections expose named snapshots and ordered fields
+PASS NeoClr.RuntimeTests.Message header views retain source behavior and follow replacement on next access
+PASS NeoClr.RuntimeTests.Single header access distinguishes absence empty duplicate and invalid names
+Tests: 13, passed: 13, failed: 0, skipped: 0
+Runtime library tests: PASS

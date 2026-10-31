@@ -1,0 +1,71 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+
+// Parser-owned alternating names and values. Validation remains in the decoders.
+// Entry objects are projected only for positional access or iteration.
+internal class HttpHeaderFields : Sequence<HttpHeader> {
+    private val fields = ArrayList<string>()
+
+    val Count: int => fields.Count / 2
+
+    func Add(name: string, value: string) {
+        fields.Add(name)
+        fields.Add(value)
+    }
+
+    func NameAt(index: int) -> string {
+        CheckIndex(index)
+        return fields[index * 2]
+    }
+
+    func ValueAt(index: int) -> string {
+        CheckIndex(index)
+        return fields[index * 2 + 1]
+    }
+
+    private func CheckIndex(index: int) {
+        if index < 0 || index >= Count {
+            Panic("Header index out of range")
+        }
+    }
+
+    val self[index: int]: HttpHeader => HttpHeader(NameAt(index), ValueAt(index))
+
+    func GetIterator() -> Iterator<HttpHeader> => HttpHeaderFieldIterator(self)
+}
+
+internal class HttpHeaderFieldIterator : Iterator<HttpHeader> {
+    private val fields: HttpHeaderFields
+    private var index = -1
+    private var current: HttpHeader? = null
+
+    init(fields: HttpHeaderFields) {
+        self.fields = fields
+    }
+
+    func MoveNext() -> bool {
+        current = null
+        if index < fields.Count {
+            index += 1
+        }
+        return index < fields.Count
+    }
+
+    val Current: HttpHeader {
+        get {
+            if current is HttpHeader cached {
+                return cached
+            }
+            let value = fields[index]
+            current = value
+            return value
+        }
+    }
+
+    func Dispose() {
+        index = fields.Count
+        current = null
+    }
+}

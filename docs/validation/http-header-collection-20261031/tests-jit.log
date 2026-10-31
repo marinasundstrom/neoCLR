@@ -1,0 +1,12 @@
+PASS Typed results preserve content and exhaustively describe response alternatives
+PASS Builder snapshots options and transfers ownership once
+PASS Invalid options and ambiguous routes fail without registration
+PASS HTTP consumer covers routing scopes cancellation and joined shutdown
+PASS Middleware wraps routing and retains one scope through completion
+PASS Peer disconnect cancels the injected request token while normal completion does not
+Tests: 6, passed: 6, failed: 0, skipped: 0
+warning: DAM2001: Neo.DependencyInjection.DefaultServiceCollection.Build instruction 37 -> Neo.DependencyInjection.ConstructorPlan.Prepare parameter 0: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2001: Neo.DependencyInjection.ServiceCollectionExtensions.AddScoped instruction 9 -> Neo.DependencyInjection.ServiceCollection.Add parameter 1: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2001: Neo.Web.JsonBodyPlan.Create instruction 131 -> System.Introspection.TypeInfo.GetProperties receiver: cannot prove dynamic member requirement 512; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2001: Neo.Web.JsonBodyPlan.Create instruction 89 -> System.Introspection.TypeInfo.GetConstructors receiver: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention

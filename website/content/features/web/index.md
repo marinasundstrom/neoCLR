@@ -308,3 +308,16 @@ The executable fixtures in
 [media type validation](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/media-types)
 exercise typed content against independent HTTP peers. Browse the
 [HTTP API reference](/docs/api/System/Web/Http/index.html) for type/member contracts.
+
+## Header collections (development)
+
+`request.Headers` and `response.Headers` expose `HttpHeaderCollection`. Read all
+values with `headers[HttpHeaderNames.ContentType]`, check presence with `Contains`,
+or use `GetSingle` and `GetContentType` to distinguish missing fields from invalid
+or duplicate values. The existing canonical name catalog is public.
+
+The read-only domain view hides compact parsed name/value storage. Named lookup
+reads it directly, while positional access or iteration materializes `HttpHeader`
+entries on demand. Message mutation and ownership contracts remain unchanged.
+WebDemo's cache middleware uses this API for its credential and cache-control checks.
+See the [API contract](/docs/http-headers.html) for errors, snapshots and allocation tradeoffs.

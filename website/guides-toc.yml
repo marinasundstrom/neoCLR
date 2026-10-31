@@ -182,6 +182,8 @@
       href: docs/stack-trace.md
     - name: "Sequence access"
       href: docs/sequence-access.md
+    - name: HTTP header collections
+      href: docs/http-headers.md
     - name: HTTP body streams
       href: docs/http-body-streams.md
     - name: HTTP server lifetime and concurrency

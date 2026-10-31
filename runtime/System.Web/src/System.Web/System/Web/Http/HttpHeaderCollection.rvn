@@ -1,0 +1,174 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+import System.Optional.*
+import System.Result.*
+
+/// Read-only HTTP fields in original order, preserving repeated names and unsplit values.
+/// Public construction snapshots its input. Message views preserve the message's retained storage.
+/// No mutation or synchronization is provided; use message WithHeader methods to derive messages.
+public class HttpHeaderCollection : Sequence<HttpHeader> {
+    private val entries: Sequence<HttpHeader>
+    private static var empty: HttpHeaderCollection?
+
+    /// A reusable read-only empty collection, cached within the runtime invocation.
+    /// No mutable implementation is exposed. Public construction remains available for independent snapshots.
+    static val Empty: HttpHeaderCollection {
+        get {
+            if empty is HttpHeaderCollection cached {
+                return cached
+            }
+            let value = HttpHeaderCollection()
+            empty = value
+            return value
+        }
+    }
+
+    /// Creates an empty collection.
+    init() {
+        entries = Array<HttpHeader>.Empty
+    }
+
+    /// Copies fields in order. Subsequent changes to the source sequence do not affect this collection.
+    /// Validation of outgoing field names, values and framing remains the transport's responsibility.
+    init(headers: Sequence<HttpHeader>) {
+        entries = ArrayList<HttpHeader>(headers)
+    }
+
+    private init(headers: Sequence<HttpHeader>, retain: bool) {
+        entries = headers
+    }
+
+    internal static func Retain(headers: Sequence<HttpHeader>) -> HttpHeaderCollection {
+        if headers is HttpHeaderCollection collection {
+            return collection
+        }
+        return HttpHeaderCollection(headers, true)
+    }
+
+    /// Number of field entries, including repeated names.
+    val Count: int => entries.Count
+
+    /// Gets a field by position. An out-of-range index is a terminal failure.
+    val self[index: int]: HttpHeader => entries[index]
+
+    /// Returns all matching values as an independent snapshot, in field order.
+    /// Names use ASCII case-insensitive matching. Missing or invalid names return an empty sequence.
+    /// Values are neither comma-split nor joined, including Set-Cookie fields.
+    val self[name: string]: Sequence<string> => HttpHeader.FindValues(entries, name)
+
+    /// Iterates field entries in their stored order.
+    func GetIterator() -> Iterator<HttpHeader> => entries.GetIterator()
+
+    /// Whether a field with this name exists. Invalid or absent names return false.
+    /// Does not materialize entries or allocate a matching-value list.
+    func Contains(name: string) -> bool {
+        if !ValidName(name) {
+            return false
+        }
+        var index = 0
+        while index < entries.Count {
+            if Matches(NameAt(entries, index), name) {
+                return true
+            }
+            index += 1
+        }
+        return false
+    }
+
+    /// Returns a single raw value, None for an absent field, or Protocol for an invalid name or repeated field.
+    /// An empty field value is Some(""). This does not allocate a matching-value list.
+    func GetSingle(name: string) -> Result<Optional<string>, HttpError> {
+        if !ValidName(name) {
+            return Failure(HttpError.Protocol("Invalid header name"))
+        }
+        var result: Optional<string> = None()
+        var index = 0
+        while index < entries.Count {
+            if Matches(NameAt(entries, index), name) {
+                if result is Some(_) {
+                    return Failure(HttpError.Protocol("Expected a single header value"))
+                }
+                result = Some(ValueAt(entries, index))
+            }
+            index += 1
+        }
+        return Ok(result)
+    }
+
+    /// Parses a single Content-Type. Returns None if absent, or Protocol for malformed or duplicate fields.
+    /// Does not consume content, infer a media type, or perform negotiation.
+    func GetContentType() -> Result<Optional<MediaType>, HttpError> {
+        let value = GetSingle(HttpHeaderNames.ContentType)?
+        if value is Some(let text) {
+            let parsed = MediaType.Parse(text)?
+            return Ok(Some(parsed))
+        }
+        return Ok(None())
+    }
+
+    internal static func NameAt(headers: Sequence<HttpHeader>, index: int) -> string {
+        if headers is HttpHeaderFields fields {
+            return fields.NameAt(index)
+        }
+        if headers is HttpHeaderCollection collection {
+            return NameAt(collection.entries, index)
+        }
+        return headers[index].Name
+    }
+
+    internal static func ValueAt(headers: Sequence<HttpHeader>, index: int) -> string {
+        if headers is HttpHeaderFields fields {
+            return fields.ValueAt(index)
+        }
+        if headers is HttpHeaderCollection collection {
+            return ValueAt(collection.entries, index)
+        }
+        return headers[index].Value
+    }
+
+    internal static func ValidName(name: string) -> bool {
+        let bytes = name.Utf8Bytes
+        if bytes.Length == 0 {
+            return false
+        }
+        var index = 0
+        while index < bytes.Length {
+            let value = bytes[index]
+            if !((value >= 48 && value <= 57) || (value >= 65 && value <= 90) ||
+                (value >= 97 && value <= 122) || value == 33 || value == 35 || value == 36 ||
+                value == 37 || value == 38 || value == 39 || value == 42 || value == 43 ||
+                value == 45 || value == 46 || value == 94 || value == 95 || value == 96 ||
+                value == 124 || value == 126) {
+                return false
+            }
+            index += 1
+        }
+        return true
+    }
+
+    internal static func Matches(candidate: string, name: string) -> bool {
+        let left = candidate.Utf8Bytes
+        let right = name.Utf8Bytes
+        if left.Length != right.Length {
+            return false
+        }
+        var index = 0
+        while index < left.Length {
+            var a = (int)left[index]
+            var b = (int)right[index]
+            if a >= 65 && a <= 90 {
+                a += 32
+            }
+            if b >= 65 && b <= 90 {
+                b += 32
+            }
+            if a != b {
+                return false
+            }
+            index += 1
+        }
+        return true
+    }
+}

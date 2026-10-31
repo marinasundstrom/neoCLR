@@ -36,8 +36,8 @@ public class DemoResponseCacheMiddleware : Middleware {
     async func InvokeAsync(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
         let request = context.Request
         if request.Method.Method != "GET" || request.Target != "/cached" ||
-            request.GetHeaderValues("Authorization").Count != 0 || request.GetHeaderValues("Cookie").Count != 0 ||
-            request.GetHeaderValues("Cache-Control").Count != 0 || request.GetHeaderValues("Pragma").Count != 0 {
+            request.Headers.Contains(System.Web.Http.HttpHeaderNames.Authorization) || request.Headers.Contains(System.Web.Http.HttpHeaderNames.Cookie) ||
+            request.Headers.Contains(System.Web.Http.HttpHeaderNames.CacheControl) || request.Headers.Contains("Pragma") {
             return await next(context)
         }
         if cache.TryGet() is string text {
@@ -49,8 +49,8 @@ public class DemoResponseCacheMiddleware : Middleware {
         let result = await next(context)
         if result is Ok(_) && (int)context.Response.StatusCode == 200 && context.Response.Content.IsBuffered &&
             context.Response.Content.Length <= 4096 && context.Response.Headers.Count == 1 &&
-            context.Response.GetHeaderValues("Content-Type").Count == 1 &&
-            context.Response.GetHeaderValues("Content-Type")[0] == "text/plain; charset=utf-8" {
+            context.Response.Headers[System.Web.Http.HttpHeaderNames.ContentType].Count == 1 &&
+            context.Response.Headers[System.Web.Http.HttpHeaderNames.ContentType][0] == "text/plain; charset=utf-8" {
             let buffered = await System.Web.Http.HttpStringContent.Read(context.Response.Content)
             if let Ok(text) = buffered {
                 cache.Store(text)

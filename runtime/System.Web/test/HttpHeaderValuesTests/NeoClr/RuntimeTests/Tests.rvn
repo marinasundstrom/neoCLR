@@ -190,3 +190,90 @@ func `HTTP messages expose HTTP 1.1 and dispose owned content without reading`()
     _ = Assert.Equal(0, borrowed.Reads)?
     return Assert.Equal(0, borrowed.Closes)
 }
+
+[Test]
+func `Header collections expose named snapshots and ordered fields`() -> Result<unit, TestFailure> {
+    let source = ArrayList<HttpHeader>()
+    source.Add(HttpHeader("Set-Cookie", "a=1; Expires=Wed, 21 Oct 2030 07:28:00 GMT"))
+    source.Add(HttpHeader("set-cookie", "b=2"))
+    let headers = HttpHeaderCollection(source)
+    source.Add(HttpHeader("SET-COOKIE", "c=3"))
+    _ = Assert.Equal(2, headers.Count)?
+    let values = headers[HttpHeaderNames.SetCookie]
+    _ = Assert.Equal(2, values.Count)?
+    _ = Assert.Equal(source[0].Value, values[0])?
+    _ = Assert.Equal("b=2", values[1])?
+    _ = Assert.Equal(0, headers["missing"].Count)?
+    _ = Assert.Equal(0, headers["bad name"].Count)?
+    var count = 0
+    for header in headers {
+        _ = Assert.Equal(source[count].Value, header.Value)?
+        count += 1
+    }
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Single header access distinguishes absence empty duplicate and invalid names`() -> Result<unit, TestFailure> {
+    let headers = HttpHeaderCollection([
+        HttpHeader("X-Empty", ""),
+        HttpHeader("Content-Type", "text/plain; charset=utf-8"),
+        HttpHeader("Set-Cookie", "a=1"),
+        HttpHeader("set-cookie", "b=2")
+    ])
+    _ = Assert.True(headers.GetSingle("missing") is Ok(None), "Absent field")?
+    let Ok(Some(empty)) = headers.GetSingle("x-EMPTY") else {
+        return Assert.True(false, "Empty value is present")
+    }
+    _ = Assert.Equal("", empty)?
+    _ = Assert.True(headers.GetSingle(HttpHeaderNames.SetCookie) is Failure(_), "Duplicates rejected")?
+    for name in ["", "x empty", "x:\r\n", "X-İ"] {
+        _ = Assert.True(headers.GetSingle(name) is Failure(_), "Invalid name rejected")?
+    }
+    let Ok(Some(mediaType)) = headers.GetContentType() else {
+        return Assert.True(false, "Parse content type")
+    }
+    _ = Assert.Equal("text", mediaType.Type)?
+    _ = Assert.Equal("plain", mediaType.SubType)?
+    _ = Assert.True(HttpHeaderCollection().GetContentType() is Ok(None), "Absent type")?
+    let malformed = HttpHeaderCollection([HttpHeader("Content-Type", "bad")])
+    _ = Assert.True(malformed.GetContentType() is Failure(_), "Malformed type")?
+    let duplicate = HttpHeaderCollection([HttpHeader("Content-Type", "text/plain"), HttpHeader("content-type", "text/plain")])
+    return Assert.True(duplicate.GetContentType() is Failure(_), "Duplicate type")
+}
+
+[Test]
+func `Message header views retain source behavior and follow replacement on next access`() -> Result<unit, TestFailure> {
+    let source = ArrayList<HttpHeader>()
+    source.Add(HttpHeader("X-Test", "one"))
+    let response = HttpResponse(200, source, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let view = response.Headers
+    _ = Assert.True(Object.ReferenceEquals(view, response.Headers), "View cached")?
+    source.Add(HttpHeader("x-test", "two"))
+    _ = Assert.Equal(2, view["X-Test"].Count)?
+    _ = Assert.True(response.SetHeader("x-test", "replacement") is Ok(_), "Replace field")?
+    _ = Assert.Equal(2, view["x-test"].Count)?
+    _ = Assert.Equal("replacement", response.Headers["X-Test"][0])?
+    let Ok(request) = HttpRequest.Post("http://example.test/", HttpStringContent("hello")) else {
+        return Assert.True(false, "Construct request")
+    }
+    _ = Assert.Equal("text/plain; charset=utf-8", request.Headers[HttpHeaderNames.ContentType][0])?
+    let Ok(copy) = request.WithHeader("X-Test", "new") else {
+        return Assert.True(false, "Derive request")
+    }
+    _ = Assert.Equal(0, request.Headers["x-test"].Count)?
+    return Assert.Equal("new", copy.Headers["x-test"][0])
+}
+
+[Test]
+func `Empty header collections are reusable read only message inputs`() -> Result<unit, TestFailure> {
+    let empty = HttpHeaderCollection.Empty
+    _ = Assert.True(Object.ReferenceEquals(empty, HttpHeaderCollection.Empty), "Empty view reused")?
+    _ = Assert.Equal(0, empty.Count)?
+    _ = Assert.True(!empty.Contains(HttpHeaderNames.ContentType), "No fields")?
+    _ = Assert.True(empty.GetSingle(HttpHeaderNames.ContentType) is Ok(None), "No single value")?
+    let response = HttpResponse(200, empty, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    _ = Assert.True(response.SetHeader("X-Test", "one") is Ok(_), "Message derives storage")?
+    _ = Assert.Equal("one", response.Headers["X-Test"][0])?
+    return Assert.Equal(0, HttpHeaderCollection.Empty.Count)
+}

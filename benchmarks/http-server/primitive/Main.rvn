@@ -1,10 +1,9 @@
 import System.*
-import System.Collections.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("42"))
+    let response = HttpResponse(200, HttpHeaderCollection.Empty, HttpStringContent("42"))
     return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
 }
 

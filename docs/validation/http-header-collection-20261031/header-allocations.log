@@ -1,0 +1,5 @@
+http-header-allocations (interpreter):
+PASS Single header lookup and cached views allocate no managed objects
+PASS Parsed HTTP fields materialize entries only for positional access
+Tests: 2, passed: 2, failed: 0, skipped: 0
+Runtime library tests: PASS

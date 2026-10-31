@@ -5,7 +5,9 @@ import System.*
 // Fixed, bounded catalog. Interning only on a cache miss makes competing first
 // readers publish the same immutable string. Later reads need no intern lookup.
 // Storage and the intern pool belong to the runtime invocation, not the process.
-internal static class HttpHeaderNames {
+/// Common HTTP field names. Values are canonical lowercase strings; field lookup is ASCII case-insensitive.
+/// Custom field names remain supported as strings. Only this fixed catalog is interned.
+public static class HttpHeaderNames {
     private static var host: string?
     private static var connection: string?
     private static var contentLength: string?
@@ -20,6 +22,7 @@ internal static class HttpHeaderNames {
     private static var userAgent: string?
     private static var cacheControl: string?
 
+    /// The Host field name.
     static val Host: string {
         get {
             if host is string cached {
@@ -31,6 +34,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The Connection field name.
     static val Connection: string {
         get {
             if connection is string cached {
@@ -42,6 +46,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The ContentLength field name.
     static val ContentLength: string {
         get {
             if contentLength is string cached {
@@ -53,6 +58,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The TransferEncoding field name.
     static val TransferEncoding: string {
         get {
             if transferEncoding is string cached {
@@ -64,6 +70,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The Expect field name.
     static val Expect: string {
         get {
             if expect is string cached {
@@ -75,6 +82,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The ContentEncoding field name.
     static val ContentEncoding: string {
         get {
             if contentEncoding is string cached {
@@ -86,6 +94,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The ContentType field name.
     static val ContentType: string {
         get {
             if contentType is string cached {
@@ -97,6 +106,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The Accept field name.
     static val Accept: string {
         get {
             if accept is string cached {
@@ -108,6 +118,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The AcceptEncoding field name.
     static val AcceptEncoding: string {
         get {
             if acceptEncoding is string cached {
@@ -119,6 +130,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The Authorization field name.
     static val Authorization: string {
         get {
             if authorization is string cached {
@@ -130,6 +142,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The Cookie field name.
     static val Cookie: string {
         get {
             if cookie is string cached {
@@ -141,6 +154,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The UserAgent field name.
     static val UserAgent: string {
         get {
             if userAgent is string cached {
@@ -152,6 +166,7 @@ internal static class HttpHeaderNames {
         }
     }
 
+    /// The CacheControl field name.
     static val CacheControl: string {
         get {
             if cacheControl is string cached {
@@ -162,4 +177,6 @@ internal static class HttpHeaderNames {
             return value
         }
     }
+    /// The Set-Cookie field name. Repeated values must remain separate.
+    static val SetCookie: string => "set-cookie"
 }
