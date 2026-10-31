@@ -114,6 +114,47 @@ class ProjectRetentionTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Expected one reflection root'):
                 self.resolve([self.entry], types)
 
+    def test_attribute_only_type_retention_does_not_grant_activation(self):
+        entries = [dict(name='Example.Handler', retain=['customAttributes'])]
+        policy = self.resolve(entries, [dict(name='handler', origin=dict(name='Example.Handler'))])
+        root = policy['types'][0]
+        self.assertTrue(root.pop('customAttributes'))
+        root.pop('definition')
+        self.assertTrue(all(flag is False for flag in root.values()))
+        self.assertEqual(policy['methodTypes'], [])
+
+    def test_version_two_module_selection_is_explicit_and_validated(self):
+        module = dict(assembly='Logic', name='Example.Web', retain=['customAttributes'])
+        policy = dict(schemaVersion=2, types=[self.entry], modules=[module])
+        self.file.write_text(json.dumps(policy))
+        self.assertEqual(builder.project_retention(self.project)[1], [self.entry, module])
+        for modules in ([module, module], [dict(module, retain=['constructors'])],
+                        [dict(module, assembly='')], [dict(module, extra=True)]):
+            self.file.write_text(json.dumps(dict(policy, modules=modules)))
+            with self.assertRaises(ValueError):
+                builder.project_retention(self.project)
+
+    def test_module_attributes_resolve_assembly_and_exact_declaration_scope(self):
+        assembly = self.root / 'App.dll'
+        library = self.root / 'Logic.dll'
+        def run(command):
+            owners = [] if command[2] == assembly else [dict(name='Logic', full_name='Logic,1',
+                declaration_modules=dict(names=['Example.Web', 'Example.Web.Child']))]
+            command[-1].write_text(json.dumps(dict(name='fixture', revision=1, types=[], assemblies=owners)))
+        entry = dict(assembly='Logic', name='Example.Web', retain=['customAttributes'])
+        path = builder.resolve_project_retention('runtime', assembly, [entry], run,
+                                                [library], runner.reflection_roots)
+        policy = json.loads(path.read_text())
+        self.assertEqual(policy['types'], [])
+        self.assertEqual(policy['methodTypes'], [])
+        self.assertEqual(policy['moduleCatalogs'], ['Logic,1'])
+        self.assertEqual(policy['moduleFunctions'], [dict(assembly='Logic,1', name='Example.Web', customAttributes=True)])
+        for invalid in (dict(entry, name='Example'), dict(entry, assembly='Missing')):
+            with self.assertRaisesRegex(ValueError, 'Expected one declared module'):
+                builder.resolve_project_retention('runtime', assembly, [invalid], run, [library], runner.reflection_roots)
+        with self.assertRaisesRegex(ValueError, 'Expected one declared module'):
+            builder.resolve_project_retention('runtime', assembly, [entry], run, [library, library], runner.reflection_roots)
+
 
 if __name__ == '__main__':
     unittest.main()

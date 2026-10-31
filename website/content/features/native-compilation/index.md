@@ -264,3 +264,9 @@ shared heap, with participant root publication and coordinated GC. Optimized/UBS
 tests cover four active participants, disjoint graph mutation and isolated faults.
 Allocation/helpers remain serialized; shared async HTTP and throughput qualification
 remain open. [Development evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-worker-pool/README.md#concurrent-compiled-shared-heap--2026-10-23).
+
+Development retention also supports `customAttributes` for handler types. Version 2
+adds exact declared-module selectors for function and parameter annotations, including
+referenced handler libraries. Neo.Web's sample includes this policy; missing metadata
+remains an explicit failure. See the [project retention contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-retention.md)
+for the schema and capability boundaries.

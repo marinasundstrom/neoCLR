@@ -29,6 +29,11 @@ Routes support literal segments and named captures. Literal routes win over
 capture routes; ambiguous registrations fail. Invalid targets return 400, missing
 paths 404, and unsupported methods 405 with an Allow header. Named string/int parameters bind from route captures; remaining service parameters
 resolve from the request scope. Invalid integer text returns 400 before invocation.
+`[FromRoute(Name: "name")]` selects a differently named capture; `[FromServices]`
+explicitly selects a scoped dependency, overriding route-name inference. Binding
+attributes and signatures are inspected once when the endpoint is registered.
+Conflicting sources or missing capture names reject registration. Each request
+still supplies fresh argument values and resolves its own services.
 
 Await RunAsync for the application lifetime. Stop closes connections and waits,
 through that task, for started handlers to settle. Dispose the application only
@@ -76,7 +81,7 @@ WebDemo combines `Use(LogRequest)` with `UseMiddleware<MaintenanceMiddleware>()`
 The latter receives Configuration through constructor injection; setting
 `Maintenance` to `true` produces a 503 response. Its project retention file keeps
 the constructor available in native/JIT builds. Endpoint query/body binding,
-`FromBody`/`FromService` and other ambiguity-resolving attributes remain planned.
+`FromBody`/`FromServices` and other ambiguity-resolving attributes remain planned.
 
 `Use` and `UseMiddleware` return `Result<WebApplication, WebError>` with the same
 application on success. Chaining is optional; WebDemo keeps route declarations

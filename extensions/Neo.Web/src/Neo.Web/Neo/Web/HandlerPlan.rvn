@@ -33,9 +33,7 @@ internal class HandlerPlan {
         self.resultKind = resultKind
     }
 
-    static func Create(pattern: string, handler: Object, method: MethodInfo) -> Result<HandlerPlan, WebError> {
-        let parsed = RoutePattern.Parse(pattern)
-        if let Failure(error) = parsed { return Failure(WebError.Routing(error)) }
+    static func Create(pattern: RoutePattern, handler: Object, method: MethodInfo) -> Result<HandlerPlan, WebError> {
         if method.ContainsGenericParameters {
             return Failure(WebError.InvalidOptions("Handler must have a closed signature"))
         }
@@ -45,29 +43,57 @@ internal class HandlerPlan {
         else if !result.Equals(typeof(HttpResult<string>)) {
             return Failure(WebError.InvalidOptions("Handler must return HttpResult<string> or Task<HttpResult<string>>"))
         }
-        let names = parsed!.GetParameterNames()
+        let names = pattern.GetParameterNames()
         let bindings = ArrayList<HandlerParameter>()
         for parameter in method.GetParameters() {
             let type = parameter.ParameterType
             if parameter.IsOut || parameter.IsOutWhenTrue || parameter.IsReadOnly || type.IsByRef || type.ContainsGenericParameters {
                 return Failure(WebError.InvalidOptions("Handler parameters must be closed values without ref/out contracts"))
             }
+            // Source attributes are registration inputs, never request-time reflection.
+            var source = 0
+            var name = parameter.Name
+            for attribute in parameter.GetCustomAttributesData() {
+                var selected = 0
+                if attribute.AttributeType.Equals(typeof(FromRouteAttribute)) { selected = 1 }
+                else if attribute.AttributeType.Equals(typeof(FromServicesAttribute)) { selected = 2 }
+                if selected != 0 {
+                    if source != 0 {
+                        return Failure(WebError.InvalidOptions("Conflicting binding sources: " + parameter.Name))
+                    }
+                    source = selected
+                    if selected == 1 {
+                        for argument in attribute.GetNamedArguments() {
+                            if argument.MemberName == "Name" {
+                                if argument.TypedValue.Value is string explicitName {
+                                    name = explicitName
+                                } else if argument.TypedValue.Value is not null {
+                                    return Failure(WebError.InvalidOptions("Invalid FromRoute name: " + parameter.Name))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             var binding = 0
-            if type.Equals(typeof(HttpContext)) { binding = 1 }
+            if source == 0 && type.Equals(typeof(HttpContext)) { binding = 1 }
             else {
                 var route = false
-                for name in names {
-                    if name == parameter.Name { route = true }
+                for capture in names {
+                    if capture == name { route = true }
                 }
-                if route {
+                if source == 1 && !route {
+                    return Failure(WebError.InvalidOptions("Missing route capture for parameter: " + parameter.Name))
+                }
+                if source != 2 && route {
                     if type.Equals(typeof(string)) { binding = 2 }
                     else if type.Equals(typeof(int)) { binding = 3 }
-                    else { return Failure(WebError.InvalidOptions("Route parameters support string and int")) }
-                } else if type.Equals(typeof(string)) || type.IsValueType || type.IsFunctionType || type.IsPointer {
+                    else { return Failure(WebError.InvalidOptions("Route parameter must be string or int: " + parameter.Name)) }
+                } else if source == 0 && type.Equals(typeof(string)) || type.IsValueType || type.IsFunctionType || type.IsPointer {
                     return Failure(WebError.InvalidOptions("Unbound handler parameter: " + parameter.Name))
                 }
             }
-            bindings.Add(HandlerParameter(binding, parameter.Name, type))
+            bindings.Add(HandlerParameter(binding, name, type))
         }
         return Ok(HandlerPlan(handler, bindings, kind))
     }

@@ -24253,3 +24253,58 @@ argument values and scoped services remain request-owned. Binding attributes are
 inputs to that plan, not metadata to inspect again on every request.
 
 The author also simplified the middleware parameter spelling to `T: Middleware`; the implementation and current API documentation adopt that name.
+
+
+### First descriptor/binding implementation (2026-10-31)
+
+After committing typed middleware (`8ba1d1655`, Raven `813dad20c`), the assistant
+continued the authorized descriptor slice. Inspection established that HandlerPlan
+already cached signature decisions, while checked dynamic invocation and route
+scanning remained request costs. The bounded change shares one parsed route
+between binding and the endpoint descriptor and adds explicit FromRoute/FromService
+selection at registration. The sample demonstrates imported annotated functions;
+framework tests cover aliases, conflicting sources, string services and independent
+request arguments. Framework tests pass 5/5, sample logic tests 4/4 and independent HTTP checks
+12/12 in each execution mode. Module parameter reflection and native attribute
+retention gaps were fixed; [evidence](validation/neo-web-descriptors-20261031/README.md)
+records the initial failures and final qualification. No throughput gain is claimed.
+
+The assistant chose the ASP.NET Core-style nullable Name property for FromRoute,
+using Raven named attribute arguments, and retained the author's singular
+FromService spelling. Query/body inference and prepared invocation/indexed lookup
+remain subsequent work, with current costs and primitive gaps recorded explicitly.
+
+The author clarified that FromRoute, FromQuery, FromBody and FromService are explicit
+overrides when heuristics cannot choose the intended source. The assistant retained
+inference for ordinary sample service parameters, kept FromRoute for the external
+name alias, and tested FromService where a string dependency conflicts with a route
+capture. ASP.NET Core's plural FromServices spelling was noted; Neo.Web retains the
+author's singular spelling. Query/body implementations remain open.
+
+The author then changed the chosen spelling to FromServices and pointed to the
+service-provider probing interface used by ASP.NET Core. The assistant confirmed
+IServiceProviderIsService.IsService(Type): it probes registration without activation
+while building the endpoint, then resolves from request services during execution.
+The maintained API and implementation now use FromServices; the earlier singular
+choice is retained above as conversation history.
+
+The author clarified that ASP.NET Core is a reference rather than a requirement to
+copy its design: neoCLR is being built from scratch and may choose better-fitting
+contracts. The assistant distinguished the useful nonactivating service-availability
+capability from the particular .NET interface shape; no copy of that interface was
+introduced. FromServices remains the selected spelling. Future alternatives should
+state concrete benefits, costs and validation rather than assume divergence is better.
+
+The author selected DI support as the next slice. The assistant will finish and
+commit the qualified descriptor/attribute foundation, then focus on nonactivating
+availability checks, registration-time service inference and request-scope resolution.
+Query/body policy expansion and invocation-performance work are not the next priority.
+
+The author included HttpContext, HttpRequest, HttpResponse and CancellationToken in
+the next binding slice, with request-cancellation semantics rather than application
+shutdown alone. The assistant will inspect and improve HttpServer's request lifecycle,
+keep request/response identities shared with the pipeline, and bind the resulting
+request-abort token. The author emphasized that Neo.Web and System.Web.Http should
+influence each other's evolution; the assistant identified transport-owned abort
+notification as a concrete example. These are next-slice directions, not completed
+capabilities of the descriptor/attribute commit.

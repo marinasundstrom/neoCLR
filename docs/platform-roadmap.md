@@ -19,7 +19,12 @@ covers the frame-accounting follow-up. The typed middleware slice adds
 DI registration and lazy request-scope activation. Both return the application on
 success; Map* keeps its current contract. The next endpoint ergonomics work is
 recorded in the [binding review](design/neo-web.md#endpoint-binding-and-ambiguity-2026-10-31).
-Middleware and constrained-call qualification is recorded in the
+The first descriptor follow-up shares parsed routes with cached binding plans and
+adds explicit FromRoute/FromServices overrides; query/body inference and prepared
+invocation remain subsequent bounded work. The author selected DI support as the
+next slice: nonactivating service availability and registration-time inference.
+[Descriptor qualification](validation/neo-web-descriptors-20261031/README.md) covers
+the binding metadata/runtime foundation. Middleware and constrained-call qualification is recorded in the
 [focused evidence](validation/neo-web-middleware-20261031/README.md).
 This author-directed task does not permanently reprioritize the roadmap.
 

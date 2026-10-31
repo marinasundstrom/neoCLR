@@ -16,9 +16,9 @@ import Neo.Web.HttpContext
 public class WebApplication : Disposable {
     private var middleware = ArrayList<WebMiddleware>()
     private var pipeline: WebRequestPipeline? = null
-    private var endpoints = ArrayList<WebEndpoint>()
+    private var endpoints = ArrayList<EndpointDescriptor>()
     private val emptyRoute: RouteMatch
-    private var terminal: WebEndpoint? = null
+    private var terminal: EndpointDescriptor? = null
     private val validator: RoutePattern
     private val ownedLogging: LoggerFactory
     private val logger: Logger
@@ -74,7 +74,7 @@ public class WebApplication : Disposable {
     /// Only one terminal handler is allowed. Malformed targets and method mismatches retain 400/405.
     func Run(handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError> {
         if started || disposed || terminal is not null { return Failure(WebError.InvalidState) }
-        terminal = WebEndpoint(null, validator, "/", handler)
+        terminal = EndpointDescriptor(null, validator, "/", handler)
         return Ok(())
     }
 
@@ -83,14 +83,18 @@ public class WebApplication : Disposable {
         if started || disposed { return Failure(WebError.InvalidState) }
         let parsed = RoutePattern.Parse(pattern)
         if let Failure(patternError) = parsed { return Failure(WebError.Routing(patternError)) }
-        let endpoint = WebEndpoint(method, parsed!, pattern, handler)
+        return Register(EndpointDescriptor(method, parsed!, pattern, handler))
+    }
+
+    private func Register(endpoint: EndpointDescriptor) -> Result<unit, WebError> {
+        let method = endpoint.Method
         for existing in endpoints {
             var sameMethod = existing.Method is null && method is null
             if existing.Method is HttpMethod previous && method is HttpMethod current {
                 sameMethod = previous.Equals(current)
             }
             if sameMethod && existing.Priority == endpoint.Priority && existing.Pattern.Overlaps(endpoint.Pattern) {
-                return Failure(WebError.Routing("Ambiguous route: " + pattern))
+                return Failure(WebError.Routing("Ambiguous route: " + endpoint.Source))
             }
         }
         endpoints.Add(endpoint)
@@ -130,18 +134,20 @@ public class WebApplication : Disposable {
     /// Registers a GET function value. Reflection and binding planning happen once at registration.
     /// Binds HttpContext, named string/int route parameters and request-scoped services.
     func MapGet<T: func>(pattern: string, handler: T) -> Result<unit, WebError> {
-        return Map("GET", pattern, handler)
+        return Map(HttpMethod.Get, pattern, handler)
     }
 
     /// Registers a POST function value with the same binding and typed-result contract as MapGet.
     func MapPost<T: func>(pattern: string, handler: T) -> Result<unit, WebError> {
-        return Map("POST", pattern, handler)
+        return Map(HttpMethod.Post, pattern, handler)
     }
 
-    private func Map<T: func>(method: string, pattern: string, handler: T) -> Result<unit, WebError> {
+    private func Map<T: func>(method: HttpMethod, pattern: string, handler: T) -> Result<unit, WebError> {
         if started || disposed { return Failure(WebError.InvalidState) }
-        let plan = HandlerPlan.Create(pattern, handler, handler.Function)?
-        return MapContext(method, pattern, plan.Execute)
+        let parsed = RoutePattern.Parse(pattern)
+        if let Failure(error) = parsed { return Failure(WebError.Routing(error)) }
+        let plan = HandlerPlan.Create(parsed!, handler, handler.Function)?
+        return Register(EndpointDescriptor(method, parsed!, pattern, plan.Execute))
     }
 
     /// Gets the listener's assigned port while running, including when configured with port zero.
@@ -208,7 +214,7 @@ public class WebApplication : Disposable {
             context.RespondText(400, "Bad request")
             return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
         }
-        var selected: WebEndpoint? = null
+        var selected: EndpointDescriptor? = null
         var captured: RouteMatch? = null
         let allowed = ArrayList<string>()
         for endpoint in endpoints {
@@ -225,7 +231,7 @@ public class WebApplication : Disposable {
                 }
                 if matchesMethod {
                     var choose = true
-                    if selected is WebEndpoint previous {
+                    if selected is EndpointDescriptor previous {
                         choose = endpoint.Priority > previous.Priority ||
                             endpoint.Priority == previous.Priority && previous.Method is null && endpoint.Method is not null
                     }
@@ -236,14 +242,14 @@ public class WebApplication : Disposable {
                 }
             }
         }
-        if selected is WebEndpoint chosen {
+        if selected is EndpointDescriptor chosen {
             if captured is RouteMatch route {
                 context.SetRouteValues(route)
                 return chosen.Handler(context)
             }
         }
         if allowed.Count == 0 {
-            if terminal is WebEndpoint fallback {
+            if terminal is EndpointDescriptor fallback {
                 return fallback.Handler(context)
             }
             context.RespondText(404, "Not found")
@@ -292,7 +298,7 @@ public class WebApplication : Disposable {
         if disposed { return }
         if running { Panic("Stop and await RunAsync before disposing WebApplication") }
         disposed = true
-        endpoints = ArrayList<WebEndpoint>()
+        endpoints = ArrayList<EndpointDescriptor>()
         terminal = null
         middleware = ArrayList<WebMiddleware>()
         pipeline = null
@@ -301,32 +307,6 @@ public class WebApplication : Disposable {
         Configuration.Dispose()
         stopping.Dispose()
         server = null
-    }
-}
-
-internal class WebEndpoint {
-    val Method: HttpMethod?
-    val Pattern: RoutePattern
-    val Priority: int
-    val Handler: (HttpContext) -> Task<Result<unit, WebError>>
-
-    init(method: HttpMethod?, pattern: RoutePattern, source: string,
-        handler: (HttpContext) -> Task<Result<unit, WebError>>) {
-        Method = method
-        Pattern = pattern
-        Handler = handler
-        // The validated grammar has at most sixteen segments. A literal at the first
-        // differing position wins. Raw '{' starts a capture; escaped braces are literals.
-        let bytes = source.Utf8Bytes
-        var priority = 0
-        var segment = 0
-        for index in 1..bytes.Length {
-            if index == 1 || bytes[index - 1] == 47 {
-                if bytes[index] != 123 { priority += 1 << (15 - segment) }
-                segment += 1
-            }
-        }
-        Priority = priority
     }
 }
 

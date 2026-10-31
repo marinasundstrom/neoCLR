@@ -1,0 +1,31 @@
+LISTENING http://127.0.0.1:51537
+info: WebDemo.Request[0] Request GET /
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /hello/Ada
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /hello/current
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request POST /visits
+info: WebDemo[0] Recorded visit 1
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request POST /visits
+info: WebDemo[0] Recorded visit 2
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/42
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/7
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/-1
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/nope
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /echo/hello
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request POST /echo/hello
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /missing/path
+info: WebDemo.Request[0] Request pipeline completed
+STOPPED
+warning: DAM2001: Neo.DependencyInjection.DefaultServiceCollection.Build instruction 37 -> Neo.DependencyInjection.ConstructorPlan.Prepare parameter 0: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2001: Neo.DependencyInjection.ServiceCollectionExtensions.AddScoped instruction 9 -> Neo.DependencyInjection.ServiceCollection.Add parameter 1: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention

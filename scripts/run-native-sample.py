@@ -8,10 +8,10 @@ import sys
 import tempfile
 
 
-def reflection_roots(runtime, assembly, names, run, constructors=False, methods=False, modules=()):
-    if constructors and methods:
-        raise ValueError('Choose constructor or method retention')
-    if not names:
+def reflection_roots(runtime, assembly, names, run, constructors=False, methods=False, modules=(), attributes=False, module_attributes=()):
+    if sum((constructors, methods, attributes, bool(module_attributes))) > 1:
+        raise ValueError('Choose one retention capability')
+    if not names and not module_attributes:
         return []
     def read_module(path):
         with tempfile.TemporaryDirectory(prefix='neoclr-sample-reflection-') as directory:
@@ -46,6 +46,25 @@ def reflection_roots(runtime, assembly, names, run, constructors=False, methods=
     if methods:
         policy = dict(schemaVersion=8, types=[], moduleCatalogs=[], moduleFunctions=[],
                       typeCatalogs=[], methodTypes=[root['definition'] for root in selected])
+    if attributes or module_attributes:
+        for root in selected:
+            root.update(construct=False, properties=False, getters=False, setters=False,
+                        customAttributes=True, fields=False, fieldGetters=False,
+                        fieldSetters=False, constructors=False)
+        policy = dict(schemaVersion=8, types=selected, moduleCatalogs=[], moduleFunctions=[],
+                      typeCatalogs=[], methodTypes=[])
+        if module_attributes:
+            inventories.extend(read_module(path) for path in modules)
+            for entry in module_attributes:
+                matches = [owner for metadata in inventories for owner in metadata.get('assemblies', [])
+                           if entry['assembly'] in (owner['name'], owner['full_name'])
+                           and entry['name'] in owner.get('declaration_modules', {}).get('names', [])]
+                if len(matches) != 1:
+                    raise ValueError('Expected one declared module: ' + entry['assembly'] + ':' + entry['name'])
+                identity = matches[0]['full_name']
+                if identity not in policy['moduleCatalogs']:
+                    policy['moduleCatalogs'].append(identity)
+                policy['moduleFunctions'].append(dict(assembly=identity, name=entry['name'], customAttributes=True))
     path = assembly.with_suffix('.reflection.json')
     path.write_text(json.dumps(policy, indent=2) + '\n')
     return ['--reflection-roots', path]

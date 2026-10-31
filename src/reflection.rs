@@ -1518,14 +1518,32 @@ pub(crate) fn module_function_attributes(
     target: &Function,
     source: bool,
 ) -> Result<Value, Fault> {
+    module_function_attributes_at(
+        module,
+        target,
+        crate::metadata_tokens::method(target)?,
+        source,
+    )
+}
+
+pub(crate) fn module_function_attributes_at(
+    module: &Module,
+    target: &Function,
+    token: i32,
+    source: bool,
+) -> Result<Value, Fault> {
     let context = QueryContext { module, source };
-    let token = crate::metadata_tokens::method(target)? as u32;
+    let method = crate::metadata_tokens::method(target)?;
     array(
         "System.Introspection.CustomAttributeData",
         target
             .custom_attributes
             .iter()
-            .filter(|attribute| attribute.target_token.is_none_or(|target| target == token))
+            .filter(|attribute| {
+                attribute
+                    .target_token
+                    .map_or(token == method, |selected| selected == token as u32)
+            })
             .map(|attribute| attribute_data(&context, attribute, &Limits::default())),
         &Limits::default(),
     )

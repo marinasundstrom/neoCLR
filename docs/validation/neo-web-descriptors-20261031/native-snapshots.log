@@ -1,0 +1,18 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.73s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-998c8f9905fce89d)
+
+running 10 tests
+test reflection_snapshots::catalog_tests::dependent_function_descriptors_are_not_closed_runtime_tokens ... ok
+test reflection_snapshots::catalog_tests::snapshot_tokens_keep_closed_identity_and_open_parameter_owners ... ok
+test reflection_snapshots::catalog_tests::type_discovery_requires_retention_and_exact_contracts ... ok
+test reflection_snapshots::catalog_tests::unrelated_type_retention_does_not_require_assembly_catalog_metadata ... ok
+test reflection_snapshots::function_inspection_reachability::unused_inspection_does_not_retain_factories_but_bound_targets_and_roots_do ... ok
+test reflection_snapshots::catalog_tests::method_retention_projects_open_and_observed_closed_owners_without_invocation ... ok
+test reflection_snapshots::catalog_tests::unretained_module_attributes_bind_an_explicit_fault_with_exact_contract ... ok
+test reflection_snapshots::catalog_tests::empty_function_scope_is_explicit_and_preserves_unretained_faults ... ok
+test reflection_snapshots::catalog_tests::declaring_type_requires_exact_contract_and_explicit_retention ... ok
+test reflection_snapshots::function_inspection_reachability::virtual_slot_candidates_keep_inspection_reachable ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 253 filtered out; finished in 0.57s

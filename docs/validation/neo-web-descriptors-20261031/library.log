@@ -1,0 +1,2 @@
+Native build output: /Users/robert/Projects/neoclr/target/neo-web-descriptors/validation3/bin/neoclr/Neo.Web.dll
+/Users/robert/Projects/neoclr/extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplication.rvn(272,23): warning RAV0403: The '!' operator treats the operand as non-null

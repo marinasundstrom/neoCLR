@@ -129,9 +129,16 @@ WebDemo combines `Use(LogRequest)` with `UseMiddleware<MaintenanceMiddleware>()`
 The latter receives Configuration through constructor injection; setting
 `Maintenance` to `true` produces a 503 response. Its project retention file keeps
 the constructor available in native/JIT builds. Endpoint query/body binding,
-`FromBody`/`FromService` and other ambiguity-resolving attributes remain planned.
+`FromBody`/`FromServices` and other ambiguity-resolving attributes remain planned.
 
 `Use` and `UseMiddleware` return `Result<WebApplication, WebError>` with the same
 application on success. Chaining is optional; WebDemo keeps route declarations
 as separate statements with postfix `?` to propagate registration failures.
 `Map*` retains its existing unit result in this slice.
+
+The imported `Greeting` function demonstrates `[FromRoute(Name: "name")]` on a
+parameter named `visitor`. Ordinary service parameters remain inferred; attributes
+are overrides for ambiguity or an explicit external name, not required annotations. These attributes affect endpoint registration;
+the sample test project continues calling both functions with ordinary arguments.
+The route, parameter-source and result plans are cached per endpoint; request
+arguments and scoped service instances are never shared between requests.

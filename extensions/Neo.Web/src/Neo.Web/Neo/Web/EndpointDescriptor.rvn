@@ -1,0 +1,38 @@
+module Neo.Web
+
+import System.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+import Neo.Web.HttpContext
+
+// Immutable endpoint definition. Parsing, signature/attribute inspection and binder
+// selection finish before publication. The cached handler owns the binding plan;
+// argument arrays, route values and service instances remain request-owned.
+internal class EndpointDescriptor {
+    val Source: string
+    val Method: HttpMethod?
+    val Pattern: RoutePattern
+    val Priority: int
+    val Handler: (HttpContext) -> Task<Result<unit, WebError>>
+
+    init(method: HttpMethod?, pattern: RoutePattern, source: string,
+        handler: (HttpContext) -> Task<Result<unit, WebError>>) {
+        Source = source
+        Method = method
+        Pattern = pattern
+        Handler = handler
+        // The validated grammar has at most sixteen segments. A literal at the first
+        // differing position wins. Raw '{' starts a capture; escaped braces are literals.
+        let bytes = source.Utf8Bytes
+        var priority = 0
+        var segment = 0
+        for index in 1..bytes.Length {
+            if index == 1 || bytes[index - 1] == 47 {
+                if bytes[index] != 123 { priority += 1 << (15 - segment) }
+                segment += 1
+            }
+        }
+        Priority = priority
+    }
+}
+

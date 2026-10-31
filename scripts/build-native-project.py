@@ -205,10 +205,14 @@ def project_retention(project, explicit=None):
         return result
     contents = path.read_bytes()
     policy = json.loads(contents, object_pairs_hook=unique_object)
-    if (not isinstance(policy, dict) or set(policy) != {'schemaVersion', 'types'}
-            or type(policy['schemaVersion']) is not int or policy['schemaVersion'] != 1
-            or not isinstance(policy['types'], list) or not 1 <= len(policy['types']) <= 64):
-        raise ValueError('Retention file requires schemaVersion 1 and 1–64 types')
+    if (not isinstance(policy, dict) or type(policy.get('schemaVersion')) is not int
+            or (policy['schemaVersion'] == 1 and set(policy) != {'schemaVersion', 'types'})
+            or (policy['schemaVersion'] == 2 and set(policy) != {'schemaVersion', 'types', 'modules'})
+            or policy['schemaVersion'] not in (1, 2)
+            or not isinstance(policy.get('types'), list)
+            or not isinstance(policy.get('modules', []), list)
+            or not 1 <= len(policy['types']) + len(policy.get('modules', [])) <= 64):
+        raise ValueError('Retention requires schemaVersion 1 types or schemaVersion 2 types/modules, with 1–64 selectors')
     seen = set()
     for entry in policy['types']:
         if not isinstance(entry, dict) or set(entry) != {'name', 'retain'}:
@@ -217,11 +221,24 @@ def project_retention(project, explicit=None):
         if not isinstance(name, str) or not name or name != name.strip() or name in seen:
             raise ValueError('Retention names must be unique nonempty exact metadata names')
         if (not isinstance(modes, list) or not modes
-                or any(not isinstance(mode, str) or mode not in ('constructors', 'properties', 'methods') for mode in modes)
+                or any(not isinstance(mode, str) or mode not in ('constructors', 'properties', 'methods', 'customAttributes') for mode in modes)
                 or len(set(modes)) != len(modes)):
-            raise ValueError('retain requires distinct constructors, properties or methods values')
+            raise ValueError('retain requires distinct constructors, properties, methods or customAttributes values')
         seen.add(name)
-    return path, policy['types'], hashlib.sha256(contents).hexdigest()
+    modules = policy.get('modules', [])
+    seen_modules = set()
+    for entry in modules:
+        if (not isinstance(entry, dict) or set(entry) != {'assembly', 'name', 'retain'}
+                or not isinstance(entry['assembly'], str) or not entry['assembly']
+                or entry['assembly'] != entry['assembly'].strip()
+                or not isinstance(entry['name'], str) or entry['name'] != entry['name'].strip()
+                or entry['retain'] != ['customAttributes']):
+            raise ValueError('Module retention requires assembly, exact name and customAttributes')
+        key = entry['assembly'], entry['name']
+        if key in seen_modules:
+            raise ValueError('Duplicate module retention selector')
+        seen_modules.add(key)
+    return path, policy['types'] + modules, hashlib.sha256(contents).hexdigest()
 
 
 def resolve_project_retention(runtime, assembly, entries, run, modules, resolver):
@@ -229,11 +246,11 @@ def resolve_project_retention(runtime, assembly, entries, run, modules, resolver
     policy = dict(schemaVersion=8, types=[], moduleCatalogs=[], moduleFunctions=[],
                   typeCatalogs=[], methodTypes=[])
     roots = {}
-    for mode in ('properties', 'constructors', 'methods'):
-        names = [entry['name'] for entry in entries if mode in entry['retain']]
+    for mode in ('properties', 'constructors', 'methods', 'customAttributes'):
+        names = [entry['name'] for entry in entries if 'assembly' not in entry and mode in entry['retain']]
         if not names:
             continue
-        options = {'constructors': True} if mode == 'constructors' else {'methods': True} if mode == 'methods' else {}
+        options = {'constructors': True} if mode == 'constructors' else {'methods': True} if mode == 'methods' else {'attributes': True} if mode == 'customAttributes' else {}
         path = resolver(runtime, assembly, names, run, modules=modules, **options)[1]
         resolved = json.loads(path.read_text())
         policy['methodTypes'].extend(resolved.get('methodTypes', []))
@@ -245,6 +262,12 @@ def resolve_project_retention(runtime, assembly, entries, run, modules, resolver
             for flag, value in root.items():
                 if flag != 'definition':
                     target[flag] |= value
+    module_entries = [entry for entry in entries if 'assembly' in entry]
+    if module_entries:
+        path = resolver(runtime, assembly, [], run, modules=modules, module_attributes=module_entries)[1]
+        resolved = json.loads(path.read_text())
+        policy['moduleCatalogs'] = resolved['moduleCatalogs']
+        policy['moduleFunctions'] = resolved['moduleFunctions']
     policy['types'] = list(roots.values())
     path = assembly.with_suffix('.reflection.json')
     path.write_text(json.dumps(policy, indent=2) + '\n')

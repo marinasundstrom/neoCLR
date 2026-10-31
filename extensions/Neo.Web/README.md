@@ -4,7 +4,8 @@ Neo.Web is an experimental web framework built on top of
 `System.Web.Http.HttpServer`. It composes DI, configuration and logging, accepts
 context and generic minimal API handlers, and supports function middleware plus
 `UseMiddleware<T: Middleware>()`. Generic handlers currently bind context, named
-string/int route values and scoped services through a registration-owned plan.
+string/int route values and scoped services through a registration-owned descriptor.
+FromRoute and FromServices override inference during registration.
 API names and assembly boundaries remain provisional; query/body binding, streaming
 results and a general host remain later work.
 
@@ -47,4 +48,6 @@ an independent HTTP peer against the reference app.
 The framework and reference app are qualified in interpreter, JIT and native modes
 with the matching development toolchain. The validation record identifies exact
 builds and limitations. Native/JIT constructor activation uses the explicit retention
-policies included with the tests and sample.
+policies included with the tests and sample. Generic handler planning also requires
+custom-attribute metadata retention for the handler type/module in native/JIT builds;
+the sample policy includes its referenced logic module.

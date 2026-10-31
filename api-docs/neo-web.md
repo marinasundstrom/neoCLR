@@ -191,17 +191,20 @@ has [separate historical evidence](https://github.com/marinasundstrom/neoCLR/blo
 `T: func` supplies a structural member contract, including the read-only `Function`
 property. It does not require a nominal delegate or invent a callable signature.
 Neo.Web reads `handler.Function` once during registration. Parameter metadata,
-route-name matching and result adaptation are retained in the endpoint plan.
+binding attributes, route-name matching and result adaptation are retained in the
+endpoint descriptor. Its parsed route and executable callback are published only
+after validation succeeds. Generic registration parses the pattern once.
 Each request supplies its own argument array and uses checked dynamic invocation;
 boxing, argument validation and ordinary DI resolution still occur per request.
 No runtime code generation is required.
 
 Parameters bind in this order:
 
-1. `Neo.Web.HttpContext` receives the active request context.
-2. A parameter whose name matches a route capture binds as `string` or `int`.
+1. `FromRoute` or `FromServices` explicitly selects the source, overriding inference.
+2. `Neo.Web.HttpContext` receives the active request context.
+3. A parameter whose name matches a route capture binds as `string` or `int`.
    Invalid integer text produces 400 without invoking the handler.
-3. Remaining reference parameters resolve through the request service provider.
+4. Remaining reference parameters resolve through the request service provider.
    Missing services produce 500. Registration does not instantiate services to
    determine availability, and does not currently validate the entire DI graph.
 
@@ -210,6 +213,35 @@ parameters and unsupported return types fail registration with `InvalidOptions`.
 No query/body binding, default argument substitution, optional service policy or
 conversion beyond route `int` parsing is provided. Source parameter names matter;
 generated adapters without useful names cannot infer route binding.
+
+## Binding attributes (development)
+
+Both attributes target handler parameters and are read through the function's
+parameter metadata once, at registration. They do not alter direct function calls.
+Native/JIT generic endpoints must retain custom-attribute metadata for the handler's
+declaring type or declared module, even if that handler has no binding attributes:
+otherwise the planner cannot establish whether an override exists. Missing retention
+is an explicit runtime capability fault, not a silently ignored annotation. The
+sample's project policy demonstrates [module attribute retention](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-retention.md);
+this is a development tooling requirement, not intended final application ceremony.
+Two binding-source attributes on one parameter fail registration with InvalidOptions.
+Unrelated attributes do not affect binding.
+
+| Type/member | Contract |
+| --- | --- |
+| `FromRouteAttribute()` | Binds string/int from a route capture. `[FromRoute]` uses the parameter name. |
+| `var FromRouteAttribute.Name: string?` | Defaults to null; `[FromRoute(Name: "id")]` selects that capture instead. Empty or missing capture names reject registration. |
+| `FromServicesAttribute()` | `[FromServices]` resolves the declared reference type from the request scope, even if the parameter name matches a capture. Explicit string services are supported. |
+
+Route names follow HttpServer's current case-sensitive capture contract. Open,
+ref/out, pointer, function and value-type service parameters remain unsupported.
+Services are activated per request; absence/activation errors produce the existing
+sanitized 500 response. Route conversion errors produce 400 before the handler runs.
+
+WebDemo's imported `Greeting` handler uses `FromRoute(Name: "name")` on its `visitor`
+parameter; its service remains inferred. Its unit tests still call it with ordinary
+arguments. Query, header and body source attributes remain unimplemented rather
+than being accepted without a matching binder.
 
 ## Typed buffered results
 

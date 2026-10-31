@@ -1,10 +1,19 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "types": [
     {
       "name": "Examples.Web.MaintenanceMiddleware",
       "retain": [
         "constructors"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "assembly": "WebDemo.Logic",
+      "name": "Examples.Web",
+      "retain": [
+        "customAttributes"
       ]
     }
   ]

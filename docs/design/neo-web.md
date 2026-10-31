@@ -625,13 +625,13 @@ remain gaps rather than silently guessed semantics.
 The author requests request-parameter binding and DI injection, including special
 parameters for HttpContext, HttpRequest, HttpResponse and CancellationToken. They
 clarified that explicit overrides are **binding attributes**, named FromBody and
-FromService, with the necessary source attributes to resolve ambiguities. This
-supersedes earlier helper-method wording. These attributes are not implemented yet.
+FromServices, with the necessary source attributes to resolve ambiguities. This
+supersedes earlier helper-method wording. FromRoute and FromServices are now
+implemented in the descriptor slice below; query/header/body families remain planned.
 
 The next binding slice should preserve the familiar [ASP.NET Core ordering](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-10.0):
 explicit source attributes, special framework types, supported scalar route/query
-conversion, registered services, then supported body binding. Neo.Web's singular
-`FromService` spelling is author-directed; ASP.NET Core spells it FromServices.
+conversion, registered services, then supported body binding. The author selected the ASP.NET Core `FromServices` spelling.
 Explicit attributes select a source rather than merely influencing a heuristic.
 Conflicting source attributes and unsupported source/type combinations should fail
 registration with parameter-specific diagnostics, never be silently ignored.
@@ -642,7 +642,7 @@ registration with parameter-specific diagnostics, never be silently ignored.
 | `FromQuery` | Select a query value even when its name matches a route capture. |
 | `FromHeader` | Select a header, including an external-name override. |
 | `FromBody` | Select body deserialization rather than DI or scalar query inference. |
-| `FromService` | Select DI even when the type/name could bind from request data. |
+| `FromServices` | Select DI even when the type/name could bind from request data. |
 
 Add form-specific attributes when form binding is actually supported; do not ship
 an attribute whose binder cannot honor it. Keyed service selection, repeated query
@@ -678,7 +678,7 @@ and cached at registration alongside the function signature, not reread per requ
 
 After middleware activation is qualified, the bounded endpoint implementation can
 start with special parameters whose lifetime/identity is already supported and
-FromService plus route/query/header attributes. Body deserialization and request
+FromServices plus route/query/header attributes. Body deserialization and request
 abort need their own primitive/metadata checks. Keep sync/async handler inputs and
 typed-result outputs consistent; richer result subsets and serializers remain
 separate from inferring where an argument comes from.
@@ -694,3 +694,49 @@ prefers separate `MapGet(...)?` statements. Conditional access (`?.`) continues 
 map members into carriers; postfix `?` is the separate propagation operation.
 
 The author subsequently selected the shorter generic name `T`: `UseMiddleware<T: Middleware>()`.
+
+
+## Registration-owned descriptors and binding overrides (development, 2026-10-31)
+
+The endpoint descriptor owns the parsed route, precedence, method and cached
+execution callback. Generic handlers inspect Function, parameters, source attributes
+and result shape before publication. The same parsed route feeds binding validation
+and routing; it is no longer parsed independently by both paths. Failed descriptor
+construction leaves the registry unchanged. Request argument arrays and services
+remain request-owned, including overlapping async calls.
+
+The bounded binding extension implements FromRoute and the author-selected
+FromServices. It follows ASP.NET Core's [FromRoute Name property](https://raw.githubusercontent.com/dotnet/aspnetcore/main/src/Mvc/Mvc.Core/src/FromRouteAttribute.cs)
+and [explicit service selection](https://raw.githubusercontent.com/dotnet/aspnetcore/main/src/Mvc/Mvc.Core/src/FromServicesAttribute.cs).
+Name is a nullable mutable attribute property; null uses the parameter name.
+Explicit selection precedes context/route/service inference. Conflicting source
+attributes, missing captures and unsupported source/type combinations fail at
+registration. Missing services remain a request activation error, not startup
+activation. Explicit string service binding resolves a scalar/route ambiguity.
+
+Current limitations remain visible: only parameter targets are admitted, route
+names follow the existing case-sensitive HttpServer primitive (ASP.NET Core uses
+case-insensitive names), and the framework does not yet expose common binding
+metadata interfaces for custom providers. Query/header/body families need their own
+binding plans and tests. In particular, future body inference needs a nonactivating
+DI service probe and a cached serializer contract; do not activate scoped services
+or inspect serializer properties on each request to infer a source.
+
+This slice removes duplicate registration parsing and validates cached source
+selection. It does not claim a throughput improvement: routing still scans endpoint
+patterns, route values use named lookup, and checked dynamic invocation, argument
+arrays/boxing and DI activation remain request costs. A prepared invocation adapter
+and a route lookup index require separate runtime/primitive work and measurements
+against direct HttpServer before claiming low-overhead parity.
+
+
+Author clarification: use ASP.NET Core as a researched reference, not a mandatory
+blueprint. The service/body inference requirement is a nonactivating availability
+probe; a separate .NET-shaped IServiceProviderIsService interface is not required.
+NeoCLR can expose the capability through an existing provider contract or a separate
+capability. The former is simpler for consumers but changes provider implementations;
+the latter supports optional provider capabilities but adds discovery and fallback
+policy. Choose and qualify that contract with the body-inference slice. Do not infer
+availability by resolving a service at registration. ASP.NET Core's
+[factory implementation](https://raw.githubusercontent.com/dotnet/aspnetcore/main/src/Http/Http.Extensions/src/RequestDelegateFactory.cs)
+is evidence of the separation between probing and request-time activation.

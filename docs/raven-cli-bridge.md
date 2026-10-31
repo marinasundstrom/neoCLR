@@ -16379,3 +16379,22 @@ function. A method already returning Result therefore introduces a nested Result
 no implicit flattening or Task is added. Neo.Web's sample favors separate
 registration statements with postfix `?`. `Use`/`UseMiddleware` return the
 application on success, allowing explicit unwrap-or-fail or propagation composition.
+
+
+## Ownerless function parameter attributes (development, 2026-10-31)
+
+Neo.Web binding attributes use existing parameter metadata and named attribute
+arguments. RuntimeParameterInfo now queries its retained Module when there is no
+nominal declaring type. The interpreter module query and native snapshot emitter
+select method versus parameter attributes by the original scoped source tokens.
+The native backend retains module catalogs/function attributes explicitly; type
+handler attributes use the existing type retention category. Project policy version
+2 exposes named module selection, avoiding hand-written compiled identities.
+
+No compiler or CLI metadata representation changes are required; unified Raven
+813dad20c emits the existing declarations. The runtime owns descriptor projection
+and token validation, while native tooling owns retention. Module ownership and
+method/parameter annotation separation are checked by focused native metadata tests;
+Neo.Web framework and imported sample functions provide execution qualification.
+This adds no custom binding-provider interfaces, serializer inference or request-abort
+semantics. The future native metadata model retains these same semantic distinctions.

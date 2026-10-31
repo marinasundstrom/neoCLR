@@ -1,0 +1,21 @@
+module Neo.Web
+
+import System.*
+
+/// Selects a named route capture for a string or int handler parameter.
+/// A null name uses the parameter name. Validated once during endpoint registration.
+[AttributeUsage(AttributeTargets.Parameter)]
+public class FromRouteAttribute : Attribute {
+    /// Uses the parameter name unless Name supplies an explicit capture name.
+    init() {}
+    /// The external capture name; null means the handler parameter name.
+    var Name: string? = null
+}
+
+/// Resolves a handler parameter from the request's service scope, overriding route inference.
+/// Only reference service types supported by DI are accepted. Activation occurs per request.
+[AttributeUsage(AttributeTargets.Parameter)]
+public class FromServicesAttribute : Attribute {
+    /// Selects request-scoped service resolution.
+    init() {}
+}

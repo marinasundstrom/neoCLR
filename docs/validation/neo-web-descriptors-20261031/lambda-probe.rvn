@@ -1,0 +1,13 @@
+module LambdaBindingProbe
+import System.*
+import System.Result.*
+import Neo.Web.*
+func Main() -> int {
+    let handler = ([FromRoute(Name: "id")] value: int) => HttpResult<string>.Ok(value.ToString())
+    let parameters = handler.Function.GetParameters()
+    Console.WriteLine(parameters[0].GetCustomAttributesData().Count.ToString())
+    use builder = WebApplication.CreateBuilder()
+    use app = builder.Build()!
+    if app.MapGet("/items/{id}", handler) is Failure(_) { return 1 }
+    return 42
+}

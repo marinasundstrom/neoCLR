@@ -280,6 +280,28 @@ pub fn module_function_attributes(
     )
 }
 
+/// Snapshot method and ordinary parameter attributes by their source metadata token.
+/// The named module must own the function; no attribute constructors are invoked.
+pub fn module_function_attribute_snapshots(
+    module: &Module,
+    identity: &str,
+    name: &str,
+    definition: &crate::metadata::MemberId,
+) -> Result<Vec<(i32, Value)>, Fault> {
+    let target = module_function(module, identity, name, definition)?;
+    let mut tokens = vec![crate::metadata_tokens::method(target)?];
+    for index in 0..target.parameters.len() {
+        tokens.push(crate::metadata_tokens::parameter(module, target, index)?);
+    }
+    tokens
+        .into_iter()
+        .map(|token| {
+            crate::reflection::module_function_attributes_at(module, target, token, true)
+                .map(|value| (token, value))
+        })
+        .collect()
+}
+
 /// Describe the assembly of a verified lexical caller, using the VM facade rules.
 pub fn executing_assembly(
     module: &Module,
@@ -587,6 +609,52 @@ fault "test body must not execute"
         module.functions[index]
             .custom_attributes
             .push(parameter_attribute);
+        let parameter_token =
+            crate::metadata_tokens::parameter(&module, &module.functions[index], 0).unwrap();
+        module.functions[index]
+            .custom_attributes
+            .last_mut()
+            .unwrap()
+            .target_token = Some(parameter_token as u32);
+        let snapshots =
+            module_function_attribute_snapshots(&module, "Package", "Example.Tests", &id).unwrap();
+        assert_eq!(snapshots.len(), 2);
+        let parameter = &snapshots
+            .iter()
+            .find(|(token, _)| *token == parameter_token)
+            .unwrap()
+            .1;
+        let Value::Array { elements, .. } = parameter else {
+            panic!("expected parameter attributes")
+        };
+        assert_eq!(elements.len(), 1);
+        let selected = crate::assembly_info::Query::ModuleMemberAttributes
+            .invoke_profile(
+                &module,
+                &[
+                    Value::String("Package".into()),
+                    Value::String("Example.Tests".into()),
+                    Value::Int32(parameter_token),
+                ],
+                &crate::Limits::default(),
+                true,
+            )
+            .unwrap();
+        assert_eq!(&selected, parameter);
+        assert!(
+            crate::assembly_info::Query::ModuleMemberAttributes
+                .invoke_profile(
+                    &module,
+                    &[
+                        Value::String("Package".into()),
+                        Value::String("Example.Tests".into()),
+                        Value::Int32(-1)
+                    ],
+                    &crate::Limits::default(),
+                    true
+                )
+                .is_err()
+        );
         let result = module_function_attributes(&module, "Package", "Example.Tests", &id).unwrap();
         let Value::Array { elements, .. } = result else {
             panic!("expected attributes");

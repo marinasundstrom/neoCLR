@@ -52,6 +52,9 @@ internal class RuntimeParameterInfo : ParameterInfo {
         if StoredDeclaringType.IsNominalType {
             return neoCLR.Runtime.MemberCustomAttributes(StoredDeclaringType, StoredMetadataToken)
         }
+        if let Some(owner) = StoredModule {
+            return neoCLR.Runtime.ModuleMemberCustomAttributes(owner.Assembly.FullName, owner.Name, StoredMetadataToken)
+        }
         return CheckedStorage.Reserve<CustomAttributeData>(0)
     }
 

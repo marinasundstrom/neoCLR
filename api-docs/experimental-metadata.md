@@ -10710,3 +10710,20 @@ load a borrowed reference receiver and retain virtual dispatch. It rejects symbo
 implementing types and invalid contracts. The existing `resolve_static_self_call`
 retains its static-only guard and delegates to this helper. These are Rust-only
 code-generator APIs, documented here rather than in RavenDoc's guest inventory.
+
+
+### Module function parameter attribute snapshots (development, 2026-10-31)
+
+The Rust native backend bridge adds
+`module_function_attribute_snapshots(module, identity, name, definition) -> Result<Vec<(i32, Value)>, Fault>`.
+It validates assembly/module ownership and returns descriptive attribute arrays for
+the function token and each ordinary parameter token. The existing
+`module_function_attributes` remains method-only. Attribute constructors never run;
+this API grants no retention or invocation rights. Interpreter module-member queries
+and native retained snapshots now recognize source parameter tokens independently
+of method annotations. Invalid or ambiguous tokens still fail.
+
+Raven's ParameterInfo.GetCustomAttributesData uses the parameter's declared module
+when its function has no nominal owner. Its public signature is unchanged. The
+[project retention contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-retention.md) describes explicit native/JIT
+attribute retention; no new CLI bridge encoding is introduced.

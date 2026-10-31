@@ -26,7 +26,8 @@ an explicitly requested missing file is an error.
 
 ## Supported declarations
 
-`schemaVersion` must be the integer `1`. `types` contains 1–64 distinct exact
+`schemaVersion: 1` supports type selectors. Version 2 requires both `types`
+and `modules` arrays, with 1–64 selectors in total. Type names are distinct exact
 metadata names. Each entry has only `name` and a nonempty `retain` array. Modes
 can be combined for the same type or across different types:
 
@@ -35,6 +36,7 @@ can be combined for the same type or across different types:
 | `constructors` | Public constructor metadata and supported checked constructor invocation, equivalent to `--reflection-constructor-type`. |
 | `properties` | The existing object-mapping policy: construction, property metadata, getters and setters, equivalent to `--reflection-type`. It is not metadata-only retention. |
 | `methods` | Declared method inspection, equivalent to `--reflection-method-type`; it does not enable method invocation. |
+| `customAttributes` | Declared type/member/parameter attribute data, without executing attribute constructors or granting constructor/property access. |
 
 Unknown keys/modes, duplicate JSON keys, duplicate names/modes, malformed JSON and
 unsupported versions fail. The builder rejects combining the selected file with
@@ -44,8 +46,8 @@ Scalar interop/library profiles continue to reject managed reflection retention.
 Names are resolved from the final compiled application, with supplied class-library
 modules searched when the application has no match, following the existing named
 root resolver. Missing or ambiguous matches fail. Application names take precedence;
-assembly-qualified selection and project-reference library discovery are not added
-by this file format. No wildcards or blanket keep-all mode are supported.
+type selectors do not accept assembly qualifiers. Referenced project libraries are
+included among supplied modules. No wildcards or blanket keep-all mode are supported.
 
 The builder combines declarations into private schema-8 `app.reflection.json` in
 its output directory and passes that policy to the backend. Constructor/property
@@ -121,3 +123,38 @@ passed to annotated APIs inside those bodies may retain further members. This do
 not turn method/property metadata inspection into invocation rights or suppress
 unknown-flow warnings. Generic-owner body specialization remains a gap. See
 [the explicit-policy consumer](validation/dynamic-access-explicit-20261028/README.md).
+
+## Module function attributes (development)
+
+Version 2 can retain metadata for functions and their parameters in an exact declared
+module. It supports annotations on imported minimal API handlers without naming
+private compiled metadata ordinals:
+
+```json
+{
+  "schemaVersion": 2,
+  "types": [],
+  "modules": [
+    {
+      "assembly": "WebDemo.Logic",
+      "name": "Examples.Web",
+      "retain": ["customAttributes"]
+    }
+  ]
+}
+```
+
+The assembly selector matches a simple name or complete metadata identity; ambiguity
+rejects. The module name is an exact declared module/namespace, not a file path or
+prefix. An empty name explicitly selects the global declaration module. Unknown
+assemblies/modules reject. Module entries currently accept only customAttributes;
+the generated policy retains the assembly's descriptive module catalog and the
+selected module's function/attribute descriptors. It does not grant type construction,
+property access or checked method invocation. Attributes remain descriptive data;
+their constructors do not run. Missing retention remains an explicit backend fault.
+
+Native parameter attribute dispatch uses each source parameter's token within its
+own assembly/module, independently of the method token. No new metadata encoding or
+compiler syntax is introduced. Neo.Web reads this data during endpoint registration.
+The framework test retains attributes on its Handlers type and NeoClr.WebTests module;
+WebDemo retains the Examples.Web module from its referenced logic assembly.

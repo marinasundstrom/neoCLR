@@ -54,6 +54,11 @@ func RegisterMiddlewareChain(app: WebApplication) -> Result<WebApplication, WebE
     return configured.Use((context, next) => next(context))
 }
 
+func MissingCapture([FromRoute(Name: "absent")] id: int) -> HttpResult<string> => HttpResult<string>.Ok(id.ToString())
+func ConflictingSources([FromRoute, FromServices] id: string) -> HttpResult<string> => HttpResult<string>.Ok(id)
+func InvalidService([FromServices] id: int) -> HttpResult<string> => HttpResult<string>.Ok(id.ToString())
+func ExplicitRoute([FromRoute] id: int) -> HttpResult<string> => HttpResult<string>.Ok(id.ToString())
+
 [Test]
 func `Invalid options and ambiguous routes fail without registration`() -> Result<unit, TestFailure> {
     use invalid = WebApplication.CreateBuilder()
@@ -61,6 +66,10 @@ func `Invalid options and ambiguous routes fail without registration`() -> Resul
     _ = Assert.True(invalid.Build() is Failure(_), "Invalid options fail")?
     use builder = WebApplication.CreateBuilder()
     use app = builder.Build()!
+    _ = Assert.True(app.MapGet("/binding/{id}", MissingCapture) is Failure(_), "Missing alias rejected during registration")?
+    _ = Assert.True(app.MapGet("/binding/{id}", ConflictingSources) is Failure(_), "Conflicting source attributes rejected")?
+    _ = Assert.True(app.MapGet("/binding/{id}", InvalidService) is Failure(_), "Value-type service rejected during registration")?
+    _ = Assert.True(app.MapGet("/binding/{id}", ExplicitRoute) is Ok(_), "Failed descriptor creation did not publish an endpoint")?
     let configured = RegisterMiddlewareChain(app)!
     _ = Assert.True(Object.ReferenceEquals(app, configured), "Middleware registration returns this application")?
     _ = Assert.True(app.MapContext("GET", "/items/{id}", Empty) is Ok(_), "Capture accepted")?
@@ -76,6 +85,11 @@ func `Invalid options and ambiguous routes fail without registration`() -> Resul
 class MissingDependency {}
 
 class Handlers {
+    var AnnotatedCalls = 0
+    func Annotated([FromRoute(Name: "id")] key: int, [FromServices] id: string) -> HttpResult<string> {
+        AnnotatedCalls += 1
+        return HttpResult<string>.Ok(id + ":" + key.ToString())
+    }
     val Tracker = Counts()
     val Entered = Promise<unit>()
     val Release = Promise<unit>()
@@ -156,6 +170,7 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
     let handlers = Handlers()
     use builder = WebApplication.CreateBuilder()
     builder.Server.Port = 0
+    _ = builder.Services.AddSingleton<string>("service")!
     _ = builder.Services.AddScoped<ScopedProbe>((provider) => Ok(ScopedProbe(handlers.Tracker)))!
     use app = builder.Build()!
     builder.Server.Port = -1
@@ -165,6 +180,7 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
     _ = app.MapContext("GET", "/failure", (context) => handlers.Failed(context))!
     _ = app.MapContext("GET", "/cancel", (context) => handlers.Cancelled(context))!
     _ = app.MapContext("GET", "/pending", (context) => handlers.Pending(context))!
+    _ = app.MapGet("/bindings/{id}", handlers.Annotated)!
     _ = app.MapGet("/generic/{id}", handlers.Generic)!
     _ = app.MapGet("/choice/{id}", handlers.Choice)!
     _ = app.MapGet("/missing-service", handlers.Missing)!
@@ -223,6 +239,12 @@ async func RunningChecks(app: WebApplication, client: HttpClient, url: string, h
     _ = Assert.True(app.RunAsync().GetResult() is Failure(_), "Duplicate run rejected")?
     _ = Assert.True(app.Map("/late-any", Empty) is Failure(_), "All-method registration frozen")?
     _ = Assert.True(app.Run(Empty) is Failure(_), "Terminal registration frozen")?
+    let boundFirst = client.GetString(url + "/bindings/41")
+    let boundSecond = client.GetString(url + "/bindings/42")
+    _ = Assert.Equal("service:41", ResponseText(await boundFirst)?)?
+    _ = Assert.Equal("service:42", ResponseText(await boundSecond)?)?
+    _ = (await CheckStatus(client, url + "/bindings/nope", 400))?
+    _ = Assert.Equal(2, handlers.AnnotatedCalls)?
     _ = Assert.Equal("literal", ResponseText(await client.GetString(url + "/any/42"))?)?
     use anyPost = (await client.Send(HttpRequest.Create(HttpMethod.Post, url + "/any/42")!))!
     _ = Assert.Equal(200, (int)anyPost.StatusCode)?

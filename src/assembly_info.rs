@@ -119,14 +119,19 @@ impl Query {
                 )?;
                 let mut matches = Vec::new();
                 for function in functions {
-                    if crate::metadata_tokens::method(function)? == *token {
+                    let mut selected = crate::metadata_tokens::method(function)? == *token;
+                    for index in 0..function.parameters.len() {
+                        selected |=
+                            crate::metadata_tokens::parameter(module, function, index)? == *token;
+                    }
+                    if selected {
                         matches.push(function);
                     }
                 }
                 if matches.len() != 1 {
                     return Err(Fault::new("missing or ambiguous module member token"));
                 }
-                crate::reflection::module_function_attributes(module, matches[0], source)
+                crate::reflection::module_function_attributes_at(module, matches[0], *token, source)
             }
             Self::Types | Self::ModuleTypes => {
                 let mut types = Vec::new();

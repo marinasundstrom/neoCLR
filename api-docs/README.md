@@ -3154,3 +3154,9 @@ included; both middleware registration methods return the application on success
 The public interface adds one native type without changing the aggregate CLI
 inventory. The [qualification](../docs/validation/neo-web-middleware-20261031/README.md)
 records source/build provenance and execution checks.
+
+The descriptor follow-up selects FromRouteAttribute (constructor and nullable Name
+property) and FromServicesAttribute alongside the existing Neo.Web types. The native
+reference supplies their declaration ownership and generated member documentation;
+[the binding contract](neo-web.md#binding-attributes-development) defines precedence,
+registration errors and remaining unsupported sources. No public API is excluded.

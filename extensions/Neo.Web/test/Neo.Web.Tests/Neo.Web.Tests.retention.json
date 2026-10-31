@@ -1,10 +1,25 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "types": [
     {
       "name": "NeoClr.WebTests.ScopedMiddleware",
       "retain": [
         "constructors"
+      ]
+    },
+    {
+      "name": "NeoClr.WebTests.Handlers",
+      "retain": [
+        "customAttributes"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "assembly": "Neo.Web.Tests",
+      "name": "NeoClr.WebTests",
+      "retain": [
+        "customAttributes"
       ]
     }
   ]

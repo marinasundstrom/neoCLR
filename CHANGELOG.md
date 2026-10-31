@@ -24,7 +24,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   hierarchies remain future options. Add the `Middleware` interface and
   `UseMiddleware<T: Middleware>()`, sharing the function middleware
   pipeline with lazy request-scope DI resolution. WebDemo demonstrates both forms;
-  constructor retention is explicit for native/JIT deployment.
+  constructor retention is explicit for native/JIT deployment. Endpoint descriptors
+  now share one parsed route with registration-time binding plans. Add FromRoute
+  with a nullable Name override and FromServices, including explicit string service
+  binding. Reject conflicting sources and missing captures before publishing a route;
+  request arguments and service instances remain request-owned. WebDemo demonstrates
+  attributes on imported handler functions while direct logic tests stay unchanged.
+  Preserve module-function parameter attributes through runtime reflection and
+  native snapshots using scoped parameter tokens. Project retention version 2
+  selects declared modules; type selectors also support descriptive customAttributes.
+  Existing version-1 retention files remain supported. Native/JIT generic handler
+  consumers must add custom-attribute retention for their handler types/modules,
+  including unannotated handlers, so source overrides cannot be silently lost.
 - Fix native metadata constrained interface calls through declaring-type parameters
   and nominal method bounds, preserving borrowed receiver semantics. Preserve
   interface bounds on imported nonvirtual generic reference-class methods; malformed

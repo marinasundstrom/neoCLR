@@ -1,0 +1,9 @@
+{
+  "command": "python3 scripts/build-website.py",
+  "exitCode": 0,
+  "pages": 6913,
+  "legacyPagesRetained": 131,
+  "published": false,
+  "correction": "Initial website check caught repository-only retention links; corrected to explicit repository URLs.",
+  "warnings": "Existing missing API descriptions remain."
+}

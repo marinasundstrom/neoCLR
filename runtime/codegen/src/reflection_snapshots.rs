@@ -755,34 +755,26 @@ pub fn bind(
                     factory.body.push(Op::Return);
                 } else {
                     for id in definitions {
-                        let target = source
-                            .functions
-                            .iter()
-                            .find(|f| f.definition.as_ref() == Some(&id))
-                            .ok_or("missing retained module function")?;
-                        let token = target
-                            .origin
-                            .as_ref()
-                            .ok_or("module attributes require source token")?
-                            .token;
-                        let token: i32 = token.try_into()?;
-                        let skip = factory.body.len() + 3;
-                        factory.body.extend([
-                            Op::Arg(2),
-                            Op::Int(token),
-                            Op::Equal,
-                            Op::BranchFalse(0),
-                        ]);
-                        let recipe = neoclr::native_metadata::module_function_attributes(
-                            source,
-                            identity,
-                            module_name,
-                            &id,
-                        )
-                        .map_err(|error| error.to_string())?;
-                        factory.emit(&recipe, &expected)?;
-                        factory.body.push(Op::Return);
-                        factory.body[skip] = Op::BranchFalse(factory.body.len());
+                        for (token, recipe) in
+                            neoclr::native_metadata::module_function_attribute_snapshots(
+                                source,
+                                identity,
+                                module_name,
+                                &id,
+                            )
+                            .map_err(|error| error.to_string())?
+                        {
+                            let skip = factory.body.len() + 3;
+                            factory.body.extend([
+                                Op::Arg(2),
+                                Op::Int(token),
+                                Op::Equal,
+                                Op::BranchFalse(0),
+                            ]);
+                            factory.emit(&recipe, &expected)?;
+                            factory.body.push(Op::Return);
+                            factory.body[skip] = Op::BranchFalse(factory.body.len());
+                        }
                     }
                 }
                 factory.body[first] = Op::BranchFalse(factory.body.len());
