@@ -227,3 +227,17 @@ Neo.DependencyInjection.Abstractions.dll, referencing only System.Runtime.
 Neo.DependencyInjection.dll contains the default container and constructor activation.
 Namespaces remain unchanged; rebuild consumers against the new assembly identities.
 No new friend access or public implementation helper is introduced.
+
+## Nonactivating service availability (development)
+
+`ServiceProvider.IsService(type: TypeInfo) -> bool` reports whether the immutable
+unkeyed catalog supports a closed service identity. It recognizes the provider
+itself and closed requests covered by open-generic registrations. Keyed-only
+registrations and open type definitions return false. It does not run factories,
+construct services, close activation plans or require a request scope. Availability
+is descriptive even after disposal; actual resolution can fail due to lifetime,
+factory, generic-constraint or disposed-provider errors.
+
+This extends the existing provider interface instead of adding .NET's optional
+IServiceProviderIsService service: every Neo provider supplies the probe directly.
+Custom ServiceProvider implementations must implement the new member and rebuild.

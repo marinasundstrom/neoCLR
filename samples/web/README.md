@@ -78,8 +78,8 @@ the handler settles. VisitStore is a container-owned singleton. Factories avoid
 requiring constructor-reflection retention in this first sample. All responses are
 buffered text; no service-dependent stream outlives a scope.
 
-The listener is loopback-only by default. There is no authentication, JSON binding,
-persistent storage in this slice. Visit state is local to one
+The listener is loopback-only by default. JSON request binding is bounded as described below;
+authentication and persistent storage are not provided in this slice. Visit state is local to one
 process and uses the existing cooperative dispatcher model.
 
 The handlers in `Endpoints.rvn` are ordinary functions with explicit arguments.
@@ -128,8 +128,8 @@ that stage; the request scope lives through the complete outer pipeline.
 WebDemo combines `Use(LogRequest)` with `UseMiddleware<MaintenanceMiddleware>()`.
 The latter receives Configuration through constructor injection; setting
 `Maintenance` to `true` produces a 503 response. Its project retention file keeps
-the constructor available in native/JIT builds. Endpoint query/body binding,
-`FromBody`/`FromServices` and other ambiguity-resolving attributes remain planned.
+the constructor available in native/JIT builds. Query/body bindings use `FromQuery`,
+`FromBody`, `FromRoute` and `FromServices` to override inference where needed.
 
 `Use` and `UseMiddleware` return `Result<WebApplication, WebError>` with the same
 application on success. Chaining is optional; WebDemo keeps route declarations
@@ -142,3 +142,36 @@ are overrides for ambiguity or an explicit external name, not required annotatio
 the sample test project continues calling both functions with ordinary arguments.
 The route, parameter-source and result plans are cached per endpoint; request
 arguments and scoped service instances are never shared between requests.
+
+### Query values and JSON bodies (development)
+
+`GET /search?q=Ada+Lovelace&page=2` binds an aliased query string, an inferred
+integer query value and an inferred scoped GreetingService. `POST /greetings`
+with `Content-Type: application/json` and `{"name":"Grace"}` binds GreetingInput
+and the same service. `POST /json-text` demonstrates explicit FromBody for a JSON
+string. Direct tests call these functions with ordinary arguments.
+
+DTO constructor/property retention is in WebDemo.retention.json. Binding plans
+are built at registration; malformed values fail before calling the handler.
+The current JSON reader accepts at most 1024 UTF-8 bytes and four container levels.
+Optional parameters, arrays and nullable DTO values remain gaps.
+
+### Response caching example
+
+`DemoResponseCacheMiddleware` caches only `GET /cached`, whose computation is
+immutable and public. A singleton `DemoResponseCache` retains one UTF-8 string of
+at most 4096 bytes; each hit creates fresh response content. `/uncached` runs the
+same computation without caching. `/cache-stats` reports hits, misses and handler
+executions; `X-Demo-Cache` identifies hits/misses on cacheable responses.
+
+Authorization, Cookie, Cache-Control or Pragma request headers bypass the cache.
+Only successful buffered text responses containing solely Content-Type are stored.
+Other paths, queries, methods, errors and responses with additional headers bypass
+storage. There is no expiration, eviction policy or concurrent-miss coalescing:
+the known immutable response lives until Clear or application disposal. This is
+application middleware demonstrating the pipeline, not a general HTTP cache.
+
+The [comparison harness](../../benchmarks/neo-web/README.md) measures cache enabled
+and disabled with identical computation/payload, separately from the constant-body
+HttpServer/context/generic comparison. It verifies execution counters as well as
+HTTP responses so avoided handler work is observable.

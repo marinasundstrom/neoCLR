@@ -1,0 +1,111 @@
+module Neo.Web
+
+import System.*
+import System.Collections.*
+import System.Data.Json.*
+import System.Introspection.*
+import System.Optional.*
+import System.Result.*
+import System.Runtime.Reflection.*
+
+// Endpoint-owned JSON mapping. Enumeration and type checks occur at registration;
+// requests only parse input and invoke the cached constructor/property descriptors.
+internal class JsonBodyPlan {
+    private val kind: int
+    private val constructor: ConstructorInfo?
+    private val properties: Sequence<PropertyInfo>
+    private val children: Sequence<JsonBodyPlan>
+
+    private init(kind: int, constructor: ConstructorInfo?, properties: Sequence<PropertyInfo>, children: Sequence<JsonBodyPlan>) {
+        self.kind = kind
+        self.constructor = constructor
+        self.properties = properties
+        self.children = children
+    }
+
+    static func Create(type: TypeInfo, depth: int = 0) -> Result<JsonBodyPlan, WebError> {
+        let properties = ArrayList<PropertyInfo>()
+        let children = ArrayList<JsonBodyPlan>()
+        var kind = 0
+        if type.Equals(typeof(string)) { kind = 1 }
+        else if type.Equals(typeof(int)) { kind = 2 }
+        else if type.Equals(typeof(bool)) { kind = 3 }
+        if kind != 0 { return Ok(JsonBodyPlan(kind, null, properties, children)) }
+        if depth >= 4 || type.IsValueType || type.IsInterface || type.IsArray || type.IsFunctionType || type.IsPointer || type.GenericArgumentCount != 0 {
+            return Failure(WebError.InvalidOptions("JSON body requires string, int, bool or a nonrecursive object with public writable properties"))
+        }
+        var constructor: ConstructorInfo? = null
+        for candidate in type.GetConstructors() {
+            if candidate.IsPublic && !candidate.IsStatic && candidate.GetParameters().Count == 0 {
+                constructor = candidate
+            }
+        }
+        if constructor is null { return Failure(WebError.InvalidOptions("JSON body type needs a public parameterless constructor")) }
+        for property in type.GetProperties() {
+            if !property.IsStatic && property.GetSetMethod() is Some(_) {
+                if property.GetIndexParameters().Count != 0 { return Failure(WebError.InvalidOptions("JSON body cannot bind indexers")) }
+                properties.Add(property)
+                children.Add(Create(property.PropertyType, depth + 1)?)
+            }
+        }
+        return Ok(JsonBodyPlan(0, constructor, properties, children))
+    }
+
+    func Read(node: JsonValue) -> Result<Object, WebError> {
+        // Validate every field before running constructors/setters, including nested objects.
+        _ = Validate(node)?
+        return Materialize(node)
+    }
+
+    private func Scalar(node: JsonValue) -> Result<Object, WebError> {
+        if kind == 1 && node is JsonString text { return Ok(text.Value) }
+        if kind == 2 && node is JsonNumber number {
+            if let Ok(value) = number.AsInt32() { return Ok(value) }
+        }
+        if kind == 3 && node is JsonBoolean flag { return Ok(flag.Value) }
+        return Failure(WebError.BadRequest("JSON value does not match body type"))
+    }
+
+    private func Validate(node: JsonValue) -> Result<unit, WebError> {
+        if kind != 0 {
+            _ = Scalar(node)?
+            return Ok(())
+        }
+        if !(node is JsonObject) { return Failure(WebError.BadRequest("Expected JSON object")) }
+        let document = (JsonObject)node
+        for index in 0..properties.Count {
+            if let Some(value) = Find(document, properties[index].Name) {
+                _ = children[index].Validate(value)?
+            }
+        }
+        return Ok(())
+    }
+
+    private static func Find(document: JsonObject, name: string) -> Optional<JsonValue> {
+        var found: Optional<JsonValue> = None()
+        for index in 0..document.Count {
+            if String.CompareOrdinalIgnoreCase(document.Name(index)!, name) == 0 {
+                found = Some(document.Item(index)!)
+            }
+        }
+        return found
+    }
+
+    private func Materialize(node: JsonValue) -> Result<Object, WebError> {
+        if kind != 0 { return Scalar(node) }
+        if !(node is JsonObject) { return Failure(WebError.BadRequest("Expected JSON object")) }
+        let document = (JsonObject)node
+        let Ok(instance) = constructor!.Invoke() else {
+            return Failure(WebError.InvalidOptions("JSON body constructor failed"))
+        }
+        for index in 0..properties.Count {
+            if let Some(node) = Find(document, properties[index].Name) {
+                let value = children[index].Materialize(node)?
+                if properties[index].SetValue(instance, value) is Failure(_) {
+                    return Failure(WebError.InvalidOptions("JSON body setter failed"))
+                }
+            }
+        }
+        return Ok(instance)
+    }
+}

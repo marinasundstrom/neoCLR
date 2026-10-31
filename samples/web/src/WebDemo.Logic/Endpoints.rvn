@@ -88,3 +88,20 @@ public class MaintenanceMiddleware : Middleware {
         return await next(context)
     }
 }
+
+// Scalar query values are inferred; aliases are explicit only when names differ.
+public func Search([FromQuery(Name: "q")] term: string, page: int, service: GreetingService) -> HttpResult<string> {
+    return HttpResult<string>.Ok(service.Greet(term) + " Page " + page.ToString())
+}
+
+public class GreetingInput {
+    init() {}
+    var Name: string = ""
+}
+
+// Unregistered complex POST input is inferred from JSON; the registered service is injected.
+public func CreateGreeting(input: GreetingInput, service: GreetingService) -> HttpResult<string> {
+    return HttpResult<string>.Created(service.Greet(input.Name))
+}
+
+public func JsonText([FromBody] text: string) -> HttpResult<string> => HttpResult<string>.Ok(text)

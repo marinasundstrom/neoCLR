@@ -1,0 +1,15 @@
+interpreter/direct: 5.55 requests/s
+interpreter/context: 4.90 requests/s
+interpreter/generic: 4.78 requests/s
+interpreter/uncached: 3.60 requests/s
+interpreter/cached: 3.86 requests/s
+native/direct: 25.24 requests/s
+native/context: 19.26 requests/s
+native/generic: 18.93 requests/s
+native/uncached: 15.38 requests/s
+native/cached: 14.36 requests/s
+jit/direct: 24.43 requests/s
+jit/context: 19.05 requests/s
+jit/generic: 17.68 requests/s
+jit/uncached: 14.51 requests/s
+jit/cached: 13.60 requests/s

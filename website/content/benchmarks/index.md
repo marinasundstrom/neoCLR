@@ -5,6 +5,7 @@ Each report identifies the measured build, workload, machine and execution mode.
 
 | Report | What it measures |
 | --- | --- |
+| [Neo.Web and response caching](/benchmarks/neo-web/) | Experimental framework overhead and the same computation with caching enabled/disabled |
 | [HTTP request processing](/benchmarks/http/) | Plain text and typed JSON across interpreter, JIT and AOT |
 | [Lazy JIT and application load](/benchmarks/lazy-jit/) | Development startup, complex handlers, I/O pressure and sync/concurrent GC tradeoffs |
 | [Garbage collection](/benchmarks/gc/) | Matched collector-path HTTP comparisons, allocation/reclamation diagnostics and correctness evidence |

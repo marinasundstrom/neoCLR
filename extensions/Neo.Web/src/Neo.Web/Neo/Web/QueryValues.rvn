@@ -1,0 +1,77 @@
+module Neo.Web
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+// Request-owned, parsed once only when an endpoint binds query values.
+internal class QueryValues {
+    private val names = ArrayList<string>()
+    private val values = ArrayList<string>()
+
+    static func Parse(target: string) -> Result<QueryValues, WebError> {
+        let result = QueryValues()
+        let bytes = target.Utf8Bytes
+        var index = 0
+        while index < bytes.Length && bytes[index] != 63 { index += 1 }
+        index += 1
+        while index < bytes.Length {
+            let start = index
+            var equal = -1
+            while index < bytes.Length && bytes[index] != 38 {
+                if bytes[index] == 61 && equal < 0 { equal = index }
+                index += 1
+            }
+            if index > start {
+                let boundary = if equal < 0 { index } else { equal }
+                result.names.Add(Decode(target, start, boundary)?)
+                result.values.Add(Decode(target, if equal < 0 { index } else { equal + 1 }, index)?)
+            }
+            index += 1
+        }
+        return Ok(result)
+    }
+
+    func Get(name: string) -> Result<string, WebError> {
+        let matched = ArrayList<string>()
+        for index in 0..names.Count {
+            if String.CompareOrdinalIgnoreCase(names[index], name) == 0 { matched.Add(values[index]) }
+        }
+        if matched.Count == 0 { return Failure(WebError.BadRequest("Missing query value: " + name)) }
+        let items: string[] = [for index in 0..matched.Count => matched[index]]
+        // ASP.NET Core's scalar StringValues conversion joins repeated values with commas.
+        return Ok(String.Join(",", items))
+    }
+
+    private static func Hex(value: byte) -> int {
+        if value >= 48 && value <= 57 { return (int)value - 48 }
+        if value >= 65 && value <= 70 { return (int)value - 55 }
+        if value >= 97 && value <= 102 { return (int)value - 87 }
+        return -1
+    }
+
+    private static func Decode(text: string, start: int, end: int) -> Result<string, WebError> {
+        let bytes = text.Utf8Bytes
+        let decoded = ArrayList<byte>()
+        var index = start
+        while index < end {
+            var value = (int)bytes[index]
+            if value == 43 { value = 32 }
+            else if value == 37 {
+                if index + 2 >= end { return Failure(WebError.BadRequest("Incomplete query escape")) }
+                let high = Hex(bytes[index + 1])
+                let low = Hex(bytes[index + 2])
+                if high < 0 || low < 0 { return Failure(WebError.BadRequest("Invalid query escape")) }
+                value = high * 16 + low
+                index += 2
+            }
+            decoded.Add((byte)value)
+            index += 1
+        }
+        let Ok(value) = Encodings.Utf8.Decode(decoded[0..decoded.Count]) else {
+            return Failure(WebError.BadRequest("Invalid query UTF-8"))
+        }
+        return Ok(value)
+    }
+}

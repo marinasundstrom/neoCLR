@@ -40,6 +40,9 @@ public interface ServiceProvider : Disposable {
     func GetServices(type: TypeInfo) -> Result<Sequence<Object>, ServiceError>
     /// Creates an independently disposable scope sharing the root singleton cache.
     func CreateScope() -> Result<ServiceProvider, ServiceError>
+    /// Reports an unkeyed closed service registration without activating it or requiring a scope.
+    /// Catalog availability survives disposal; activation may still fail. Open definitions return false.
+    func IsService(type: TypeInfo) -> bool
 }
 
 /// Collects registrations and builds independent provider snapshots.

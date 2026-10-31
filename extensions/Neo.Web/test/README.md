@@ -12,3 +12,9 @@ checks use real loopback connections; result-contract checks need no listener.
 Sample application behavior belongs separately in
 [`samples/web/test/WebDemo.Tests`](../../../samples/web/test/WebDemo.Tests).
 No separate Neo.Web testing framework is introduced.
+
+The binding follow-up adds registration rejection for conflicting/multiple body
+sources, nonactivating service probing (including a keyed-only negative control),
+framework-parameter identity, and header replacement/injection rejection. The
+external WebDemo HTTP consumer additionally covers query conversion/UTF-8 errors,
+JSON DTO/scalar bodies, 400/415 failures and the application response-cache example.

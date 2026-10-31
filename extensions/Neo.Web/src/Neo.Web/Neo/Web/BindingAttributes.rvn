@@ -2,7 +2,7 @@ module Neo.Web
 
 import System.*
 
-/// Selects a named route capture for a string or int handler parameter.
+/// Selects a named route capture for a string, int or bool handler parameter.
 /// A null name uses the parameter name. Validated once during endpoint registration.
 [AttributeUsage(AttributeTargets.Parameter)]
 public class FromRouteAttribute : Attribute {
@@ -17,5 +17,21 @@ public class FromRouteAttribute : Attribute {
 [AttributeUsage(AttributeTargets.Parameter)]
 public class FromServicesAttribute : Attribute {
     /// Selects request-scoped service resolution.
+    init() {}
+}
+
+/// Selects a query-string value for a string, int or bool handler parameter.
+[AttributeUsage(AttributeTargets.Parameter)]
+public class FromQueryAttribute : Attribute {
+    /// Uses the parameter name unless Name supplies an external query name.
+    init() {}
+    /// The query key; null means the handler parameter name. Keys ignore ASCII case.
+    var Name: string? = null
+}
+
+/// Selects JSON request-body binding. Only one body parameter is allowed per endpoint.
+[AttributeUsage(AttributeTargets.Parameter)]
+public class FromBodyAttribute : Attribute {
+    /// Selects a required JSON body, including on GET endpoints.
     init() {}
 }

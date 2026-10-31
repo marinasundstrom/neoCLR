@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "types": [
+    {
+      "name": "Examples.Web.DemoResponseCacheMiddleware",
+      "retain": [
+        "constructors"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "assembly": "NeoWebBenchmark",
+      "name": "Benchmarks.NeoWeb",
+      "retain": [
+        "customAttributes"
+      ]
+    },
+    {
+      "assembly": "WebDemo.Logic",
+      "name": "Examples.Web",
+      "retain": [
+        "customAttributes"
+      ]
+    }
+  ]
+}

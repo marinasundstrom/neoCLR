@@ -132,7 +132,7 @@ public class WebApplication : Disposable {
     }
 
     /// Registers a GET function value. Reflection and binding planning happen once at registration.
-    /// Binds HttpContext, named string/int route parameters and request-scoped services.
+    /// Binds framework values, scalar route/query values, explicit JSON bodies and request-scoped services.
     func MapGet<T: func>(pattern: string, handler: T) -> Result<unit, WebError> {
         return Map(HttpMethod.Get, pattern, handler)
     }
@@ -146,7 +146,7 @@ public class WebApplication : Disposable {
         if started || disposed { return Failure(WebError.InvalidState) }
         let parsed = RoutePattern.Parse(pattern)
         if let Failure(error) = parsed { return Failure(WebError.Routing(error)) }
-        let plan = HandlerPlan.Create(parsed!, handler, handler.Function)?
+        let plan = HandlerPlan.Create(parsed!, method, Services, handler, handler.Function)?
         return Register(EndpointDescriptor(method, parsed!, pattern, plan.Execute))
     }
 
@@ -282,6 +282,8 @@ public class WebApplication : Disposable {
                 if let Failure(error) = pending.GetResult() {
                     if error is WebError.BadRequest(_) {
                         completedResponse.Respond(HttpStatusCode.BadRequest, HttpStringContent("Bad request"))
+                    } else if error is WebError.UnsupportedMediaType {
+                        completedResponse.Respond((HttpStatusCode)415, HttpStringContent("Unsupported media type"))
                     } else {
                         logger.LogError("Request handler failed")
                         completedResponse.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))

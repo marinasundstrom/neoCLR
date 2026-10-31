@@ -1,0 +1,22 @@
+{
+  "6": {
+    "manifest.json": "b33d91cc0ba44dd9b2eeb9e8c4ca1f40e334649fef1ed852ac0ce23fc568eede",
+    "bin/neoclr": "7c0a7b4e1003d15414ddd0ce0c97bb2bf806658bccfc365ff9989e580e53136b",
+    "bin/neoclr-codegen": "b06341770cfaed9ab249fd2a4fb1e5ce8de52c481e626a6d9b812db61852460f",
+    "sdk/tools/rvnc/rvnc.dll": "cc19c56d15c6ea3692e641551d4e0a3708ce853e5e57433d30bd7b0d2983030a",
+    "lib/Neo.Web.dll": "5e8c2dc8bfc86c7f5ce1f4b7c09e54f0e910d350b6d0f5332195c29695c64822",
+    "lib/System.Web.dll": "5cb00dce6fe64c62f4d67a59dbfca88166c1a2ca0b17a5c07e7fa6fd13059439",
+    "lib/Neo.DependencyInjection.dll": "3af89fec3a573938624f38f5a2a356bc5c56b618c8b3cd5deefad107e5fee7fc",
+    "lib/Neo.DependencyInjection.Abstractions.dll": "3428f0dc49cad595e33d95a7fd4c8df583be697c3dc107261aab4056b3c492a6"
+  },
+  "7": {
+    "manifest.json": "f8fa01e9e216741dc0360d1f5c37868dfc3e05cae12364a306c85d7b2a2f9858",
+    "bin/neoclr": "7c0a7b4e1003d15414ddd0ce0c97bb2bf806658bccfc365ff9989e580e53136b",
+    "bin/neoclr-codegen": "b06341770cfaed9ab249fd2a4fb1e5ce8de52c481e626a6d9b812db61852460f",
+    "sdk/tools/rvnc/rvnc.dll": "cc19c56d15c6ea3692e641551d4e0a3708ce853e5e57433d30bd7b0d2983030a",
+    "lib/Neo.Web.dll": "d96b09e39f5a782f5557e72ecda2e413868f15737fd82dc195cf859678df4f0a",
+    "lib/System.Web.dll": "5cb00dce6fe64c62f4d67a59dbfca88166c1a2ca0b17a5c07e7fa6fd13059439",
+    "lib/Neo.DependencyInjection.dll": "3af89fec3a573938624f38f5a2a356bc5c56b618c8b3cd5deefad107e5fee7fc",
+    "lib/Neo.DependencyInjection.Abstractions.dll": "3428f0dc49cad595e33d95a7fd4c8df583be697c3dc107261aab4056b3c492a6"
+  }
+}

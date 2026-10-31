@@ -12,6 +12,7 @@ public union WebError {
     case InvalidOptions(message: string)
     case Routing(message: string)
     case BadRequest(message: string)
+    case UnsupportedMediaType
     case Services(error: ServiceError)
     case Transport(error: HttpError)
 }
@@ -28,9 +29,11 @@ public class WebServerOptions {
 
 /// A request-owned view with buffered response operations. Do not retain it after the request pipeline settles.
 public class HttpContext {
-    private var response: HttpResponse
+    private val response: HttpResponse
     private var route: RouteMatch
     private var active = true
+    /// The active response configuration; do not retain it beyond the pipeline.
+    val Response: HttpResponse => response
     /// The incoming request; content is valid until the request pipeline settles.
     val Request: HttpRequest
     /// The scope owned by this request. Do not dispose it yourself.
@@ -83,10 +86,8 @@ public class HttpContext {
 
     internal func RespondMethodNotAllowed(methods: string[]) {
         EnsureActive()
-        let headers = ArrayList<HttpHeader>()
-        headers.Add(HttpHeader("Allow", String.Join(", ", methods)))
-        response.Dispose()
-        response = HttpResponse(405, headers, HttpStringContent("Method not allowed"))
+        response.Respond((HttpStatusCode)405, HttpStringContent("Method not allowed"))
+        _ = response.SetHeader("Allow", String.Join(", ", methods))!
     }
 
     internal func Finish() -> HttpResponse {

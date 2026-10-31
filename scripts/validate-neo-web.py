@@ -27,6 +27,7 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--codegen', type=Path, help='Source-matched code generator override for the development hosting graph')
     parser.add_argument('--mode', choices=['native', 'interpreter', 'jit'], action='append')
+    parser.add_argument('--component', choices=['tests', 'sample', 'sample-tests'], action='append', help='Run only changed consumers; default runs all')
     args = parser.parse_args()
     original, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -103,6 +104,8 @@ def main():
         for name, project in [('tests', 'extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.rvnproj'),
                               ('sample', 'samples/web/src/WebDemo/WebDemo.rvnproj'),
                               ('sample-tests', 'samples/web/test/WebDemo.Tests/WebDemo.Tests.rvnproj')]:
+            if args.component and name not in args.component:
+                continue
             run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
                  'windows-http' if os.name == 'nt' else 'http', '--bundle', bundle, '--project', ROOT / project,
                  '--aot', codegen, '--output', out / name], name + '-build')
@@ -165,16 +168,44 @@ def sample(command, env, mode, out):
             if line.startswith('LISTENING '):
                 url = line.strip().split(' ', 1)[1]
                 break
-        for method, path, status, body in [('GET', '/', 200, 'Hello, neoCLR!'),
+        cases = [('GET', '/', 200, 'Hello, neoCLR!'),
                 ('GET', '/hello/Ada', 200, 'Hello, Ada!'),
                 ('GET', '/hello/current', 200, 'The current visitor is neoCLR'),
                 ('POST', '/visits', 201, 'Visit 1'), ('POST', '/visits', 201, 'Visit 2'),
                 ('GET', '/items/42', 200, 'The answer'), ('GET', '/items/7', 404, ''), ('GET', '/items/-1', 400, ''),
                 ('GET', '/items/nope', 400, 'Bad request'),
                 ('GET', '/echo/hello', 200, 'GET:hello'), ('POST', '/echo/hello', 200, 'POST:hello'),
-                ('GET', '/missing/path', 404, 'No endpoint matched')]:
+                ('GET', '/missing/path', 404, 'No endpoint matched')]
+        cases = [(*case, None, {}) for case in cases]
+        cases += [
+            ('GET', '/search?q=Ada+Lovelace&page=2', 200, 'Hello, Ada Lovelace! Page 2', None, {}),
+            ('GET', '/search?Q=%C3%85sa&page=3', 200, 'Hello, Åsa! Page 3', None, {}),
+            ('GET', '/search?q=Ada', 400, 'Bad request', None, {}),
+            ('GET', '/search?q=Ada&page=bad', 400, 'Bad request', None, {}),
+            ('GET', '/search?q=Ada&page=1&page=2', 400, 'Bad request', None, {}),
+            ('GET', '/search?q=%FF&page=1', 400, 'Bad request', None, {}),
+            ('POST', '/greetings', 201, 'Hello, Grace!', b'{"Name":"Grace"}', {'Content-Type': 'application/json'}),
+            ('POST', '/greetings', 201, 'Hello, Ada!', b'{"name":"Ada","unused":42}', {'Content-Type': 'application/vnd.demo+json; charset=utf-8'}),
+            ('POST', '/greetings', 400, 'Bad request', b'{', {'Content-Type': 'application/json'}),
+            ('POST', '/greetings', 415, 'Unsupported media type', b'Grace', {'Content-Type': 'text/plain'}),
+            ('POST', '/json-text', 200, 'plain value', b'"plain value"', {'Content-Type': 'application/json'}),
+            ('POST', '/json-text', 400, 'Bad request', b'42', {'Content-Type': 'application/json'}),
+        ]
+        computed = 0
+        for index in range(5000):
+            computed = (computed * 17 + index) % 1009
+        cached_body = 'Computed ' + str(computed)
+        cases += [
+            ('GET', '/cached', 200, cached_body, None, {}),
+            ('GET', '/cached', 200, cached_body, None, {}),
+            ('GET', '/cache-stats', 200, 'hits=1;misses=1;executions=1', None, {}),
+            ('GET', '/uncached', 200, cached_body, None, {}),
+            ('GET', '/cached', 200, cached_body, None, {'Cache-Control': 'no-cache'}),
+            ('GET', '/cache-stats', 200, 'hits=1;misses=1;executions=3', None, {}),
+        ]
+        for method, path, status, body, data, headers in cases:
             try:
-                response = urllib.request.urlopen(urllib.request.Request(url + path, method=method), timeout=60)
+                response = urllib.request.urlopen(urllib.request.Request(url + path, method=method, data=data, headers=headers), timeout=60)
             except urllib.error.HTTPError as error:
                 response = error
             with response:

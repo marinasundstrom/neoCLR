@@ -1,0 +1,73 @@
+module Examples.Web
+
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import Neo.Web.*
+
+// A deliberately bounded demonstration: one immutable public text response.
+// The application owns this singleton; request scopes never own cached content.
+public class DemoResponseCache {
+    private var text: string? = null
+    private var hits = 0
+    private var misses = 0
+    private var executions = 0
+    val Hits: int => hits
+    val Misses: int => misses
+    val Executions: int => executions
+
+    func TryGet() -> string? {
+        if text is string { hits += 1 }
+        return text
+    }
+    func RecordMiss() { misses += 1 }
+    func RecordExecution() { executions += 1 }
+    func Store(value: string) {
+        if value.GetUtf8ByteCount() <= 4096 { text = value }
+    }
+    func Clear() { text = null }
+}
+
+// This is an application example, not a general HTTP cache policy.
+public class DemoResponseCacheMiddleware : Middleware {
+    private val cache: DemoResponseCache
+    init(cache: DemoResponseCache) { self.cache = cache }
+
+    async func InvokeAsync(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+        let request = context.Request
+        if request.Method.Method != "GET" || request.Target != "/cached" ||
+            request.GetHeaderValues("Authorization").Count != 0 || request.GetHeaderValues("Cookie").Count != 0 ||
+            request.GetHeaderValues("Cache-Control").Count != 0 || request.GetHeaderValues("Pragma").Count != 0 {
+            return await next(context)
+        }
+        if cache.TryGet() is string text {
+            context.RespondText(text)
+            _ = context.Response.SetHeader("X-Demo-Cache", "hit")!
+            return Ok(())
+        }
+        cache.RecordMiss()
+        let result = await next(context)
+        if result is Ok(_) && (int)context.Response.StatusCode == 200 && context.Response.Content.IsBuffered &&
+            context.Response.Content.Length <= 4096 && context.Response.Headers.Count == 1 &&
+            context.Response.GetHeaderValues("Content-Type").Count == 1 &&
+            context.Response.GetHeaderValues("Content-Type")[0] == "text/plain; charset=utf-8" {
+            let buffered = await System.Web.Http.HttpStringContent.Read(context.Response.Content)
+            if let Ok(text) = buffered {
+                cache.Store(text)
+                _ = context.Response.SetHeader("X-Demo-Cache", "miss")!
+            }
+        }
+        return result
+    }
+}
+
+public func Computed(cache: DemoResponseCache) -> HttpResult<string> {
+    cache.RecordExecution()
+    var value = 0
+    for index in 0..5000 { value = (value * 17 + index) % 1009 }
+    return HttpResult<string>.Ok("Computed " + value.ToString())
+}
+
+public func CacheStatistics(cache: DemoResponseCache) -> HttpResult<string> {
+    return HttpResult<string>.Ok("hits=" + cache.Hits.ToString() + ";misses=" + cache.Misses.ToString() + ";executions=" + cache.Executions.ToString())
+}

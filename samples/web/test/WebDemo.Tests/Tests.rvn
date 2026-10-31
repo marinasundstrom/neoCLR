@@ -18,11 +18,26 @@ func `Greeting uses the supplied configuration and name`() -> Result<unit, TestF
     let result = Greeting("Ada", service)
     _ = Assert.Equal(200, result.StatusCode)?
     _ = Assert.True(result is HttpResult<string>.Ok(_), "Greeting returns Ok")?
-    return Assert.Equal("Welcome, Ada!", Describe(result))
+    _ = Assert.Equal("Welcome, Ada!", Describe(result))?
+    _ = Assert.Equal("Welcome, Ada! Page 2", Describe(Search("Ada", 2, service)))?
+    let input = GreetingInput()
+    input.Name = "Grace"
+    let created = CreateGreeting(input, service)
+    _ = Assert.Equal(201, created.StatusCode)?
+    return Assert.Equal("Welcome, Grace!", Describe(created))
 }
 
 [Test]
 func `Visits retain application state and return created results`() -> Result<unit, TestFailure> {
+    let cache = DemoResponseCache()
+    _ = Assert.True(cache.TryGet() is null, "Cache starts empty")?
+    let calculated = Computed(cache)
+    _ = Assert.Equal(1, cache.Executions)?
+    cache.Store(Describe(calculated))
+    _ = Assert.Equal(Describe(calculated), cache.TryGet() ?? "")?
+    _ = Assert.Equal(1, cache.Hits)?
+    cache.Clear()
+    _ = Assert.True(cache.TryGet() is null, "Invalidation removes cached value")?
     let visits = VisitStore()
     use logging = DefaultLoggerFactory()
     let first = Visit(visits, logging)

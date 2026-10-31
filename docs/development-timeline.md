@@ -24308,3 +24308,40 @@ request-abort token. The author emphasized that Neo.Web and System.Web.Http shou
 influence each other's evolution; the assistant identified transport-owned abort
 notification as a concrete example. These are next-slice directions, not completed
 capabilities of the descriptor/attribute commit.
+
+## 2026-10-31 — Neo.Web binding foundation and execution-mode goal
+
+The author selected DI as the next slice, chose the spelling `FromServices`, and
+asked for HttpContext, HttpRequest, HttpResponse and CancellationToken binding.
+They clarified that Neo.Web and System.Web.Http should inform each other's
+evolution, with ASP.NET Core-like foundational behavior qualified in interpreter,
+JIT and AOT and supported by benchmarks. They then explicitly included query
+parameters and request bodies. These are author directions, not claims of parity.
+
+The assistant implemented a nonactivating service-catalog probe on ServiceProvider,
+explicit/inferred query and JSON body binding, and registration-owned DTO mapping
+plans. An added HttpResponse.SetHeader primitive preserves response identity for
+405 handling. The native compilation graph exceeded the intermediate inventory
+ceiling (8431 versus 8192 functions); the bound was raised to 16384 while keeping
+selected-image/host bounds unchanged. A comparison harness separates startup,
+first request and warmed sequential HTTP exchanges. Validation and request-abort
+transport work remain open at this entry; outcomes will be linked when qualified.
+
+The author then proposed response caching middleware as a small example of how
+caching affects performance, without an elaborate store. The assistant added an
+application-owned one-entry cache for an immutable public endpoint, bypass rules,
+hit/miss/execution counters, and paired benchmark cases reusing that middleware.
+This remains sample code rather than a general caching API in Neo.Web.
+
+The completed binding/sample checks pass: framework 5/5 and sample logic 4/4 in
+interpreter, JIT and AOT, plus 30 external HTTP responses per mode. The API snapshot
+has four passing checks. [Qualification and remaining gaps](validation/neo-web-bindings-20261031/README.md)
+record the exact evidence. Request-abort token binding remains open; application
+shutdown has not been relabeled as request cancellation.
+
+The measured cache cases skip 35 handler executions. In the single short run,
+throughput changes by about +7% in interpreter, −7% in AOT and −6% in JIT. The
+assistant retained the slower cases and documented the limited workload rather
+than claiming a universal benefit. JIT readiness is roughly one minute for the
+shared comparison image. All 546 benchmark HTTP responses pass; the final website
+check covers 6936 pages.

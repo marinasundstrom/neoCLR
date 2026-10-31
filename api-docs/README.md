@@ -3160,3 +3160,15 @@ property) and FromServicesAttribute alongside the existing Neo.Web types. The na
 reference supplies their declaration ownership and generated member documentation;
 [the binding contract](neo-web.md#binding-attributes-development) defines precedence,
 registration errors and remaining unsupported sources. No public API is excluded.
+
+### Neo.Web query/body and service inference (2026-10-31)
+
+The development snapshot now includes FromQueryAttribute/Name, FromBodyAttribute,
+Neo.Web.HttpContext.Response, WebError.UnsupportedMediaType,
+ServiceProvider.IsService and HttpResponse.SetHeader. Neo.Web types are selected
+by the existing namespace selection; existing provider/response selections include
+their new members. The aggregate HTTP bridge adds SetHeader and its authored XML.
+The native audit uses rebuilt System.Web, DI abstractions/implementation and Neo.Web
+with Raven 813dad20c; component hashes preserve the provenance of reused libraries.
+No new renderer exclusions were needed. Sample-only cache types remain in the sample
+source, not the platform API reference.

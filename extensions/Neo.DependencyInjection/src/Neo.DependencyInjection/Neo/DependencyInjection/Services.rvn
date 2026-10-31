@@ -241,6 +241,10 @@ internal class DefaultServiceProvider : ServiceProvider {
         return checked
     }
 
+    func IsService(type: TypeInfo) -> bool {
+        return !type.ContainsGenericParameters && Available(type)
+    }
+
     private func Available(type: TypeInfo) -> bool {
         if type.Equals(typeof(ServiceProvider)) { return true }
         for entry in registrations {

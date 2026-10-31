@@ -6,6 +6,19 @@
       "retain": [
         "constructors"
       ]
+    },
+    {
+      "name": "Examples.Web.GreetingInput",
+      "retain": [
+        "constructors",
+        "properties"
+      ]
+    },
+    {
+      "name": "Examples.Web.DemoResponseCacheMiddleware",
+      "retain": [
+        "constructors"
+      ]
     }
   ],
   "modules": [

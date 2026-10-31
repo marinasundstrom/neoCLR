@@ -1,0 +1,54 @@
+module Benchmarks.NeoWeb
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import Neo.Web.*
+import Neo.DependencyInjection.*
+import Examples.Web.*
+import Neo.Web.HttpContext
+import System.Web.Http.*
+
+func Value() -> HttpResult<string> => HttpResult<string>.Ok("42")
+
+func ContextValue(context: HttpContext) -> Task<Result<unit, WebError>> {
+    context.RespondText("42")
+    return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
+}
+
+func Direct(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("42"))))
+}
+
+// External harness owns process termination after measuring completed exchanges.
+async func Main(arguments: string[]) -> Task<int> {
+    if arguments.Length != 1 { return 1 }
+    if arguments[0] == "direct" {
+        let server = HttpServer.Listen("127.0.0.1", 0, 128)!
+        let serverLifetime = server.Serve(Direct)
+        Console.WriteLine("LISTENING http://127.0.0.1:" + server.GetLocalPort()!.ToString())
+        _ = await serverLifetime
+        server.Close()
+        return 0
+    }
+    use builder = WebApplication.CreateBuilder()
+    builder.Server.Port = 0
+    if arguments[0] == "cached" || arguments[0] == "uncached" {
+        _ = builder.Services.AddSingleton<DemoResponseCache>((provider) => Ok(DemoResponseCache()))!
+        _ = builder.Services.AddScoped<DemoResponseCacheMiddleware>()!
+    }
+    use app = builder.Build()!
+    if arguments[0] == "generic" { app.MapGet("/", Value)! }
+    else if arguments[0] == "context" { app.MapContext("GET", "/", ContextValue)! }
+    else if arguments[0] == "cached" || arguments[0] == "uncached" {
+        if arguments[0] == "cached" { app.UseMiddleware<DemoResponseCacheMiddleware>()! }
+        app.MapGet("/cached", Computed)!
+        app.MapGet("/cache-stats", CacheStatistics)!
+    }
+    else { return 1 }
+    let lifetime = app.RunAsync()
+    Console.WriteLine("LISTENING http://127.0.0.1:" + app.GetLocalPort()!.ToString())
+    _ = await lifetime
+    return 0
+}

@@ -165,6 +165,7 @@ static class HttpBindings
                 public HttpResponse(HttpStatusCode statusCode, Collections.Sequence<HttpHeader> headers, HttpContent content) { }
                 public void Respond(HttpStatusCode statusCode) { }
                 public void Respond(HttpStatusCode statusCode, HttpContent content) { }
+                public Result<PropagationUnit, HttpError> SetHeader(string name, string value) => default;
                 public HttpStatusCode StatusCode => default;
                 public bool IsSuccessStatusCode => default;
                 public Collections.Sequence<HttpHeader> Headers => default;
@@ -327,6 +328,7 @@ static class HttpBindings
             ("HttpServer", "Release") when library => ("", "void", false),
             ("HttpServer", "get_StopToken") when library => ("", CancellationBindings.Token, false),
             ("HttpContext", ".ctor") when library => ($"{Prefix}HttpServer,System.Networking.Sockets.Socket,{request}", "void", false),
+            ("HttpResponse", "SetHeader") => ("String,String", "System.Result<Void,System.Web.Http.HttpError>", false),
             ("HttpContext", "get_Response") => ("", response, false),
             ("HttpContext", "Complete") => (args.Length == 1 ? CancellationBindings.Token : "", "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpContext", "RespondText") => (args.Length == 1 ? "String" : Prefix + "HttpStatusCode,String", "void", false),

@@ -1,0 +1,6 @@
+native build: warning: DAM2001: Neo.DependencyInjection.DefaultServiceCollection.Build instruction 37 -> Neo.DependencyInjection.ConstructorPlan.Prepare parameter 0: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2001: Neo.DependencyInjection.ServiceCollectionExtensions.AddScoped instruction 9 -> Neo.DependencyInjection.ServiceCollection.Add parameter 1: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2001: Neo.Web.JsonBodyPlan.Create instruction 131 -> System.Introspection.TypeInfo.GetProperties receiver: cannot prove dynamic member requirement 512; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2001: Neo.Web.JsonBodyPlan.Create instruction 89 -> System.Introspection.TypeInfo.GetConstructors receiver: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention
+warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention
+neoclr-codegen: closed-world input inventory exceeds bounds: 8431 functions (limit 8192), 1655 types (limit 4096)

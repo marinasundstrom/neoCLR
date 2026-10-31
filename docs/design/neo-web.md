@@ -740,3 +740,25 @@ policy. Choose and qualify that contract with the body-inference slice. Do not i
 availability by resolving a service at registration. ASP.NET Core's
 [factory implementation](https://raw.githubusercontent.com/dotnet/aspnetcore/main/src/Http/Http.Extensions/src/RequestDelegateFactory.cs)
 is evidence of the separation between probing and request-time activation.
+
+## Query/body and DI binding implementation (2026-10-31)
+
+The author expanded the DI slice to query and request-body binding and identified
+ASP.NET Core-like foundational behavior across interpreter/JIT/AOT as the goal,
+including measured overhead against HttpServer. The implementation uses explicit
+source overrides, framework values, scalar route/query binding, nonactivating DI
+availability, then inferred POST JSON bodies. GET bodies require FromBody.
+
+Primary comparison: [ASP.NET Core parameter binding](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-10.0)
+and [IServiceProviderIsService](https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/IServiceProviderIsService.cs).
+Neo puts IsService on the existing provider: no extra capability service or
+fallback activation is needed, at the cost of requiring custom providers to
+implement the probe. Availability is not an activation guarantee.
+
+Body plans cache constructor/property descriptors rather than repeatedly using
+the serializer's metadata enumeration. The bounded DTO/scalar mapper keeps
+case-insensitive web property matching, ignored unknown fields and constructor
+defaults for omitted fields. Existing strict UTF-8 JSON limits remain visible;
+arrays, nullable/defaulted endpoint parameters and general converters remain gaps.
+Prepared invocation, transport-owned request-abort notification and comparative
+benchmarks remain separate completion items; no throughput improvement is claimed.

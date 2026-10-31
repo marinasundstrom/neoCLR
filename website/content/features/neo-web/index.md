@@ -27,8 +27,8 @@ member, ownership and failure contract.
 
 Routes support literal segments and named captures. Literal routes win over
 capture routes; ambiguous registrations fail. Invalid targets return 400, missing
-paths 404, and unsupported methods 405 with an Allow header. Named string/int parameters bind from route captures; remaining service parameters
-resolve from the request scope. Invalid integer text returns 400 before invocation.
+paths 404, and unsupported methods 405 with an Allow header. Named string/int/bool parameters bind from route captures or query values; registered service parameters
+resolve from the request scope without activation during registration. Invalid integer text returns 400 before invocation.
 `[FromRoute(Name: "name")]` selects a differently named capture; `[FromServices]`
 explicitly selects a scoped dependency, overriding route-name inference. Binding
 attributes and signatures are inspected once when the endpoint is registered.
@@ -52,7 +52,11 @@ ordinary arguments, and matches cover the result alternatives exhaustively.
 WebDemo includes its own logic-test project; framework tests live under
 `extensions/Neo.Web/test`.
 
-Query/body binding, JSON serializers and streaming remain future work.
+Query parameters support required string/int/bool values and explicit `FromQuery(Name: ...)` aliases.
+POST handlers infer JSON DTO bodies; `FromBody` selects a body explicitly. Body plans cache
+constructors and writable properties at registration. Invalid input returns 400 and unsupported
+media types return 415. Current JSON reader size/depth bounds apply; optional parameters,
+array bodies, request-abort token binding, arbitrary result serialization and streaming remain gaps.
 Reflection planning is cached, but per-request argument arrays, checked invocation
 and DI resolution remain costs to measure.
 
@@ -80,10 +84,26 @@ that stage; the request scope lives through the complete outer pipeline.
 WebDemo combines `Use(LogRequest)` with `UseMiddleware<MaintenanceMiddleware>()`.
 The latter receives Configuration through constructor injection; setting
 `Maintenance` to `true` produces a 503 response. Its project retention file keeps
-the constructor available in native/JIT builds. Endpoint query/body binding,
-`FromBody`/`FromServices` and other ambiguity-resolving attributes remain planned.
+the constructor available in native/JIT builds. Endpoint source attributes are `FromRoute`, `FromQuery`, `FromBody` and `FromServices`.
 
 `Use` and `UseMiddleware` return `Result<WebApplication, WebError>` with the same
 application on success. Chaining is optional; WebDemo keeps route declarations
 as separate statements with postfix `?` to propagate registration failures.
 `Map*` retains its existing unit result in this slice.
+
+## Response caching example
+
+WebDemo's `DemoResponseCacheMiddleware` demonstrates short-circuiting the pipeline
+with a cached response. It stores one small immutable public text result for
+`GET /cached`; `/uncached` runs the same computation and `/cache-stats` exposes
+hits, misses and executions. Cached content belongs to a singleton, while every
+request retains its own context and scope. Requests carrying authentication,
+cookies or cache-control headers bypass the example cache.
+
+This application example has no expiration or general HTTP cache policy. Its
+comparison harness measures the same endpoint with caching enabled and disabled
+in interpreter, JIT and AOT, reporting first-request and warmed-request times
+separately. See the [reference app](/cases/neo-web/) for source and limits.
+
+The [initial measurements](/benchmarks/neo-web/) show both saved handler executions
+and cache overhead, with startup and warmed request times kept separate.

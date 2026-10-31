@@ -27,6 +27,8 @@ async func Main(arguments: string[]) -> Task<int> {
         return Ok(GreetingService(provider.GetRequiredService<Configuration>()!))
     })!
     _ = builder.Services.AddScoped<MaintenanceMiddleware>()!
+    _ = builder.Services.AddSingleton<DemoResponseCache>((provider) => Ok(DemoResponseCache()))!
+    _ = builder.Services.AddScoped<DemoResponseCacheMiddleware>()!
     let Ok(app) = builder.Build() else { return 1 }
     use application = app
     let Ok(_) = Configure(app) else { return 1 }
@@ -46,10 +48,17 @@ async func Main(arguments: string[]) -> Task<int> {
 func Configure(app: WebApplication) -> Result<unit, WebError> {
     app.Use(LogRequest)?
     app.UseMiddleware<MaintenanceMiddleware>()?
+    app.UseMiddleware<DemoResponseCacheMiddleware>()?
+    app.MapGet("/cached", Computed)?
+    app.MapGet("/uncached", Computed)?
+    app.MapGet("/cache-stats", CacheStatistics)?
     app.MapGet("/", Home)?
     app.MapGet("/hello/{name}", Greeting)?
     app.MapGet("/hello/current", Current)?
     app.MapPost("/visits", Visit)?
+    app.MapGet("/search", Search)?
+    app.MapPost("/greetings", CreateGreeting)?
+    app.MapPost("/json-text", JsonText)?
     app.MapGet("/items/{id}", Item)?
     app.Map("/echo/{value}", Echo)?
     return app.Run(Unmatched)

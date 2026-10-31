@@ -1,6 +1,7 @@
 module NeoClr.WebTests
 
 import System.*
+import System.Collections.*
 import System.Result.*
 import System.Concurrency.*
 import System.Concurrency.Tasks.*
@@ -57,15 +58,26 @@ func RegisterMiddlewareChain(app: WebApplication) -> Result<WebApplication, WebE
 func MissingCapture([FromRoute(Name: "absent")] id: int) -> HttpResult<string> => HttpResult<string>.Ok(id.ToString())
 func ConflictingSources([FromRoute, FromServices] id: string) -> HttpResult<string> => HttpResult<string>.Ok(id)
 func InvalidService([FromServices] id: int) -> HttpResult<string> => HttpResult<string>.Ok(id.ToString())
+func TwoBodies([FromBody] first: string, [FromBody] second: string) -> HttpResult<string> => HttpResult<string>.Ok(first)
+func InferredBody(service: MissingDependency) -> HttpResult<string> => HttpResult<string>.Ok("unexpected")
 func ExplicitRoute([FromRoute] id: int) -> HttpResult<string> => HttpResult<string>.Ok(id.ToString())
 
 [Test]
 func `Invalid options and ambiguous routes fail without registration`() -> Result<unit, TestFailure> {
+    use response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(""))
+    _ = Assert.True(response.SetHeader("X-Test", "one") is Ok(_), "Header accepted")?
+    _ = Assert.True(response.SetHeader("x-test", "two") is Ok(_), "Header replaced ignoring case")?
+    _ = Assert.Equal(1, response.GetHeaderValues("X-Test").Count)?
+    _ = Assert.True(response.SetHeader("bad name", "value") is Failure(_), "Invalid name rejected")?
+    _ = Assert.True(response.SetHeader("X-Test", "bad\r\nvalue") is Failure(_), "Header injection rejected")?
+    _ = Assert.Equal("two", response.GetHeaderValues("X-Test")[0])?
     use invalid = WebApplication.CreateBuilder()
     invalid.Server.Port = -1
     _ = Assert.True(invalid.Build() is Failure(_), "Invalid options fail")?
     use builder = WebApplication.CreateBuilder()
     use app = builder.Build()!
+    _ = Assert.True(app.MapPost("/two-bodies", TwoBodies) is Failure(_), "Multiple bodies rejected")?
+    _ = Assert.True(app.MapGet("/implicit-body", InferredBody) is Failure(_), "GET does not infer body")?
     _ = Assert.True(app.MapGet("/binding/{id}", MissingCapture) is Failure(_), "Missing alias rejected during registration")?
     _ = Assert.True(app.MapGet("/binding/{id}", ConflictingSources) is Failure(_), "Conflicting source attributes rejected")?
     _ = Assert.True(app.MapGet("/binding/{id}", InvalidService) is Failure(_), "Value-type service rejected during registration")?
@@ -94,7 +106,10 @@ class Handlers {
     val Entered = Promise<unit>()
     val Release = Promise<unit>()
 
-    async func Generic(id: int, probe: ScopedProbe, context: HttpContext) -> Task<HttpResult<string>> {
+    async func Generic(id: int, probe: ScopedProbe, context: HttpContext, request: HttpRequest, response: HttpResponse) -> Task<HttpResult<string>> {
+        if !Object.ReferenceEquals(request, context.Request) || !Object.ReferenceEquals(response, context.Response) {
+            Panic("Framework parameter identity differs from context")
+        }
         let value = await Task.Run(() => id)
         if probe.Disposed { Panic("Injected scope ended before await") }
         if context.RouteValues.Get("id")! != id.ToString() { Panic("Context and route binding disagree") }
@@ -104,7 +119,7 @@ class Handlers {
         if id == 42 { return HttpResult<string>.Ok("found") }
         return HttpResult<string>.NotFound
     }
-    func Missing(service: MissingDependency) -> HttpResult<string> => HttpResult<string>.Ok("unexpected")
+    func Missing([FromServices] service: MissingDependency) -> HttpResult<string> => HttpResult<string>.Ok("unexpected")
     func Unsupported(id: int) -> int => id
     func Any(context: HttpContext) -> Task<Result<unit, WebError>> {
         context.RespondText(context.Request.Method.Method + ":" + context.RouteValues.Get("id")!)
@@ -170,10 +185,15 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
     let handlers = Handlers()
     use builder = WebApplication.CreateBuilder()
     builder.Server.Port = 0
+    _ = builder.Services.AddKeyedInstance(typeof(MissingDependency), "key", MissingDependency())!
     _ = builder.Services.AddSingleton<string>("service")!
     _ = builder.Services.AddScoped<ScopedProbe>((provider) => Ok(ScopedProbe(handlers.Tracker)))!
     use app = builder.Build()!
     builder.Server.Port = -1
+    _ = Assert.True(app.Services.IsService(typeof(ScopedProbe)), "Probe sees scoped service from root without activation")?
+    _ = Assert.True(app.Services.IsService(typeof(ServiceProvider)), "Provider is a built-in service")?
+    _ = Assert.True(!app.Services.IsService(typeof(MissingDependency)), "Missing service remains missing")?
+    _ = Assert.Equal(0, handlers.Tracker.Created)?
     _ = app.MapContext("GET", "/items/{id}", (context) => handlers.Capture(context))!
     _ = app.MapContext("GET", "/items/current", (context) => handlers.Literal(context))!
     _ = app.MapContext("GET", "/bad", (context) => handlers.Bad(context))!

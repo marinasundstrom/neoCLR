@@ -20,9 +20,14 @@ DI registration and lazy request-scope activation. Both return the application o
 success; Map* keeps its current contract. The next endpoint ergonomics work is
 recorded in the [binding review](design/neo-web.md#endpoint-binding-and-ambiguity-2026-10-31).
 The first descriptor follow-up shares parsed routes with cached binding plans and
-adds explicit FromRoute/FromServices overrides; query/body inference and prepared
-invocation remain subsequent bounded work. The author selected DI support as the
-next slice: nonactivating service availability and registration-time inference.
+adds explicit FromRoute/FromServices overrides. The author expanded the DI follow-up
+to query/body and framework-parameter binding, ASP.NET Core-like behavior across
+interpreter/JIT/AOT, and comparative measurements. Nonactivating service availability,
+FromQuery/FromBody and cached DTO plans are now implemented and qualified with
+framework/sample consumers in all three modes. The sample also demonstrates bounded
+response caching and a direct-HttpServer performance comparison. See the
+[binding qualification](validation/neo-web-bindings-20261031/README.md).
+Transport-owned request-abort notification and prepared invocation remain open.
 [Descriptor qualification](validation/neo-web-descriptors-20261031/README.md) covers
 the binding metadata/runtime foundation. Middleware and constrained-call qualification is recorded in the
 [focused evidence](validation/neo-web-middleware-20261031/README.md).

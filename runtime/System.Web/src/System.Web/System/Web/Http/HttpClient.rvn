@@ -216,6 +216,26 @@ public class HttpResponse : Disposable {
         return result
     }
 
+    /// Replaces all fields with this name without changing response identity or content.
+    /// Invalid field names or control characters return InvalidRequest without mutation.
+    /// Framing and content consistency are still validated when the response is sent.
+    func SetHeader(name: string, value: string) -> Result<unit, HttpError> {
+        if !MediaTypeParser.ValidToken(name) { return Failure(HttpError.InvalidRequest("Invalid header name")) }
+        let bytes = value.Utf8Bytes
+        for index in 0..bytes.Length {
+            if bytes[index] == 127 || bytes[index] < 32 && bytes[index] != 9 {
+                return Failure(HttpError.InvalidRequest("Invalid header value"))
+            }
+        }
+        let headers = ArrayList<HttpHeader>()
+        for header in storedHeaders {
+            if String.CompareOrdinalIgnoreCase(header.Name, name) != 0 { headers.Add(header) }
+        }
+        headers.Add(HttpHeader(name, value))
+        storedHeaders = headers
+        return Ok(())
+    }
+
     /// Sets the status and empty content. Does not perform network I/O.
     func Respond(statusCode: HttpStatusCode) {
         Respond(statusCode, HttpMemoryContent(default(ReadOnlyMemory<byte>)))

@@ -139,10 +139,13 @@ and path-prefix branches remain future work.
 This is distinct from `System.Web.Http.HttpContext`. Applications normally import
 only `Neo.Web.*`; add `import Neo.Web.HttpContext` when also importing
 `System.Web.Http.*`. The transport
-context, direct completion and mutable streaming content are not exposed.
+context and direct completion are not exposed. Response exposes the underlying
+configuration object; this slice supports buffered, independently owned content.
+Service-dependent streaming responses are not yet qualified.
 
 | Member | Contract |
 | --- | --- |
+| `Response: System.Web.Http.HttpResponse` | The response being configured; borrowed for the pipeline lifetime. |
 | `Request: System.Web.Http.HttpRequest` | Incoming request/body, borrowed for this handler's lifetime. |
 | `Services: ServiceProvider` | Per-request scope. The application owns disposal; handlers must not dispose it. |
 | `RouteValues: System.Web.Http.RouteMatch` | Decoded captures; use Get/GetInt32 for explicit binding. |
@@ -159,7 +162,7 @@ request. Request values must not escape the pipeline lifetime.
 The request scope survives handler and middleware awaits, then is disposed on success, typed
 failure or cancellation. Responses own buffered data independently of services.
 A successful callback sends its configured response (default 200 empty). BadRequest
-returns sanitized 400; other WebError values produce a logged sanitized 500.
+returns sanitized 400; UnsupportedMediaType returns sanitized 415; other WebError values produce a logged sanitized 500.
 Cancelled handlers close their exchange. Terminal target faults are not HTTP error
 results and have no additional cleanup guarantee. Returned error messages are not
 included in client responses.
@@ -167,10 +170,11 @@ included in client responses.
 ## WebError
 
 A standard Raven union: `InvalidState`, `InvalidOptions(message: string)`,
-`Routing(message: string)`, `BadRequest(message: string)`,
+`Routing(message: string)`, `BadRequest(message: string)`, `UnsupportedMediaType`,
 `Services(error: ServiceError)` and `Transport(error: HttpError)`.
 Builder and lifecycle operations preserve recoverable service/transport causes.
 Use BadRequest for explicit recoverable input failures in a context handler.
+Adding UnsupportedMediaType requires exhaustive WebError matches to handle the new case.
 
 ## Example and limits
 
@@ -178,7 +182,7 @@ The [reference app](/cases/neo-web/) demonstrates DI factories, configuration,
 logging, awaited handlers and shutdown. See the
 [feature guide](/features/neo-web/) for the supported slice.
 
-General hosting, query/body binding, arbitrary result serialization, streaming,
+General hosting, arbitrary result serialization, streaming,
 authentication, automatic HTTPS, configuration binding and process signal
 integration remain future work. Existing libraries stay independently usable.
 The generic handler layer requires matching development compiler/runtime support.
@@ -200,23 +204,46 @@ No runtime code generation is required.
 
 Parameters bind in this order:
 
-1. `FromRoute` or `FromServices` explicitly selects the source, overriding inference.
-2. `Neo.Web.HttpContext` receives the active request context.
-3. A parameter whose name matches a route capture binds as `string` or `int`.
-   Invalid integer text produces 400 without invoking the handler.
-4. Remaining reference parameters resolve through the request service provider.
-   Missing services produce 500. Registration does not instantiate services to
-   determine availability, and does not currently validate the entire DI graph.
+1. `FromRoute`, `FromQuery`, `FromBody` or `FromServices` explicitly selects the source.
+2. `Neo.Web.HttpContext`, `System.Web.Http.HttpRequest` and `HttpResponse` receive
+   the active request's framework values.
+3. Required `string`, `int` and `bool` parameters use matching route captures,
+   otherwise query values. Missing values and invalid conversions return 400.
+4. Registered reference services use the request scope. `ServiceProvider.IsService`
+   probes the immutable catalog without activation, including scoped registrations.
+5. Other POST parameters infer a JSON body. GET requires explicit `FromBody`.
 
-Open signatures, ref/out parameters, unsupported route types, unbound scalar
-parameters and unsupported return types fail registration with `InvalidOptions`.
-No query/body binding, default argument substitution, optional service policy or
-conversion beyond route `int` parsing is provided. Source parameter names matter;
-generated adapters without useful names cannot infer route binding.
+Migration: reference parameters previously defaulted to DI even when unregistered.
+They now infer DI only when the catalog reports a service; otherwise POST infers
+body and GET rejects implicit body binding. Use FromServices to force service
+resolution (and retain request-time missing-service failure).
+
+Only one body parameter is allowed. JSON content requires `application/json` or an
+`application/*+json` media type with absent or UTF-8 charset; unsupported/missing
+content type returns 415. Invalid JSON or incompatible input returns 400 before
+handler invocation. Explicit services are resolved even when not registered; a
+missing explicit service produces 500. Unsupported signatures and conflicting
+sources fail registration before publishing the endpoint.
+
+Query keys ignore case. Values decode UTF-8 percent escapes and `+` as space once;
+malformed escapes/UTF-8 return 400. Repeated scalar keys join with commas, so a
+repeated integer/boolean generally fails conversion. Empty strings are valid;
+missing values are not. Query parsing is lazy and request-owned.
+
+JSON body plans cache constructors, writable-property descriptors and nested type
+plans at registration. They support string, int, bool and nongeneric reference
+DTOs with public parameterless constructors. Property matching ignores case;
+unknown fields are ignored and omitted fields retain constructor defaults. Input
+is validated before constructing the DTO graph. DTO types require constructor and
+property retention for native/JIT deployment. The existing JSON reader limits
+apply (1024 UTF-8 bytes, four container levels); recursive models, arrays, nullable
+values, custom converters, default/optional parameter substitution and arbitrary
+result serialization remain unsupported. These are development gaps, not claimed
+ASP.NET Core parity. CancellationToken request-abort binding remains pending.
 
 ## Binding attributes (development)
 
-Both attributes target handler parameters and are read through the function's
+All four attributes target handler parameters and are read through the function's
 parameter metadata once, at registration. They do not alter direct function calls.
 Native/JIT generic endpoints must retain custom-attribute metadata for the handler's
 declaring type or declared module, even if that handler has no binding attributes:
@@ -229,9 +256,12 @@ Unrelated attributes do not affect binding.
 
 | Type/member | Contract |
 | --- | --- |
-| `FromRouteAttribute()` | Binds string/int from a route capture. `[FromRoute]` uses the parameter name. |
+| `FromRouteAttribute()` | Binds string/int/bool from a route capture. `[FromRoute]` uses the parameter name. |
 | `var FromRouteAttribute.Name: string?` | Defaults to null; `[FromRoute(Name: "id")]` selects that capture instead. Empty or missing capture names reject registration. |
 | `FromServicesAttribute()` | `[FromServices]` resolves the declared reference type from the request scope, even if the parameter name matches a capture. Explicit string services are supported. |
+| `FromQueryAttribute()` | Selects a required query string/int/bool value even when a route capture has the same name. |
+| `var FromQueryAttribute.Name: string?` | Null uses the handler parameter name; otherwise uses the external query key. |
+| `FromBodyAttribute()` | Selects the endpoint's required JSON body, including explicitly on GET. No options in this slice. |
 
 Route names follow HttpServer's current case-sensitive capture contract. Open,
 ref/out, pointer, function and value-type service parameters remain unsupported.

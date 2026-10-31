@@ -10,16 +10,20 @@ import System.Runtime.CompilerServices.*
 import System.Runtime.Reflection.*
 import System.Web.Http.*
 import Neo.Web.HttpContext
+import Neo.DependencyInjection.*
+import System.Web.Http.Json.*
 
 // Registration-owned metadata. Request arguments are separate for concurrent requests.
 internal class HandlerParameter {
     val Kind: int
     val Name: string
     val Type: TypeInfo
-    init(kind: int, name: string, type: TypeInfo) {
+    val Body: JsonBodyPlan?
+    init(kind: int, name: string, type: TypeInfo, body: JsonBodyPlan?) {
         Kind = kind
         Name = name
         Type = type
+        Body = body
     }
 }
 
@@ -33,7 +37,7 @@ internal class HandlerPlan {
         self.resultKind = resultKind
     }
 
-    static func Create(pattern: RoutePattern, handler: Object, method: MethodInfo) -> Result<HandlerPlan, WebError> {
+    static func Create(pattern: RoutePattern, verb: HttpMethod, services: ServiceProvider, handler: Object, method: MethodInfo) -> Result<HandlerPlan, WebError> {
         if method.ContainsGenericParameters {
             return Failure(WebError.InvalidOptions("Handler must have a closed signature"))
         }
@@ -45,6 +49,7 @@ internal class HandlerPlan {
         }
         let names = pattern.GetParameterNames()
         let bindings = ArrayList<HandlerParameter>()
+        var bodyCount = 0
         for parameter in method.GetParameters() {
             let type = parameter.ParameterType
             if parameter.IsOut || parameter.IsOutWhenTrue || parameter.IsReadOnly || type.IsByRef || type.ContainsGenericParameters {
@@ -57,63 +62,105 @@ internal class HandlerPlan {
                 var selected = 0
                 if attribute.AttributeType.Equals(typeof(FromRouteAttribute)) { selected = 1 }
                 else if attribute.AttributeType.Equals(typeof(FromServicesAttribute)) { selected = 2 }
+                else if attribute.AttributeType.Equals(typeof(FromQueryAttribute)) { selected = 3 }
+                else if attribute.AttributeType.Equals(typeof(FromBodyAttribute)) { selected = 4 }
                 if selected != 0 {
                     if source != 0 {
                         return Failure(WebError.InvalidOptions("Conflicting binding sources: " + parameter.Name))
                     }
                     source = selected
-                    if selected == 1 {
+                    if selected == 1 || selected == 3 {
                         for argument in attribute.GetNamedArguments() {
                             if argument.MemberName == "Name" {
                                 if argument.TypedValue.Value is string explicitName {
                                     name = explicitName
                                 } else if argument.TypedValue.Value is not null {
-                                    return Failure(WebError.InvalidOptions("Invalid FromRoute name: " + parameter.Name))
+                                    return Failure(WebError.InvalidOptions("Invalid binding name: " + parameter.Name))
                                 }
                             }
                         }
                     }
                 }
             }
+            // Kinds: service=0, context=1, route=2, query=3, body=4, request=5, response=6.
             var binding = 0
-            if source == 0 && type.Equals(typeof(HttpContext)) { binding = 1 }
+            var route = false
+            for capture in names {
+                if capture == name { route = true }
+            }
+            let scalar = type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool))
+            if source == 1 {
+                if !route || !scalar { return Failure(WebError.InvalidOptions("Invalid route binding: " + parameter.Name)) }
+                binding = 2
+            } else if source == 3 {
+                if !scalar { return Failure(WebError.InvalidOptions("Query parameter must be string, int or bool: " + parameter.Name)) }
+                binding = 3
+            } else if source == 4 { binding = 4 }
+            else if source == 2 {
+                if type.IsValueType || type.IsFunctionType || type.IsPointer {
+                    return Failure(WebError.InvalidOptions("Unsupported service type: " + parameter.Name))
+                }
+            } else if type.Equals(typeof(HttpContext)) { binding = 1 }
+            else if type.Equals(typeof(HttpRequest)) { binding = 5 }
+            else if type.Equals(typeof(HttpResponse)) { binding = 6 }
+            else if scalar { binding = if route { 2 } else { 3 } }
+            else if services.IsService(type) { binding = 0 }
             else {
-                var route = false
-                for capture in names {
-                    if capture == name { route = true }
+                if verb.Equals(HttpMethod.Get) {
+                    return Failure(WebError.InvalidOptions("GET body binding requires FromBody: " + parameter.Name))
                 }
-                if source == 1 && !route {
-                    return Failure(WebError.InvalidOptions("Missing route capture for parameter: " + parameter.Name))
-                }
-                if source != 2 && route {
-                    if type.Equals(typeof(string)) { binding = 2 }
-                    else if type.Equals(typeof(int)) { binding = 3 }
-                    else { return Failure(WebError.InvalidOptions("Route parameter must be string or int: " + parameter.Name)) }
-                } else if source == 0 && type.Equals(typeof(string)) || type.IsValueType || type.IsFunctionType || type.IsPointer {
-                    return Failure(WebError.InvalidOptions("Unbound handler parameter: " + parameter.Name))
+                binding = 4
+            }
+            if binding == 4 {
+                bodyCount += 1
+                if bodyCount > 1 { return Failure(WebError.InvalidOptions("Only one request body parameter is supported")) }
+                if type.IsFunctionType || type.IsPointer || type.IsInterface || type.IsValueType && !scalar {
+                    return Failure(WebError.InvalidOptions("Unsupported body type: " + parameter.Name))
                 }
             }
-            bindings.Add(HandlerParameter(binding, name, type))
+            var body: JsonBodyPlan? = null
+            if binding == 4 { body = JsonBodyPlan.Create(type)? }
+            bindings.Add(HandlerParameter(binding, name, type, body))
         }
         return Ok(HandlerPlan(handler, bindings, kind))
     }
 
-    private func Bind(context: HttpContext) -> Result<Object?[], WebError> {
+    private async func Bind(context: HttpContext) -> Task<Result<Object?[], WebError>> {
         let arguments = CheckedStorage.Reserve<Object?>(parameters.Count)
+        var query: QueryValues? = null
         var index = 0
-        for parameter in parameters {
+        while index < parameters.Count {
+            let parameter = parameters[index]
             if parameter.Kind == 1 { arguments[index] = context }
+            else if parameter.Kind == 5 { arguments[index] = context.Request }
+            else if parameter.Kind == 6 { arguments[index] = context.Response }
             else if parameter.Kind == 2 || parameter.Kind == 3 {
-                let Ok(text) = context.RouteValues.Get(parameter.Name) else {
-                    return Failure(WebError.BadRequest("Missing route value: " + parameter.Name))
-                }
-                if parameter.Kind == 2 { arguments[index] = text }
-                else {
-                    let Ok(number) = Int32.Parse(text) else {
-                        return Failure(WebError.BadRequest("Invalid integer route value: " + parameter.Name))
+                var text = ""
+                if parameter.Kind == 2 {
+                    let Ok(value) = context.RouteValues.Get(parameter.Name) else {
+                        return Failure(WebError.BadRequest("Missing route value: " + parameter.Name))
                     }
-                    arguments[index] = number
+                    text = value
+                } else {
+                    if query is null { query = QueryValues.Parse(context.Request.Target)? }
+                    text = query!.Get(parameter.Name)?
                 }
+                arguments[index] = ConvertScalar(text, parameter)?
+            } else if parameter.Kind == 4 {
+                let Ok(Some(media)) = context.Request.GetContentType() else {
+                    return Failure(WebError.UnsupportedMediaType)
+                }
+                if media.Type != "application" || media.SubType != "json" && !(media.Suffix is Some("json")) {
+                    return Failure(WebError.UnsupportedMediaType)
+                }
+                if let Some(charset) = media.CharSet {
+                    if String.CompareOrdinalIgnoreCase(charset, "utf-8") != 0 {
+                        return Failure(WebError.UnsupportedMediaType)
+                    }
+                }
+                let read = await context.Request.Content.ReadJsonNode()
+                let Ok(value) = read else { return Failure(WebError.BadRequest("Invalid JSON body")) }
+                arguments[index] = parameter.Body!.Read(value)?
             } else {
                 let resolved = context.Services.GetRequiredService(parameter.Type)
                 if let Failure(error) = resolved { return Failure(WebError.Services(error)) }
@@ -124,8 +171,21 @@ internal class HandlerPlan {
         return Ok(arguments)
     }
 
+    private static func ConvertScalar(text: string, parameter: HandlerParameter) -> Result<Object, WebError> {
+        if parameter.Type.Equals(typeof(string)) { return Ok(text) }
+        if parameter.Type.Equals(typeof(int)) {
+            let Ok(number) = Int32.Parse(text) else {
+                return Failure(WebError.BadRequest("Invalid integer: " + parameter.Name))
+            }
+            return Ok(number)
+        }
+        if String.CompareOrdinalIgnoreCase(text, "true") == 0 { return Ok(true) }
+        if String.CompareOrdinalIgnoreCase(text, "false") == 0 { return Ok(false) }
+        return Failure(WebError.BadRequest("Invalid boolean: " + parameter.Name))
+    }
+
     async func Execute(context: HttpContext) -> Task<Result<unit, WebError>> {
-        let arguments = Bind(context)?
+        let arguments = (await Bind(context))?
         let invoked = FunctionReflection.Invoke(handler, arguments)
         if let Failure(_) = invoked { return Failure(WebError.InvalidOptions("Handler invocation failed")) }
         let value = invoked!

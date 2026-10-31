@@ -43,6 +43,11 @@ the structural function contract and caches bindings. The sample does not import
 | `GET /visits` | 405 with `Allow: POST` |
 | `GET /items/42` | `The answer`; other integers produce an empty 404 |
 | `GET /items/nope` | 400 without entering the handler |
+| `GET /search?q=Ada&page=2` | Query values and an injected service produce a greeting |
+| `POST /greetings` | JSON GreetingInput plus an injected service produces 201 |
+| `GET /cached` | One small immutable computed response is cached by example middleware |
+| `GET /uncached` | The same computation executes on every request |
+| `GET /cache-stats` | Hit, miss and execution counters |
 | Unknown route | 404 |
 
 ```sh
@@ -51,7 +56,8 @@ curl -X POST http://127.0.0.1:8080/visits
 ```
 
 All responses are buffered text. State is local to the process; there is no database,
-authentication, automatic body binding or general middleware. The
+or authentication. Query values, JSON request DTOs and function/typed middleware
+are supported within the development limits. The
 [Neo.Web guide](/features/neo-web/) explains the current boundaries and lifecycle.
 
 The handlers in `Endpoints.rvn` are ordinary functions with explicit arguments.
@@ -59,3 +65,9 @@ The sample's `test/WebDemo.Tests` project calls those functions without starting
 server and asserts the payloads and closed HTTP outcomes. Shared testing helpers
 remain local to the sample. Framework behavior has its own NeoClr.Testing project
 under `extensions/Neo.Web/test`.
+
+Response caching is deliberately an application example: one immutable public text
+endpoint, a bounded singleton store, and fresh response content on every hit.
+Authentication/cookie/cache-control requests bypass it. There is no expiry or
+general HTTP cache policy. A dedicated harness compares the same computation with
+caching enabled and disabled across interpreter, JIT and AOT.

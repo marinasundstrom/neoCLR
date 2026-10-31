@@ -17,7 +17,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pipeline. Registration freezes on `RunAsync`; shutdown joins middleware work.
   WebDemo demonstrates named handlers, middleware and direct handler tests in its
   own NeoClr.Testing project; framework behavior remains under `extensions/Neo.Web/test`.
-  Query/body binding, general serialization and streaming remain future work.
+  General result serialization and streaming remain future work.
   Add the read-only `HttpResult<T>.StatusCode` union member, projecting 200/201/400/404
   from its case for any payload type. Use the same projection when writing responses
   and in direct WebDemo handler tests. Further common properties and closed class
@@ -36,6 +36,25 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Existing version-1 retention files remain supported. Native/JIT generic handler
   consumers must add custom-attribute retention for their handler types/modules,
   including unannotated handlers, so source overrides cannot be silently lost.
+  Add nonactivating `ServiceProvider.IsService` and use it for Neo.Web service
+  inference; custom provider implementations must implement the new member.
+  Unregistered reference inputs now infer POST bodies or reject implicit GET bodies;
+  FromServices explicitly retains service-resolution semantics.
+  Add FromQuery/FromBody, required string/int/bool query binding and cached JSON
+  scalar/DTO body plans, with sanitized 400/415 failures before handler invocation.
+  Bind HttpRequest/HttpResponse with context identity, and add HttpResponse.SetHeader
+  so 405 responses preserve that identity. WebDemo demonstrates query/body/service
+  inputs and direct logic tests. Optional parameters, array/nullable bodies and
+  request-abort token binding remain gaps. Add a direct-HttpServer comparison harness
+  separating readiness, first request and warm request timings across execution modes.
+  WebDemo includes bounded response-cache middleware with hit/miss/execution counters;
+  the benchmark compares identical computation with caching enabled and disabled.
+  Qualify framework 5/5, sample logic 4/4 and 30 sample HTTP checks per mode across
+  interpreter/JIT/AOT. Preserve all 15 benchmark cases (546 HTTP responses), including
+  slower native/JIT caching results and the substantial JIT startup cost.
+  Raise the code generator's intermediate function inventory from 8192 to 16384 for
+  the combined web/JSON graph; executable image and native host limits are unchanged.
+
 - Fix native metadata constrained interface calls through declaring-type parameters
   and nominal method bounds, preserving borrowed receiver semantics. Preserve
   interface bounds on imported nonvirtual generic reference-class methods; malformed

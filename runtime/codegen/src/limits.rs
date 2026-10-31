@@ -11,7 +11,9 @@ pub const FUNCTION_CLONES: usize = FUNCTIONS;
 // shapes. Selection still limits the executable image to TYPES. Raw linked
 // source remains separately bounded by MAX_LOAD_SET_TYPES.
 pub const INPUT_TYPES: usize = 2 * TYPES;
-pub const INPUT_FUNCTIONS: usize = 8192;
+// Neo.Web + JSON binding crosses 8,192 intermediate declarations. This is
+// compilation inventory only; selected image/host limits remain unchanged.
+pub const INPUT_FUNCTIONS: usize = 16384;
 // Match NEOCLR_NATIVE_LAYOUT_LANES in the native host header.
 pub const INLINE_LANES: usize = 256;
 // Heap objects use pointer ABI lanes regardless of payload size. Keep their

@@ -59,3 +59,9 @@ and equality preserves case-sensitive boundary/unknown parameter values.
 `HttpContent.GetContentType()` reads producer metadata. None of these reads consumes
 a body. Content-Type is a concrete media type, not an Accept range or quality weight.
 See the [media type contract](/features/web/#media-types-development) for limits.
+
+Development `HttpResponse.SetHeader(name: string, value: string) -> Result<unit, HttpError>`
+replaces matching fields without replacing the response or its content. Names are
+HTTP tokens; prohibited controls return InvalidRequest without mutation. Response
+framing/content validation still happens on send. Neo.Web uses this to preserve
+response identity while configuring a 405 Allow header.
