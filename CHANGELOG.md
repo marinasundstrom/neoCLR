@@ -18,8 +18,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   WebDemo demonstrates named handlers, middleware and direct handler tests in its
   own NeoClr.Testing project; framework behavior remains under `extensions/Neo.Web/test`.
   Query/body binding, general serialization and streaming remain future work.
-  Record the author's direction for common result properties projected by union
-  members; these properties are planned, with closed class hierarchies a future option.
+  Add the read-only `HttpResult<T>.StatusCode` union member, projecting 200/201/400/404
+  from its case for any payload type. Use the same projection when writing responses
+  and in direct WebDemo handler tests. Further common properties and closed class
+  hierarchies remain future options.
 - Expose the structural function-value `Function` contract through the matching
   unified Raven compiler and runtime metadata service. Preserve function-value
   terminology and binding value identity in maintained documentation. Support
@@ -48,6 +50,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   collection-before-rejection; leave transport/test deadlines unchanged. The same
   framework assembly now passes all five interpreter tests. Retain the original
   failure and focused accounting/HTTP evidence in `docs/validation/neo-web-timeout-20261031`.
+
+- Extend interpreter array accounting to cache unchanged frame argument/local
+  totals, invalidated by writes through their aliases. Keep evaluation-stack and
+  construction storage checks, current quotas and collection behavior. The result
+  property workload exposed remaining frame-scan cost after the heap-only fix;
+  preserve the failed HTTP attempts and control alongside the passing follow-up.
 
 - Publish Preview 19 after final source-asset upload crosses midnight in Stockholm.
   Verify all 12 public asset hashes/sizes and the checksum download; qualified

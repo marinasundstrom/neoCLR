@@ -14,7 +14,7 @@ pub(crate) struct Slot {
     // Invalidate on payload-changing mutations, including interior aliases.
     // Numeric summaries contain no references and never cache quota permission.
     array_usage: std::cell::Cell<Option<crate::arrays::Usage>>,
-    heap_arrays_dirty: Option<Arc<std::sync::atomic::AtomicBool>>,
+    arrays_dirty: Option<Arc<std::sync::atomic::AtomicBool>>,
     writes: u64,
     construction: Option<Vec<Type>>,
     replacements: HashMap<Vec<usize>, u64>,
@@ -43,20 +43,20 @@ impl Slot {
             ty,
             value,
             array_usage: std::cell::Cell::new(None),
-            heap_arrays_dirty: None,
+            arrays_dirty: None,
             writes: 0,
             construction: None,
             replacements: HashMap::new(),
         }))
     }
-    pub(crate) fn track_heap_arrays(&mut self, dirty: Arc<std::sync::atomic::AtomicBool>) {
-        self.heap_arrays_dirty = Some(dirty);
+    pub(crate) fn track_array_usage(&mut self, dirty: Arc<std::sync::atomic::AtomicBool>) {
+        self.arrays_dirty = Some(dirty);
         self.invalidate_array_usage();
     }
 
     fn invalidate_array_usage(&self) {
         self.array_usage.set(None);
-        if let Some(dirty) = &self.heap_arrays_dirty {
+        if let Some(dirty) = &self.arrays_dirty {
             dirty.store(true, std::sync::atomic::Ordering::Relaxed);
         }
     }

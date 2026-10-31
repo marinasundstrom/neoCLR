@@ -5,13 +5,8 @@ import System.Result.*
 import Neo.Web.*
 import NeoClr.Testing.*
 
-// No wildcard: all outcomes are covered, independent of the payload type.
-func StatusOf<T>(result: HttpResult<T>) -> int => match result {
-    HttpResult<T>.Ok(_) => 200
-    HttpResult<T>.Created(_) => 201
-    HttpResult<T>.BadRequest => 400
-    HttpResult<T>.NotFound => 404
-}
+// Exercise the member through an imported open generic union, not only closed cases.
+func StatusOf<T>(result: HttpResult<T>) -> int => result.StatusCode
 
 [Test]
 func `Typed results preserve content and exhaustively describe response alternatives`() -> Result<unit, TestFailure> {
@@ -22,7 +17,9 @@ func `Typed results preserve content and exhaustively describe response alternat
         _ => 0
     }
     _ = Assert.Equal(42, actual)?
+    _ = Assert.Equal(200, number.StatusCode)?
     _ = Assert.Equal(200, StatusOf(number))?
+    _ = Assert.Equal(201, created.StatusCode)?
     _ = Assert.Equal(201, StatusOf(created))?
     _ = Assert.Equal(404, StatusOf(HttpResult<string>.NotFound))?
     return Assert.Equal(400, StatusOf(HttpResult<string>.BadRequest))

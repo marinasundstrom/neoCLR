@@ -16,6 +16,7 @@ func `Greeting uses the supplied configuration and name`() -> Result<unit, TestF
     use root = configuration.Build()
     use service = GreetingService(root)
     let result = Greeting("Ada", service)
+    _ = Assert.Equal(200, result.StatusCode)?
     _ = Assert.True(result is HttpResult<string>.Ok(_), "Greeting returns Ok")?
     return Assert.Equal("Welcome, Ada!", Describe(result))
 }
@@ -28,6 +29,8 @@ func `Visits retain application state and return created results`() -> Result<un
     let second = Visit(visits, logging)
     _ = Assert.True(first is HttpResult<string>.Created(_), "First visit returns Created")?
     _ = Assert.True(second is HttpResult<string>.Created(_), "Second visit returns Created")?
+    _ = Assert.Equal(201, first.StatusCode)?
+    _ = Assert.Equal(201, second.StatusCode)?
     _ = Assert.Equal("Visit 1", Describe(first))?
     return Assert.Equal("Visit 2", Describe(second))
 }
@@ -41,6 +44,9 @@ func Describe(result: HttpResult<string>) -> string => match result {
 
 [Test]
 func `Item lookup chooses among the closed result alternatives`() -> Result<unit, TestFailure> {
+    _ = Assert.Equal(200, Item(42).StatusCode)?
+    _ = Assert.Equal(404, Item(7).StatusCode)?
+    _ = Assert.Equal(400, Item(-1).StatusCode)?
     _ = Assert.Equal("The answer", Describe(Item(42)))?
     _ = Assert.True(Item(7) is HttpResult<string>.NotFound, "Unknown item returns NotFound")?
     return Assert.True(Item(-1) is HttpResult<string>.BadRequest, "Negative ID returns BadRequest")

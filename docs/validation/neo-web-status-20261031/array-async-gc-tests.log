@@ -1,0 +1,79 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.19s
+     Running tests/reference_arrays.rs (target/debug/deps/reference_arrays-7ba18340fd9523b0)
+
+running 15 tests
+test array_reference_identity_is_distinct_and_substitutes_in_metadata ... ok
+test interface_objects_survive_in_jagged_array_across_gc ... ok
+test generic_constructor_defaults_array_field_then_assigns_buffer ... ok
+test aliases_share_elements_but_rebinding_preserves_old_allocation ... ok
+test element_address_roots_returned_array_across_gc ... ok
+test jagged_arrays_default_inner_references_to_null ... ok
+test array_reference_slot_requires_explicit_load_and_supports_reset ... ok
+test exact_array_cast_preserves_identity_and_wrong_element_cast_faults ... ok
+test reference_arrays_fail_notreference_constraint ... ok
+test reflection_recognizes_ordinary_array_shape ... ok
+test reference_array_is_not_an_owned_array_or_native_payload ... ok
+test ordinary_array_operations_enforce_bounds_types_and_budgets ... ok
+test null_array_operations_fault_without_verifier ... ok
+test array_isinst_returns_null_for_mismatches_without_weakening_invariance ... ok
+test mutable_arrays_are_invariant_even_for_reference_elements_and_typed_nulls ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.36s
+
+     Running tests/runtime_async_await.rs (target/debug/deps/runtime_async_await-5bcde6c3fa002940)
+
+running 35 tests
+test cancelled_body_handle_cannot_be_released_while_body_is_still_parked ... ok
+test async_start_runs_until_first_suspend_then_publishes_body_result ... ok
+test async_start_body_fault_remains_terminal_in_this_poc ... ok
+test callback_fault_terminates_pending_await ... ok
+test async_start_completed_body_returns_a_completed_operation ... ok
+test body_can_observe_its_own_terminal_cancellation ... ok
+test cancellation_delivery_resumes_without_reading_the_cancelled_result ... ok
+test async_start_charges_frame_before_running_body ... ok
+test completed_before_await_returns_result_and_completion_is_one_shot ... ok
+test cancelled_operation_faults_and_cannot_be_completed ... ok
+test detached_arrays_still_count_against_invocation_budget ... ok
+test cli_no_result_unit_await_does_not_push_a_value ... ok
+test entry_drain_tracks_its_frame_across_detached_unit_body_calls ... ok
+test managed_notifications_are_drained_again_after_an_activation_reparks ... ok
+test entry_result_survives_detached_callback_completion_after_entry_return ... ok
+test host_cancellation_interrupts_an_incomplete_operation ... ok
+test independently_dispatched_callback_can_await_the_submitting_body ... ok
+test managed_body_ownership_reclaims_abandoned_frames_and_signals ... ok
+test parked_activations_keep_managed_completion_dispatch_alive ... ok
+test completed_handle_can_be_awaited_repeatedly_until_released ... ok
+test manual_unit_completion_is_retained_and_one_shot ... ok
+test multiple_parked_bodies_share_completion_and_release_cannot_retract_delivery ... ok
+test nested_async_starts_return_to_their_own_callers_and_publish_results ... ok
+test parent_resumes_while_callback_waits_for_parent_reply ... ok
+test suspended_managed_queue_callback_is_not_drained_recursively ... ok
+test pending_frames_still_charge_frame_budget ... ok
+test invalid_delay_and_unknown_handles_are_rejected ... ok
+test pending_operation_resumes_after_producer_itself_suspends_and_collects ... ok
+test pending_body_self_wait_fails_instead_of_hanging ... ok
+test unit_body_can_complete_eagerly ... ok
+test completion_observation_rejects_unknown_and_released_handles ... ok
+test unit_body_suspends_and_repeated_awaits_preserve_unit_result ... ok
+test readiness_query_is_nonconsuming_and_validates_handles ... ok
+test ready_managed_body_survives_collection_after_completion_owner_is_dropped ... ok
+test unit_and_integer_results_cannot_be_confused ... ok
+
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.97s
+
+     Running tests/runtime_gc.rs (target/debug/deps/runtime_gc-7f42f6ca5f539912)
+
+running 10 tests
+test construction_and_keep_alive_use_the_same_heap_roots ... ok
+test explicit_collection_reclaims_unreachable_cycles ... ok
+test explicit_collection_cannot_evade_heap_limit ... ok
+test collection_preserves_caller_locals_and_interior_references ... ok
+test bundled_gc_facade_matches_canonical_service_returns ... ok
+test explicit_collection_reclaims_garbage_and_preserves_stack_roots ... ok
+test gc_control_reports_heap_requirement_and_consumes_instruction_budget ... ok
+test no_result_gc_controls_preserve_live_stack_roots_without_pushing_unit ... ok
+test counters_are_execution_local_and_queries_do_not_collect ... ok
+test service_signatures_are_exact ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.74s

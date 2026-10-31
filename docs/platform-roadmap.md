@@ -12,6 +12,10 @@ on unified Raven main. See the [API contract](../api-docs/neo-web.md),
 The interpreter timeout is resolved by a bounded heap-accounting cache; the
 unchanged framework suite now passes in interpreter mode. See the
 [fix qualification](validation/neo-web-timeout-20261031/README.md).
+`HttpResult<T>.StatusCode` now projects its closed cases and drives the writer;
+[result-property qualification](validation/neo-web-status-20261031/README.md) also
+covers the frame-accounting follow-up. The next author-directed sequence is typed
+middleware (`TMiddleware : Middleware`, an interface), then endpoint ergonomics.
 This author-directed task does not permanently reprioritize the roadmap.
 
 **Neo.Web design proposal (2026-10-30):** At the author's request, the

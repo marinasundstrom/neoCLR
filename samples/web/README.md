@@ -111,3 +111,8 @@ The host and test project both reference `src/WebDemo.Logic/WebDemo.Logic.rvnpro
 This library owns the named handlers and application state; the executable owns
 composition and lifetime. Native project references currently require library
 outputs, so the tests reference this shared logic instead of the executable.
+
+`HttpResult<T>.StatusCode` is available when testing handler outputs directly:
+WebDemo.Tests asserts the projected 200/201/400/404 status alongside exhaustive case
+matches and payload checks. No HTTP listener or transport namespace import is
+needed to inspect the result. The property also drives the framework response writer.

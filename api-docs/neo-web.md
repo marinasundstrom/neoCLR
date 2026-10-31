@@ -191,6 +191,13 @@ generated adapters without useful names cannot infer route binding.
 | `BadRequest` | No payload, HTTP 400. |
 | `NotFound` | No payload, HTTP 404. |
 
+`val StatusCode: int` is a read-only instance property on the union. It projects
+200, 201, 400 or 404 from the active case for every `T`, without executing the result,
+serializing its payload or resolving services. It is non-nullable because every
+case has a defined status. The integer matches HttpContext's response methods and
+requires no System.Web.Http import. The response writer consumes this same property;
+there is no separate mutable status that could disagree with the case.
+
 Values preserve `T` independently of hosting. The initial endpoint adapter accepts
 `HttpResult<string>` and `Task<HttpResult<string>>`; successful strings become
 UTF-8 `text/plain` responses and the other cases have empty bodies. Other payload
@@ -199,17 +206,19 @@ is supported. No implicit JSON serialization or arbitrary `Task<T>` adaptation i
 provided. A match can cover all four alternatives without a wildcard:
 
 ```raven
-func Status(result: HttpResult<string>) -> int => match result {
-    HttpResult<string>.Ok(_) => 200
-    HttpResult<string>.Created(_) => 201
-    HttpResult<string>.BadRequest => 400
-    HttpResult<string>.NotFound => 404
+func Describe(result: HttpResult<string>) -> string => match result {
+    HttpResult<string>.Ok(let value) => value
+    HttpResult<string>.Created(let value) => value
+    HttpResult<string>.BadRequest => "400"
+    HttpResult<string>.NotFound => "404"
 }
 ```
 
 The generic union is the bounded implementation of the proposed closed result
 hierarchy. The payload type is on the union; nongeneric `HttpResult.Ok<T>` nested
 class cases and existential generic-case patterns are not part of this API.
+The current return type admits all four cases; endpoint-specific subsets and
+independent payload types per alternative remain future work.
 
 Framework behavior is tested in `extensions/Neo.Web/test`. WebDemo's separate test
 project references the sample and calls its ordinary handler functions directly,

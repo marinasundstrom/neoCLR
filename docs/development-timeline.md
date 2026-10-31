@@ -1,5 +1,33 @@
 # Development conversation record
 
+## 2026-10-31 — Implement common result status and clarify variant enforcement
+
+- **Author:** Directed continuation after proposing common union members, then
+  clarified the goal: resemble ASP.NET Core result types while improving/enhancing
+  variant enforcement.
+- **Assistant implementation:** Added read-only `HttpResult<T>.StatusCode: int`,
+  exhaustively projected from the four current cases, and used it in HTTP response
+  writing and direct sample tests. This preserves typed case payloads and avoids
+  a transport namespace dependency for property access.
+- **Assistant comparison:** Recorded ASP.NET Core's existing typed-result and
+  declared-alternative checking in the [design](design/neo-web.md#variant-enforcement-and-aspnet-core-familiarity-2026-10-31).
+  Raven's closed variants and exhaustive payload matching are the intended language
+  benefit. Endpoint-specific subsets/differing payload alternatives and closed class
+  hierarchies remain future work; this property does not establish those capabilities.
+- **Author next sequence:** First make function middleware and typed middleware
+  registration consistent; specified `TMiddleware : Middleware` with Middleware
+  an interface. Then review endpoint signatures for ASP.NET Core-like ergonomics.
+  The assistant proposed one pipeline contract with per-request DI activation for
+  the typed adapter; the design records that next-slice direction separately.
+- **Validation follow-up:** The result-property workload passed native/JIT and direct
+  sample tests but reproduced the interpreter HTTP timeout, including without the
+  website build running. The prior assembly still passed on the same interpreter.
+  The assistant extended numeric accounting reuse to unchanged frame slots, keeping
+  all quotas and stack checks. A callee-alias regression and 99 focused tests pass;
+  the unchanged property workload now completes the HTTP checks. Evidence retains
+  the failed attempts and the previous-assembly control rather than treating the
+  earlier heap-only repair as a universal timeout guarantee.
+
 ## 2026-10-31 — Common response properties on HttpResult
 
 - **Author:** Clarified that unions support members and that HttpResult could expose

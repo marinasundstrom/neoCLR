@@ -39,7 +39,9 @@ are released; streaming remains outside this slice.
 The [lower-level HTTP APIs](/features/web/) remain available independently.
 
 `HttpResult<T>` is a closed result union: `Ok(T)`, `Created(T)`, `BadRequest`
-and `NotFound`. The initial adapter accepts `HttpResult<string>` and its task form,
+and `NotFound`. Its read-only `StatusCode` property projects the active case's
+200, 201, 400 or 404 status for any payload type, including in direct handler tests.
+The initial adapter accepts `HttpResult<string>` and its task form,
 writing successful payloads as text. Handlers can be called directly in tests with
 ordinary arguments, and matches cover the result alternatives exhaustively.
 WebDemo includes its own logic-test project; framework tests live under

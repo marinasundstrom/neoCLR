@@ -551,13 +551,66 @@ lifetime with real HTTP requests.
 The author clarified that unions allow members: `HttpResult<T>` can expose common
 response properties, such as `StatusCode`, by projecting information from its active
 case. The current union need not become a class hierarchy to provide that contract.
-For example, a future status property can exhaustively map Ok to 200, Created to
-201, BadRequest to 400 and NotFound to 404 while retaining typed case payloads.
-This is a design direction; the current union does not yet expose that property.
+The status property exhaustively maps Ok to 200, Created to 201, BadRequest to
+400 and NotFound to 404 while retaining typed case payloads.
+The bounded follow-up now implements `val StatusCode: int` with that exhaustive
+projection and uses it in the response writer. The integer follows the existing
+HttpContext response methods without requiring a transport namespace import.
 
 Keep sealed/closed class hierarchies as a future alternative, evaluated for their
 own requirements rather than as a prerequisite for common result members. Unlike
 nominal result interfaces/classes, union members can share the exhaustive case
-model already used by direct handler tests. Before adding the API, settle the
-status property's type, which other information is genuinely common to every case,
-and how the HTTP adapter consumes those projections without weakening typed payloads.
+model already used by direct handler tests. Additional common properties remain future design work: require information that
+is meaningful for every case and preserve the typed case payloads. No mutable
+status override or replacement of the union with a class hierarchy is introduced.
+
+## Variant enforcement and ASP.NET Core familiarity (2026-10-31)
+
+The author clarified the purpose: resemble ASP.NET Core result types while enhancing
+variant enforcement. ASP.NET Core already supports typed results and
+[`Results<T1, ..., Tn>`](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/responses?view=aspnetcore-10.0#resultstresult1-tresultn),
+which reject return types outside the declared alternatives and retain endpoint
+metadata. Neo.Web should preserve that familiar typed-response experience rather
+than claim that ASP.NET Core has no compile-time variant checking.
+
+The intended additional benefit is Raven's language-level closed variants,
+typed payload patterns and exhaustiveness checking, with common members derived
+from the active case. The current `HttpResult<T>` closes the four supported cases
+and fixes each case's status; it does not yet let each endpoint declare a narrower
+subset or different payload types per alternative. Those richer result sets remain
+future design work, together with any sealed-hierarchy alternative. The tradeoff
+of the present union is that adding a case affects exhaustive consumers, and every
+handler returning it advertises all four alternatives. Status projection alone
+must not be described as completing that broader goal.
+
+## Middleware registration consistency (next slice, 2026-10-31)
+
+The author selected `TMiddleware : Middleware`, with `Middleware` an interface,
+and requested middleware consistency before endpoint signature ergonomics.
+The proposed typed path is `UseMiddleware<TMiddleware>()`; the existing
+`Use(handlerFunc)` remains the direct function-value path. Both should compose
+through exactly the same `(context, next) -> Task<Result<unit, WebError>>` pipeline.
+The interface's proposed `InvokeAsync` method has those same inputs and output.
+
+Resolve the registered concrete middleware type from the request's service scope
+when its stage is reached. Constructor dependencies therefore follow DI lifetimes;
+short-circuited downstream middleware is not activated. The outer pipeline already
+keeps the scope alive through post-next work and cancellation. Missing registration
+or activation errors should propagate as WebError.Services and use the existing
+sanitized failure response. Register services explicitly; pipeline registration
+should neither mutate an already built provider nor instantiate scoped middleware
+at startup. No method-name reflection or convention activation is needed.
+
+This follows ASP.NET Core's [interface-based middleware activation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/extensibility?view=aspnetcore-10.0)
+in preferring strongly typed invocation and request-scoped resolution. The bounded
+Neo.Web adapter can reuse its public DI service scope without introducing a separate
+middleware factory service. A factory replacement/activation policy remains a later
+extension point if needed. Function captures remain caller-owned; typed middleware
+lifetime/disposal follows its DI registration. Neither form gains reentrant next,
+retained continuations or independent scope ownership.
+
+After that slice, review endpoint signatures: sync versus async typed results,
+explicit context versus injected parameters, route/query/body/service binding and
+startup diagnostics. Preserve the cached registration plan and structural function
+contract. ASP.NET Core familiarity is the target, but unsupported binding families
+remain gaps rather than silently guessed semantics.

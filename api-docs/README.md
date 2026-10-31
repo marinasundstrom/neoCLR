@@ -3142,3 +3142,8 @@ API names are provisional. The matching unified Raven compiler (`9cd1c94ae`) ren
 MapGet/MapPost function constraints, typed results, Map/Run and Use middleware.
 The native reference also includes RuntimeContext.GetFunctionInfo. No public type
 is excluded; query/body binding and general result serialization remain deferred.
+
+The follow-up HttpResult<T>.StatusCode property is selected on the existing union
+page and has a generated member page and XML summary. It is a total read-only int
+projection; no new type selection or renderer exclusion is needed. The response
+writer and direct handler tests use the property with the matching Neo.Web assembly.

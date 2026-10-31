@@ -280,3 +280,21 @@ fn reserved_arrays_obey_budgets_and_cannot_deinitialize_existing_elements() {
             .contains("cannot become uninitialized")
     );
 }
+
+#[test]
+fn caller_array_budget_tracks_callee_alias_writes_after_summary_reuse() {
+    let p = program(
+        ".function Grow(String[]&) -> Void\nldarg 0\nldc.i4 0\nldstr \"longer\"\nstelem String\nldvoid\nret\n.end",
+        ".local String[] items\nldc.i4 1\nldstr \"a\"\narray.create String\nstloc items\nldloca items\ncall Grow(String[]&)\npop\nldc.i4 0",
+        "Int32",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(0));
+    let fault = p
+        .run(Limits {
+            array_bytes: std::mem::size_of::<Value>() + 1,
+            ..Limits::default()
+        })
+        .unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::ArrayLimitExceeded);
+}

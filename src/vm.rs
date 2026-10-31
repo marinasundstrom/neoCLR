@@ -1854,6 +1854,8 @@ struct Frame {
     pc: usize,
     trace_pc: usize,
     args: Vec<crate::slots::Cell>,
+    slot_arrays_dirty: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    slot_array_usage: std::cell::Cell<Option<crate::arrays::Usage>>,
     constructing: bool,
     construction_object: Option<crate::value::ObjectReference>,
     construction_receiver: Option<crate::SlotReference>,
@@ -1908,10 +1910,17 @@ impl Frame {
                 }
             }
         }
+        let slot_arrays_dirty = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+        let tracked_slot = |ty, value| {
+            let cell = crate::slots::Slot::cell(ty, value);
+            cell.borrow_mut()
+                .track_array_usage(slot_arrays_dirty.clone());
+            cell
+        };
         let locals = function
             .locals
             .iter()
-            .map(|ty| crate::slots::Slot::cell(ty.clone(), None))
+            .map(|ty| tracked_slot(ty.clone(), None))
             .collect();
         Ok(Self {
             initializing_type: None,
@@ -1921,8 +1930,10 @@ impl Frame {
             trace_pc: 0,
             args: args
                 .into_iter()
-                .map(|v| crate::slots::Slot::cell(v.ty(), Some(v)))
+                .map(|v| tracked_slot(v.ty(), Some(v)))
                 .collect(),
+            slot_arrays_dirty,
+            slot_array_usage: std::cell::Cell::new(None),
             permit: None,
             queue_callback: false,
             runtime_callback: false,
@@ -2596,12 +2607,31 @@ fn frame_array_usage(
         .iter()
         .chain(parked.iter().flat_map(|activation| &activation.frames))
     {
-        for cell in frame
-            .args
-            .iter()
-            .chain(&frame.locals)
-            .chain(frame.construction_storage.iter())
+        // Arguments/locals have stable storage. Alias writes invalidate their
+        // frame's numeric summary even while that activation is parked. Stack
+        // values and separate construction storage are still measured each time.
+        if frame
+            .slot_arrays_dirty
+            .load(std::sync::atomic::Ordering::Relaxed)
+            || frame.slot_array_usage.get().is_none()
         {
+            let mut measured = crate::arrays::Usage::default();
+            for cell in frame.args.iter().chain(&frame.locals) {
+                cell.borrow().array_usage(&mut measured, limits)?;
+            }
+            frame.slot_array_usage.set(Some(measured));
+            frame
+                .slot_arrays_dirty
+                .store(false, std::sync::atomic::Ordering::Relaxed);
+        }
+        usage.add(
+            frame
+                .slot_array_usage
+                .get()
+                .expect("complete frame array summary"),
+            limits,
+        )?;
+        if let Some(cell) = &frame.construction_storage {
             cell.borrow().array_usage(&mut usage, limits)?;
         }
         for value in &frame.stack {

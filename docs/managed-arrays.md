@@ -146,6 +146,14 @@ participant payloads still contribute on every check, and every caller's current
 limits are enforced. This adds a shared dirty flag and numeric cache; it changes
 neither array semantics nor collection policy or transport deadlines.
 
+The [result-property follow-up](validation/neo-web-status-20261031/README.md) also
+caches unchanged argument/local totals per frame, including parked activations.
+Writes through aliases invalidate the owning frame. Evaluation stacks and separate
+construction storage are still measured each time; each complete cached total is
+added against current limits. This adds one shared invalidation flag per frame and
+numeric cache metadata, outside logical payload quotas. It reduces the remaining
+scan cost without changing the quota or scheduling contracts.
+
 Existing GC object statistics include heap arrays as allocations; they do not
 report array payload bytes. Host invocation does not yet accept array input schemas.
 The JSON format remains 5 with additive Array type and array opcode variants.

@@ -1,0 +1,19 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.85s
+     Running unittests src/lib.rs (target/debug/deps/neoclr-552dc2137edebb2f)
+
+running 12 tests
+test slots::tests::managed_values_are_send_and_sync_without_unsafe_markers ... ok
+test slots::tests::payload_summary_rechecks_limits_and_accumulates_all_roots ... ok
+test slots::tests::byte_array_writes_preserve_quotas_initialization_and_output_epochs ... ok
+test slots::tests::cross_thread_array_mutation_invalidates_payload_summary ... ok
+test slots::tests::payload_summary_tracks_aliased_element_and_nested_field_writes ... ok
+test slots::tests::reference_replacement_releases_only_the_replaced_retention ... ok
+test slots::tests::payload_summary_tracks_replacement_failed_stores_and_reset ... ok
+test slots::tests::heap_payload_summary_rechecks_quotas_allocation_and_shared_mutation ... ok
+test slots::tests::heap_payload_summary_tracks_native_style_replacement_and_does_not_root_storage ... ok
+test slots::tests::references_retain_storage_and_failed_stores_do_not_fulfill_outputs ... ok
+test slots::tests::concurrent_record_replacement_and_reads_do_not_observe_torn_values ... ok
+test slots::tests::native_threads_mutate_the_same_heap_object_through_interior_aliases ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 416 filtered out; finished in 0.02s

@@ -14,15 +14,24 @@ public union HttpResult<T> {
     case BadRequest
     /// An empty 404 response.
     case NotFound
+
+    /// The HTTP status code projected from the active case: 200, 201, 400 or 404.
+    /// Available for every payload type; reading it does not execute or serialize the result.
+    val StatusCode: int => match self {
+        HttpResult<T>.Ok(_) => 200
+        HttpResult<T>.Created(_) => 201
+        HttpResult<T>.BadRequest => 400
+        HttpResult<T>.NotFound => 404
+    }
 }
 
 internal static class HttpResultWriter {
     static func Write(result: HttpResult<string>, context: HttpContext) {
         match result {
-            HttpResult<string>.Ok(let value) => context.RespondText(200, value)
-            HttpResult<string>.Created(let value) => context.RespondText(201, value)
-            HttpResult<string>.BadRequest => context.Respond(400)
-            HttpResult<string>.NotFound => context.Respond(404)
+            HttpResult<string>.Ok(let value) => context.RespondText(result.StatusCode, value)
+            HttpResult<string>.Created(let value) => context.RespondText(result.StatusCode, value)
+            HttpResult<string>.BadRequest => context.Respond(result.StatusCode)
+            HttpResult<string>.NotFound => context.Respond(result.StatusCode)
         }
     }
 }

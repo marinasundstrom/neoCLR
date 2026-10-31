@@ -1,0 +1,22 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.99s
+     Running tests/managed_arrays.rs (target/debug/deps/managed_arrays-95e40aebb7d98ad2)
+
+running 15 tests
+test direct_reference_elements_and_unsupported_default_values_are_rejected ... ok
+test current_frame_element_reference_cannot_return_even_without_verification ... ok
+test generic_arrays_substitute_elements_and_normalize_small_scalar_loads ... ok
+test fixed_shape_prevents_invalidating_existing_element_paths ... ok
+test caller_array_budget_tracks_callee_alias_writes_after_summary_reuse ... ok
+test only_element_reference_roots_array_and_transitive_heap_fields ... ok
+test payload_pressure_collects_unreachable_arrays_before_faulting ... ok
+test replacement_of_array_inside_record_preserves_shape ... ok
+test reference_elements_trace_targets_and_replacement_releases_old_roots ... ok
+test heap_arrays_have_default_elements_and_native_length_and_indices ... ok
+test value_copies_are_independent_and_element_references_follow_replacement ... ok
+test reserved_arrays_obey_budgets_and_cannot_deinitialize_existing_elements ... ok
+test reserved_capacity_faults_on_reads_and_accepts_typed_initialization ... ok
+test allocation_budgets_bound_copies_strings_and_lengths ... ok
+test bounds_and_invalid_operands_fault ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.93s

@@ -246,7 +246,7 @@ impl ManagedHeap {
         })?;
         let cell = crate::slots::Slot::cell(value.ty(), Some(value));
         cell.borrow_mut()
-            .track_heap_arrays(self.arrays_dirty.clone());
+            .track_array_usage(self.arrays_dirty.clone());
         self.objects.insert(identity, cell);
         self.peak_objects = self.peak_objects.max(self.len());
         Ok(identity)
