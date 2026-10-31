@@ -1,0 +1,28 @@
+LISTENING http://127.0.0.1:50095
+info: WebDemo.Request[0] Request GET /
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /hello/Ada
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /hello/current
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request POST /visits
+info: WebDemo[0] Recorded visit 1
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request POST /visits
+info: WebDemo[0] Recorded visit 2
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/42
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/7
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/-1
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /items/nope
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /echo/hello
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request POST /echo/hello
+info: WebDemo.Request[0] Request pipeline completed
+info: WebDemo.Request[0] Request GET /missing/path
+info: WebDemo.Request[0] Request pipeline completed
+STOPPED

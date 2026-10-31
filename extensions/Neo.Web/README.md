@@ -1,10 +1,12 @@
 # Neo.Web
 
 Neo.Web is an experimental web framework built on top of
-`System.Web.Http.HttpServer`. This first
-slice composes DI, configuration and logging and accepts context handlers. API
-names and assembly boundaries remain provisional. Generic minimal API binding,
-streaming results and a general host are later work.
+`System.Web.Http.HttpServer`. It composes DI, configuration and logging, accepts
+context and generic minimal API handlers, and supports function middleware plus
+`UseMiddleware<T: Middleware>()`. Generic handlers currently bind context, named
+string/int route values and scoped services through a registration-owned plan.
+API names and assembly boundaries remain provisional; query/body binding, streaming
+results and a general host remain later work.
 
 Start with the [reference app](../../samples/web/README.md), which will evolve with
 Neo.Web. Its application code imports `Neo.Web.*`; it does not need to import the
@@ -14,7 +16,7 @@ values and buffered response methods. When lower-level code also imports `System
 
 See the [API contract](../../api-docs/neo-web.md),
 [design proposal](../../docs/design/neo-web.md) and
-[validation record](../../docs/validation/neo-web-20261031/README.md).
+[validation record](../../docs/validation/neo-web-middleware-20261031/README.md).
 
 ## Build
 
@@ -38,11 +40,11 @@ python3 scripts/validate-neo-web.py --bundle /path/to/bundle \
 ```
 
 Use `--mode native`, `--mode interpreter` or `--mode jit` to select execution modes.
-Default is native, the qualified execution path for this experimental slice.
-Other modes are explicit probes; native executable compilation is shared across modes. The
+Default is native; native executable compilation is shared across modes. The
 framework consumer owns behavior assertions; the Python harness drives builds and
 an independent HTTP peer against the reference app.
 
-The current interpreter probe fails when calling Build despite passing metadata
-verification. See the validation record for the exact qualification and remaining
-execution-mode gap; this is not a permanent framework restriction.
+The framework and reference app are qualified in interpreter, JIT and native modes
+with the matching development toolchain. The validation record identifies exact
+builds and limitations. Native/JIT constructor activation uses the explicit retention
+policies included with the tests and sample.

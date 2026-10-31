@@ -7,6 +7,7 @@ internal static class OpenConstrainedCallChecks
 {
     internal static void Run()
     {
+        NominalInstanceCalls();
         External();
         PrimitiveDesignation();
         foreach (var self in new[] { false, true })
@@ -51,6 +52,28 @@ internal static class OpenConstrainedCallChecks
                 File.WriteAllBytes(path + (self ? ".self.neox" : ".neox"), native);
         }
     }
+    internal static void NominalInstanceCalls()
+    {
+        var graph = new AssemblyBuilder(new("NominalInstanceCalls", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
+        var contract = graph.AddInterface("Example", "Reads");
+        var read = contract.AddInterfaceMethod("Read", new(PrimitiveType.Int32, []));
+        var holder = graph.AddGenericClass("Example", "Holder", ["T"]);
+        var ownerParameter = SignatureType.TypeParameter(0);
+        var owned = holder.AddMethod("Read", new(PrimitiveType.Int32, [ownerParameter]));
+        Reject(() => owned.GetILGenerator().CallConstrained(ownerParameter, read));
+        holder.AddBaseTypeConstraint(0, contract);
+        Reject(() => owned.GetILGenerator().CallConstrained(SignatureType.TypeParameter(1), read));
+        Reject(() => owned.GetILGenerator().CallConstrained(SignatureType.MethodParameter(0), read));
+        var il = owned.GetILGenerator();
+        il.LoadArgumentAddress(0); il.CallConstrained(ownerParameter, read); il.Return();
+        var parameter = SignatureType.MethodParameter(0);
+        var method = graph.AddFunction("Read", new(PrimitiveType.Int32, [parameter], ["T"]));
+        method.AddInterfaceConstraint(0, contract);
+        il = method.GetILGenerator();
+        il.LoadArgumentAddress(0); il.CallConstrained(parameter, read); il.Return();
+        _ = graph.WriteNativeAssembly();
+    }
+
     private static void External()
     {
         var core = new AssemblyIdentity("System.Runtime", new Version(10, 0, 0, 0));

@@ -201,6 +201,11 @@ typed function local/type argument is an acceptable initial fallback.
 
 ## Registration and routing
 
+**Historical proposal:** the position-based From* operations below are superseded
+by the author's 2026-10-31 direction toward parameter binding attributes. See
+[endpoint binding and ambiguity](#endpoint-binding-and-ambiguity-2026-10-31).
+They are not implemented APIs.
+
 MapGet/MapPost validate the route pattern and retain the handler. They return a
 RouteHandlerBuilder with the following proposed configuration operations, each
 returning `Result<unit, WebRegistrationError>`:
@@ -583,14 +588,14 @@ of the present union is that adding a case affects exhaustive consumers, and eve
 handler returning it advertises all four alternatives. Status projection alone
 must not be described as completing that broader goal.
 
-## Middleware registration consistency (next slice, 2026-10-31)
+## Middleware registration consistency (development, 2026-10-31)
 
 The author selected `TMiddleware : Middleware`, with `Middleware` an interface,
 and requested middleware consistency before endpoint signature ergonomics.
-The proposed typed path is `UseMiddleware<TMiddleware>()`; the existing
-`Use(handlerFunc)` remains the direct function-value path. Both should compose
+The implemented typed path is `UseMiddleware<T>()`; the existing
+`Use(handlerFunc)` remains the direct function-value path. Both compose
 through exactly the same `(context, next) -> Task<Result<unit, WebError>>` pipeline.
-The interface's proposed `InvokeAsync` method has those same inputs and output.
+The interface's `InvokeAsync` method has those same inputs and output.
 
 Resolve the registered concrete middleware type from the request's service scope
 when its stage is reached. Constructor dependencies therefore follow DI lifetimes;
@@ -614,3 +619,78 @@ explicit context versus injected parameters, route/query/body/service binding an
 startup diagnostics. Preserve the cached registration plan and structural function
 contract. ASP.NET Core familiarity is the target, but unsupported binding families
 remain gaps rather than silently guessed semantics.
+
+## Endpoint binding and ambiguity (2026-10-31)
+
+The author requests request-parameter binding and DI injection, including special
+parameters for HttpContext, HttpRequest, HttpResponse and CancellationToken. They
+clarified that explicit overrides are **binding attributes**, named FromBody and
+FromService, with the necessary source attributes to resolve ambiguities. This
+supersedes earlier helper-method wording. These attributes are not implemented yet.
+
+The next binding slice should preserve the familiar [ASP.NET Core ordering](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-10.0):
+explicit source attributes, special framework types, supported scalar route/query
+conversion, registered services, then supported body binding. Neo.Web's singular
+`FromService` spelling is author-directed; ASP.NET Core spells it FromServices.
+Explicit attributes select a source rather than merely influencing a heuristic.
+Conflicting source attributes and unsupported source/type combinations should fail
+registration with parameter-specific diagnostics, never be silently ignored.
+
+| Proposed parameter attribute | Ambiguity resolved |
+| --- | --- |
+| `FromRoute` | Select a route capture, with an optional external-name override. |
+| `FromQuery` | Select a query value even when its name matches a route capture. |
+| `FromHeader` | Select a header, including an external-name override. |
+| `FromBody` | Select body deserialization rather than DI or scalar query inference. |
+| `FromService` | Select DI even when the type/name could bind from request data. |
+
+Add form-specific attributes when form binding is actually supported; do not ship
+an attribute whose binder cannot honor it. Keyed service selection, repeated query
+values, optional/default parameters and null/empty-body policy require explicit
+contracts and tests. Keep one consuming body binding per endpoint unless an
+intentional shared-body model is introduced. Parsing/required-data failures should
+produce sanitized client errors before invoking the handler; DI activation failures
+remain server errors. Attribute constructors and allowed targets must be reflected
+and cached at registration alongside the function signature, not reread per request.
+
+### Existing foundations and required work
+
+- HandlerPlan already caches function metadata, parameter names and route/service
+  plans; it binds Neo.Web.HttpContext, named string/int route values and remaining
+  reference-type services. There is no query/body/header inference yet.
+- ParameterInfo exposes GetCustomAttributesData. Qualify parameter attributes on
+  bound module functions, bound instance methods and imported function values in
+  interpreter/JIT/AOT before relying on this bridge for binding attributes.
+- HttpContext already retains the request. Response injection needs one stable
+  response identity shared with the context: current 405 handling replaces its
+  private response, so exposing that object blindly would leave stale aliases.
+  Preserve the context's response-validation and lifetime rules when defining the API.
+- CancellationToken should reflect request abort, as in ASP.NET Core, independently
+  of ApplicationStopping. HttpServer currently exposes application/operation tokens
+  but no public request-abort token on its context. Improve that primitive and
+  qualify disconnect/stop/cleanup behavior before claiming equivalent injection.
+- DI has no public nonactivating registered-service probe. Add an explicit provider
+  capability or retain registration metadata before inferring service versus body;
+  do not instantiate scoped services at startup merely to choose a binding source.
+- Keep simple handlers free of transport imports. Decide how explicitly typed
+  request/response parameters are presented through Neo.Web without introducing
+  unnecessary duplicate request/response objects or claiming aliases already exist.
+
+After middleware activation is qualified, the bounded endpoint implementation can
+start with special parameters whose lifetime/identity is already supported and
+FromService plus route/query/header attributes. Body deserialization and request
+abort need their own primitive/metadata checks. Keep sync/async handler inputs and
+typed-result outputs consistent; richer result subsets and serializers remain
+separate from inferring where an argument comes from.
+
+
+Middleware registration returns `Result<WebApplication, WebError>` from `Use` and
+`UseMiddleware`, permitting composition while preserving recoverable failures.
+This does not imply all registration methods should return the application:
+ASP.NET Core's [MapGet source](https://source.dot.net/Microsoft.AspNetCore.Routing/Builder/EndpointRouteBuilderExtensions.cs.html)
+returns an endpoint convention/route-handler builder. Neo.Web retains unit results
+for Map* in this slice; endpoint-specific configuration is future work. WebDemo
+prefers separate `MapGet(...)?` statements. Conditional access (`?.`) continues to
+map members into carriers; postfix `?` is the separate propagation operation.
+
+The author subsequently selected the shorter generic name `T`: `UseMiddleware<T: Middleware>()`.

@@ -152,6 +152,17 @@ internal static class AuthoredStructuralConstraintChecks
         graph.CompleteInterfaceReference(owner);
         var a = graph.AddInterface("Example", "A");
         a.AddBaseInterface(owner);
+        var holder = graph.AddGenericClass("Example", "Holder", ["T"]);
+        holder.AddBaseTypeConstraint(0, a);
+        var ownerParameter = SignatureType.TypeParameter(0);
+        var ownerRead = holder.AddMethod("Read", new MethodSignature(PrimitiveType.Int32, [ownerParameter]));
+        var ownerIl = ownerRead.GetILGenerator();
+        ownerIl.LoadArgumentAddress(0); ownerIl.CallConstrained(ownerParameter, imported); ownerIl.Return();
+        Reject(() => ownerIl.CallConstrained(SignatureType.TypeParameter(1), imported));
+        var nominal = graph.AddFunction("Nominal", new MethodSignature(PrimitiveType.Int32, [SignatureType.MethodParameter(0)], ["T"]));
+        nominal.AddInterfaceConstraint(0, owner);
+        var nominalIl = nominal.GetILGenerator();
+        nominalIl.LoadArgumentAddress(0); nominalIl.CallConstrained(SignatureType.MethodParameter(0), imported); nominalIl.Return();
         var b = graph.AddInterface("Example", "B");
         var parameter = SignatureType.MethodParameter(0);
         var strong = graph.AddFunction("Strong", new MethodSignature(PrimitiveType.Int32, [parameter], ["T"]));

@@ -26,16 +26,10 @@ async func Main(arguments: string[]) -> Task<int> {
     _ = builder.Services.AddScoped<GreetingService>((provider) => {
         return Ok(GreetingService(provider.GetRequiredService<Configuration>()!))
     })!
+    _ = builder.Services.AddScoped<MaintenanceMiddleware>()!
     let Ok(app) = builder.Build() else { return 1 }
     use application = app
-    _ = app.Use(LogRequest)!
-    _ = app.MapGet("/", Home)!
-    _ = app.MapGet("/hello/{name}", Greeting)!
-    _ = app.MapGet("/hello/current", Current)!
-    _ = app.MapPost("/visits", Visit)!
-    _ = app.MapGet("/items/{id}", Item)!
-    _ = app.Map("/echo/{value}", Echo)!
-    _ = app.Run(Unmatched)!
+    let Ok(_) = Configure(app) else { return 1 }
     let lifetime = app.RunAsync()
     let Ok(actualPort) = app.GetLocalPort() else {
         _ = await lifetime
@@ -47,4 +41,16 @@ async func Main(arguments: string[]) -> Task<int> {
     let Ok(_) = await lifetime else { return 1 }
     Console.WriteLine("STOPPED")
     return 0
+}
+
+func Configure(app: WebApplication) -> Result<unit, WebError> {
+    app.Use(LogRequest)?
+    app.UseMiddleware<MaintenanceMiddleware>()?
+    app.MapGet("/", Home)?
+    app.MapGet("/hello/{name}", Greeting)?
+    app.MapGet("/hello/current", Current)?
+    app.MapPost("/visits", Visit)?
+    app.MapGet("/items/{id}", Item)?
+    app.Map("/echo/{value}", Echo)?
+    return app.Run(Unmatched)
 }

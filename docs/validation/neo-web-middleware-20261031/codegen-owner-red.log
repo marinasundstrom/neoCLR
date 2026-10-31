@@ -1,0 +1,23 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 41.44s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-998c8f9905fce89d)
+
+running 1 test
+test specialization::tests::nominal_owner_bounds_use_original_value_conformance ... FAILED
+
+failures:
+
+---- specialization::tests::nominal_owner_bounds_use_original_value_conformance stdout ----
+
+thread 'specialization::tests::nominal_owner_bounds_use_original_value_conformance' (178258996) panicked at runtime/codegen/src/specialization.rs:1863:94:
+called `Result::unwrap()` on an `Err` value: "Fault: generic argument Named(\"Count\") violates TypeBound(Named(\"Number\")) constraint on parameter 0 [code=RuntimeError]"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    specialization::tests::nominal_owner_bounds_use_original_value_conformance
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 261 filtered out; finished in 0.45s
+
+error: test failed, to rerun pass `-p neoclr-codegen --lib`

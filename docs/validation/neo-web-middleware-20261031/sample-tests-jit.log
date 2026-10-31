@@ -1,0 +1,6 @@
+PASS Greeting uses the supplied configuration and name
+PASS Visits retain application state and return created results
+PASS Item lookup chooses among the closed result alternatives
+PASS Awaited greeting returns a typed result
+Tests: 4, passed: 4, failed: 0, skipped: 0
+warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention

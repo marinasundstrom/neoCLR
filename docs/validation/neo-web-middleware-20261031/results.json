@@ -1,0 +1,651 @@
+{
+  "passed": true,
+  "sources": {
+    "extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.retention.json": "f52eb42320be11ccd6037b12c4a122c2c8aed0c21ecd04f11400ae0737474930",
+    "extensions/Neo.Web/test/Neo.Web.Tests/Tests.rvn": "36f8dfdc02a01fe14f5a8f15fc1b58cd8a4a56494abbf82e975f5d4b2fe55838",
+    "extensions/Neo.Web/test/Neo.Web.Tests/ResultTests.rvn": "b538c6ae17da2be807bfb8fceabff7ca87bc27a97782d6ea183abf2368ac7078",
+    "extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.rvnproj": "446c7a4dfa88a4304a6a80b70509d75649d0e624578f5a613c6a7d972a2f1e05",
+    "extensions/Neo.Web/test/Neo.Web.Tests/MiddlewareTests.rvn": "feeb5e55bc8cdbb0ee710c9c0ef085455f9e9a03a743ff7d0a12be1a995d2985",
+    "extensions/Neo.Web/src/Neo.Web/Neo.Web.rvnproj": "31b4f79d827ba8d77370402503283adc3971e3e234d5fb1ae1a2c8e594e4e628",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/HttpResults.rvn": "06a003e215918b4d9a5c551339aeda8eaab073c21b8af5a452774abe75e222ef",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplication.rvn": "8a2e8cf9c3a90138403fed4006e2093a22391acdab3a8de0ef7ffca4ae530c02",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/HandlerPlan.rvn": "c639ed6038dc8673c304e420925ca87dc314cc0454518ea9c4e1d5c1ca1575c9",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/Middleware.rvn": "a7f89aa2e6239b93253b33fd5df69b6fd52a636a39c0e2287b4777d081541dbd",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplicationBuilder.rvn": "0046d159cac2a02e5535ba0d10a429feb384db926a14abb8e2dcd2a4880298dd",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebContracts.rvn": "4366cb80004f4d16f1220628c1582f014c6fb9a4e7e8e45190c377adb168ec32",
+    "samples/web/test/WebDemo.Tests/Tests.rvn": "93e682f16c860f66a5a42b3d2658cc27e1216edf92b01f47afd5f74ddad731a1",
+    "samples/web/test/WebDemo.Tests/WebDemo.Tests.rvnproj": "7ce16d2f38a4b2af99f693fb0c1a091c3708f43d1411f39493e624d1dc075364",
+    "samples/web/src/WebDemo.Logic/WebDemo.Logic.rvnproj": "cb4cc7eea1373f61a4e947a02efa11e52c3032da8dd745f97f1e03a2baca4bc7",
+    "samples/web/src/WebDemo.Logic/Endpoints.rvn": "9e90836f256360240c155fea8b75677427143b17c1930d2de4d82d54298d5974",
+    "samples/web/src/WebDemo/WebDemo.retention.json": "68a9ee0d5f5996e2b4c7f5e0875f4ad7ca95ac14fbf10c5b0983e9f96e3c77ea",
+    "samples/web/src/WebDemo/Main.rvn": "141e6dca7b657520229661732000fe18daed68e30fcc12ac99a1ea538e979687",
+    "samples/web/src/WebDemo/WebDemo.rvnproj": "77ba19e05e39b3f2378c2fa8a1e61ca4712222c8333c6540a8af78438be4909c"
+  },
+  "commands": [
+    {
+      "name": "library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/Neo.Web.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "tests-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.rvnproj",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/tests"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "tests-native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/tests/app"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "tests-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/tests/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Json.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.PostgreSql.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Web.dll",
+        "--"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "tests-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/tests/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr-jit-host.dylib",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/tests/app.reflection.json",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Json.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.PostgreSql.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Web.dll",
+        "--"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "sample-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle",
+        "--project",
+        "/Users/robert/Projects/neoclr/samples/web/src/WebDemo/WebDemo.rvnproj",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/sample"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "sample-tests-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle",
+        "--project",
+        "/Users/robert/Projects/neoclr/samples/web/test/WebDemo.Tests/WebDemo.Tests.rvnproj",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/sample-tests"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "sample-tests-native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/sample-tests/app"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "sample-tests-interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/sample-tests/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Json.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.PostgreSql.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/sample-tests/modules/WebDemo.Logic.dll",
+        "--"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "sample-tests-jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/sample-tests/app.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr-codegen",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/bin/neoclr-jit-host.dylib",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.DependencyInjection.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Localization.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Logging.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Abstractions.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Configuration.Json.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/System.Data.PostgreSql.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/lib/Neo.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/sample-tests/modules/WebDemo.Logic.dll",
+        "--"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "tests",
+      "mode": "native",
+      "passed": true,
+      "stdout": "PASS Typed results preserve content and exhaustively describe response alternatives\nPASS Builder snapshots options and transfers ownership once\nPASS Invalid options and ambiguous routes fail without registration\nPASS HTTP consumer covers routing scopes cancellation and joined shutdown\nPASS Middleware wraps routing and retains one scope through completion\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "tests",
+      "mode": "interpreter",
+      "passed": true,
+      "stdout": "PASS Typed results preserve content and exhaustively describe response alternatives\nPASS Builder snapshots options and transfers ownership once\nPASS Invalid options and ambiguous routes fail without registration\nPASS HTTP consumer covers routing scopes cancellation and joined shutdown\nPASS Middleware wraps routing and retains one scope through completion\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "tests",
+      "mode": "jit",
+      "passed": true,
+      "stdout": "PASS Typed results preserve content and exhaustively describe response alternatives\nPASS Builder snapshots options and transfers ownership once\nPASS Invalid options and ambiguous routes fail without registration\nPASS HTTP consumer covers routing scopes cancellation and joined shutdown\nPASS Middleware wraps routing and retains one scope through completion\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": "warning: DAM2001: Neo.DependencyInjection.DefaultServiceCollection.Build instruction 37 -> Neo.DependencyInjection.ConstructorPlan.Prepare parameter 0: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: Neo.DependencyInjection.ServiceCollectionExtensions.AddScoped instruction 9 -> Neo.DependencyInjection.ServiceCollection.Add parameter 1: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n"
+    },
+    {
+      "name": "sample",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "LISTENING http://127.0.0.1:50095\ninfo: WebDemo.Request[0] Request GET /\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/Ada\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/current\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 2\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/42\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/7\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/-1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/nope\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /missing/path\ninfo: WebDemo.Request[0] Request pipeline completed\nSTOPPED\n",
+      "stderr": "",
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/",
+          "status": 200,
+          "body": "Hello, neoCLR!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/Ada",
+          "status": 200,
+          "body": "Hello, Ada!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/current",
+          "status": 200,
+          "body": "The current visitor is neoCLR"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 1"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 2"
+        },
+        {
+          "method": "GET",
+          "path": "/items/42",
+          "status": 200,
+          "body": "The answer"
+        },
+        {
+          "method": "GET",
+          "path": "/items/7",
+          "status": 404,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/-1",
+          "status": 400,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/nope",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "GET:hello"
+        },
+        {
+          "method": "POST",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "POST:hello"
+        },
+        {
+          "method": "GET",
+          "path": "/missing/path",
+          "status": 404,
+          "body": "No endpoint matched"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "sample",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "LISTENING http://127.0.0.1:50117\ninfo: WebDemo.Request[0] Request GET /\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/Ada\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/current\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 2\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/42\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/7\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/-1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/nope\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /missing/path\ninfo: WebDemo.Request[0] Request pipeline completed\nSTOPPED\n",
+      "stderr": "",
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/",
+          "status": 200,
+          "body": "Hello, neoCLR!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/Ada",
+          "status": 200,
+          "body": "Hello, Ada!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/current",
+          "status": 200,
+          "body": "The current visitor is neoCLR"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 1"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 2"
+        },
+        {
+          "method": "GET",
+          "path": "/items/42",
+          "status": 200,
+          "body": "The answer"
+        },
+        {
+          "method": "GET",
+          "path": "/items/7",
+          "status": 404,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/-1",
+          "status": 400,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/nope",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "GET:hello"
+        },
+        {
+          "method": "POST",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "POST:hello"
+        },
+        {
+          "method": "GET",
+          "path": "/missing/path",
+          "status": 404,
+          "body": "No endpoint matched"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "sample",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "LISTENING http://127.0.0.1:50213\ninfo: WebDemo.Request[0] Request GET /\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/Ada\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/current\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 2\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/42\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/7\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/-1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/nope\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /missing/path\ninfo: WebDemo.Request[0] Request pipeline completed\nSTOPPED\n",
+      "stderr": "warning: DAM2001: Neo.DependencyInjection.DefaultServiceCollection.Build instruction 37 -> Neo.DependencyInjection.ConstructorPlan.Prepare parameter 0: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: Neo.DependencyInjection.ServiceCollectionExtensions.AddScoped instruction 9 -> Neo.DependencyInjection.ServiceCollection.Add parameter 1: cannot prove dynamic member requirement 3; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n",
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/",
+          "status": 200,
+          "body": "Hello, neoCLR!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/Ada",
+          "status": 200,
+          "body": "Hello, Ada!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/current",
+          "status": 200,
+          "body": "The current visitor is neoCLR"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 1"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 2"
+        },
+        {
+          "method": "GET",
+          "path": "/items/42",
+          "status": 200,
+          "body": "The answer"
+        },
+        {
+          "method": "GET",
+          "path": "/items/7",
+          "status": 404,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/-1",
+          "status": 400,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/nope",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "GET:hello"
+        },
+        {
+          "method": "POST",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "POST:hello"
+        },
+        {
+          "method": "GET",
+          "path": "/missing/path",
+          "status": 404,
+          "body": "No endpoint matched"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "sample-tests",
+      "mode": "native",
+      "passed": true,
+      "stdout": "PASS Greeting uses the supplied configuration and name\nPASS Visits retain application state and return created results\nPASS Item lookup chooses among the closed result alternatives\nPASS Awaited greeting returns a typed result\nTests: 4, passed: 4, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "sample-tests",
+      "mode": "interpreter",
+      "passed": true,
+      "stdout": "PASS Greeting uses the supplied configuration and name\nPASS Visits retain application state and return created results\nPASS Item lookup chooses among the closed result alternatives\nPASS Awaited greeting returns a typed result\nTests: 4, passed: 4, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "sample-tests",
+      "mode": "jit",
+      "passed": true,
+      "stdout": "PASS Greeting uses the supplied configuration and name\nPASS Visits retain application state and return created results\nPASS Item lookup chooses among the closed result alternatives\nPASS Awaited greeting returns a typed result\nTests: 4, passed: 4, failed: 0, skipped: 0\n",
+      "stderr": "warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n"
+    }
+  ],
+  "codegenSha256": "75b4c1f9a97eb988470b333778237e0eaf35163b3ca29f9d7d5678566f3ed3e5",
+  "originalManifestSha256": "b6f0b573527c76270411019dbcbf0312aa9788416ff1d77c458a8e5bc9b87053",
+  "compilerSha256": "cc19c56d15c6ea3692e641551d4e0a3708ce853e5e57433d30bd7b0d2983030a",
+  "compilerRevision": "813dad20c",
+  "runtimeAndMetadataBase": "02659917f45bad5499b8ebc526ecc1eebcf0ac79",
+  "runtimeAndMetadataState": "working changes in the commit containing this evidence",
+  "artifacts": {
+    "target/neo-web-middleware/validation8/bundle/bin/neoclr": "4a571debe3960c2ddb607845e8adef21aa1b5bb11de30bf4b89af461f65e7472",
+    "target/neo-web-middleware/validation8/bundle/bin/neoclr-codegen": "75b4c1f9a97eb988470b333778237e0eaf35163b3ca29f9d7d5678566f3ed3e5",
+    "target/neo-web-middleware/validation8/bundle/lib/Neo.Web.dll": "e7db3b2762b8d21553e78a43e33c7128a53c01b09bc53c689351a04461b30243",
+    "target/neo-web-middleware/validation8/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "017af930f4f1e1d1f1fe7ff36264f5fcd1dab6989e38a076d8c747179008dcba"
+  },
+  "focusedCompilerTests": {
+    "passed": 60,
+    "failed": 0,
+    "log": "compiler-tests.log"
+  },
+  "nominalConsumer": {
+    "interpreterExitCode": 42,
+    "jitExitCode": 42,
+    "assemblySha256": "898d6369e27b7c7a8e6e3d80aa3e80cf64f7044acb27780f8df0eb3b792af630"
+  },
+  "documentationBuild": {
+    "buildEvidenceSha256": "5ac6f16d69fb4260854049f6068a16dc65bf2d5ca9a0fd634c004d16ecc12371",
+    "baseSourceRevision": "6228d0be91564fc7b320d8e5bf0b7c750ce23be6",
+    "baseCompilerRevision": "4f7619fd8-working",
+    "componentBuild": {
+      "assembly": "Neo.Web",
+      "compilerRevision": "813dad20c",
+      "compilerSha256": "cc19c56d15c6ea3692e641551d4e0a3708ce853e5e57433d30bd7b0d2983030a",
+      "sources": {
+        "extensions/Neo.Web/src/Neo.Web/Neo.Web.rvnproj": "31b4f79d827ba8d77370402503283adc3971e3e234d5fb1ae1a2c8e594e4e628",
+        "extensions/Neo.Web/src/Neo.Web/Neo/Web/HttpResults.rvn": "06a003e215918b4d9a5c551339aeda8eaab073c21b8af5a452774abe75e222ef",
+        "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplication.rvn": "8a2e8cf9c3a90138403fed4006e2093a22391acdab3a8de0ef7ffca4ae530c02",
+        "extensions/Neo.Web/src/Neo.Web/Neo/Web/HandlerPlan.rvn": "c639ed6038dc8673c304e420925ca87dc314cc0454518ea9c4e1d5c1ca1575c9",
+        "extensions/Neo.Web/src/Neo.Web/Neo/Web/Middleware.rvn": "a7f89aa2e6239b93253b33fd5df69b6fd52a636a39c0e2287b4777d081541dbd",
+        "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplicationBuilder.rvn": "0046d159cac2a02e5535ba0d10a429feb384db926a14abb8e2dcd2a4880298dd",
+        "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebContracts.rvn": "4366cb80004f4d16f1220628c1582f014c6fb9a4e7e8e45190c377adb168ec32"
+      },
+      "command": {
+        "name": "library",
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/bundle/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/target/neo-web-middleware/validation8/Neo.Web.rvnproj"
+        ],
+        "exitCode": 0
+      },
+      "assemblySha256": "e7db3b2762b8d21553e78a43e33c7128a53c01b09bc53c689351a04461b30243",
+      "validation": "docs/validation/neo-web-middleware-20261031/results.json"
+    }
+  }
+}

@@ -28,7 +28,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="visibility">Public by default; Protected is admitted only for constructors and requires a direct derived constructor call.</param>
     /// <param name="isVirtual">True for an ordinary nongeneric method slot on a reference class, including a generic class.</param>
     /// <param name="isAbstract">True for a bodyless new class slot, including on a generic owner; requires isVirtual.</param>
-    /// <param name="interfaceBounds">Optional method parameter bounds, limited to output-owned nongeneric nominal interface references. Requires a static generic method.</param>
+    /// <param name="interfaceBounds">Optional method parameter bounds, limited to output-owned nongeneric nominal interface references. Requires a static generic method or a nonvirtual generic instance method on a reference class.</param>
     /// <param name="functionParameters">Method parameter ordinals constrained to native structural function values. Copied; incompatible with nominal bounds on the same parameter. Native output only.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
@@ -66,8 +66,6 @@ public sealed partial class AssemblyBuilder
         var functions = functionParameters?.Order().ToArray() ?? [];
         if (functions.Distinct().Count() != functions.Length || functions.Any(index => index < 0 || index >= signature.GenericParameterNames.Count || bounds.Any(bound => bound.ParameterIndex == index)))
             throw new ArgumentException("invalid function parameter constraint", nameof(functionParameters));
-        if (bounds.Length != 0 && !isStatic)
-            throw new ArgumentException("invalid imported method interface bounds", nameof(interfaceBounds));
         if (visibility != MethodVisibility.Public && !(visibility == MethodVisibility.Protected && name == ".ctor" && !isStatic))
             throw new ArgumentException("only constructors may use protected reference visibility");
         if (!ReferenceEquals(declaringType.Owner, this) ||
@@ -89,6 +87,8 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("grapheme members require ordinary methods or exact Object overrides without primitive reinterpretation");
         bool constructor = name == ".ctor";
         bool isInterface = authoredInterfaces.Contains(declaringType);
+        if (bounds.Length != 0 && (isInterface || isVirtual || isAbstract || !isStatic && declaringType.IsValueType))
+            throw new ArgumentException("interface bounds require a static or nonvirtual reference-class method", nameof(interfaceBounds));
         if (functions.Length != 0 && (isInterface || isVirtual || isAbstract))
             throw new ArgumentException("function constraints require a nonvirtual method", nameof(functionParameters));
         if (isInterface && (constructor || isStatic && signature.GenericParameterNames.Count != 0))

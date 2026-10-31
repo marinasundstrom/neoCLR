@@ -81,6 +81,24 @@ fn equivalent_containers_have_identical_listings() {
 }
 
 #[test]
+fn format_six_libraries_are_inspectable_in_json_and_neox() {
+    let temp = Temp::new();
+    let mut module = neoclr::metadata_container::decode(&fs::read(ROOT).unwrap()).unwrap();
+    module.format = 6;
+    let json = temp.0.join("library.json");
+    let neox = temp.0.join("library.neox");
+    fs::write(&json, serde_json::to_vec(&module).unwrap()).unwrap();
+    fs::write(
+        &neox,
+        neoclr::metadata_container::write_module(&module).unwrap(),
+    )
+    .unwrap();
+    let listing = success(run(&[json.to_str().unwrap()]));
+    assert!(String::from_utf8_lossy(&listing).contains("\"format\": 6"));
+    assert_eq!(listing, success(run(&[neox.to_str().unwrap()])));
+}
+
+#[test]
 fn unresolved_dependencies_and_unverified_bodies_remain_inspectable() {
     let temp = Temp::new();
     let mut module = neoclr::metadata_container::decode(&fs::read(ROOT).unwrap()).unwrap();
@@ -130,6 +148,7 @@ fn malformed_or_unsupported_inputs_never_publish_output() {
         b"NEOX",
         b"{}",
         br#"{"format":4,"name":"old","functions":[]}"#,
+        br#"{"format":7,"name":"future","functions":[]}"#,
         b".module source",
     ] {
         fs::write(&input, bytes).unwrap();

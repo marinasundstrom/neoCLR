@@ -14,8 +14,13 @@ unchanged framework suite now passes in interpreter mode. See the
 [fix qualification](validation/neo-web-timeout-20261031/README.md).
 `HttpResult<T>.StatusCode` now projects its closed cases and drives the writer;
 [result-property qualification](validation/neo-web-status-20261031/README.md) also
-covers the frame-accounting follow-up. The next author-directed sequence is typed
-middleware (`TMiddleware : Middleware`, an interface), then endpoint ergonomics.
+covers the frame-accounting follow-up. The typed middleware slice adds
+`UseMiddleware<T: Middleware>()` alongside function `Use`, with explicit
+DI registration and lazy request-scope activation. Both return the application on
+success; Map* keeps its current contract. The next endpoint ergonomics work is
+recorded in the [binding review](design/neo-web.md#endpoint-binding-and-ambiguity-2026-10-31).
+Middleware and constrained-call qualification is recorded in the
+[focused evidence](validation/neo-web-middleware-20261031/README.md).
 This author-directed task does not permanently reprioritize the roadmap.
 
 **Neo.Web design proposal (2026-10-30):** At the author's request, the

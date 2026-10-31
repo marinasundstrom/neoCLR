@@ -1,0 +1,6 @@
+Unhandled exception. System.ArgumentException: generic method argument does not satisfy its interface bound
+   at NeoCLR.Metadata.Experimental.Model.MethodBuilder.ValidateMethodArguments(IReadOnlyList`1 arguments, MethodBuilder caller, Boolean deferOpen) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/GenericMethodConstraint.cs:line 277
+   at NeoCLR.Metadata.Experimental.Model.MethodBuilder.MakeGenericInstance(SignatureType[] typeArguments) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/GenericMethodInstance.cs:line 39
+   at OpenConstrainedCallChecks.Run() in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/OpenConstrainedCallChecks.cs:line 44
+   at Program.<Main>$(String[] args) in /Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/Program.cs:line 81
+   at Program.<Main>(String[] args)

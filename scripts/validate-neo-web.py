@@ -32,7 +32,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     report = dict(passed=False, sources={str(p.relative_to(ROOT)): sha(p) for parent in
                   [ROOT / 'extensions/Neo.Web', ROOT / 'samples/web'] for p in parent.rglob('*')
-                  if p.suffix in ('.rvn', '.rvnproj') and not {'bin', 'obj'}.intersection(p.parts)}, commands=[], cases=[])
+                  if (p.suffix in ('.rvn', '.rvnproj') or p.name.endswith('.retention.json')) and not {'bin', 'obj'}.intersection(p.parts)}, commands=[], cases=[])
     manifest = json.loads((original / 'manifest.json').read_text())
     for relative, digest in manifest['files'].items():
         if sha(original / relative) != digest:
@@ -117,6 +117,9 @@ def main():
                         command += ['--instructions', '100000000']
                     if mode == 'jit':
                         command += ['--jit-compiler', str(codegen), '--jit-host', str(bundle / 'bin' / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib'))]
+                    retention = out / name / 'app.reflection.json'
+                    if mode == 'jit' and retention.exists():
+                        command += ['--reflection-roots', str(retention)]
                     for module in manifest['modules']:
                         command += ['--module', str(bundle / module)]
                     build = json.loads((out / name / 'build.json').read_text())

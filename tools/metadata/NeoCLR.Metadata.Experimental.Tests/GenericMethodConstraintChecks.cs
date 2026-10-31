@@ -9,6 +9,7 @@ internal static class GenericMethodConstraintChecks
 {
     internal static void Run()
     {
+        AuthoredInstanceBounds();
         ExternalBounds();
         foreach (var detached in new[] { false, true })
         {
@@ -78,6 +79,37 @@ internal static class GenericMethodConstraintChecks
             Reject<InvalidDataException>(() => graph.Write());
         }
     }
+    private static void AuthoredInstanceBounds()
+    {
+        var core = new AssemblyIdentity("System.Runtime", new Version(10, 0, 0, 0));
+        var graph = new AssemblyBuilder(new("InstanceBoundConsumer", new Version(1, 0, 0, 0)), core);
+        var provider = new AssemblyIdentity("MiddlewareProvider", new Version(1, 0, 0, 0));
+        var hash = new string('0', 64);
+        var owner = graph.CreateTypeReference(provider, core, hash, "Example", "Application", 0);
+        var bound = graph.CreateInterfaceReference(provider, core, hash, "Example", "Middleware");
+        graph.CompleteInterfaceReference(bound);
+        var signature = new MethodSignature(PrimitiveType.Int32, [], ["TMiddleware"]);
+        var method = graph.CreateMethodReference(owner, "UseMiddleware", signature, interfaceBounds: [new(0, bound)]);
+        if (!ReferenceEquals(method, graph.CreateMethodReference(owner, "UseMiddleware", signature, interfaceBounds: [new(0, bound)])))
+            throw new Exception("identical interface-constrained instance reference was not interned");
+        Reject<InvalidDataException>(() => graph.CreateMethodReference(owner, "UseMiddleware", signature));
+        Reject<ArgumentException>(() => graph.CreateMethodReference(owner, "BadIndex", signature, interfaceBounds: [new(1, bound)]));
+        Reject<ArgumentException>(() => graph.CreateMethodReference(owner, "Duplicate", signature, interfaceBounds: [new(0, bound), new(0, bound)]));
+        Reject<ArgumentException>(() => graph.CreateMethodReference(owner, "Mixed", signature, interfaceBounds: [new(0, bound)], functionParameters: [0]));
+        Reject<ArgumentException>(() => graph.CreateMethodReference(owner, "Virtual", signature, isVirtual: true, interfaceBounds: [new(0, bound)]));
+        Reject<ArgumentException>(() => graph.CreateMethodReference(bound, "GenericSlot", signature, interfaceBounds: [new(0, bound)]));
+        var implementation = graph.AddClass("Example", "Implementation");
+        implementation.AddInterfaceImplementation(bound);
+        method.MakeGenericInstance(implementation);
+        Reject<ArgumentException>(() => method.MakeGenericInstance(PrimitiveType.Int32));
+        Reject<ArgumentException>(() => method.MakeGenericInstance(graph.AddClass("Example", "Unrelated")));
+        var use = graph.AddFunction("Use", new(PrimitiveType.Int32, [owner]));
+        use.LoadArgument(0);
+        use.Call(method.MakeGenericInstance(implementation));
+        use.Return();
+        AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(graph));
+    }
+
     private static void ExternalBounds()
     {
         foreach (var manual in new[] { false, true })

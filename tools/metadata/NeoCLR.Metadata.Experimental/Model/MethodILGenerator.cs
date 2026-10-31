@@ -507,15 +507,27 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ValidateExternalConstructedConstrainedOperands(bodyBuilder, implementingType, target);
         Append(new("call.constrained", Target: target.Definition.Target, Type: implementingType, ConstructedTarget: target.Target, ConstrainedConstructedReference: target));
     }
+    private static bool GuaranteesConstrainedContract(MethodBuilder caller, SignatureType implementingType, SignatureType contract)
+    {
+        bool Satisfies(SignatureType bound) => contract.ClassType is { } local
+            ? bound.ClassType?.ConformsTo(local) == true
+            : contract.ImportedType is { } external && caller.Assembly.SatisfiesConstrainedBound(bound, external, implementingType);
+        if (implementingType.TypeParameterIndex is { } ownerIndex)
+            return caller.DeclaringType is { } owner && ownerIndex < owner.GenericParameterNames.Count &&
+                owner.GenericConstraints.Any(c => c.ParameterIndex == ownerIndex && Satisfies(c.BaseType));
+        if (implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count)
+            return false;
+        return caller.Definition.AuthoredTypeConstraints.Any(c => c.ParameterIndex == index)
+            ? caller.ForwardedBoundsSatisfy(caller, index, contract)
+            : caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && Satisfies(caller.Definition.ConstraintSignature(c.InterfaceType)));
+    }
+
     internal static void ValidateExternalConstructedConstrainedOperands(MethodBuilder caller, SignatureType implementingType, ImportedConstructedMethodReference target)
     {
         ArgumentNullException.ThrowIfNull(implementingType);
         if (!ReferenceEquals(target.Definition.Owner, caller.Assembly) || !target.Definition.IsInterfaceMethod || target.MethodArguments.Count != 0 ||
-            implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !(caller.Definition.AuthoredTypeConstraints.Any(c => c.ParameterIndex == index)
-                ? caller.ForwardedBoundsSatisfy(caller, index, target.DeclaringType)
-                : caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), target.DeclaringType, implementingType))))
-            throw new ArgumentException("constructed constrained call requires a matching method interface bound");
+            !GuaranteesConstrainedContract(caller, implementingType, target.DeclaringType))
+            throw new ArgumentException("constructed constrained call requires a matching method or declaring-type interface bound");
         foreach (var argument in target.DeclaringType.TypeArguments) argument.ValidateOwner(caller.Assembly, caller.Signature.GenericParameterNames.Count, caller.DeclaringType?.GenericParameterNames.Count ?? 0);
         _ = caller.Assembly.ExternalInterfaceMethods(target.DeclaringType).ToArray();
     }
@@ -525,11 +537,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(implementingType); ArgumentNullException.ThrowIfNull(target);
         if (!ReferenceEquals(target.Owner, caller.Assembly) || !target.IsInterfaceMethod ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringReference is not { GenericArity: 0 } owner ||
-            implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !(caller.Definition.AuthoredTypeConstraints.Any(c => c.ParameterIndex == index)
-                ? caller.ForwardedBoundsSatisfy(caller, index, owner)
-                : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesInterfaceBound(caller.Definition.ConstraintSignature(c.InterfaceType), owner))))
-            throw new ArgumentException("external constrained call requires a guaranteed completed nongeneric interface contract; instance calls require structural bounds");
+            !GuaranteesConstrainedContract(caller, implementingType, owner))
+            throw new ArgumentException("external constrained call requires a guaranteed completed nongeneric interface contract");
         _ = caller.Assembly.ExternalInterfaceMethods(owner).ToArray();
     }
 
@@ -537,13 +546,10 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     {
         ArgumentNullException.ThrowIfNull(implementingType);
         ArgumentNullException.ThrowIfNull(target);
-        if (implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsAbstract ||
+        if (!ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsAbstract ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringType is not { IsInterface: true, GenericParameterNames.Count: 0 } owner ||
-            !(caller.Definition.AuthoredTypeConstraints.Any(c => c.ParameterIndex == index)
-                ? caller.ForwardedBoundsSatisfy(caller, index, owner)
-                : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Definition.ConstraintSignature(c.InterfaceType).ClassType is { } bound && bound.ConformsTo(owner))))
-            throw new ArgumentException("open constrained call requires a guaranteed owned nongeneric interface contract; instance calls require structural bounds");
+            !GuaranteesConstrainedContract(caller, implementingType, owner))
+            throw new ArgumentException("open constrained call requires a guaranteed owned nongeneric interface contract");
     }
 
     internal static SignatureType SubstituteConstrainedSelf(SignatureType type, SignatureType implementingType) => type.IsSelf ? implementingType

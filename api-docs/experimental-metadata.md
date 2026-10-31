@@ -10273,7 +10273,8 @@ this manual entry and Rustdoc are their API reference.
 
 `AssemblyBuilder.CreateMethodReference` adds the optional final parameter
 `IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null`. Bounds are
-copied, limited to 128, and admitted only on static generic methods. Each bound
+copied, limited to 128, and admitted on static generic methods or nonvirtual
+generic instance methods on reference classes (extended 2026-10-31). Each bound
 must name an output-owned nongeneric nominal interface via SignatureType.ImportedType,
 with a valid method parameter ordinal. Null entries, duplicates, foreign ownership,
 noninterface or constructed/generic bounds reject with ArgumentException. A reference
@@ -10680,3 +10681,32 @@ consume their receiver under the existing binding rules. Null, foreign reference
 and incompatible shapes reject. No nominal delegate encoding is introduced.
 The current Raven native emitter uses this for nongeneric module-level functions,
 allowing a host and tests to reference the same handler library.
+
+
+### Nominal instance and owner-parameter constrained dispatch — development 2026-10-31
+
+`IILGenerator.CallConstrained(SignatureType, MethodBuilder/ImportedMethodReference/
+ImportedConstructedMethodReference)` now admits in-scope declaring-type parameters
+with a proving nominal bound, as well as method parameters with nominal or
+structural bounds. Instance calls consume a managed reference to the implementing
+parameter. Value mutations therefore reach the addressed slot; reference receivers
+retain ordinary interface/virtual dispatch. Invalid ordinals, missing guarantees,
+foreign targets and incomplete imported contracts reject before emission. Existing
+nongeneric target and constructed imported-target restrictions remain. `Self` is
+substituted by the implementing parameter; inherited-Self conformance remains a
+separate limitation. This extends the historical method-only descriptions above.
+
+`CreateMethodReference` also preserves interface bounds on nonvirtual generic
+reference-class instance methods, including `UseMiddleware<T>()`.
+Interface slots, virtual methods and value-type instance methods remain outside
+that imported generic bound profile. Duplicate or conflicting contracts reject.
+
+
+`native_metadata::resolve_self_call(module, concrete, target) -> Result<Function, Fault>`
+resolves a closed static or instance nominal constrained contract using the same
+conformance/Self validation as the interpreter. It returns the implementation's
+receiver mode and virtual facts; callers must preserve a borrowed value receiver,
+load a borrowed reference receiver and retain virtual dispatch. It rejects symbolic
+implementing types and invalid contracts. The existing `resolve_static_self_call`
+retains its static-only guard and delegates to this helper. These are Rust-only
+code-generator APIs, documented here rather than in RavenDoc's guest inventory.

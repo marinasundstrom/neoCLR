@@ -17,8 +17,8 @@ pub(crate) fn execute(args: &[String]) -> Result<Vec<String>, String> {
         serde_json::from_slice(&bytes)
             .map_err(|error| format!("Invalid native metadata JSON: {error}"))?
     };
-    if module.format != 5 {
-        return Err("unsupported module format (expected 5); reassemble source".into());
+    if !matches!(module.format, 5 | 6) {
+        return Err("unsupported module format (expected 5 or 6); reassemble source".into());
     }
     let listing = render(&module)?;
     if let Some(output) = args.get(2) {

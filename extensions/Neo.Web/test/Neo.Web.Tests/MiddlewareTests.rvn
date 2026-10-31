@@ -11,13 +11,19 @@ import Neo.Web.*
 import Neo.Web.HttpContext
 import NeoClr.Testing.*
 
-class MiddlewareProbe {
+public class MiddlewareProbe {
     val Tracker = Counts()
     var Trace = ""
+    var MiddlewareCreated = 0
+    var MiddlewareDisposed = 0
     val Entered = Promise<unit>()
     val Release = Promise<unit>()
 
     async func Outer(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+        if context.Request.Target == "/outer-short" {
+            context.RespondText("outer short")
+            return Ok(())
+        }
         let service = context.Services.GetRequiredService<ScopedProbe>()!
         Trace += "outer>"
         let result = await next(context)
@@ -59,12 +65,35 @@ class MiddlewareProbe {
     }
 }
 
+public class ScopedMiddleware : Middleware, Disposable {
+    private val probe: MiddlewareProbe
+    private val service: ScopedProbe
+    init(probe: MiddlewareProbe, service: ScopedProbe) {
+        self.probe = probe
+        self.service = service
+        probe.MiddlewareCreated += 1
+    }
+    async func InvokeAsync(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+        let result = await probe.Inner(context, next)
+        if service.Disposed { return Failure(WebError.InvalidOptions("Scoped dependency ended inside typed middleware")) }
+        return result
+    }
+    func Dispose() { probe.MiddlewareDisposed += 1 }
+}
+
 async func MiddlewareChecks(app: WebApplication, probe: MiddlewareProbe, client: HttpClient, url: string, lifetime: Task<Result<unit, WebError>>) -> Task<Result<unit, TestFailure>> {
+    _ = Assert.True(RegisterMiddlewareChain(app) is Failure(_), "Chained registration preserves frozen-state failure")?
     _ = Assert.True(app.Use(probe.Outer) is Failure(_), "Middleware registration freezes")?
+    _ = Assert.True(app.UseMiddleware<ScopedMiddleware>() is Failure(_), "Typed middleware registration freezes")?
+    _ = Assert.Equal("outer short", ResponseText(await client.GetString(url + "/outer-short"))?)?
+    _ = Assert.Equal(0, probe.MiddlewareCreated)?
+    _ = Assert.Equal(0, probe.Tracker.Created)?
     _ = Assert.Equal("42", ResponseText(await client.GetString(url + "/ordered/42"))?)?
     _ = Assert.Equal("outer>inner>endpoint<inner<outer", probe.Trace)?
     _ = Assert.Equal(1, probe.Tracker.Created)?
     _ = Assert.Equal(1, probe.Tracker.Disposed)?
+    _ = Assert.Equal(1, probe.MiddlewareCreated)?
+    _ = Assert.Equal(1, probe.MiddlewareDisposed)?
     probe.Trace = ""
     _ = Assert.Equal("short", ResponseText(await client.GetString(url + "/short"))?)?
     _ = Assert.Equal("outer>inner>short<outer", probe.Trace)?
@@ -85,9 +114,12 @@ async func MiddlewareChecks(app: WebApplication, probe: MiddlewareProbe, client:
     app.Stop()
     _ = Assert.True(!lifetime.IsCompleted, "Shutdown joins post-next middleware work")?
     _ = Assert.Equal(5, probe.Tracker.Disposed)?
+    _ = Assert.Equal(6, probe.MiddlewareCreated)?
+    _ = Assert.Equal(5, probe.MiddlewareDisposed)?
     _ = probe.Release.Complete(())
     _ = await lifetime
     _ = await pending
+    _ = Assert.Equal(6, probe.MiddlewareDisposed)?
     return Assert.Equal(6, probe.Tracker.Disposed)
 }
 
@@ -95,10 +127,13 @@ async func MiddlewareContract() -> Task<Result<unit, TestFailure>> {
     let probe = MiddlewareProbe()
     use builder = WebApplication.CreateBuilder()
     builder.Server.Port = 0
+    _ = builder.Services.AddSingleton<MiddlewareProbe>(probe)!
     _ = builder.Services.AddScoped<ScopedProbe>((provider) => Ok(ScopedProbe(probe.Tracker)))!
+    _ = builder.Services.AddScoped<ScopedMiddleware>()!
     use app = builder.Build()!
     _ = app.Use(probe.Outer)!
-    _ = app.Use(probe.Inner)!
+    _ = app.UseMiddleware<ScopedMiddleware>()!
+    _ = Assert.Equal(0, probe.MiddlewareCreated)?
     _ = app.Map("/ordered/{id}", probe.Endpoint)!
     _ = app.Map("/cancel", probe.Cancel)!
     let lifetime = app.RunAsync()
@@ -110,5 +145,16 @@ async func MiddlewareContract() -> Task<Result<unit, TestFailure>> {
     app.Stop()
     _ = probe.Release.Complete(())
     _ = await lifetime
-    return result
+    _ = result?
+    // An unregistered middleware fails through the ordinary hosting error adapter.
+    use missingBuilder = WebApplication.CreateBuilder()
+    missingBuilder.Server.Port = 0
+    use missingApp = missingBuilder.Build()!
+    _ = missingApp.UseMiddleware<ScopedMiddleware>()!
+    let missingLifetime = missingApp.RunAsync()
+    let missingUrl = "http://127.0.0.1:" + missingApp.GetLocalPort()!.ToString()
+    let missingResult = await CheckStatus(client, missingUrl, 500)
+    missingApp.Stop()
+    _ = await missingLifetime
+    return missingResult
 }

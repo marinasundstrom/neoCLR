@@ -11,6 +11,28 @@ generic handlers use the structural `func` contract. The follow-on implementatio
 is under qualification; matching compiler/runtime changes are required. All public types are in the
 `Neo.Web` module and `Neo.Web.dll` assembly.
 
+## Middleware
+
+`Middleware` is an interface with one member:
+
+```raven
+func InvokeAsync(context: HttpContext,
+    next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>
+```
+
+Await `next(context)` at most once, or return to short-circuit. Register the
+implementation with `builder.Services` before `Build()`, then call
+`app.UseMiddleware<Implementation>()`. Registration adds an adapter without
+creating the service. Each reached request resolves it through `context.Services`;
+DI controls singleton/scoped/transient lifetime and ownership. The scope remains
+alive until the outermost middleware settles. Missing services or recoverable
+activation errors become the existing sanitized HTTP 500 response. Constructor
+activation requires a publicly visible implementation and public constructor, and
+needs constructor reflection retention in native/JIT deployments, as
+shown by WebDemo's project retention file. There is no implicit service registration
+or separate middleware factory service. Function middleware passed to `Use` keeps
+its caller-owned captures and uses the same pipeline contract.
+
 ## WebApplicationBuilder
 
 Create with `WebApplication.CreateBuilder()` or the parameterless constructor.
@@ -48,7 +70,8 @@ not automatically bound. HttpServer's default transport options remain in effect
 | `Configuration: ConfigurationRoot` | Application-owned live root. |
 | `MapContext(method: string, pattern: string, handler: (Neo.Web.HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Registers one callback atomically; invalid method/pattern, ambiguous overlap or frozen/disposed state returns failure. |
 | `RunAsync(cancellationToken: CancellationToken = default) -> Task<Result<unit, WebError>>` | Freezes registration, opens a listener and returns its joined lifetime. A listen attempt consumes the single-run application. |
-| `Use(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Adds middleware around routing and terminal handling, in registration order. Await next(context) to continue, or return to short-circuit. Frozen/disposed registration returns InvalidState. |
+| `Use(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>) -> Result<WebApplication, WebError>` | Adds middleware around routing and terminal handling, in registration order. Await next(context) to continue, or return to short-circuit. Frozen/disposed registration returns InvalidState. |
+| `UseMiddleware<T: Middleware>() -> Result<WebApplication, WebError>` | Adds a typed middleware stage; resolves its explicit DI registration from each request scope. Frozen/disposed registration returns InvalidState. |
 | `Map(pattern: string, handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Registers a fixed context handler for all HTTP methods at a route pattern. |
 | `Run(handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Installs the single terminal handler for requests left unmatched by routing; does not start the server. Duplicate/frozen/disposed registration returns InvalidState. |
 | `MapGet<T: func>(pattern: string, handler: T) -> Result<unit, WebError>` | Registers a GET function value after inspecting its bound signature and caching its binding plan. |
@@ -56,6 +79,14 @@ not automatically bound. HttpServer's default transport options remain in effect
 | `GetLocalPort() -> Result<int, WebError>` | Actual listener port while running; otherwise InvalidState. |
 | `Stop()` | Requests application cancellation and closes connections; no effect before running or after completion. |
 | `Dispose()` | Idempotent outside a run. Disposes root services, default logging and configuration. Active disposal is terminal misuse: Stop and await the lifetime first. |
+
+`Use` and `UseMiddleware` return `Ok(self)` for composition. Inside a compatible
+`Result`-returning function, postfix `?` propagates the first error and skips later
+statements; `!.` is available for unwrap-or-fail chaining. Carrier `?.` maps the
+accessed value, so calling a Result-returning method through it nests Results. Successful earlier registrations remain in
+place when a later registration fails; a chain is not a transaction. `Map*` and
+terminal `Run` retain `Result<unit, WebError>` in this slice; endpoint convention
+builders remain future work. Prefer separate route declarations when clearer.
 
 Pre-cancelled RunAsync opens no socket, returns a cancelled Task and leaves
 registration available. Caller cancellation cancels the lifetime task; ordinary
@@ -100,7 +131,7 @@ no route matches; requests reaching routing with malformed targets receive 400 a
 Unlike ASP.NET Core's path-prefix `Map` middleware branch, this `Map` performs
 full route-pattern matching. Unlike an ordered middleware builder, registering
 `Run` before routes does not make them unreachable: it configures the fixed final
-stage. Middleware ordering applies to Use registrations; explicit routing-stage insertion
+stage. Middleware ordering applies to both Use and UseMiddleware registrations; explicit routing-stage insertion
 and path-prefix branches remain future work.
 
 ## Neo.Web.HttpContext

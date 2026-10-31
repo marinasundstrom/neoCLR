@@ -316,7 +316,7 @@ impl Specializer<'_> {
         if !definition.generic_constraints.is_empty() {
             // Check the original closed construction before discarding parameters
             // from its executable shape. This also validates nested/base arguments.
-            self.source
+            self.conformance
                 .instantiated_fields(ty)
                 .map_err(|error| error.to_string())?;
         }
@@ -630,6 +630,7 @@ impl Specializer<'_> {
         }
         neoclr::function_interop::lower(self.conformance, &mut result)
             .map_err(|e| e.to_string())?;
+        lower_borrowed_calls(self.conformance, &mut result, arguments, methods)?;
         for t in result
             .parameters
             .iter_mut()
@@ -849,6 +850,121 @@ impl Specializer<'_> {
         Ok(result)
     }
 }
+// Adapt receivers before shape erasure. Spilling only arguments leaves the borrowed
+// receiver on the stack, and preserves argument evaluation and source branch targets.
+fn lower_borrowed_calls(
+    module: &neoclr::Module,
+    function: &mut Function,
+    types: &[Type],
+    methods: &[Type],
+) -> Result<(), Error> {
+    if !function
+        .body
+        .iter()
+        .any(|op| matches!(op, Op::CallSelf { borrowed: true, .. }))
+    {
+        return Ok(());
+    }
+    let mut body = Vec::new();
+    let mut offsets = vec![0; function.body.len() + 1];
+    for (index, op) in function.body.iter().enumerate() {
+        offsets[index] = body.len();
+        let Op::CallSelf {
+            borrowed: true,
+            self_type,
+            target,
+        } = op
+        else {
+            body.push(op.clone());
+            continue;
+        };
+        if !target.instance {
+            return Err("borrowed static constrained call".into());
+        }
+        let concrete = substitute(self_type, types, methods).map_err(|e| e.to_string())?;
+        let mut contract = target.clone();
+        contract.owner = contract
+            .owner
+            .as_ref()
+            .map(|t| substitute(t, types, methods))
+            .transpose()
+            .map_err(|e| e.to_string())?;
+        contract.parameters = contract
+            .parameters
+            .iter()
+            .map(|t| substitute(t, types, methods))
+            .collect::<Result<_, _>>()
+            .map_err(|e| e.to_string())?;
+        let implementation =
+            neoclr::native_metadata::resolve_self_call(module, &concrete, &contract)
+                .map_err(|e| e.to_string())?;
+        if !implementation.receiver_byref {
+            if !module.is_object_reference_type(&concrete) {
+                return Err(
+                    "borrowed value implementation requires a by-reference receiver".into(),
+                );
+            }
+            let first = function.locals.len();
+            function.locals.extend(implementation.parameters.clone());
+            for slot in (first..function.locals.len()).rev() {
+                body.push(Op::Store(slot));
+            }
+            body.push(Op::LoadObject(concrete));
+            for slot in first..function.locals.len() {
+                body.push(Op::Load(slot));
+            }
+        }
+        let dispatch = implementation.is_virtual || implementation.is_override;
+        let target = FunctionRef {
+            definition: implementation.definition,
+            name: implementation.name,
+            owner: implementation.owner,
+            instance: true,
+            generic_arguments: vec![],
+            parameters: implementation.parameters,
+        };
+        body.push(if dispatch {
+            Op::CallVirtual(target)
+        } else {
+            Op::Call(target)
+        });
+    }
+    offsets[function.body.len()] = body.len();
+    for op in &mut body {
+        match op {
+            Op::Branch(t)
+            | Op::BranchTrue(t)
+            | Op::BranchFalse(t)
+            | Op::BranchEqual(t)
+            | Op::BranchNotEqual(t)
+            | Op::BranchGreater(t)
+            | Op::BranchGreaterUnsigned(t)
+            | Op::BranchLess(t)
+            | Op::BranchLessUnsigned(t)
+            | Op::BranchGreaterEqual(t)
+            | Op::BranchGreaterEqualUnsigned(t)
+            | Op::BranchLessEqual(t)
+            | Op::BranchLessEqualUnsigned(t) => {
+                *t = *offsets.get(*t).ok_or("invalid constrained-call branch")?
+            }
+            Op::Switch(targets) => {
+                for t in targets {
+                    *t = *offsets.get(*t).ok_or("invalid constrained-call switch")?;
+                }
+            }
+            _ => {}
+        }
+    }
+    for point in &mut function.sequence_points {
+        point.instruction = *offsets
+            .get(point.instruction)
+            .ok_or("invalid constrained-call sequence point")?;
+    }
+    function.local_names.resize(function.locals.len(), None);
+    function.body = body;
+    Ok(())
+}
+
 fn substitute(t: &Type, types: &[Type], methods: &[Type]) -> Result<Type, neoclr::Fault> {
     t.substitute_method_parameters(methods)?
         .substitute_type_parameters(types)
@@ -1851,6 +1967,120 @@ ret
                 .value,
             neoclr::Value::Int32(42)
         );
+    }
+
+    #[test]
+    fn borrowed_nominal_calls_preserve_value_mutation_and_reference_arguments() {
+        let source = neoclr::assemble(
+            r#"
+.module BorrowedCalls
+.entry Main
+.interface Counter
+.method instance Next(Int32 delta) -> Int32
+.end
+.end
+.type Count
+.implements Counter
+.field Value Int32
+.method instance byref Next(Int32 delta) -> Int32
+ldarg this
+ldarg this
+ldfld Count::Value
+ldarg delta
+add
+stfld Count::Value
+pop
+ldarg this
+ldfld Count::Value
+ret
+.end
+.end
+.type class Box
+.implements Counter
+.field Value Int32
+.method instance .ctor(Int32 value) -> void
+ldarg this
+ldarg value
+stfld Box::Value
+ret
+.end
+.method instance Next(Int32 delta) -> Int32
+ldarg this
+ldarg this
+ldfld Box::Value
+ldarg delta
+add
+stfld Box::Value
+ldarg this
+ldfld Box::Value
+ret
+.end
+.end
+.function Twice<T>(T value) -> Int32
+.constraint T Counter
+ldc.i4 1
+brfalse fail
+ldarga value
+ldc.i4 1
+callself borrow T = instance Counter::Next(Int32)
+ldarga value
+ldc.i4 1
+callself borrow T = instance Counter::Next(Int32)
+add
+br done
+fail:
+ldc.i4 -1
+done:
+ret
+.end
+.function Main() -> Int32
+ldc.i4 20
+newobj Count
+call Twice<Count>(Count)
+ldc.i4 20
+newobj instance Box::.ctor(Int32)
+call Twice<Box>(Box)
+add
+ret
+.end
+"#,
+        )
+        .unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(86)
+        );
+    }
+
+    #[test]
+    fn nominal_owner_bounds_use_original_value_conformance() {
+        let source = neoclr::assemble(&include_str!(
+            "../../../docs/validation/numerics-interfaces/StaticSelf.neoil"
+        ).replace(".function Main() -> Int32", ".type Holder<T>\n.constraint T Number\n.field Value T\n.end\n.function Main() -> Int32\n.local Holder<Count> holder")).unwrap();
+        let mut projected = source.clone();
+        projected
+            .types
+            .iter_mut()
+            .find(|t| t.name == "Count")
+            .unwrap()
+            .implements
+            .clear();
+        let (expanded, _) =
+            super::expand_with_conformance(&projected, &source, "Main", &[]).unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        assert_eq!(
+            neoclr::LoadedProgram::new(&selected)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        assert!(super::expand_with_conformance(&projected, &projected, "Main", &[]).is_err());
     }
 
     #[test]

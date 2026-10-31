@@ -1,0 +1,21 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.71s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-998c8f9905fce89d)
+
+running 13 tests
+test compiler::values::structural_jit_tests::structural_tuple_jit_costs_match_nominal_records ... ignored, explicit native performance qualification; runs millions of calls
+test compiler::values::gc_layout::tests::nominal_array_backing_is_not_an_object_containing_itself ... ok
+test selection::composition_admission_tests::structural_union_signatures_are_selected_without_nominal_carriers ... ok
+test reflection_metadata::object_tests::object_query_retains_exact_function_shapes_without_nominal_rows ... ok
+test selection::composition_admission_tests::structural_tuple_storage_is_selected_without_nominal_carriers ... ok
+test linking::variance_projection_tests::array_argument_variance_preserves_closed_nominal_conformance ... ok
+test reflection_metadata::open_query_tests::partial_generic_arguments_use_the_selected_nominal_identity ... ok
+test specialization::tests::nominal_class_constraints_are_checked_before_specialization ... ok
+test specialization::tests::nominal_interface_owner_bounds_are_checked_before_specialization ... ok
+test specialization::tests::nominal_owner_bounds_use_original_value_conformance ... ok
+test specialization::tests::nominal_self_inheritance_closes_views_at_the_implementing_owner ... ok
+test linking::variance_projection_tests::nominal_rename_preserves_native_variance_and_slot_identity ... ok
+test specialization::tests::nominal_static_self_methods_specialize_without_erasing_conformance ... ok
+
+test result: ok. 12 passed; 0 failed; 1 ignored; 0 measured; 249 filtered out; finished in 2.41s

@@ -97,13 +97,23 @@ public class WebApplication : Disposable {
         return Ok(())
     }
 
-    /// Adds middleware in registration order. Await next(context) to continue, or return to short-circuit.
+    /// Returns this application on success. Adds middleware in registration order. Await next(context) to continue, or return to short-circuit.
     /// Pass the supplied context to next and await it at most once; do not retain the continuation.
     /// The request scope remains alive until the outermost middleware settles. Registration freezes on RunAsync.
-    func Use(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>) -> Result<unit, WebError> {
+    func Use(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>) -> Result<WebApplication, WebError> {
         if started || disposed { return Failure(WebError.InvalidState) }
         middleware.Add(WebMiddleware(handler))
-        return Ok(())
+        return Ok(self)
+    }
+
+    /// Returns this application on success. Registers a DI-backed stage with the same ordering and next contract as Use(handler).
+    /// Register T in Services before Build. It is resolved from each request's
+    /// scope only when reached; activation errors follow the existing sanitized 500 path.
+    /// Service lifetime and disposal follow DI registration. Registration freezes on RunAsync.
+    func UseMiddleware<T: Middleware>() -> Result<WebApplication, WebError> {
+        if started || disposed { return Failure(WebError.InvalidState) }
+        let stage = ServiceMiddleware<T>()
+        return Use(stage.InvokeAsync)
     }
 
     private func BuildPipeline() -> WebRequestPipeline {

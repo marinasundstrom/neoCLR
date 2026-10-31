@@ -1,0 +1,43 @@
+    Blocking waiting for file lock on artifact directory
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 11s
+     Running tests/generic_bounds.rs (target/debug/deps/generic_bounds-a8586b78599716ef)
+
+running 12 tests
+test ambiguous_bounds_and_value_receiver_copying_are_not_silently_selected ... ok
+test bound_types_substitute_owner_and_method_namespaces_independently ... ok
+test raw_metadata_checks_bounds_and_substitution ... ok
+test host_calls_cannot_bypass_bounds_and_verifier_requires_evidence ... ok
+test malformed_nominal_bounds_are_rejected ... ok
+test bundled_generic_interface_bounds_substitute_method_parameters ... ok
+test constrained_dispatch_uses_explicit_and_default_implementations ... ok
+test borrowed_bounds_preserve_local_and_heap_identity ... ok
+test example_runs ... ok
+test base_bound_calls_virtual_override_without_value_slicing ... ok
+test wrong_bounds_and_readonly_mutation_are_rejected ... ok
+test scoped_bounds_require_module_references_and_preserve_serialized_identity ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.30s
+
+     Running tests/self_types.rs (target/debug/deps/self_types-a1ad48b0f88fc66e)
+
+running 17 tests
+test inherited_self_does_not_satisfy_derived_generic_bound_or_direct_dispatch ... ok
+test borrowed_self_reference_dispatch_preserves_virtual_targets_in_execution_and_graph ... ok
+test borrowed_self_mutation_preserves_the_original_value_slot ... ok
+test generic_clone_checks_null_even_when_implementation_ignores_receiver ... ok
+test generic_clone_adapts_value_and_reference_receivers_without_boxing ... ok
+test native_self_rejects_missing_bound_mismatched_implementation_and_storage ... ok
+test self_is_not_an_ordinary_generic_parameter_or_lowercase_alias ... ok
+test serialized_self_cannot_forge_a_derived_bound_without_verification ... ok
+test self_in_an_inherited_generic_contract_is_bound_to_implementer ... ok
+test native_self_static_contract_executes_through_generic_bound ... ok
+test inherited_self_keeps_base_result_and_virtual_override_contract ... ok
+test native_self_substitutes_inside_array_and_constructed_signatures ... ok
+test self_instance_clone_uses_concrete_receiver_and_result ... ok
+test system_number_has_native_self_and_runs_a_constrained_numeric_algorithm ... ok
+test system_clonable_uses_native_self_for_value_and_reference_clones ... ok
+test generic_clone_rejects_unproven_copying_and_readonly_receivers ... ok
+test derived_self_requires_redeclaration_and_exact_derived_result ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.42s

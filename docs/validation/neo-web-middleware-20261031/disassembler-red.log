@@ -1,0 +1,23 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.73s
+     Running tests/disassemble.rs (target/debug/deps/disassemble-34867f18b7a2be2b)
+
+running 1 test
+test format_six_libraries_are_inspectable_in_json_and_neox ... FAILED
+
+failures:
+
+---- format_six_libraries_are_inspectable_in_json_and_neox stdout ----
+
+thread 'format_six_libraries_are_inspectable_in_json_and_neox' (178357652) panicked at tests/disassemble.rs:38:5:
+unsupported module format (expected 5); reassemble source
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    format_six_libraries_are_inspectable_in_json_and_neox
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.95s
+
+error: test failed, to rerun pass `--test disassemble`

@@ -12,12 +12,12 @@ import Neo.Web.HttpContext
 import NeoClr.Testing.*
 import System.Web.Http.*
 
-class Counts {
+public class Counts {
     var Created = 0
     var Disposed = 0
 }
 
-class ScopedProbe : Disposable {
+public class ScopedProbe : Disposable {
     private val counts: Counts
     var Disposed = false
     init(counts: Counts) {
@@ -49,6 +49,11 @@ func `Builder snapshots options and transfers ownership once`() -> Result<unit, 
     return Assert.True(app.Services.GetRequiredService<Configuration>() is Ok(_), "Configuration is available through DI")
 }
 
+func RegisterMiddlewareChain(app: WebApplication) -> Result<WebApplication, WebError> {
+    let configured = app.Use((context, next) => next(context))?
+    return configured.Use((context, next) => next(context))
+}
+
 [Test]
 func `Invalid options and ambiguous routes fail without registration`() -> Result<unit, TestFailure> {
     use invalid = WebApplication.CreateBuilder()
@@ -56,6 +61,8 @@ func `Invalid options and ambiguous routes fail without registration`() -> Resul
     _ = Assert.True(invalid.Build() is Failure(_), "Invalid options fail")?
     use builder = WebApplication.CreateBuilder()
     use app = builder.Build()!
+    let configured = RegisterMiddlewareChain(app)!
+    _ = Assert.True(Object.ReferenceEquals(app, configured), "Middleware registration returns this application")?
     _ = Assert.True(app.MapContext("GET", "/items/{id}", Empty) is Ok(_), "Capture accepted")?
     _ = Assert.True(app.MapContext("GET", "/items/{name}", Empty) is Failure(_), "Ambiguity rejected")?
     _ = Assert.True(app.MapContext("GET", "/items/current", Empty) is Ok(_), "Literal outranks capture")?
@@ -164,7 +171,7 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
     _ = app.Map("/any/{id}", handlers.Any)!
     _ = app.MapContext("GET", "/any/{id}", handlers.Literal)!
     let unsupported = app.MapGet("/unsupported/{id}", handlers.Unsupported)
-    _ = Assert.True(unsupported is Result<unit, WebError>.Failure(_), "Unsupported return rejected at registration")?
+    _ = Assert.True(unsupported is Failure(_), "Unsupported return rejected at registration")?
     use cancellation = CancellationTokenSource()
     cancellation.Cancel()
     let precancelled = app.RunAsync(cancellation.Token)

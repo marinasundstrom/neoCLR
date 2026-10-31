@@ -1,0 +1,14 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.54s
+     Running tests/disassemble.rs (target/debug/deps/disassemble-34867f18b7a2be2b)
+
+running 7 tests
+test generic_library_keeps_declaration_and_operand_facts ... ok
+test unresolved_dependencies_and_unverified_bodies_remain_inspectable ... ok
+test emitted_pe_shows_source_identity_slots_and_instructions_without_host_selection ... ok
+test format_six_libraries_are_inspectable_in_json_and_neox ... ok
+test equivalent_containers_have_identical_listings ... ok
+test output_is_exact_and_never_overwrites_existing_files ... ok
+test malformed_or_unsupported_inputs_never_publish_output ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s

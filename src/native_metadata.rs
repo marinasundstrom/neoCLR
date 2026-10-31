@@ -924,6 +924,22 @@ pub fn resolve_static_self_call(
             "static Self specialization requires a closed implementing type",
         ));
     }
+    resolve_self_call(module, concrete, target)
+}
+
+/// Resolve a closed nominal constrained call, preserving the implementation's receiver mode.
+/// Code generation must retain a borrowed value receiver or load a reference receiver;
+/// virtual reference implementations still require ordinary virtual dispatch.
+pub fn resolve_self_call(
+    module: &Module,
+    concrete: &Type,
+    target: &crate::metadata::FunctionRef,
+) -> Result<crate::metadata::Function, Fault> {
+    if crate::constraints::symbolic(concrete) {
+        return Err(Fault::new(
+            "Self specialization requires a closed implementing type",
+        ));
+    }
     let contract = crate::vm::resolve(module, target)?;
     let interface = contract
         .owner

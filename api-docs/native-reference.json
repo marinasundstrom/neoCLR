@@ -5,14 +5,14 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "49198cc179a17cb9487d07ab81f52937972b2a3f09aa8cf4d4d86c64534324ca",
+  "sha256": "20b369a8f1fdea3cf09dd04313c9da5379fc19240bf69fd09e8b2ccaccea0ac8",
   "librarySourceRevision": "6228d0be91564fc7b320d8e5bf0b7c750ce23be6",
   "compilerRevision": "4f7619fd8-working",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "549000fc5dff350c4ccd77d56cdb34039d8ea4fd446f375b9c4c9598fe002f6f"
+    "sha256": "5ac6f16d69fb4260854049f6068a16dc65bf2d5ca9a0fd634c004d16ecc12371"
   },
-  "rendererRevision": "9cd1c94ae",
+  "rendererRevision": "813dad20c",
   "libraryArtifacts": {
     "System.Runtime.dll": "41c0fc816049b26f8d6804672064325768cd1f0a5e4c7f58be34272e9948154a",
     "System.Data.dll": "650971af4982ffbd0cab325d8e9479571ffb5d9535867ad643ee3142e8d6ef7d",
@@ -27,7 +27,7 @@
     "Neo.Configuration.Abstractions.dll": "615237ff5d50a4ad5bc83046de3c2374c2024ee144426560cb34cf71673a98eb",
     "Neo.Configuration.dll": "7dddd94e80c38902ab5d4ce108bdeeede4ba50c755ddc456be553d7481980b9d",
     "Neo.Configuration.Json.dll": "b3ab4274b591daced423d016a727d17427e87d488cc18a52deb971de692e986a",
-    "Neo.Web.dll": "d76651489812acef55d3bde91ceedcd65600c0b603e4bebae3f7f530dc171cad",
+    "Neo.Web.dll": "e7db3b2762b8d21553e78a43e33c7128a53c01b09bc53c689351a04461b30243",
     "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
     "System.Data.PostgreSql.dll": "1c9a35895cdfb8e44cea087749e1da037ce50afecbd267afaa268a9efc4dcd99"
   },

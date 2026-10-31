@@ -21,7 +21,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add the read-only `HttpResult<T>.StatusCode` union member, projecting 200/201/400/404
   from its case for any payload type. Use the same projection when writing responses
   and in direct WebDemo handler tests. Further common properties and closed class
-  hierarchies remain future options.
+  hierarchies remain future options. Add the `Middleware` interface and
+  `UseMiddleware<T: Middleware>()`, sharing the function middleware
+  pipeline with lazy request-scope DI resolution. WebDemo demonstrates both forms;
+  constructor retention is explicit for native/JIT deployment.
+- Fix native metadata constrained interface calls through declaring-type parameters
+  and nominal method bounds, preserving borrowed receiver semantics. Preserve
+  interface bounds on imported nonvirtual generic reference-class methods; malformed
+  and unproven bounds remain rejected. Matching Raven lowering is required. Native
+  specialization validates owner bounds against original conformance metadata and
+  adapts borrowed instance calls while preserving value mutations and virtual
+  reference dispatch. `Use` now returns `Result<WebApplication, WebError>`;
+  callers explicitly typed to its former unit result must migrate. Map* contracts
+  and Raven conditional-access semantics remain unchanged. Native `disassemble`
+  now accepts supported format-6 libraries as well as format 5, allowing constructor
+  retention policies to resolve types from referenced libraries.
 - Expose the structural function-value `Function` contract through the matching
   unified Raven compiler and runtime metadata service. Preserve function-value
   terminology and binding value identity in maintained documentation. Support

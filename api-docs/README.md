@@ -3132,8 +3132,8 @@ and snapshot/source-link checks pass. See [migration and qualification](../docs/
 ### Experimental Neo.Web development 2026-10-31
 
 The optional Neo.Web native assembly is selected by the native audit renderer when
-present. Its WebApplicationBuilder, WebApplication, HttpContext, WebServerOptions
-WebError and HttpResult<T> types have native type/member pages, generated source summaries and
+present. Its WebApplicationBuilder, WebApplication, HttpContext, WebServerOptions,
+WebError, HttpResult<T> and Middleware types have native type/member pages, generated source summaries and
 an explicit [API contract](neo-web.md). No public type is excluded. The CLI aggregate
 bridge retains its existing inventory; the unified native snapshot supplies this
 extension's assembly ownership and navigation, as with other Neo extensions.
@@ -3147,3 +3147,10 @@ The follow-up HttpResult<T>.StatusCode property is selected on the existing unio
 page and has a generated member page and XML summary. It is a total read-only int
 projection; no new type selection or renderer exclusion is needed. The response
 writer and direct handler tests use the property with the matching Neo.Web assembly.
+
+The typed middleware follow-up uses Raven `813dad20c` with the matching metadata
+writer/runtime. `Middleware.InvokeAsync` and `UseMiddleware<T: Middleware>()` are
+included; both middleware registration methods return the application on success.
+The public interface adds one native type without changing the aggregate CLI
+inventory. The [qualification](../docs/validation/neo-web-middleware-20261031/README.md)
+records source/build provenance and execution checks.

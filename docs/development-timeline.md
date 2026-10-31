@@ -1,5 +1,21 @@
 # Development conversation record
 
+## 2026-10-31 — Typed middleware and explicit binding attributes
+
+- **Author:** Selected `TMiddleware : Middleware` with Middleware an interface.
+  Requested this consistency work before reviewing endpoint handler ergonomics.
+- **Author endpoint direction:** Handlers should bind request parameters and inject
+  services, HttpRequest, HttpResponse, HttpContext and CancellationToken, following
+  ASP.NET Core familiarity. Initially said helper methods, then corrected that to
+  binding attributes, naming FromBody and FromService and requiring attributes to
+  resolve ambiguities.
+- **Assistant action:** Implementing typed registration through the existing function
+  pipeline and request DI scope. Reviewed the next endpoint slice and recorded
+  [binding precedence and concrete gaps](design/neo-web.md#endpoint-binding-and-ambiguity-2026-10-31):
+  response identity, request-abort exposure, nonactivating DI discovery and parameter
+  attribute metadata qualification. Binding attributes remain a proposal, not shipped
+  API; the author's singular FromService spelling is retained.
+
 ## 2026-10-31 — Implement common result status and clarify variant enforcement
 
 - **Author:** Directed continuation after proposing common union members, then
@@ -24198,3 +24214,42 @@ Evidence: [design and implemented profile](design/generic-function-methods.md),
 - **Outcome:** all 14 libraries build; focused SDK/runtime/compiler checks and
   native/interpreter stream and HTTP tests pass. The refreshed API reference displays
   the actual defaults. [Evidence](validation/runtime-defaults-20261030/README.md).
+
+
+### Carrier access clarification and Neo.Web style (2026-10-31)
+
+- The author requested `Result<WebApplication, WebError>` from `Use` and
+  `UseMiddleware`, while cautioning that endpoint `Map*` methods may eventually
+  return endpoint-specific builders, following ASP.NET Core. The assistant limited
+  the application-returning change to middleware registration.
+- The assistant proposed differing method/property `?.` behavior during the
+  discussion. The author subsequently clarified the existing intended rule:
+  `obj?.Age` is `Result<int, ...>` and `obj?.ToString()` is `Result<string, ...>`.
+  Both map; standalone postfix `?` unwraps or propagates. The assistant withdrew
+  its attempted binder/spec change and removed the associated experimental test.
+- The author emphasized that chaining support is not a style recommendation;
+  separate `app.MapGet(...)?` and `app.MapPost(...)?` statements can be clearer.
+  WebDemo now uses that form. No Task creation or implicit Result flattening is
+  implied by carrier access. The matching compiler change is committed as Raven `813dad20c`. Framework tests
+  pass 5/5, direct sample tests 4/4 and independent sample HTTP checks 12/12 in all
+  three execution modes; [qualification](validation/neo-web-middleware-20261031/README.md)
+  records the constrained-call and tooling fixes.
+
+
+### Endpoint descriptors as the next slice (2026-10-31)
+
+The author directed the assistant to continue after typed middleware with endpoint
+descriptors: resolve signatures and parameter-binding decisions at registration,
+then use cached descriptors for quick request lookup and execution, keeping overhead
+low above HttpServer. The assistant noted that HandlerPlan already caches binding
+metadata and proposed auditing the remaining invocation/routing path, then measuring
+the descriptor path against direct HttpServer. This is the next authorized slice;
+no descriptor/performance outcome is claimed yet.
+
+The author further clarified that parameter/body/service binding, both inferred
+and attribute-directed, must drive descriptor creation. The assistant proposed one
+registration-time binding pipeline whose result is cached per endpoint; request
+argument values and scoped services remain request-owned. Binding attributes are
+inputs to that plan, not metadata to inspect again on every request.
+
+The author also simplified the middleware parameter spelling to `T: Middleware`; the implementation and current API documentation adopt that name.

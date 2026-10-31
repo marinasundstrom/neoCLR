@@ -1,0 +1,24 @@
+module Neo.Web
+
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import Neo.DependencyInjection.*
+
+/// A DI-registered middleware stage with the same invocation contract as Use(handler).
+/// Resolve from the request scope; await next(context) at most once or short-circuit.
+public interface Middleware {
+    /// Runs this stage. The supplied context and continuation belong to this request.
+    /// The request scope remains alive until the complete outer pipeline settles.
+    func InvokeAsync(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>
+}
+
+internal class ServiceMiddleware<T: Middleware> {
+    func InvokeAsync(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+        let resolved = context.Services.GetRequiredService<T>()
+        return match resolved {
+            Ok(let middleware) => middleware.InvokeAsync(context, next)
+            Failure(let error) => Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Failure(WebError.Services(error)))
+        }
+    }
+}

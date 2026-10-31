@@ -63,3 +63,22 @@ short-circuit with a response. One request scope remains alive through the entir
 pipeline, including middleware work after the endpoint returns. The sample logs
 requests before and after next; explicit routing-stage placement and path-prefix
 branches remain future work.
+
+### Typed middleware (development)
+
+`Use(handler)` and `UseMiddleware<T: Middleware>()` share the same
+context/continuation pipeline. `Middleware` is an interface whose `InvokeAsync`
+method awaits `next(context)` or short-circuits. Register its implementation with
+DI before building the application. Resolution happens only when a request reaches
+that stage; the request scope lives through the complete outer pipeline.
+
+WebDemo combines `Use(LogRequest)` with `UseMiddleware<MaintenanceMiddleware>()`.
+The latter receives Configuration through constructor injection; setting
+`Maintenance` to `true` produces a 503 response. Its project retention file keeps
+the constructor available in native/JIT builds. Endpoint query/body binding,
+`FromBody`/`FromService` and other ambiguity-resolving attributes remain planned.
+
+`Use` and `UseMiddleware` return `Result<WebApplication, WebError>` with the same
+application on success. Chaining is optional; WebDemo keeps route declarations
+as separate statements with postfix `?` to propagate registration failures.
+`Map*` retains its existing unit result in this slice.

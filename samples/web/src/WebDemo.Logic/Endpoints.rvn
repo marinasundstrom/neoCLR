@@ -74,3 +74,17 @@ public async func LogRequest(context: HttpContext, next: (HttpContext) -> Task<R
     logger.LogInformation("Request pipeline completed")
     return result
 }
+
+// DI-backed middleware shares the same context/next contract as LogRequest.
+public class MaintenanceMiddleware : Middleware {
+    private val configuration: Configuration
+    init(configuration: Configuration) { self.configuration = configuration }
+
+    async func InvokeAsync(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+        if configuration["Maintenance"] == "true" {
+            context.RespondText(503, "Service unavailable")
+            return Ok(())
+        }
+        return await next(context)
+    }
+}
