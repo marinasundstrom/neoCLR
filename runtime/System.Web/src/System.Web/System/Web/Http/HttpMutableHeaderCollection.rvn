@@ -23,8 +23,22 @@ internal class HttpMutableHeaderCollection : ReadOnlyHttpHeaderCollection, Mutab
         if !clearWhenAbsent && mediaType is not Some(_) {
             return headers
         }
+        // Never retain the attached mutable view as its own backing sequence.
+        let entries = if headers is HttpMutableHeaderCollection view { view.StoredEntries } else { headers }
+        if mediaType is not Some(_) {
+            var index = 0
+            while index < entries.Count {
+                if ReadOnlyHttpHeaderCollection.Matches(ReadOnlyHttpHeaderCollection.NameAt(entries, index), HttpHeaderNames.ContentType) {
+                    break
+                }
+                index += 1
+            }
+            if index == entries.Count {
+                return entries
+            }
+        }
         let result = ArrayList<HttpHeader>()
-        for header in headers {
+        for header in entries {
             if !ReadOnlyHttpHeaderCollection.Matches(header.Name, HttpHeaderNames.ContentType) {
                 result.Add(header)
             }

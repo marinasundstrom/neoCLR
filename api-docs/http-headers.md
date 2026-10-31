@@ -67,6 +67,11 @@ indexer still allocates a result snapshot; `Contains` and `GetSingle` avoid that
 `GetContentType` on the collection parses on each call; message-level
 `GetContentType` retains its existing parsed-value cache.
 
+`HttpServerResponse.Respond` retains existing header entries when the replacement
+content has no media type and no Content-Type field needs clearing. Reusing content
+and a warmed attached view allocates no managed header objects in the focused
+interpreter check; this is not a measured HTTP throughput gain.
+
 This changes the declared return type of `Headers`; rebuild consumers with the
 matching System.Web library. Sequence-based consumers remain source-compatible.
 `GetHeaderValues` remains supported with its existing snapshot behavior. Use `HttpServerResponse.SetHeader` or the mutable collection for response fields,

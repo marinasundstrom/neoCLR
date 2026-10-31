@@ -14,6 +14,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   MutableHttpHeaderCollection with validated Set/Append/Remove. Preserve lazy views
   and shared immutable Empty; outgoing views stay attached across response changes.
   Server responses delegate content-type replacement to the header implementation.
+  Avoid copying response headers when Respond has no content type to replace or
+  clear, retaining the attached mutable view. Add a focused allocation regression.
   Reuse the existing HttpHeaderNames catalog with multiple-value lookup, Contains,
   checked GetSingle and typed GetContentType. Parsers retain compact name/value
   strings; named lookup avoids eager HttpHeader objects and temporary name encodings.

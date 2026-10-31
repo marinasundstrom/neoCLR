@@ -14,6 +14,7 @@ func Report(result: Result<unit, TestFailure>, name: string) {
 async func Main() -> Task<int> {
     Report(`Single header lookup and cached views allocate no managed objects`(), "Single header lookup and cached views allocate no managed objects")
     Report(await `Parsed HTTP fields materialize entries only for positional access`(), "Parsed HTTP fields materialize entries only for positional access")
-    Console.WriteLine("Tests: 2, passed: 2, failed: 0, skipped: 0")
+    Report(`Respond without content type retains headers without managed allocations`(), "Respond without content type retains headers without managed allocations")
+    Console.WriteLine("Tests: 3, passed: 3, failed: 0, skipped: 0")
     return 0
 }

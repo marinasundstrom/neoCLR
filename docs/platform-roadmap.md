@@ -11,6 +11,8 @@ with read-only incoming and mutable outgoing headers. Static interface helper ga
 are fixed in Raven main and the metadata/codegen layers. See the
 [migration reference](../api-docs/http-messages.md) and
 [three-mode qualification](validation/http-message-surfaces-20261031/README.md).
+A [response-header allocation follow-up](validation/http-header-noop-20261031/README.md)
+retains entries when Respond has no content type to replace or clear.
 Server-specific body handling and measured throughput gains remain follow-up work.
 
 **HTTP throughput and execution continuity (author direction, 2026-10-31):**

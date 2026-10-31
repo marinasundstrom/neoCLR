@@ -79,3 +79,27 @@ async func `Parsed HTTP fields materialize entries only for positional access`()
     use owned = response
     return CheckParsed(response.Headers)
 }
+
+[Test]
+func `Respond without content type retains headers without managed allocations`() -> Result<unit, TestFailure> {
+    let content = HttpMemoryContent(default(ReadOnlyMemory<byte>))
+    let response = HttpServerResponse(200, [HttpHeader("X-Test", "retained")], content)
+    let headers = response.Headers
+    response.Respond(HttpStatusCode.OK, content)
+    let before = System.Runtime.GC.AllocatedObjectCount
+    var index = 0
+    while index < 128 {
+        response.Respond(HttpStatusCode.OK, content)
+        index += 1
+    }
+    let allocated = System.Runtime.GC.AllocatedObjectCount - before
+    if allocated != 0 {
+        Console.WriteLine(String.Concat("Response header allocations: ", allocated.ToString()))
+    }
+    _ = Assert.True(allocated == 0, String.Concat("Response header allocations: ", allocated.ToString()))?
+    _ = Assert.True(Object.ReferenceEquals(headers, response.Headers), "Attached view retained")?
+    _ = Assert.Equal(1, headers.Count)?
+    _ = Assert.Equal("retained", headers[0].Value)?
+    _ = headers.Set("X-After", "visible")!
+    return Assert.Equal(2, response.Headers.Count)
+}

@@ -301,6 +301,11 @@ func `Mutable outgoing headers preserve repeated values and validate atomically`
     response.Respond(HttpStatusCode.OK)
     _ = Assert.True(!headers.Contains(HttpHeaderNames.ContentType), "Respond clears old content type without replacement")?
     _ = Assert.Equal("value", headers["X-Keep"][0])?
+    response.Respond(HttpStatusCode.OK)
+    _ = Assert.True(Object.ReferenceEquals(headers, response.Headers), "No-change response keeps attached view")?
+    _ = Assert.Equal("value", headers["X-Keep"][0])?
+    _ = Assert.True(headers.Set("X-After", "visible") is Ok(_), "View remains mutable after no-change response")?
+    _ = Assert.Equal(2, response.Headers.Count)?
     let explicit = HttpServerResponse(HttpStatusCode.OK,
         HttpHeaderCollection.Snapshot([HttpHeader("Content-Type", "application/custom")]),
         HttpMemoryContent(default(ReadOnlyMemory<byte>)))
