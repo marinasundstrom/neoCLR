@@ -8,7 +8,7 @@ import System.Web.Http.*
 import System.Web.Http.Json.*
 import System.Data.Json.*
 
-async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+async func Echo(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     if !request.IsSecure || request.Method.Method != "POST" || request.Target != "/echo" {
         return Failure(HttpError.Handler("Unexpected request"))
     }
@@ -19,7 +19,7 @@ async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let Ok(content) = JsonContent.CreateNode(node) else {
         return Failure(HttpError.Handler("Cannot encode JSON response"))
     }
-    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     response.Respond(HttpStatusCode.OK, content)
     return Ok(response)
 }

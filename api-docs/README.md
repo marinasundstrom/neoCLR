@@ -3197,3 +3197,16 @@ HttpHeaderCollection.GetContentType because MediaType remains native-only there,
 as do the existing message/content media-type accessors. This is a legacy bridge
 coverage limit, not an omission from the on-site native API reference. No new
 native renderer exclusion is introduced. Rebuild System.Web and consumers together.
+
+### Independent HTTP message surfaces — 2026-10-31 development
+
+Replace the provisional HttpRequest/HttpResponse selections with HttpClientRequest,
+HttpClientResponse, HttpServerRequest and HttpServerResponse. Client send/handler
+APIs use client messages; HttpServer/HttpContext and Neo.Web use server messages.
+HttpHeaderCollection is now an interface and MutableHttpHeaderCollection adds
+outgoing mutation. Empty, Snapshot and Create are static interface helpers; refresh
+native documentation with the matching Raven/metadata producer so those members
+are not misclassified as abstract contracts. The native reference is authoritative;
+the legacy facade continues to omit MediaType/GetContentType as already recorded.
+The host producer's concrete static interface helpers and explicit import flag are
+covered in the linked experimental-metadata manual, not guest type selection.

@@ -26,33 +26,33 @@ class OwnedInput : InputStream {
 
 class Application {
     val Server: HttpServer
-    val Gates = ArrayList<Promise<Result<HttpResponse, HttpError>>>()
+    val Gates = ArrayList<Promise<Result<HttpServerResponse, HttpError>>>()
     var Released: int = 0
     var Disposed: int = 0
     init(server: HttpServer) { Server = server }
 
-    func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         if request.Target == "/error" {
-            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Error(HttpError.Handler("expected")))
+            return Task.FromResult<Result<HttpServerResponse, HttpError>>(Result<HttpServerResponse, HttpError>.Error(HttpError.Handler("expected")))
         }
         if request.Target == "/cancel" {
-            let cancelled = Promise<Result<HttpResponse, HttpError>>()
+            let cancelled = Promise<Result<HttpServerResponse, HttpError>>()
             _ = cancelled.Cancel()
             return cancelled.Task
         }
         if request.Target == "/hold" || request.Target == "/inline" {
             if request.Target == "/inline" { Server.Close() }
-            let gate = Promise<Result<HttpResponse, HttpError>>()
+            let gate = Promise<Result<HttpServerResponse, HttpError>>()
             Gates.Add(gate)
             Console.WriteLine("HOLD")
             return gate.Task
         }
-        let response = HttpResponse(if request.Target == "/invalid" { 100 } else { 200 }, ArrayList<HttpHeader>(), HttpMemoryContent([(byte)120]))
-        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+        let response = HttpServerResponse(if request.Target == "/invalid" { 100 } else { 200 }, ArrayList<HttpHeader>(), HttpMemoryContent([(byte)120]))
+        return Task.FromResult<Result<HttpServerResponse, HttpError>>(Result<HttpServerResponse, HttpError>.Ok(response))
     }
 
     func ReleaseOne(late: bool) {
-        let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent([(byte)120]))
+        let response = HttpServerResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent([(byte)120]))
         if late {
             let Ok(content) = HttpStreamContent.Create(OwnedInput(self), 1, false) else { Panic("Content failed") }
             response.Respond(HttpStatusCode.OK, content)

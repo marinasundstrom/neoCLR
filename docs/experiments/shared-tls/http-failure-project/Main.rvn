@@ -13,12 +13,12 @@ func Url(host: string, port: int) -> string {
     return String.Concat(String.Concat(String.Concat("https://", host), ":"), port.ToString())
 }
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     if !request.IsSecure {
-        let error: Result<HttpResponse, HttpError> = Failure(HttpError.Handler("Expected secure request"))
+        let error: Result<HttpServerResponse, HttpError> = Failure(HttpError.Handler("Expected secure request"))
         return Task.FromResult(error)
     }
-    let response: Result<HttpResponse, HttpError> = Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("recovered")))
+    let response: Result<HttpServerResponse, HttpError> = Ok(HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("recovered")))
     return Task.FromResult(response)
 }
 

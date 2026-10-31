@@ -592,3 +592,18 @@ Implementations can remain internal, with `HttpHeaderCollection.Empty` exposing 
 shared immutable empty view. The current slice adds Empty to the provisional
 concrete collection; the interface conversion belongs with the message split so
 construction and mutation contracts migrate together.
+
+### Revised names and ownership (2026-10-31)
+
+The author subsequently selected `HttpClientRequest` and `HttpClientResponse` to
+mirror the server names. The four types have independent contracts and storage;
+there is no shared message interface or inheritance requirement. Client requests
+and server responses permit outgoing mutation. Server requests and client responses
+expose read-only received data. Read-only access is compatible with lazy parsing,
+wrapper materialization and cached properties in every role.
+
+This implementation slice retains HttpContent for body ownership compatibility;
+server-specific body APIs remain an explicit future option. The benefit is a clear
+boundary for specialization; the cost is a breaking type migration and additional
+API surface. Direct HttpServer allocation/throughput measurements must establish
+any performance gains separately.

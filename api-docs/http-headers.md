@@ -1,7 +1,10 @@
 # HTTP header collections (development)
 
-`System.Web.Http.HttpRequest.Headers` and `HttpResponse.Headers` return
-`HttpHeaderCollection`, a read-only `Sequence<HttpHeader>` with HTTP-aware lookup.
+Incoming `HttpServerRequest.Headers` and `HttpClientResponse.Headers` expose
+`HttpHeaderCollection`, a read-only `Sequence<HttpHeader>` interface. Outgoing
+`HttpClientRequest.Headers` and `HttpServerResponse.Headers` expose
+`MutableHttpHeaderCollection`, which extends that read contract. The implementations
+are internal and can specialize storage for each role.
 `HttpHeaderNames` exposes the existing canonical lowercase name catalog, including
 `ContentType`, `ContentLength`, `Host`, `Authorization`, `Cookie`, `SetCookie` and
 `CacheControl`. Custom names remain ordinary strings.
@@ -19,8 +22,7 @@ exercise this API.
 | Member | Contract |
 | --- | --- |
 | `static Empty: HttpHeaderCollection` | Reusable read-only empty collection, cached within the runtime invocation. |
-| `HttpHeaderCollection()` | Empty collection. |
-| `HttpHeaderCollection(headers: Sequence<HttpHeader>)` | Shallow snapshot in entry order; subsequent source mutations are invisible. Does not validate outgoing framing or values. |
+| `static Snapshot(headers: Sequence<HttpHeader>): HttpHeaderCollection` | Shallow snapshot in entry order; subsequent source mutations are invisible. Does not validate outgoing framing or values. |
 | `Count: int` | Number of field entries, including repeated names. |
 | `self[index: int]: HttpHeader` | Positional entry; invalid bounds are terminal. Parsed entries are materialized on demand; reference identity is not a contract. |
 | `self[name: string]: Sequence<string>` | Independent snapshot of matching raw values in order. Invalid or missing names give an empty sequence. No comma splitting or joining. |
@@ -34,14 +36,21 @@ Names use ASCII case-insensitive comparison and HTTP token grammar. Repeated
 The string indexer is a multiple-value API even for fields normally used once.
 Use `GetSingle` or `GetContentType` to enforce those expectations.
 
+`MutableHttpHeaderCollection.Create()` creates an independent empty mutable
+collection. `Set(name, value)` replaces all matching fields; `Append(name, value)`
+adds a separate field; `Remove(name)` removes all matching fields and returns
+whether any existed. Each returns `Result<..., HttpError>` and validates before
+mutation. Client-owned collections reject transport/content-controlled fields,
+matching `WithHeader`; server-owned collections validate names and values, with
+framing checked when sent. Concurrent mutation is unsupported.
+
 ## Ownership and allocation
 
-Public construction copies the entry sequence. A message's collection view instead
-retains its existing storage: callers supplying a mutable sequence to a message
-constructor retain the same alias behavior as before. This is not deep immutability
-or thread safety. A view already obtained keeps its source when `SetHeader` or
-`Respond` replaces a response's storage; obtain `response.Headers` again to observe
-the replacement. Request `WithHeader` still derives a separate message.
+`Snapshot` copies the entry sequence. Message constructors retain supplied storage;
+this does not imply deep immutability or thread safety. Incoming views do not expose
+the mutable interface, even when supplied mutable storage. Outgoing views remain
+attached across `SetHeader`, direct header mutation and `Respond`. Request
+`WithHeader` still derives a separate message. `Empty` is never mutable.
 
 Incoming parsers store alternating name/value strings in a private buffer. Their
 validation and limits are unchanged. Named lookup and content-type inspection read
@@ -52,7 +61,7 @@ borrowed wire-buffer lifetime contract. No arbitrary input is interned.
 Use `HttpHeaderCollection.Empty` when no fields are needed. It exposes no mutation;
 setting a response header derives new message storage and leaves Empty unchanged.
 
-The public view is created lazily and reused while storage remains the same. Lookup
+The public view is created lazily and reused for the message. Lookup
 compares borrowed UTF-8 views instead of encoding temporary byte arrays. The string
 indexer still allocates a result snapshot; `Contains` and `GetSingle` avoid that list.
 `GetContentType` on the collection parses on each call; message-level
@@ -60,17 +69,16 @@ indexer still allocates a result snapshot; `Contains` and `GetSingle` avoid that
 
 This changes the declared return type of `Headers`; rebuild consumers with the
 matching System.Web library. Sequence-based consumers remain source-compatible.
-`GetHeaderValues` remains supported with its existing snapshot behavior. No mutable
-collection API is introduced; use `HttpResponse.SetHeader` or `HttpRequest.WithHeader`.
+`GetHeaderValues` remains supported with its existing snapshot behavior. Use `HttpServerResponse.SetHeader` or the mutable collection for response fields,
+and `HttpClientRequest.WithHeader` to derive a client request.
 
 ## .NET comparison
 
 ASP.NET Core's [IHeaderDictionary](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.iheaderdictionary)
 returns multiple values and an empty result for a missing name. neoCLR retains that
 lookup shape, with `Sequence<string>` snapshots and `Result<Optional<string>, HttpError>`
-for checked single-value access instead of an out parameter. It deliberately retains
-the existing read-only message view and message mutation methods; general mutable
-collection semantics remain future work. Compact storage saves eager entry objects
+for checked single-value access instead of an out parameter. Incoming and outgoing contracts deliberately separate read and mutation access.
+This prevents incoming-message APIs from implying outgoing configuration semantics. Compact storage saves eager entry objects
 but positional iteration now materializes them. Neither a dictionary nor a parsed
 header cache is imposed on every message; those tradeoffs can evolve behind this API.
 

@@ -15,18 +15,18 @@ func Check(condition: bool) {
 
 class ReplyHandler : HttpHandler {
 
-    val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
-    val Response: HttpResponse
+    val Completion: Promise<Result<HttpClientResponse, HttpError>> = Promise<Result<HttpClientResponse, HttpError>>()
+    val Response: HttpClientResponse
     var Calls: int = 0
     var SawToken: bool = false
     private var pending: bool
 
     init(status: int, text: string, pending: bool) {
-        Response = HttpResponse(status, ArrayList<HttpHeader>(), HttpStringContent(text))
+        Response = HttpClientResponse(status, ArrayList<HttpHeader>(), HttpStringContent(text))
         self.pending = pending
     }
 
-    override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, token: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Calls += 1
         SawToken = token.CanBeCancelled
         if !pending {
@@ -39,7 +39,7 @@ class ReplyHandler : HttpHandler {
 func RequestAssociation() {
     let ready = ReplyHandler(200, "{}", false)
     Check(ready.Response.Request is None)
-    let Ok(request) = HttpRequest.Get("http://example.test/direct") else {
+    let Ok(request) = HttpClientRequest.Get("http://example.test/direct") else {
         Panic("Request creation failed")
     }
     let sent = HttpClient(ready).Send(request)
@@ -106,7 +106,7 @@ func DefaultHeaders() {
     client.DefaultRequestHeaders = defaults
     defaults.Add(HttpHeader("X-Later", "ignored"))
     Check(client.DefaultRequestHeaders.Count == 3)
-    let Ok(baseRequest) = HttpRequest.Get("http://example.test/") else {
+    let Ok(baseRequest) = HttpClientRequest.Get("http://example.test/") else {
         Panic("Default-header request failed")
     }
     let Ok(explicitRequest) = baseRequest.WithHeader("x-mode", "explicit") else {

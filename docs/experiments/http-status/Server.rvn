@@ -5,7 +5,7 @@ import System.Concurrency.Tasks.*
 import System.Text.*
 import System.Web.Http.*
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     var status = 600
     let target = request.Target
     if target == "/201" {
@@ -37,8 +37,8 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     }
     let empty = (status == 204 || status == 205 || status == 304) && request.Target != "/bad-body"
     let body = HttpStringContent(if empty { "" } else { "body" })
-    let result = Promise<Result<HttpResponse, HttpError>>()
-    _ = result.Complete(Ok(HttpResponse(status, ArrayList<HttpHeader>(), body)))
+    let result = Promise<Result<HttpServerResponse, HttpError>>()
+    _ = result.Complete(Ok(HttpServerResponse(status, ArrayList<HttpHeader>(), body)))
     return result.Task
 }
 

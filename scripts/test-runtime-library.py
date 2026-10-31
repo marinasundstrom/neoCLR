@@ -489,7 +489,6 @@ HTTP_METHOD_VALUES_NAMES = [
     'NeoClr.RuntimeTests.HTTP URI request factories support custom methods and empty content',
 ]
 HTTP_HEADER_VALUES_NAMES = [
-    'NeoClr.RuntimeTests.Empty header collections are reusable read only message inputs',
     'NeoClr.RuntimeTests.HTTP header lookup preserves repeated values without splitting commas',
     'NeoClr.RuntimeTests.HTTP header lookup distinguishes empty values from absent fields',
     'NeoClr.RuntimeTests.HTTP header lookup rejects invalid names',
@@ -501,7 +500,11 @@ HTTP_HEADER_VALUES_NAMES = [
     'NeoClr.RuntimeTests.HTTP messages expose HTTP 1.1 and dispose owned content without reading',
     'NeoClr.RuntimeTests.Header collections expose named snapshots and ordered fields',
     'NeoClr.RuntimeTests.Single header access distinguishes absence empty duplicate and invalid names',
-    'NeoClr.RuntimeTests.Message header views retain source behavior and follow replacement on next access',
+    'NeoClr.RuntimeTests.Outgoing header views remain attached across message mutations',
+    'NeoClr.RuntimeTests.Empty header collections are reusable read only message inputs',
+    'NeoClr.RuntimeTests.Mutable outgoing headers preserve repeated values and validate atomically',
+    'NeoClr.RuntimeTests.Client request headers enforce transport ownership and derived request independence',
+    'NeoClr.RuntimeTests.Incoming response views and Empty never expose outgoing mutation',
 ]
 HTTP_ROUTE_MATCHING_NAMES = [
     'NeoClr.RuntimeTests.Route matching preserves case segment and trailing-slash distinctions',

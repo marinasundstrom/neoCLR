@@ -16423,3 +16423,24 @@ boxed-record result path. This supports CancellationToken's source reference;
 borrowed records/views remain excluded. No Raven compiler semantic or Runtime
 Contract configuration change is required; runtime/codegen and the networking
 library must be upgraded together for the new socket service.
+
+### HTTP interface factories (2026-10-31 development)
+
+The HTTP message split uses public concrete static members on the nongeneric
+HttpHeaderCollection and MutableHttpHeaderCollection interfaces. Native intent is
+a direct call to a helper body, distinct from abstract implementation obligations.
+Raven admits this through StaticInterfaceMethodBody; no Runtime Contract setting
+or temporary CLI carrier is added. The metadata producer now authors, roundtrips
+and imports concrete helper identity explicitly (`isInterfaceHelper`). Matching
+Raven/producer builds are required. Default instance bodies, generic-owner static
+helpers and native static extension properties remain outside this slice.
+
+The legacy documentation facade has a separate authoring limitation: its bootstrap
+C# core lacks RuntimeFeature default-interface markers. Header declarations are
+compiled as declaration-only abstract carriers, then projected to actual interface
+metadata (including their static helpers), removing constructors and retaining
+interface inheritance. This is a reference-generation step, not an executable class
+carrier or a native runtime encoding. MediaType/GetContentType remain native-only
+in that legacy facade and are explicitly listed in api-docs/exclusions.json; the
+native reference contains those members. The native compiler/docs reader are the
+replacement for this temporary facade, as described in api-docs/README.md.

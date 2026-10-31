@@ -14,7 +14,7 @@ class HttpSession {
         self.server = server
     }
 
-    private func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    private func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         count += 1
         if request.Target == "/fault" {
             Panic("Retained HTTP handler fault")
@@ -22,7 +22,7 @@ class HttpSession {
         let headers = ArrayList<HttpHeader>()
         headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
         let body = String.Concat("Request ", count.ToString())
-        let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, HttpStringContent(body)))
+        let result: Result<HttpServerResponse, HttpError> = Ok(HttpServerResponse(200, headers, HttpStringContent(body)))
         return Task.FromResult(result)
     }
 

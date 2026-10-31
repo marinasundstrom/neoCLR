@@ -412,7 +412,6 @@
       <param name="value">The case payload.</param>
     </member>
 
-
     <member name="T:System.IO.StreamError.NotFound">
       <summary>The requested file or a required parent does not exist.</summary>
     </member>
@@ -423,7 +422,6 @@
       <summary>Wraps the NotFound case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-
 
     <member name="T:System.IO.StreamError.AccessDenied">
       <summary>The host denies access.</summary>
@@ -436,7 +434,6 @@
       <param name="value">The case payload.</param>
     </member>
 
-
     <member name="T:System.IO.StreamError.WrongKind">
       <summary>The path does not resolve to an allowed regular file or required directory.</summary>
     </member>
@@ -447,7 +444,6 @@
       <summary>Wraps the WrongKind case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-
 
     <member name="T:System.IO.StreamError.AlreadyExists">
       <summary>Exclusive creation found an existing entry.</summary>
@@ -460,7 +456,6 @@
       <param name="value">The case payload.</param>
     </member>
 
-
     <member name="T:System.IO.StreamError.Closed">
       <summary>The stream is closed or its owning invocation has ended.</summary>
     </member>
@@ -471,7 +466,6 @@
       <summary>Wraps the Closed case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-
 
     <member name="T:System.IO.StreamError.InvalidRange">
       <summary>The buffer offset or count is negative or outside the array.</summary>
@@ -484,7 +478,6 @@
       <param name="value">The case payload.</param>
     </member>
 
-
     <member name="T:System.IO.StreamError.LimitExceeded">
       <summary>The request exceeds a transfer or resource limit.</summary>
     </member>
@@ -495,7 +488,6 @@
       <summary>Wraps the LimitExceeded case in a StreamError.</summary>
       <param name="value">The case payload.</param>
     </member>
-
 
     <member name="T:System.IO.StreamError.WrongAccess">
       <summary>The internal resource has the wrong access direction; directional wrappers do not normally expose this case.</summary>
@@ -508,7 +500,6 @@
       <param name="value">The case payload.</param>
     </member>
 
-
     <member name="T:System.IO.StreamError.IoFailure">
       <summary>Another host I/O error occurred.</summary>
     </member>
@@ -520,7 +511,6 @@
       <param name="value">The case payload.</param>
     </member>
 
-
     <member name="T:System.Storage.Metadata">
       <summary>Synchronous metadata queries for native host paths.</summary>
       <remarks>Development after Preview 9. This static host adapter is separate from the experimental provider API. It performs no content read and retains no stream handle.</remarks>
@@ -531,17 +521,6 @@
       <param name="path">A native host path. Relative paths use the process working directory, not a provider root.</param>
       <returns>Ok with File or Directory, or a typed StorageLookupError. No resource is retained.</returns>
     </member>
-
-
-
-
-
-
-
-
-
-
-
 
     <member name="T:System.Storage.StorageLookupError">
       <summary>Expected failures from metadata queries, child address validation and provider lookup.</summary>
@@ -559,7 +538,6 @@
       <param name="value">The InvalidPath case to hold.</param>
     </member>
 
-
     <member name="T:System.Storage.StorageLookupError.NotFound">
       <summary>The path or followed target does not exist.</summary>
     </member>
@@ -570,7 +548,6 @@
       <summary>Constructs a carrier holding NotFound.</summary>
       <param name="value">The NotFound case to hold.</param>
     </member>
-
 
     <member name="T:System.Storage.StorageLookupError.AccessDenied">
       <summary>The host rejected metadata access.</summary>
@@ -583,7 +560,6 @@
       <param name="value">The AccessDenied case to hold.</param>
     </member>
 
-
     <member name="T:System.Storage.StorageLookupError.WrongKind">
       <summary>The item does not have the requested or supported kind.</summary>
     </member>
@@ -595,7 +571,6 @@
       <param name="value">The WrongKind case to hold.</param>
     </member>
 
-
     <member name="T:System.Storage.StorageLookupError.IoFailure">
       <summary>Another host I/O failure prevented lookup.</summary>
     </member>
@@ -606,7 +581,6 @@
       <summary>Constructs a carrier holding IoFailure.</summary>
       <param name="value">The IoFailure case to hold.</param>
     </member>
-
 
     <member name="T:System.Storage.Path">
       <summary>An immutable validated logical Storage path, with existing native string helpers.</summary>
@@ -763,7 +737,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileReadError.InvalidPath">
       <summary>The native path is empty or contains NUL.</summary>
     </member>
@@ -774,7 +747,6 @@
       <summary>Constructs a carrier holding InvalidPath.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-
 
     <member name="T:System.Storage.FileReadError.NotFound">
       <summary>The file or a required parent cannot be found.</summary>
@@ -787,7 +759,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileReadError.AccessDenied">
       <summary>The host denied access.</summary>
     </member>
@@ -798,7 +769,6 @@
       <summary>Constructs a carrier holding AccessDenied.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-
 
     <member name="T:System.Storage.FileReadError.NotRegularFile">
       <summary>The target is not a regular file.</summary>
@@ -811,7 +781,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileReadError.TooLarge">
       <summary>The file or encoded text exceeds the byte limit.</summary>
     </member>
@@ -822,7 +791,6 @@
       <summary>Constructs a carrier holding TooLarge.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-
 
     <member name="T:System.Storage.FileReadError.ReadFailed">
       <summary>A remaining native read failure occurred.</summary>
@@ -835,7 +803,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileReadError.InvalidUtf8">
       <summary>File bytes are not valid UTF-8.</summary>
     </member>
@@ -846,7 +813,6 @@
       <summary>Constructs a carrier holding InvalidUtf8.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-
 
     <member name="T:System.Storage.FileWriteError">
       <summary>Expected failures from the static native whole-text file helper.</summary>
@@ -864,7 +830,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileWriteError.InvalidPath">
       <summary>The native path is empty or contains NUL.</summary>
     </member>
@@ -875,7 +840,6 @@
       <summary>Constructs a carrier holding InvalidPath.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-
 
     <member name="T:System.Storage.FileWriteError.NotFound">
       <summary>The file or a required parent cannot be found.</summary>
@@ -888,7 +852,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileWriteError.AccessDenied">
       <summary>The host denied access.</summary>
     </member>
@@ -899,7 +862,6 @@
       <summary>Constructs a carrier holding AccessDenied.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-
 
     <member name="T:System.Storage.FileWriteError.NotRegularFile">
       <summary>The target is not a regular file.</summary>
@@ -912,7 +874,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileWriteError.TooLarge">
       <summary>The file or encoded text exceeds the byte limit.</summary>
     </member>
@@ -924,7 +885,6 @@
       <param name="value">The case value to retain.</param>
     </member>
 
-
     <member name="T:System.Storage.FileWriteError.WriteFailed">
       <summary>A remaining native write failure occurred.</summary>
     </member>
@@ -935,7 +895,6 @@
       <summary>Constructs a carrier holding WriteFailed.</summary>
       <param name="value">The case value to retain.</param>
     </member>
-
 
     <member name="T:System.Storage.StorageItem">
       <summary>A stored item whose two permitted interface branches are File and Directory.</summary>
@@ -1414,9 +1373,6 @@
     <member name="P:System.Optional.Some`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
     <member name="T:System.Optional`1"><summary>A nominal union containing Some with a value or None without one.</summary><remarks>Prefer Some/None construction, union patterns and propagation in Raven source. Construct None explicitly for absence.</remarks></member>
 
-
-
-
     <member name="M:System.Optional`1.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param><remarks>Initializes the output to its default before matching; returns false when the requested propagation case is absent.</remarks></member>
 
     <member name="M:System.Optional`1.TryGetResidual(System.Void@)"><summary>Returns true and assigns the residual only when propagation should leave the current operation.</summary><param name="residual">Receives or supplies the residual outcome used by propagation.</param><remarks>Initializes the output to its default before matching; returns false when the requested propagation case is absent.</remarks></member>
@@ -1493,11 +1449,6 @@
 
     <member name="P:System.Result.Failure`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
     <member name="T:System.Result`2"><summary>A nominal union containing a successful value or an expected error.</summary><remarks>Prefer Ok/Error construction, union patterns and propagation in Raven source. Expected errors remain values.</remarks></member>
-
-
-
-
-
 
     <member name="M:System.Result`2.TryGetOutput(`0@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param><remarks>Initializes the output to its default before matching; returns false when the requested propagation case is absent.</remarks></member>
 
@@ -1611,20 +1562,12 @@
     <member name="P:System.Time.LocalDateTime.Date"><summary>Gets the local calendar date.</summary></member>
     <member name="P:System.Time.LocalDateTime.Time"><summary>Gets the local time of day.</summary></member>
 
-
-
-
-
-
-
     <member name="T:System.IntegerDivisionError"><summary>An expected integer division failure: division by zero or signed overflow.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
     <member name="M:System.IntegerDivisionError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
 
     <member name="M:System.IntegerDivisionError.#ctor(System.IntegerDivisionError.DivisionByZero)"><summary>Constructs IntegerDivisionError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-
     <member name="M:System.IntegerDivisionError.#ctor(System.IntegerDivisionError.Overflow)"><summary>Constructs IntegerDivisionError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
-
 
     <member name="T:System.IntegerDivisionError.DivisionByZero"><summary>The DivisionByZero case of System.IntegerDivisionError.</summary></member>
     <member name="M:System.IntegerDivisionError.DivisionByZero.#ctor"><summary>Creates DivisionByZero.</summary></member>
@@ -1835,10 +1778,6 @@
 
     <member name="M:System.Concurrency.Tasks.TaskOutcome`1.#ctor(System.Concurrency.Tasks.TaskOutcome.Cancelled)"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-
-
-
-
     <member name="M:System.Concurrency.Tasks.TaskOutcome`1.TryGetValue(System.Concurrency.Tasks.TaskOutcome.Completed{`0}@)"><summary>Tests the requested case and assigns its case value on a successful match; clears the output to its default value otherwise.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="M:System.Concurrency.Tasks.TaskOutcome`1.TryGetValue(System.Concurrency.Tasks.TaskOutcome.Cancelled@)"><summary>Tests the requested case and assigns its case value on a successful match; clears the output to its default value otherwise.</summary><param name="value">The value on which this operation acts.</param></member>
@@ -1859,9 +1798,7 @@
 
     <member name="M:System.Linq.SingleError.#ctor(System.Linq.SingleError.Empty)"><summary>Constructs SingleError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-
     <member name="M:System.Linq.SingleError.#ctor(System.Linq.SingleError.Multiple)"><summary>Constructs SingleError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
-
 
     <member name="T:System.Linq.SingleError.Empty"><summary>The Empty case of System.Linq.SingleError.</summary></member>
     <member name="M:System.Linq.SingleError.Empty.#ctor"><summary>Creates Empty.</summary></member>
@@ -1919,17 +1856,13 @@
 
     <member name="M:System.Text.Utf8SliceError.#ctor(System.Text.Utf8SliceError.OutOfRange)"><summary>Constructs Utf8SliceError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-
     <member name="M:System.Text.Utf8SliceError.#ctor(System.Text.Utf8SliceError.InvalidBoundary)"><summary>Constructs Utf8SliceError with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
-
 
     <member name="T:System.Text.Utf8SliceError.OutOfRange"><summary>The OutOfRange case of System.Text.Utf8SliceError.</summary></member>
     <member name="M:System.Text.Utf8SliceError.OutOfRange.#ctor"><summary>Creates OutOfRange.</summary></member>
 
     <member name="T:System.Text.Utf8SliceError.InvalidBoundary"><summary>The InvalidBoundary case of System.Text.Utf8SliceError.</summary></member>
     <member name="M:System.Text.Utf8SliceError.InvalidBoundary.#ctor"><summary>Creates InvalidBoundary.</summary></member>
-
-
 
     <member name="T:System.Text.UnicodeScalar"><summary>Unicode category and ASCII predicates over scalar code points.</summary><remarks>Predicates accept UInt32 code points. These operations classify Unicode scalars, not the extended grapheme clusters represented by Char.</remarks></member>
     <member name="M:System.Text.UnicodeScalar.IsDigit(System.UInt32)"><summary>Tests whether the code point is a Unicode decimal digit.</summary><param name="value">The value on which this operation acts.</param></member>
@@ -1973,14 +1906,7 @@
     <member name="T:System.Web.Http.HttpClient"><summary>Sends requests through an injected handler pipeline; defaults to HttpSocketHandler.</summary><remarks>Development after Preview 9. Expected HTTP failures use the HttpError union, preserving DNS and socket causes. The socket transport admits HTTP/1.1 final statuses 200–599 using Content-Length, bounded chunked or close-delimited framing; HEAD/204/304 complete after headers, at most 32,768 header bytes, 100 fields and 1,048,576 body bytes. Chunk metadata is limited to 65,536 bytes; extensions and trailers are unsupported. HTTPS requires explicit SslClientAuthenticationOptions through HttpSocketHandler. No pooling, redirects or unknown-length uploads. Bounded informational responses are supported. ResponseHeadersRead transfers a one-shot body stream after final headers. Known-length stream uploads, buffered bodies and decoded incoming streams are limited to 1,048,576 bytes. HttpClient.Timeout covers the complete handler pipeline through the selected response completion point and defaults to 100 seconds. None disables the client countdown. DNS, connect and transfers retain independent five-second phase bounds, so transport failures can occur earlier. Direct HttpSocketHandler use has no client-wide countdown. Cancellation and expiry require scheduler progress and provider cleanup acknowledgement. See the Web feature guide for contracts and limits.</remarks></member>
     <member name="T:System.Web.Http.HttpHandler"><summary>Abstract base for a Disposable request pipeline returning Task&lt;Result&lt;HttpResponse, HttpError&gt;&gt;. Override Send for a transport or derive DelegatingHandler for middleware.</summary><remarks>Development after Preview 9. Expected HTTP failures use the HttpError union, preserving DNS and socket causes. The socket transport admits HTTP/1.1 final statuses 200–599 using Content-Length, bounded chunked or close-delimited framing; HEAD/204/304 complete after headers, at most 32,768 header bytes, 100 fields and 1,048,576 body bytes. Chunk metadata is limited to 65,536 bytes; extensions and trailers are unsupported. HTTPS requires explicit SslClientAuthenticationOptions through HttpSocketHandler. No pooling, redirects or unknown-length uploads. Bounded informational responses are supported. ResponseHeadersRead transfers a one-shot body stream after final headers. Known-length stream uploads, buffered bodies and decoded incoming streams are limited to 1,048,576 bytes. HttpClient.Timeout covers the complete handler pipeline through the selected response completion point and defaults to 100 seconds. None disables the client countdown. DNS, connect and transfers retain independent five-second phase bounds, so transport failures can occur earlier. Direct HttpSocketHandler use has no client-wide countdown. Cancellation and expiry require scheduler progress and provider cleanup acknowledgement. See the Web feature guide for contracts and limits.</remarks></member>
     <member name="T:System.Web.Http.HttpSocketHandler"><summary>A bounded socket-backed HTTP/1.1 transport for predefined and custom method tokens; CONNECT tunnelling is unsupported. Each Send owns independent buffers and a connection.</summary><remarks>Development after Preview 9. Expected HTTP failures use the HttpError union, preserving DNS and socket causes. The socket transport admits HTTP/1.1 final statuses 200–599 using Content-Length, bounded chunked or close-delimited framing; HEAD/204/304 complete after headers, at most 32,768 header bytes, 100 fields and 1,048,576 body bytes. Chunk metadata is limited to 65,536 bytes; extensions and trailers are unsupported. HTTPS requires explicit SslClientAuthenticationOptions through HttpSocketHandler. No pooling, redirects or unknown-length uploads. Bounded informational responses are supported. ResponseHeadersRead transfers a one-shot body stream after final headers. Known-length stream uploads, buffered bodies and decoded incoming streams are limited to 1,048,576 bytes. HttpClient.Timeout covers the complete handler pipeline through the selected response completion point and defaults to 100 seconds. None disables the client countdown. DNS, connect and transfers retain independent five-second phase bounds, so transport failures can occur earlier. Direct HttpSocketHandler use has no client-wide countdown. Cancellation and expiry require scheduler progress and provider cleanup acknowledgement. See the Web feature guide for contracts and limits.</remarks></member>
-    <member name="T:System.Web.Http.HttpRequest"><summary>An HTTP request with a validated HttpMethod and content; Create accepts predefined and custom methods. Factories validate the supported URL subset.</summary><remarks>Development after Preview 9. Expected HTTP failures use the HttpError union, preserving DNS and socket causes. The socket transport admits HTTP/1.1 final statuses 200–599 using Content-Length, bounded chunked or close-delimited framing; HEAD/204/304 complete after headers, at most 32,768 header bytes, 100 fields and 1,048,576 body bytes. Chunk metadata is limited to 65,536 bytes; extensions and trailers are unsupported. HTTPS requires explicit SslClientAuthenticationOptions through HttpSocketHandler. No pooling, redirects or unknown-length uploads. Bounded informational responses are supported. ResponseHeadersRead transfers a one-shot body stream after final headers. Known-length stream uploads, buffered bodies and decoded incoming streams are limited to 1,048,576 bytes. HttpClient.Timeout covers the complete handler pipeline through the selected response completion point and defaults to 100 seconds. None disables the client countdown. DNS, connect and transfers retain independent five-second phase bounds, so transport failures can occur earlier. Direct HttpSocketHandler use has no client-wide countdown. Cancellation and expiry require scheduler progress and provider cleanup acknowledgement. See the Web feature guide for contracts and limits.</remarks></member>
-    <member name="M:System.Web.Http.HttpResponse.SetHeader(System.String,System.String)">
-      <summary>Replaces matching headers without changing response identity or content.</summary>
-      <param name="name">A valid HTTP field token, matched without case.</param>
-      <param name="value">Field text without prohibited controls.</param>
-      <returns>Ok on replacement; InvalidRequest without mutation for invalid input. Transport framing validation still applies when sending.</returns>
-    </member>
-    <member name="T:System.Web.Http.HttpResponse"><summary>A disposable response with status, headers and buffered or streaming content; Respond configures status/content without I/O. Public construction supports fake/custom handlers.</summary><remarks>Development after Preview 9. Expected HTTP failures use the HttpError union, preserving DNS and socket causes. The socket transport admits HTTP/1.1 final statuses 200–599 using Content-Length, bounded chunked or close-delimited framing; HEAD/204/304 complete after headers, at most 32,768 header bytes, 100 fields and 1,048,576 body bytes. Chunk metadata is limited to 65,536 bytes; extensions and trailers are unsupported. HTTPS requires explicit SslClientAuthenticationOptions through HttpSocketHandler. No pooling, redirects or unknown-length uploads. Bounded informational responses are supported. ResponseHeadersRead transfers a one-shot body stream after final headers. Known-length stream uploads, buffered bodies and decoded incoming streams are limited to 1,048,576 bytes. HttpClient.Timeout covers the complete handler pipeline through the selected response completion point and defaults to 100 seconds. None disables the client countdown. DNS, connect and transfers retain independent five-second phase bounds, so transport failures can occur earlier. Direct HttpSocketHandler use has no client-wide countdown. Cancellation and expiry require scheduler progress and provider cleanup acknowledgement. See the Web feature guide for contracts and limits.</remarks></member>
+
     <member name="T:System.Web.Http.HttpHeader"><summary>An HTTP header name and value. Socket parsing lowercases names and trims surrounding spaces/tabs from values.</summary><remarks>Development after Preview 9. Expected HTTP failures use the HttpError union, preserving DNS and socket causes. The socket transport admits HTTP/1.1 final statuses 200–599 using Content-Length, bounded chunked or close-delimited framing; HEAD/204/304 complete after headers, at most 2,048 header bytes, 16 fields and 1,024 body bytes. Chunk metadata is limited to 2,048 bytes; extensions and trailers are unsupported. HTTPS requires explicit SslClientAuthenticationOptions through HttpSocketHandler. No pooling, redirects, unknown-length uploads, streaming responses or informational responses. Known-length stream uploads are limited to 65,536 bytes; buffered requests and received bodies retain their 1,024-byte limit. HttpClient.Timeout covers the complete handler pipeline through buffered response completion and defaults to 100 seconds. None disables the client countdown. DNS, connect and transfers retain independent five-second phase bounds, so transport failures can occur earlier. Direct HttpSocketHandler use has no client-wide countdown. Cancellation and expiry require scheduler progress and provider cleanup acknowledgement. See the Web feature guide for contracts and limits.</remarks></member>
     <member name="T:System.Web.Http.HttpMemoryContent"><summary>Retains a ReadOnlyMemory&lt;byte&gt; window as buffered HTTP content without copying.</summary><remarks>Arrays convert implicitly. Memory exposes the retained window; readonly is shallow. Constructors and Memory use native-only signatures documented in the HTTP body-stream guide.</remarks></member>
     <member name="T:System.Web.Http.HttpStreamContent"><summary>One-shot input-stream content with explicit source ownership.</summary></member>
@@ -1990,24 +1916,17 @@
     <member name="M:System.Web.Http.HttpStringContent.#ctor(System.String,System.String)"><summary>Encodes UTF-8 text with an explicit Content-Type.</summary><param name="text">Text to encode into owned bytes.</param><param name="contentType">Media type validated by transport before sending.</param></member>
     <member name="M:System.Web.Http.HttpStringContent.Read(System.Web.Http.HttpContent)"><summary>Consumes any buffered or streaming content as strict UTF-8 text.</summary><param name="content">Body to read. Streaming content is one-shot; it remains open.</param><returns>Owned text, Content preserving an I/O error or Protocol for invalid UTF-8.</returns><remarks>Streaming reads use the shared incremental UTF-8 reader with 256-byte read staging and a 65536-byte text quota; larger already-buffered content can be decoded without that quota. Declared lengths prevent over-read; early EOF preserves Content(IoFailure). Text fragments and concatenation still allocate. This is a temporary implementation gap. No Content-Type negotiation or decompression. Disposed content returns Content(Closed).</remarks></member>
     <member name="T:System.Web.Http.HttpContent"><summary>Abstract HTTP body and content metadata with stream transfer and explicit ownership.</summary><remarks>Create HttpMemoryContent, HttpStreamContent or HttpStringContent. CopyTo supports backpressure; TryGetStream exposes streaming sources. Buffered storage belongs to the concrete type. Custom producers and unknown-length outgoing framing remain pending.</remarks></member>
-    <member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpRequest)"><summary>Sends a request through this client or handler.</summary><param name="request">A non-null prepared request using a supported HTTP method.</param><returns>A task containing the response or a structured HttpError.</returns><remarks>The socket transport buffers the body and closes the connection before completing. Its fixed 15-second exchange budget covers DNS, connection attempts and repeated transfers; expiry closes the owned connection and returns HttpError.TimedOut. It starts before DNS lookup, after request validation and byte snapshotting, and checks expiry before reporting success. Custom handlers choose their own behavior; mutable handler state requires its own concurrency policy. Runtime Faults are not converted to Result errors.</remarks></member>
-    <member name="M:System.Web.Http.HttpSocketHandler.Send(System.Web.Http.HttpRequest)"><summary>Sends a request through this client or handler.</summary><param name="request">A non-null prepared request using a supported HTTP method.</param><returns>A task containing the response or a structured HttpError.</returns><remarks>The socket transport buffers the body and closes the connection before completing. Its fixed 15-second exchange budget covers DNS, connection attempts and repeated transfers; expiry closes the owned connection and returns HttpError.TimedOut. It starts before DNS lookup, after request validation and byte snapshotting, and checks expiry before reporting success. Custom handlers choose their own behavior; mutable handler state requires its own concurrency policy. Runtime Faults are not converted to Result errors.</remarks></member>
+    <member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpClientRequest)"><summary>Sends a request through this client or handler.</summary><param name="request">A non-null prepared request using a supported HTTP method.</param><returns>A task containing the response or a structured HttpError.</returns><remarks>The socket transport buffers the body and closes the connection before completing. Its fixed 15-second exchange budget covers DNS, connection attempts and repeated transfers; expiry closes the owned connection and returns HttpError.TimedOut. It starts before DNS lookup, after request validation and byte snapshotting, and checks expiry before reporting success. Custom handlers choose their own behavior; mutable handler state requires its own concurrency policy. Runtime Faults are not converted to Result errors.</remarks></member>
+    <member name="M:System.Web.Http.HttpSocketHandler.Send(System.Web.Http.HttpClientRequest)"><summary>Sends a request through this client or handler.</summary><param name="request">A non-null prepared request using a supported HTTP method.</param><returns>A task containing the response or a structured HttpError.</returns><remarks>The socket transport buffers the body and closes the connection before completing. Its fixed 15-second exchange budget covers DNS, connection attempts and repeated transfers; expiry closes the owned connection and returns HttpError.TimedOut. It starts before DNS lookup, after request validation and byte snapshotting, and checks expiry before reporting success. Custom handlers choose their own behavior; mutable handler state requires its own concurrency policy. Runtime Faults are not converted to Result errors.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.#ctor"><summary>Creates a client owning its default socket handler.</summary></member>
     <member name="M:System.Web.Http.HttpSocketHandler.#ctor"><summary>Creates the default socket-backed handler.</summary></member>
     <member name="M:System.Web.Http.HttpClient.#ctor(System.Web.Http.HttpHandler)"><summary>Creates a client with the supplied pipeline.</summary><param name="handler">A non-null handler owned and disposed by this client.</param></member>
     <member name="M:System.Web.Http.HttpClient.Get(System.String)"><summary>Constructs a GET request using the current BaseUri policy and sends it through the handler pipeline.</summary><param name="url">An absolute HTTP URL when BaseUri is None; a relative reference without authority when it is Some.</param><returns>A response or structured HttpError. Parsing, base validation and resolution errors complete without calling the handler.</returns><remarks>Uses the Uri parser and resolver. The final URL must meet HttpRequest.Get limits. BaseUri is read during this call; later configuration changes do not change an already constructed request.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Get(System.String)"><summary>Parses a URI reference and constructs an absolute GET request without network activity.</summary><param name="url">An absolute plain http:// URL, at most 1,024 UTF-8 bytes after parsing.</param><returns>A request or HttpError. URI syntax errors preserve UriError in InvalidUri; HTTP policy errors remain distinct.</returns><remarks>Uses Uri.Parse before HTTP validation. Defaults to port 80 and target /. A query without a path becomes /?query. Rejects HTTPS, user information, IPv6 literals, fragments, raw Unicode, whitespace/control bytes and invalid ports. Host length is 1–253 bytes. Percent escapes must be well formed. Absolute request paths preserve the Uri text; no decoding is performed.</remarks></member>
-    <member name="P:System.Web.Http.HttpRequest.Method"><summary>The validated HttpMethod value. Read Method.Method for its wire spelling.</summary><remarks>Development change: formerly string. Predefined factories use canonical methods; incoming and custom requests retain constructor spelling.</remarks></member>
-    <member name="P:System.Web.Http.HttpRequest.Host"><summary>ASCII host without port.</summary></member>
-    <member name="P:System.Web.Http.HttpRequest.Port"><summary>TCP port, default 80.</summary></member>
-    <member name="P:System.Web.Http.HttpRequest.Target"><summary>Slash-prefixed target, default /.</summary></member>
+
     <member name="M:System.Web.Http.HttpHeader.#ctor(System.String,System.String)"><summary>Stores a header without validation or normalization.</summary><param name="name">Non-null header name.</param><param name="value">Non-null header value.</param></member>
     <member name="P:System.Web.Http.HttpHeader.Name"><summary>The stored header name.</summary></member>
     <member name="P:System.Web.Http.HttpHeader.Value"><summary>The stored header value.</summary></member>
-    <member name="M:System.Web.Http.HttpResponse.#ctor(System.Int32,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Web.Http.HttpContent)"><summary>Creates a response without validating HTTP framing.</summary><param name="statusCode">Numeric status supplied by the handler; the socket parser admits final statuses 200–599.</param><param name="headers">Retained when content has no media type. Otherwise a new header list preserves other fields and replaces all Content-Type fields with the content metadata; the supplied list is not mutated.</param><param name="content">The retained content producer. Construction neither reads a stream nor copies the body. Keep borrowed memory stable until sending completes.</param><remarks>Framing and length are validated by the transport. Pass HttpMemoryContent, HttpStringContent or HttpStreamContent explicitly; no Sequence body conversion is performed.</remarks></member>
-    <member name="P:System.Web.Http.HttpResponse.StatusCode"><summary>The response status as HttpStatusCode; unnamed numeric values remain representable.</summary></member>
-    <member name="P:System.Web.Http.HttpResponse.Headers"><summary>The read-only response header collection; named lookup preserves repeated values.</summary></member>
-    <member name="P:System.Web.Http.HttpResponse.Content"><summary>The response buffered content.</summary></member>
+
     <member name="M:System.Web.Http.HttpContent.CopyTo(System.IO.OutputStream)"><summary>Copies buffered or streaming content with no cancellation request.</summary><param name="destination">Borrowed output, never flushed or closed.</param><returns>Completion or a typed HTTP content error; output may be partial on failure.</returns></member>
     <member name="M:System.Web.Http.HttpContent.CopyTo(System.IO.OutputStream,System.Concurrency.CancellationToken)"><summary>Copies the body with bounded staging and backpressure.</summary><param name="destination">Borrowed output kept open through completion.</param><param name="cancellationToken">Cancellation propagates as a cancelled task, including for empty bodies.</param><returns>Completion, Content preserving a stream error, or InvalidRequest for a reused streaming body.</returns><remarks>Does not flush or close either stream or add HTTP framing. Arrays are written directly; other sequences and streams use at most 1024 staging bytes. Streaming content is one-shot once started, including after failure or cancellation. Known lengths reject early EOF and stop without overreading. Unknown incoming bodies end at EOF. Do not concurrently read, copy, upload or mutate the body. Disposed content returns Content(Closed). Pre-cancellation does not consume the body.</remarks></member>
     <member name="T:System.Web.Http.HttpServerOptions"><summary>Buffered request admission and read/write deadlines, validated and snapshotted by Listen.</summary><remarks>Defaults preserve existing behavior. Mutation after Listen does not change the server. Limits do not reserve host resources. Unsupported values return HttpError.InvalidRequest from Listen before opening a socket.</remarks></member>
@@ -2021,9 +1940,9 @@
     <member name="T:System.Web.Http.HttpServer"><summary>A bounded HTTP/1.1 server with manual acceptance, single-exchange callbacks and server-managed concurrent dispatch.</summary><remarks>Accept and AcceptHeaders transfer context ownership to the caller. ServeOne owns one complete exchange; Serve owns up to 16 concurrent exchanges and returns a server-lifetime task. HTTP framing and body/header limits follow HttpServerOptions; TLS is configured through its SslOptions. Responses close the connection; keep-alive is not implemented. Close closes connections immediately. The Serve lifetime then joins started handlers and disposes late responses. See the HTTP server lifetime reference for errors, cancellation and ownership.</remarks></member>
     <member name="M:System.Web.Http.HttpServer.Listen(System.String,System.Int32,System.Int32)"><summary>Binds a TCP listener for bounded HTTP exchanges.</summary><param name="address">Numeric local IPv4 address; use 127.0.0.1 for loopback.</param><param name="port">Port from zero through 65535; zero requests an OS-assigned port.</param><param name="backlog">Requested connection backlog from 1 through 128.</param><returns>A server or HttpError.Transport carrying the socket bind/listen error.</returns><remarks>The caller owns the server and must call Close. Binding does not start accepting requests.</remarks></member>
     <member name="M:System.Web.Http.HttpServer.GetLocalPort"><summary>Returns the listener's bound port.</summary><returns>The selected port or HttpError.Transport carrying the socket error.</returns></member>
-    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}})"><summary>Accepts one request, awaits its application response, sends it and closes the connection.</summary><param name="handler">Non-null callback invoked once after a complete valid supported request. Keep response sequences stable while consumed.</param><returns>A task containing success after sending, or a typed accept, parse, handler, validation or transfer error.</returns><remarks>Malformed requests and handler errors close the connection without an HTTP error response. The server supplies Content-Length and Connection: close; application headers cannot override framing or declare content/transfer encoding. Final statuses 200–599 are supported; 204/205/304 require empty content. Content-Length is omitted for 204/304. One accept may be pending per listener. Closing the server cancels pending acceptance and closes active contexts, including callback waits. Cancelled callback tasks close their context and cancel ServeOne. Runtime Faults remain terminal; managed cleanup is not guaranteed after a Fault. This is not a permanent hosting loop.</remarks></member>
+    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpServerRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpServerResponse,System.Web.Http.HttpError}}})"><summary>Accepts one request, awaits its application response, sends it and closes the connection.</summary><param name="handler">Non-null callback invoked once after a complete valid supported request. Keep response sequences stable while consumed.</param><returns>A task containing success after sending, or a typed accept, parse, handler, validation or transfer error.</returns><remarks>Malformed requests and handler errors close the connection without an HTTP error response. The server supplies Content-Length and Connection: close; application headers cannot override framing or declare content/transfer encoding. Final statuses 200–599 are supported; 204/205/304 require empty content. Content-Length is omitted for 204/304. One accept may be pending per listener. Closing the server cancels pending acceptance and closes active contexts, including callback waits. Cancelled callback tasks close their context and cancel ServeOne. Runtime Faults remain terminal; managed cleanup is not guaranteed after a Fault. This is not a permanent hosting loop.</remarks></member>
     <member name="M:System.Web.Http.HttpServer.Close"><summary>Stops acceptance and closes all owned exchanges.</summary><remarks>Idempotent. Cancels pending accepts and callback waits, and closes active contexts. Does not drain or preempt handlers. Native completion callbacks still acknowledge pending I/O; scheduler progress is required. This changes the previous listener-only shutdown behavior.</remarks></member>
-    <member name="P:System.Web.Http.HttpRequest.Headers"><summary>Received request headers in wire order, with lowercase names and trimmed surrounding whitespace.</summary><remarks>Requests created by Get have an empty sequence. Post includes its optional Content-Type; socket framing headers are generated by the provider. Incoming headers are retained. This read-only capability is not a general client header builder.</remarks></member>
+
     <member name="T:System.Uri"><summary>An immutable validated ASCII URI reference.</summary><remarks>Development contract: escaped ASCII up to 4096 bytes. No I/O, implicit escaping, IDNA, IRI or bracketed IP literals. Equality and hashing use exact Text, including casing, escaping and fragment; they are not resource or origin equivalence. Parsing does not imply HTTP transport support.</remarks></member>
     <member name="M:System.Uri.Parse(System.String)"><summary>Validates a relative or absolute URI reference without normalization.</summary><param name="text">Escaped ASCII reference; empty text is a valid relative reference.</param><returns>Ok with Uri, or InvalidFormat, UnsupportedAuthority for bracketed forms, or TooLong.</returns></member>
     <member name="P:System.Uri.Text"><summary>Gets exact validated text.</summary></member>
@@ -2248,7 +2167,6 @@
       <summary>The requested HTTP behavior is not supported.</summary>
     </member>
 
-
     <member name="T:System.Networking.IPAddress"><summary>An immutable address in a closed IPv4/IPv6 class hierarchy.</summary><remarks>Development API. Parse performs no DNS or network I/O. Equality compares the address family and bytes; an IPv4-mapped IPv6 address remains distinct from IPv4. Transport support is separate: the current socket backend supports IPv4. Scope identifiers and URI brackets are unsupported.</remarks></member>
     <member name="T:System.Networking.IPv4Address"><summary>An immutable IPv4 address created by IPAddress.Parse.</summary><remarks>Four decimal components, each from 0 to 255. Leading zeros, abbreviated addresses, hexadecimal and octal forms are rejected.</remarks></member>
     <member name="T:System.Networking.IPv6Address"><summary>An immutable IPv6 address created by IPAddress.Parse.</summary><remarks>Accepts full or compressed hexadecimal groups and a final dotted-decimal IPv4 component. Scope identifiers are unsupported. This address class's presence does not imply IPv6 transport support.</remarks></member>
@@ -2286,7 +2204,7 @@
     <member name="M:System.Concurrency.CancellationRegistration.Dispose"><summary>Removes an unstarted callback and releases its captured state.</summary><remarks>Idempotent, including after invocation or source disposal.</remarks></member>
     <member name="P:System.Web.Http.HttpClient.BaseUri"><summary>Optional absolute base URL used by address-taking helpers; defaults to None.</summary><remarks>Set Some(text) or None. Text is validated when a helper constructs a request, reporting errors through its Result instead of a setter exception. With Some, Get accepts only relative references without authority; absolute and //host references are rejected. None requires absolute URLs. Configuration may change between calls; existing requests are unaffected. Send receives an already constructed request and does not apply BaseUri. An inactive default Optional is contract misuse and faults.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Get(System.Uri)"><summary>Constructs and sends GET using the same BaseUri rules as the string overload.</summary><param name="uri">An absolute URI without a base, or a relative reference without authority when BaseUri is set.</param><returns>A response or structured HttpError; invalid configuration or HTTP policy never reaches the handler.</returns></member>
-    <member name="M:System.Web.Http.HttpRequest.Get(System.Uri)"><summary>Constructs a GET request from a parsed absolute URI.</summary><param name="uri">A non-null absolute URI satisfying the same HTTP limits as the string factory.</param><returns>A request or HttpError for unsupported scheme, authority, target or bounds. No network activity occurs.</returns></member>
+
     <member name="M:System.Networking.Sockets.Socket.Connect(System.Collections.Sequence{System.String},System.Int32,System.Concurrency.CancellationToken)"><summary>Tries a bounded sequence of numeric IPv4 addresses in order under one shared connection deadline.</summary><param name="addresses">A stable non-null sequence containing 1–16 numeric IPv4 strings. Reads Count once and snapshots indexed values synchronously; caller mutation afterwards is safe. Duplicate addresses are skipped. Hostnames and IPv6 are rejected.</param><param name="port">Remote TCP port from 1 through 65535, shared by all candidates.</param><returns>A Task containing the first connected Socket or SocketError. Empty input returns InvalidRange, more than 16 entries returns LimitExceeded, and any malformed address returns InvalidAddress before starting network activity. If all attempts fail, returns the last attempt error; overall expiry returns TimedOut.</returns><param name="cancellationToken">An invocation-local cancellation request. None preserves the tokenless behavior. A token already requested cancels the task before validation or native admission.</param><remarks>Development after Preview 9. Cancellation that wins the native outcome cancels the Task after the provider consumes the completion; it does not return an Error case. A committed native result wins over a later request. Registrations are disposed before result consumption. Completion delivery requires scheduler progress. Source disposal removes the registration without cancelling I/O; registering through a disposed source faults. Tokens cannot be shared across invocations. Cancelling a pending connect releases the uncommitted connection and abandons remaining address candidates. No connected Socket is returned.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.Connect(System.String,System.Int32,System.Concurrency.CancellationToken)"><summary>Starts a TCP connection to a numeric IPv4 address.</summary><param name="address">Dotted-decimal IPv4 address, such as 127.0.0.1. Hostnames and IPv6 are rejected.</param><param name="port">Remote TCP port from 1 through 65535.</param><returns>A Task containing a connected Socket or SocketError. Validation and admission failures may complete immediately.</returns><param name="cancellationToken">An invocation-local cancellation request. None preserves the tokenless behavior. A token already requested cancels the task before validation or native admission.</param><remarks>Development after Preview 9. Cancellation that wins the native outcome cancels the Task after the provider consumes the completion; it does not return an Error case. A committed native result wins over a later request. Registrations are disposed before result consumption. Completion delivery requires scheduler progress. Source disposal removes the registration without cancelling I/O; registering through a disposed source faults. Tokens cannot be shared across invocations. Cancelling a pending connect releases the uncommitted connection and abandons remaining address candidates. No connected Socket is returned.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.Receive(System.Memory{System.Byte},System.Concurrency.CancellationToken)"><summary>Receives bytes into the destination memory window.</summary><param name="buffer">Persistent destination byte window. Keep it unmodified and do not use an overlapping pending operation until this Task completes.</param><returns>A Task containing the actual count or SocketError. A positive-size receive returning zero means EOF; a zero-size receive returns zero without testing EOF. Short reads are normal.</returns><param name="cancellationToken">An invocation-local cancellation request. None preserves the tokenless behavior. A token already requested cancels the task before validation or native admission.</param><remarks>Development after Preview 9. Cancellation that wins the native outcome cancels the Task after the provider consumes the completion; it does not return an Error case. A committed native result wins over a later request. Registrations are disposed before result consumption. Completion delivery requires scheduler progress. Source disposal removes the registration without cancelling I/O; registering through a disposed source faults. Tokens cannot be shared across invocations. Cancelling a pending transfer releases its buffer reservation and preserves the connection. It cannot undo bytes from earlier completed operations. Even a zero-size transfer awaits owner polling; cancellation before that poll can win. Once an outcome is committed, later cancellation preserves it.</remarks></member>
@@ -2295,20 +2213,20 @@
     <member name="M:System.Networking.Sockets.Socket.Accept(System.Concurrency.CancellationToken)"><summary>Waits asynchronously for one incoming connection on this listener.</summary><returns>A Task containing a new connected Socket or SocketError. Only one accept may be pending per listener; another returns Busy. Calling on a connected socket returns InvalidOperation.</returns><param name="cancellationToken">An invocation-local cancellation request. None preserves the tokenless behavior. A token already requested cancels the task before validation or native admission.</param><remarks>Development after Preview 9. Cancellation that wins the native outcome cancels the Task after the provider consumes the completion; it does not return an Error case. A committed native result wins over a later request. Registrations are disposed before result consumption. Completion delivery requires scheduler progress. Source disposal removes the registration without cancelling I/O; registering through a disposed source faults. Tokens cannot be shared across invocations. Cancelling an accept preserves the listening socket for another accept.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.Connect(System.Networking.IPAddress,System.Int32,System.Concurrency.CancellationToken)"><summary>Connects to an immutable address value.</summary><param name="address">The remote IPv4 address.</param><param name="port">The remote port.</param><returns>A socket task result, or UnsupportedAddressFamily for IPv6.</returns><param name="cancellationToken">An invocation-local cancellation request. None preserves the tokenless behavior. A token already requested cancels the task before validation or native admission.</param><remarks>Development after Preview 9. Cancellation that wins the native outcome cancels the Task after the provider consumes the completion; it does not return an Error case. A committed native result wins over a later request. Registrations are disposed before result consumption. Completion delivery requires scheduler progress. Source disposal removes the registration without cancelling I/O; registering through a disposed source faults. Tokens cannot be shared across invocations. Cancelling a pending connect releases the uncommitted connection and abandons remaining address candidates. No connected Socket is returned.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.Connect(System.Collections.Sequence{System.Networking.IPAddress},System.Int32,System.Concurrency.CancellationToken)"><summary>Tries a bounded address sequence using the existing shared connection deadline.</summary><param name="addresses">One to sixteen address values, copied before the call returns. Every address must be IPv4.</param><param name="port">The remote port.</param><returns>A connected socket or a socket error. UnsupportedAddressFamily rejects a sequence containing IPv6 before connecting.</returns><param name="cancellationToken">An invocation-local cancellation request. None preserves the tokenless behavior. A token already requested cancels the task before validation or native admission.</param><remarks>Development after Preview 9. Cancellation that wins the native outcome cancels the Task after the provider consumes the completion; it does not return an Error case. A committed native result wins over a later request. Registrations are disposed before result consumption. Completion delivery requires scheduler progress. Source disposal removes the registration without cancelling I/O; registering through a disposed source faults. Tokens cannot be shared across invocations. Cancelling a pending connect releases the uncommitted connection and abandons remaining address candidates. No connected Socket is returned.</remarks></member>
-    <member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)"><summary>Sends a prepared request with cooperative cancellation.</summary><param name="request">A non-null parsed request; BaseUri is not applied.</param><param name="cancellationToken">An invocation-local request token, forwarded unchanged by handlers.</param><returns>A response or HttpError, or an acknowledged cancelled Task.</returns><remarks>Development after Preview 9. Client and socket-handler pre-cancellation skips dispatch. The socket handler forwards this token through DNS, connect and transfers, consumes native completion and closes its owned connection before cancelling its task. A cancelled child task is observed before GetResult. A fully received native outcome can win over a late cancellation request; cancellation between successful phases prevents the next phase. DNS host work may continue under its capacity permit. Custom handlers must forward or honor the token and finish their own cleanup before cancellation completion. The client does not race custom handler tasks against tokens or dispose injected handlers. This replaces the former tokenless HttpHandler method; rebuild and migrate implementations.</remarks></member>
-    <member name="M:System.Web.Http.HttpSocketHandler.Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)"><summary>Sends a prepared request with cooperative cancellation.</summary><param name="request">A non-null parsed request; BaseUri is not applied.</param><param name="cancellationToken">An invocation-local request token, forwarded unchanged by handlers.</param><returns>A response or HttpError, or an acknowledged cancelled Task.</returns><remarks>Development after Preview 9. Client and socket-handler pre-cancellation skips dispatch. The socket handler forwards this token through DNS, connect and transfers, consumes native completion and closes its owned connection before cancelling its task. A cancelled child task is observed before GetResult. A fully received native outcome can win over a late cancellation request; cancellation between successful phases prevents the next phase. DNS host work may continue under its capacity permit. Custom handlers must forward or honor the token and finish their own cleanup before cancellation completion. The client does not race custom handler tasks against tokens or dispose injected handlers. This replaces the former tokenless HttpHandler method; rebuild and migrate implementations.</remarks></member>
-    <member name="M:System.Web.Http.HttpHandler.Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)"><summary>Sends a prepared request with cooperative cancellation.</summary><param name="request">A non-null parsed request; BaseUri is not applied.</param><param name="cancellationToken">An invocation-local request token, forwarded unchanged by handlers.</param><returns>A response or HttpError, or an acknowledged cancelled Task.</returns><remarks>Development after Preview 9. Client and socket-handler pre-cancellation skips dispatch. The socket handler forwards this token through DNS, connect and transfers, consumes native completion and closes its owned connection before cancelling its task. A cancelled child task is observed before GetResult. A fully received native outcome can win over a late cancellation request; cancellation between successful phases prevents the next phase. DNS host work may continue under its capacity permit. Custom handlers must forward or honor the token and finish their own cleanup before cancellation completion. The client does not race custom handler tasks against tokens or dispose injected handlers. This replaces the former tokenless HttpHandler method; rebuild and migrate implementations.</remarks></member>
+    <member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpClientRequest,System.Concurrency.CancellationToken)"><summary>Sends a prepared request with cooperative cancellation.</summary><param name="request">A non-null parsed request; BaseUri is not applied.</param><param name="cancellationToken">An invocation-local request token, forwarded unchanged by handlers.</param><returns>A response or HttpError, or an acknowledged cancelled Task.</returns><remarks>Development after Preview 9. Client and socket-handler pre-cancellation skips dispatch. The socket handler forwards this token through DNS, connect and transfers, consumes native completion and closes its owned connection before cancelling its task. A cancelled child task is observed before GetResult. A fully received native outcome can win over a late cancellation request; cancellation between successful phases prevents the next phase. DNS host work may continue under its capacity permit. Custom handlers must forward or honor the token and finish their own cleanup before cancellation completion. The client does not race custom handler tasks against tokens or dispose injected handlers. This replaces the former tokenless HttpHandler method; rebuild and migrate implementations.</remarks></member>
+    <member name="M:System.Web.Http.HttpSocketHandler.Send(System.Web.Http.HttpClientRequest,System.Concurrency.CancellationToken)"><summary>Sends a prepared request with cooperative cancellation.</summary><param name="request">A non-null parsed request; BaseUri is not applied.</param><param name="cancellationToken">An invocation-local request token, forwarded unchanged by handlers.</param><returns>A response or HttpError, or an acknowledged cancelled Task.</returns><remarks>Development after Preview 9. Client and socket-handler pre-cancellation skips dispatch. The socket handler forwards this token through DNS, connect and transfers, consumes native completion and closes its owned connection before cancelling its task. A cancelled child task is observed before GetResult. A fully received native outcome can win over a late cancellation request; cancellation between successful phases prevents the next phase. DNS host work may continue under its capacity permit. Custom handlers must forward or honor the token and finish their own cleanup before cancellation completion. The client does not race custom handler tasks against tokens or dispose injected handlers. This replaces the former tokenless HttpHandler method; rebuild and migrate implementations.</remarks></member>
+    <member name="M:System.Web.Http.HttpHandler.Send(System.Web.Http.HttpClientRequest,System.Concurrency.CancellationToken)"><summary>Sends a prepared request with cooperative cancellation.</summary><param name="request">A non-null parsed request; BaseUri is not applied.</param><param name="cancellationToken">An invocation-local request token, forwarded unchanged by handlers.</param><returns>A response or HttpError, or an acknowledged cancelled Task.</returns><remarks>Development after Preview 9. Client and socket-handler pre-cancellation skips dispatch. The socket handler forwards this token through DNS, connect and transfers, consumes native completion and closes its owned connection before cancelling its task. A cancelled child task is observed before GetResult. A fully received native outcome can win over a late cancellation request; cancellation between successful phases prevents the next phase. DNS host work may continue under its capacity permit. Custom handlers must forward or honor the token and finish their own cleanup before cancellation completion. The client does not race custom handler tasks against tokens or dispose injected handlers. This replaces the former tokenless HttpHandler method; rebuild and migrate implementations.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Get(System.String,System.Concurrency.CancellationToken)"><summary>Resolves the address using BaseUri and sends GET with cancellation.</summary><param name="url">An absolute address without BaseUri, or a relative reference without authority with BaseUri.</param><param name="cancellationToken">An invocation-local cancellation request; a pre-requested token skips parsing and dispatch.</param><returns>A response, HttpError, or an acknowledged cancelled Task.</returns><remarks>Uses the same request construction and handler pipeline as the tokenless overload. Does not add a configurable timeout.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.GetString(System.String)"><summary>Fetches the buffered response body and decodes strict UTF-8.</summary><param name="url">An address using the same BaseUri rules as Get.</param><returns>A Task containing text or HttpError, or a cancelled Task when the exchange acknowledges cancellation.</returns><remarks>Development after Preview 9. Uses the Get/Send handler pipeline. Existing HTTP errors remain unchanged; malformed UTF-8 becomes Protocol("Invalid UTF-8 body"). Statuses 200–299 are successful, including custom handler replies; other statuses produce UnsuccessfulStatus with the status code. No charset negotiation, decompression or streaming is added. The socket transport retains its 1,024-byte body bound. Conversion uses the existing Task.Map cancellation behavior and does not reread a token after the response task completes. Tokenless overloads use CancellationToken.None. Use HttpStringContent.Read for generic text content consumption.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.GetString(System.String,System.Concurrency.CancellationToken)"><summary>Fetches the buffered response body and decodes strict UTF-8.</summary><param name="url">An address using the same BaseUri rules as Get.</param><param name="cancellationToken">An invocation-local cancellation request; forwarded through the exchange. Pre-cancellation skips request construction.</param><returns>A Task containing text or HttpError, or a cancelled Task when the exchange acknowledges cancellation.</returns><remarks>Development after Preview 9. Uses the Get/Send handler pipeline. Existing HTTP errors remain unchanged; malformed UTF-8 becomes Protocol("Invalid UTF-8 body"). Statuses 200–299 are successful, including custom handler replies; other statuses produce UnsuccessfulStatus with the status code. No charset negotiation, decompression or streaming is added. The socket transport retains its 1,024-byte body bound. Conversion uses the existing Task.Map cancellation behavior and does not reread a token after the response task completes. Tokenless overloads use CancellationToken.None. Use HttpStringContent.Read for generic text content consumption.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Get(System.Uri,System.Concurrency.CancellationToken)"><summary>Resolves the address using BaseUri and sends GET with cancellation.</summary><param name="uri">An absolute address without BaseUri, or a relative reference without authority with BaseUri.</param><param name="cancellationToken">An invocation-local cancellation request; a pre-requested token skips parsing and dispatch.</param><returns>A response, HttpError, or an acknowledged cancelled Task.</returns><remarks>Uses the same request construction and handler pipeline as the tokenless overload. Does not add a configurable timeout.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.GetString(System.Uri)"><summary>Fetches the buffered response body and decodes strict UTF-8.</summary><param name="uri">An address using the same BaseUri rules as Get.</param><returns>A Task containing text or HttpError, or a cancelled Task when the exchange acknowledges cancellation.</returns><remarks>Development after Preview 9. Uses the Get/Send handler pipeline. Existing HTTP errors remain unchanged; malformed UTF-8 becomes Protocol("Invalid UTF-8 body"). Statuses 200–299 are successful, including custom handler replies; other statuses produce UnsuccessfulStatus with the status code. No charset negotiation, decompression or streaming is added. The socket transport retains its 1,024-byte body bound. Conversion uses the existing Task.Map cancellation behavior and does not reread a token after the response task completes. Tokenless overloads use CancellationToken.None. Use HttpStringContent.Read for generic text content consumption.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.GetString(System.Uri,System.Concurrency.CancellationToken)"><summary>Fetches the buffered response body and decodes strict UTF-8.</summary><param name="uri">An address using the same BaseUri rules as Get.</param><param name="cancellationToken">An invocation-local cancellation request; forwarded through the exchange. Pre-cancellation skips request construction.</param><returns>A Task containing text or HttpError, or a cancelled Task when the exchange acknowledges cancellation.</returns><remarks>Development after Preview 9. Uses the Get/Send handler pipeline. Existing HTTP errors remain unchanged; malformed UTF-8 becomes Protocol("Invalid UTF-8 body"). Statuses 200–299 are successful, including custom handler replies; other statuses produce UnsuccessfulStatus with the status code. No charset negotiation, decompression or streaming is added. The socket transport retains its 1,024-byte body bound. Conversion uses the existing Task.Map cancellation behavior and does not reread a token after the response task completes. Tokenless overloads use CancellationToken.None. Use HttpStringContent.Read for generic text content consumption.</remarks></member>
-    <member name="P:System.Web.Http.HttpResponse.IsSuccessStatusCode"><summary>Whether StatusCode is in the successful 200–299 range.</summary></member>
+
     <member name="T:System.Web.Http.HttpError.UnsuccessfulStatus"><summary>A convenience operation received a non-success HTTP status.</summary><remarks>GetString requires 200–299. Send and Get return final statuses as response data.</remarks></member>
     <member name="M:System.Web.Http.HttpError.UnsuccessfulStatus.#ctor(System.Web.Http.HttpStatusCode)"><summary>Describes a non-success response status.</summary><param name="statusCode">The response status code, preserved for pattern matching.</param></member>
     <member name="T:System.Web.Http.HttpStatusCode"><summary>Named HTTP status codes with Int32 values.</summary><remarks>Development API. This initial set covers common HTTP statuses; casts preserve unnamed values. A named constant does not imply transport support. The current transport handles final statuses 200–599, not informational responses. ToString returns a name when defined and numeric text otherwise.</remarks></member>
-    <member name="M:System.Web.Http.HttpResponse.#ctor(System.Web.Http.HttpStatusCode,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Web.Http.HttpContent)"><summary>Creates a response with a named or extension status.</summary><param name="statusCode">The status code; transport validation applies when sending.</param><param name="headers">Retained when content has no media type. Otherwise a new header list preserves other fields and replaces all Content-Type fields with the content metadata; the supplied list is not mutated.</param><param name="content">The retained content producer. Construction neither reads a stream nor copies the body. Keep borrowed memory stable until sending completes.</param><remarks>Framing and length are validated by the transport. Pass HttpMemoryContent, HttpStringContent or HttpStreamContent explicitly; no Sequence body conversion is performed.</remarks></member>
+
     <member name="F:System.Web.Http.HttpStatusCode.Continue"><summary>HTTP status 100 (Continue).</summary></member>
     <member name="F:System.Web.Http.HttpStatusCode.SwitchingProtocols"><summary>HTTP status 101 (SwitchingProtocols).</summary></member>
     <member name="F:System.Web.Http.HttpStatusCode.OK"><summary>HTTP status 200 (OK).</summary></member>
@@ -2349,38 +2267,34 @@
     <member name="F:System.Web.Http.HttpStatusCode.HttpVersionNotSupported"><summary>HTTP status 505 (HttpVersionNotSupported).</summary></member>
     <member name="M:System.Web.Http.HttpClient.Post(System.String,System.Web.Http.HttpContent)"><summary>Posts buffered content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed.</param><returns>A task with an HTTP response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. The socket provider snapshots bytes before DNS and limits request bodies to 1,024 bytes and headers to 2,048 bytes. It generates Content-Length and optional Content-Type. Invalid Content-Type control/non-ASCII bytes and oversized bodies fail before network I/O. No streaming, compression or Expect/continue support. Tokenless calls use CancellationToken.None.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Post(System.String,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)"><summary>Posts buffered content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed.</param><param name="cancellationToken">Forwarded unchanged; pre-cancellation skips address parsing and dispatch.</param><returns>A task with an HTTP response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. The socket provider snapshots bytes before DNS and limits request bodies to 1,024 bytes and headers to 2,048 bytes. It generates Content-Length and optional Content-Type. Invalid Content-Type control/non-ASCII bytes and oversized bodies fail before network I/O. No streaming, compression or Expect/continue support. Tokenless calls use CancellationToken.None.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Post(System.String,System.Web.Http.HttpContent)"><summary>Validates an absolute HTTP address and constructs a POST request without I/O.</summary><param name="url">An absolute address in the same supported URI subset as Get.</param><param name="content">Non-null buffered content retained without copying.</param><returns>The request, or an address error.</returns><remarks>BaseUri resolution belongs to HttpClient. Provider-specific size and header checks occur when sending; keep content stable until consumed. The optional content type appears in Headers.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Post(System.Uri,System.Web.Http.HttpContent)"><summary>Posts buffered content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed.</param><returns>A task with an HTTP response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. The socket provider snapshots bytes before DNS and limits request bodies to 1,024 bytes and headers to 2,048 bytes. It generates Content-Length and optional Content-Type. Invalid Content-Type control/non-ASCII bytes and oversized bodies fail before network I/O. No streaming, compression or Expect/continue support. Tokenless calls use CancellationToken.None.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Post(System.Uri,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)"><summary>Posts buffered content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed.</param><param name="cancellationToken">Forwarded unchanged; pre-cancellation skips address parsing and dispatch.</param><returns>A task with an HTTP response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. The socket provider snapshots bytes before DNS and limits request bodies to 1,024 bytes and headers to 2,048 bytes. It generates Content-Length and optional Content-Type. Invalid Content-Type control/non-ASCII bytes and oversized bodies fail before network I/O. No streaming, compression or Expect/continue support. Tokenless calls use CancellationToken.None.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Post(System.Uri,System.Web.Http.HttpContent)"><summary>Validates an absolute HTTP address and constructs a POST request without I/O.</summary><param name="uri">An absolute address in the same supported URI subset as Get.</param><param name="content">Non-null buffered content retained without copying.</param><returns>The request, or an address error.</returns><remarks>BaseUri resolution belongs to HttpClient. Provider-specific size and header checks occur when sending; keep content stable until consumed. The optional content type appears in Headers.</remarks></member>
-    <member name="P:System.Web.Http.HttpRequest.Content"><summary>The request content, which may be a stream source for outbound POST, PUT or PATCH.</summary><remarks>Incoming headers are available before handler dispatch; nonempty content is read asynchronously on demand during the context lifetime. Content-Type is available in request Headers. Disposing the request releases its content without draining it.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.GetHeaderValues(System.String)"><summary>Gets a snapshot of all stored field values whose names match using ASCII case-insensitive comparison.</summary><param name="name">An HTTP field-name token. Names are not trimmed; empty, non-ASCII or invalid tokens return an empty sequence.</param><returns>A new sequence in stored field order, empty if absent. An empty field value remains one empty string. Repeated fields are neither joined nor comma-split.</returns><remarks>Development API. Reads Headers only: it does not synthesize Host, Content-Length or other provider-generated fields. Lookup does not parse field-specific syntax or validate stored values. Each call allocates a result sequence and compares encoded names; this bounded POC is not a general HTTP header collection. Callers must not mutate the source headers concurrently.</remarks></member>
-    <member name="M:System.Web.Http.HttpResponse.GetHeaderValues(System.String)"><summary>Gets a snapshot of all stored field values whose names match using ASCII case-insensitive comparison.</summary><param name="name">An HTTP field-name token. Names are not trimmed; empty, non-ASCII or invalid tokens return an empty sequence.</param><returns>A new sequence in stored field order, empty if absent. An empty field value remains one empty string. Repeated fields are neither joined nor comma-split.</returns><remarks>Development API. Reads Headers only: it does not synthesize Host, Content-Length or other provider-generated fields. Lookup does not parse field-specific syntax or validate stored values. Each call allocates a result sequence and compares encoded names; this bounded POC is not a general HTTP header collection. Callers must not mutate the source headers concurrently.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.WithHeader(System.String,System.String)"><summary>Returns a new request with all case-insensitive matches for one application header replaced by the supplied field.</summary><param name="name">A nonempty ASCII HTTP field-name token, at most 2,048 bytes. The supplied casing is preserved.</param><param name="value">A printable ASCII value, possibly empty, at most 2,048 bytes. Control characters, tabs and non-ASCII bytes are rejected.</param><returns>Ok with a new request sharing the original content and preserving its address/method; InvalidRequest for invalid or reserved fields; LimitExceeded if more than 13 application fields would result.</returns><remarks>Development API. Leaves the original request unchanged and appends the replacement after other fields. Content-Type belongs to HttpContent construction. Host, Content-Length, Transfer-Encoding, Connection, Keep-Alive, Proxy-Connection, TE, Trailer, Upgrade, Expect and Content-Encoding are reserved by this bounded provider contract. Socket Send revalidates fields and enforces the total 2,048-byte encoded header bound before DNS. No field-specific value parser or append/remove API. Treat exposed Headers and shared content as stable during use; this is not a deeply immutable object.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Put(System.String,System.Web.Http.HttpContent)"><summary>Sends an HTTP PUT request with buffered content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Put(System.String,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)"><summary>Sends an HTTP PUT request with buffered content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Put(System.String,System.Web.Http.HttpContent)"><summary>Constructs an HTTP PUT request without network I/O.</summary><param name="url">An absolute address in the supported HTTP URI subset.</param><param name="content">Non-null content retained by reference. Keep it stable during Send.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. DELETE creates empty content.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Put(System.Uri,System.Web.Http.HttpContent)"><summary>Sends an HTTP PUT request with buffered content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Put(System.Uri,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)"><summary>Sends an HTTP PUT request with buffered content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Put(System.Uri,System.Web.Http.HttpContent)"><summary>Constructs an HTTP PUT request without network I/O.</summary><param name="uri">An absolute address in the supported HTTP URI subset.</param><param name="content">Non-null content retained by reference. Keep it stable during Send.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. DELETE creates empty content.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Patch(System.String,System.Web.Http.HttpContent)"><summary>Sends an HTTP PATCH request with buffered content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Patch(System.String,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)"><summary>Sends an HTTP PATCH request with buffered content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Patch(System.String,System.Web.Http.HttpContent)"><summary>Constructs an HTTP PATCH request without network I/O.</summary><param name="url">An absolute address in the supported HTTP URI subset.</param><param name="content">Non-null content retained by reference. Keep it stable during Send.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. DELETE creates empty content.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Patch(System.Uri,System.Web.Http.HttpContent)"><summary>Sends an HTTP PATCH request with buffered content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Patch(System.Uri,System.Web.Http.HttpContent,System.Concurrency.CancellationToken)"><summary>Sends an HTTP PATCH request with buffered content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="content">Non-null buffered content, kept stable while consumed. The socket provider allows at most 1,024 bytes.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Patch(System.Uri,System.Web.Http.HttpContent)"><summary>Constructs an HTTP PATCH request without network I/O.</summary><param name="uri">An absolute address in the supported HTTP URI subset.</param><param name="content">Non-null content retained by reference. Keep it stable during Send.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. DELETE creates empty content.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Delete(System.String)"><summary>Sends an HTTP DELETE request without content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Delete(System.String,System.Concurrency.CancellationToken)"><summary>Sends an HTTP DELETE request without content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Delete(System.String)"><summary>Constructs an HTTP DELETE request without network I/O.</summary><param name="url">An absolute address in the supported HTTP URI subset.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. DELETE creates empty content.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Delete(System.Uri)"><summary>Sends an HTTP DELETE request without content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Delete(System.Uri,System.Concurrency.CancellationToken)"><summary>Sends an HTTP DELETE request without content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. DELETE content is unsupported in this checkpoint.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Delete(System.Uri)"><summary>Constructs an HTTP DELETE request without network I/O.</summary><param name="uri">An absolute address in the supported HTTP URI subset.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. DELETE creates empty content.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Head(System.String)"><summary>Sends an HTTP HEAD request without request content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. HEAD completes at the end of response headers and exposes empty content; Content-Length describes the representation.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Head(System.String,System.Concurrency.CancellationToken)"><summary>Sends an HTTP HEAD request without request content through the Send handler pipeline.</summary><param name="url">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. HEAD completes at the end of response headers and exposes empty content; Content-Length describes the representation.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Head(System.String)"><summary>Constructs an HTTP HEAD request without network I/O.</summary><param name="url">An absolute address in the supported HTTP URI subset.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. HEAD creates empty request content.</remarks></member>
+
     <member name="M:System.Web.Http.HttpClient.Head(System.Uri)"><summary>Sends an HTTP HEAD request without request content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. HEAD completes at the end of response headers and exposes empty content; Content-Length describes the representation.</remarks></member>
     <member name="M:System.Web.Http.HttpClient.Head(System.Uri,System.Concurrency.CancellationToken)"><summary>Sends an HTTP HEAD request without request content through the Send handler pipeline.</summary><param name="uri">A relative address when BaseUri is set; otherwise an absolute HTTP address.</param><param name="cancellationToken">Forwarded unchanged. Pre-cancellation skips parsing and handler dispatch.</param><returns>A task containing the response or HttpError, or an acknowledged cancelled task. Non-success statuses remain response data.</returns><remarks>Development API. Uses the same address, framing, header bounds and exchange lifetime as Get/Post. Tokenless calls use CancellationToken.None. No automatic retry, redirect or method-specific application behavior. PATCH payload format is selected by the caller through content type; the library does not apply patches. HEAD completes at the end of response headers and exposes empty content; Content-Length describes the representation.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Head(System.Uri)"><summary>Constructs an HTTP HEAD request without network I/O.</summary><param name="uri">An absolute address in the supported HTTP URI subset.</param><returns>Ok with a prepared request, or InvalidUri, InvalidRequest, Unsupported or LimitExceeded for address validation.</returns><remarks>Development API. Factories do not resolve BaseUri. Request fields can be added with WithHeader; socket Send validates content/framing limits before DNS. HEAD creates empty request content.</remarks></member>
+
     <member name="T:System.Web.Http.HttpContext"><summary>Owns the combined lifetime of an accepted request and its outgoing response.</summary><remarks>Development API. One HTTP/1.1 exchange with headers-first request delivery. Complete snapshots the configured response and ends the exchange on success, validation/send failure or acknowledged cancellation. Close/Dispose disposes request and response content and never implicitly reads, drains or sends. Current transport closes the physical connection; this is not a keep-alive contract. Request/response objects remain readable after closure.</remarks></member>
     <member name="P:System.Web.Http.HttpContext.Request"><summary>Gets the incoming request.</summary><remarks>All server entry points dispatch after headers. Nonempty content exposes a one-shot InputStream through Content.TryGetStream; empty requests use empty buffered content. Read the body during the context lifetime; Complete/Close ends access. Body limits and the original request deadline remain enforced during streaming reads.</remarks></member>
     <member name="P:System.Web.Http.HttpContext.Response"><summary>Gets the mutable outgoing response configuration, initially status 200 with empty content.</summary><remarks>Use Response.Respond to select status/content. Configuration performs no I/O. Complete validates and snapshots; later mutations cannot change already captured wire bytes.</remarks></member>
@@ -2392,9 +2306,8 @@
     <member name="M:System.Web.Http.HttpContext.Dispose"><summary>Ends the exchange without sending unsent response content.</summary><remarks>Development API. One HTTP/1.1 exchange with headers-first request delivery. Complete snapshots the configured response and ends the exchange on success, validation/send failure or acknowledged cancellation. Close/Dispose disposes request and response content and never implicitly reads, drains or sends. Current transport closes the physical connection; this is not a keep-alive contract. Request/response objects remain readable after closure. Safe to repeat. Closing during a pending Complete settles that task as cancelled after transport acknowledgement; bytes may already have reached the peer.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.RespondText(System.String)"><summary>Configures status 200 and UTF-8 text/plain content without sending.</summary><param name="text">Text encoded as UTF-8 with Content-Type text/plain; charset=utf-8.</param><remarks>Forwards to Response.Respond. Call Complete to send and observe errors. Content bounds are validated at Complete.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.RespondText(System.Web.Http.HttpStatusCode,System.String)"><summary>Configures a status and UTF-8 text/plain content without sending.</summary><param name="statusCode">Status to validate when the context completes.</param><param name="text">Text encoded as UTF-8 with Content-Type text/plain; charset=utf-8.</param><remarks>Forwards to Response.Respond. Call Complete to send; statuses prohibiting content require empty text.</remarks></member>
-    <member name="M:System.Web.Http.HttpResponse.Respond(System.Web.Http.HttpStatusCode)"><summary>Sets status and empty content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Calling this on a client response only changes that local object. Separate inbound/outbound implementations are a future design direction.</remarks></member>
-    <member name="M:System.Web.Http.HttpResponse.Respond(System.Web.Http.HttpStatusCode,System.Web.Http.HttpContent)"><summary>Sets status and content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><param name="content">Non-null buffered content retained by reference until context completion snapshots it.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Calling this on a client response only changes that local object. Separate inbound/outbound implementations are a future design direction.</remarks></member>
-    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}},System.Concurrency.CancellationToken)"><summary>Accepts a context, invokes the callback and sends its response through the context lifetime.</summary><param name="handler">Callback returning a buffered response or application error.</param><param name="cancellationToken">Covers accept, request read, callback wait and sending.</param><returns>A completed result or an acknowledged cancelled task.</returns><remarks>Callback errors/cancellation close the context. Cancellation stops waiting for a handler and ignores a later result, but cannot preempt user code or cancel arbitrary handler work. Server.Close has the same scope-ending effect. Runtime Faults remain terminal and are not converted into HTTP errors; managed cleanup is not guaranteed after a terminal Fault.</remarks></member>
+
+    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpServerRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpServerResponse,System.Web.Http.HttpError}}},System.Concurrency.CancellationToken)"><summary>Accepts a context, invokes the callback and sends its response through the context lifetime.</summary><param name="handler">Callback returning a buffered response or application error.</param><param name="cancellationToken">Covers accept, request read, callback wait and sending.</param><returns>A completed result or an acknowledged cancelled task.</returns><remarks>Callback errors/cancellation close the context. Cancellation stops waiting for a handler and ignores a later result, but cannot preempt user code or cancel arbitrary handler work. Server.Close has the same scope-ending effect. Runtime Faults remain terminal and are not converted into HTTP errors; managed cleanup is not guaranteed after a terminal Fault.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.Respond(System.Web.Http.HttpStatusCode)"><summary>Forwards to Response.Respond to set status and empty content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Separate inbound/outbound implementations are a future design direction.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.Respond(System.Web.Http.HttpStatusCode,System.Web.Http.HttpContent)"><summary>Forwards to Response.Respond to set status and content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><param name="content">Non-null buffered content retained by reference until context completion snapshots it.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Separate inbound/outbound implementations are a future design direction.</remarks></member>
       <member name="T:System.IO.MemoryStream">
@@ -2558,7 +2471,7 @@
 <member name="M:System.Web.Http.Json.JsonContent.ReadNode(System.Web.Http.HttpContent)"><summary>Parses buffered HTTP bytes into the closed JSON DOM.</summary><param name="content">Request or response content, retained and readable afterward.</param><returns>A node or JsonError. Invalid UTF-8 returns Read(InvalidUtf8); empty input is a syntax error; JSON null is a JsonNull node.</returns><remarks>Checks the 1024-byte limit before decoding. Does not validate Content-Type or HTTP status. Stream content is consumed once asynchronously; its read token controls transport reads.</remarks></member>
 <member name="M:System.Web.Http.Json.JsonContent.Read(System.Web.Http.HttpContent,System.Introspection.TypeInfo)"><summary>Reads a model from buffered HTTP content using a runtime-backed type.</summary><param name="content">Buffered request or response bytes.</param><param name="type">Supported scalar, typed array, or public nongeneric reference class with a public parameterless constructor.</param><returns>The model or unchanged JSON/reflection error.</returns><remarks>Same mapping rules as JsonSerializer.Deserialize. Headers, status and lifecycle remain caller policy; reads do not consume content.</remarks></member>
 <member name="M:System.Web.Http.Json.JsonContent.Read``1(System.Web.Http.HttpContent)"><summary>Reads a typed model from buffered HTTP content.</summary><typeparam name="T">Supported scalar, typed array, or public nongeneric reference class with a public parameterless constructor.</typeparam><param name="content">Buffered request or response bytes, retained after reading.</param><returns>The model or unchanged JsonError, including UnsupportedMapping for unsupported T shapes.</returns><remarks>Synchronous; same UTF-8, limits, mapping and lifecycle policy as the TypeInfo overload.</remarks></member>
-<member name="P:System.Web.Http.HttpResponse.Request"><summary>Gets the effective request associated by HttpClient.Send.</summary><returns>Some with the request passed to the handler, or None before client association.</returns><remarks>Standalone and server-created responses start with None. Applying defaults can create a derived request without mutating the caller request. Successful client responses are associated across custom handlers and delayed completion. HTTP error statuses are still responses and retain their request. Failed or cancelled tasks do not associate a response. Respond preserves the association. This is a retained reference, not a snapshot or ownership transfer; reusing a mutable response for another send replaces its association. Direct handler calls do not promise association. Redirect/final-request tracking is not implemented.</remarks></member>
+
 <member name="P:System.Web.Http.HttpClient.DefaultRequestHeaders"><summary>Gets or sets client-wide application headers, copied on get and set.</summary><remarks>Send validates and snapshots these defaults before invoking any handler. Explicit request headers win by case-insensitive name; duplicate defaults for an otherwise absent name retain their order. Defaults cannot set transport-controlled fields or Content-Type. Invalid names/values return HttpError.InvalidRequest from Send; more than 13 configured or merged headers returns LimitExceeded. Cancellation already requested takes precedence. Applying defaults derives a new request with shared content and leaves the original unchanged; Response.Request exposes the effective request. Do not treat these copies as a concurrent mutation guarantee.</remarks></member>
 <member name="T:System.Web.Http.Json.HttpClientJsonExtensions"><summary>Buffered generic JSON helpers for HttpClient.</summary><remarks>Development POC. Uses the configured handler, BaseUri and default request headers. Serialization is synchronous over buffered content; network operations return tasks. No TLS or streaming codec is introduced.</remarks></member>
 <member name="T:System.Web.Http.Json.HttpJsonError"><summary>Legacy nominal HTTP/JSON error wrapper, retained for explicitly declared contracts.</summary><remarks>Current development JSON client helpers return HttpError | JsonError directly. This wrapper is no longer their return error type; existing consumers must update signatures and patterns. Match Http(reason) or Json(reason) when using this nominal type explicitly.</remarks></member>
@@ -3141,7 +3054,7 @@
     <member name="M:System.Web.Http.DelegatingHandler.#ctor"><summary>Initializes middleware requiring InnerHandler assignment before sending.</summary></member>
     <member name="M:System.Web.Http.DelegatingHandler.#ctor(System.Web.Http.HttpHandler)"><summary>Initializes middleware owning the supplied inner handler.</summary><param name="innerHandler">Non-null next stage of the pipeline.</param></member>
     <member name="P:System.Web.Http.DelegatingHandler.InnerHandler"><summary>The owned next stage, initially null for the parameterless constructor.</summary><value>Assign a non-null handler before sending or disposal.</value><remarks>Null assignment, reassignment after starting, and assignment after disposal fault. Reading remains valid after disposal.</remarks></member>
-    <member name="M:System.Web.Http.DelegatingHandler.Send(System.Web.Http.HttpRequest,System.Concurrency.CancellationToken)"><summary>Forwards the request and token to InnerHandler and freezes configuration.</summary><param name="request">Request forwarded to the next handler.</param><param name="cancellationToken">Cooperative cancellation request.</param><returns>The next handler's response task.</returns><remarks>Faults if disposed or no inner handler has been assigned. Overrides normally call base.Send.</remarks></member>
+    <member name="M:System.Web.Http.DelegatingHandler.Send(System.Web.Http.HttpClientRequest,System.Concurrency.CancellationToken)"><summary>Forwards the request and token to InnerHandler and freezes configuration.</summary><param name="request">Request forwarded to the next handler.</param><param name="cancellationToken">Cooperative cancellation request.</param><returns>The next handler's response task.</returns><remarks>Faults if disposed or no inner handler has been assigned. Overrides normally call base.Send.</remarks></member>
     <member name="M:System.Web.Http.DelegatingHandler.Dispose"><summary>Disposes the owned inner handler once.</summary><remarks>Overrides must call base.Dispose(). Repeated disposal is harmless.</remarks></member>
     <member name="T:System.Concurrency.Timer"><summary>An invocation-local, duration-based timer with captured callback state.</summary><remarks>Development API. Callbacks run serially through the invocation completion queue. Repeating schedules wait the interval after each callback completes; missed ticks do not accumulate. This is not a thread-pool timer. Scheduler progress is required.</remarks></member>
     <member name="M:System.Concurrency.Timer.#ctor(System.Func{System.Void})"><summary>Creates a stopped timer.</summary><param name="callback">Synchronous callback, which may capture state.</param></member>
@@ -3161,10 +3074,7 @@
     <member name="P:System.Web.Http.HttpVersion.Http11"><summary>The HTTP/1.1 protocol version.</summary></member>
     <member name="M:System.Web.Http.HttpVersion.Equals(System.Web.Http.HttpVersion)"><summary>Compares major and minor components.</summary><param name="other">Version to compare.</param><returns>True when both components match.</returns></member>
     <member name="M:System.Web.Http.HttpVersion.ToString"><summary>Formats major.minor.</summary><returns>Explicitly allocated display text.</returns></member>
-    <member name="P:System.Web.Http.HttpRequest.Version"><summary>The request protocol version, available with the headers.</summary><remarks>Read-only HTTP/1.1 in the current transport; no version negotiation is implied.</remarks></member>
-    <member name="P:System.Web.Http.HttpResponse.ReasonPhrase"><summary>The exact HTTP/1.1 reason phrase, including an empty value.</summary><remarks>Custom incoming phrases are decoded on first access and cached; this never reads the body. StatusCode determines success. Locally constructed responses use OK for 200 and an empty phrase for other statuses, matching the current writer. Custom phrases retain bounded header storage until accessed or the response is collected.</remarks></member>
-    <member name="P:System.Web.Http.HttpResponse.Version"><summary>The response protocol version.</summary><remarks>Read-only HTTP/1.1 in the current transport.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Dispose"><summary>Disposes owned content without reading or draining it.</summary><remarks>Idempotent. Header-derived request copies share content, so disposing one affects all aliases. Borrowed streams honor leaveOpen. The client does not dispose caller-owned requests; HttpContext disposes incoming requests.</remarks></member>
+
     <member name="T:System.Web.Http.HttpMethod"><summary>An immutable HTTP method token with predefined and custom values.</summary><remarks>Development API. Nonempty ASCII token syntax; construction preserves spelling. Equality and hashing are ordinal-ignore-case, following .NET. Predefined properties provide canonical values without a singleton identity guarantee. A method value does not enable protocol features such as CONNECT tunnelling.</remarks></member>
     <member name="M:System.Web.Http.HttpMethod.#ctor(System.String)"><summary>Constructs a method, preserving its spelling.</summary><param name="method">A nonempty ASCII HTTP token, including custom names.</param><remarks>Invalid whitespace, separators, controls and non-ASCII characters cause a terminal fault. Use Parse for a typed error.</remarks></member>
     <member name="P:System.Web.Http.HttpMethod.Method"><summary>The validated method spelling.</summary></member>
@@ -3183,10 +3093,7 @@
     <member name="P:System.Web.Http.HttpMethod.Trace"><summary>The canonical TRACE method value.</summary></member>
     <member name="P:System.Web.Http.HttpMethod.Connect"><summary>The canonical CONNECT method value.</summary></member>
     <member name="P:System.Web.Http.HttpMethod.Query"><summary>The canonical QUERY method value.</summary></member>
-    <member name="M:System.Web.Http.HttpRequest.Create(System.Web.Http.HttpMethod,System.String)"><summary>Constructs a request with a predefined or custom method without performing I/O.</summary><param name="method">Validated method token.</param><param name="url">Absolute HTTP address supported by this transport.</param><returns>The prepared request or HttpError.</returns><remarks>Existing URI, framing and body limits apply when sent. Custom methods use ordinary HTTP/1.1 origin-form requests. CONNECT tunnelling is unsupported. Headers retain the content media type.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Create(System.Web.Http.HttpMethod,System.String,System.Web.Http.HttpContent)"><summary>Constructs a request with a predefined or custom method without performing I/O.</summary><param name="method">Validated method token.</param><param name="url">Absolute HTTP address supported by this transport.</param><param name="content">Request content, shared by the prepared request.</param><returns>The prepared request or HttpError.</returns><remarks>Existing URI, framing and body limits apply when sent. Custom methods use ordinary HTTP/1.1 origin-form requests. CONNECT tunnelling is unsupported. Headers retain the content media type.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Create(System.Web.Http.HttpMethod,System.Uri)"><summary>Constructs a request with a predefined or custom method without performing I/O.</summary><param name="method">Validated method token.</param><param name="uri">Absolute HTTP address supported by this transport.</param><returns>The prepared request or HttpError.</returns><remarks>Existing URI, framing and body limits apply when sent. Custom methods use ordinary HTTP/1.1 origin-form requests. CONNECT tunnelling is unsupported. Headers retain the content media type.</remarks></member>
-    <member name="M:System.Web.Http.HttpRequest.Create(System.Web.Http.HttpMethod,System.Uri,System.Web.Http.HttpContent)"><summary>Constructs a request with a predefined or custom method without performing I/O.</summary><param name="method">Validated method token.</param><param name="uri">Absolute HTTP address supported by this transport.</param><param name="content">Request content, shared by the prepared request.</param><returns>The prepared request or HttpError.</returns><remarks>Existing URI, framing and body limits apply when sent. Custom methods use ordinary HTTP/1.1 origin-form requests. CONNECT tunnelling is unsupported. Headers retain the content media type.</remarks></member>
+
 <member name="M:System.Index.#ctor(System.Int32)">
       <summary>Creates an index; negative values fault. From-end zero is the end boundary.</summary>
     </member>
@@ -3478,7 +3385,6 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
       <remarks>Pre-cancellation precedes Closed and range checks. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
 
-
     <member name="T:System.Runtime.InteropServices.NativeExportAttribute"><summary>Exports a supported free function through the native C boundary. Managed layouts and pointer ownership are not exported.</summary></member>
     <member name="M:System.Runtime.InteropServices.NativeExportAttribute.#ctor"><summary>Uses versioned source-identity mangling and Cdecl.</summary></member>
     <member name="M:System.Runtime.InteropServices.NativeExportAttribute.#ctor(System.String)"><summary>Uses an exact entry point, or versioned mangling for an empty string, and Cdecl.</summary><param name="entryPoint">Native symbol name.</param></member>
@@ -3590,9 +3496,9 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
 <member name="F:System.Web.Http.HttpCompletionOption.ResponseContentRead"><summary>Complete after buffering the entire response body. This is the default.</summary></member>
 <member name="F:System.Web.Http.HttpCompletionOption.ResponseHeadersRead"><summary>Complete after final headers; consume Content.TryGetStream on demand.</summary></member>
 <member name="M:System.Web.Http.HttpContent.TryGetStream"><summary>Returns Some with the one-shot InputStream, or None for buffered content.</summary><returns>A borrowed view of the content source. No read or allocation of a whole-body buffer occurs.</returns><remarks>The content owns incoming streams. Read with an explicit cancellation token; use response/context disposal to end ownership. Reading a disposed stream returns Closed. Concurrent reads return WrongAccess. Malformed/truncated framing returns InvalidData, size overflow LimitExceeded, and transport/deadline failure IoFailure. HttpMemoryContent exposes its retained Memory window; this method does not manufacture a stream for buffered content.</remarks></member>
-<member name="M:System.Web.Http.HttpResponse.Dispose"><summary>Disposes owned content and closes an unread incoming connection. Safe to repeat.</summary></member>
-<member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpRequest,System.Web.Http.HttpCompletionOption)"><summary>Sends with the selected completion point and CancellationToken.None.</summary><param name="request">Request passed through the configured handler pipeline.</param><param name="completionOption">Buffered content or final headers.</param><returns>A response or HttpError. The caller owns streaming response disposal.</returns></member>
-<member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpRequest,System.Web.Http.HttpCompletionOption,System.Concurrency.CancellationToken)"><summary>Sends through the handler pipeline, optionally completing at final headers.</summary><param name="request">Request; the effective copy carries the completion preference through delegating handlers.</param><param name="completionOption">ResponseContentRead or ResponseHeadersRead; other values return InvalidRequest.</param><param name="cancellationToken">Covers Send until the selected completion point. Later body reads take their own token.</param><returns>A response, HttpError, or acknowledged cancellation.</returns><remarks>The socket handler supports streaming completion. Custom handlers may return already-buffered content. Client timeout ends when Send completes; socket body reads retain their own five-second transfer ceiling. Dispose streaming responses even when abandoning the body. Closing the client after successful headers does not own the transferred response connection.</remarks></member>
+
+<member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpClientRequest,System.Web.Http.HttpCompletionOption)"><summary>Sends with the selected completion point and CancellationToken.None.</summary><param name="request">Request passed through the configured handler pipeline.</param><param name="completionOption">Buffered content or final headers.</param><returns>A response or HttpError. The caller owns streaming response disposal.</returns></member>
+<member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpClientRequest,System.Web.Http.HttpCompletionOption,System.Concurrency.CancellationToken)"><summary>Sends through the handler pipeline, optionally completing at final headers.</summary><param name="request">Request; the effective copy carries the completion preference through delegating handlers.</param><param name="completionOption">ResponseContentRead or ResponseHeadersRead; other values return InvalidRequest.</param><param name="cancellationToken">Covers Send until the selected completion point. Later body reads take their own token.</param><returns>A response, HttpError, or acknowledged cancellation.</returns><remarks>The socket handler supports streaming completion. Custom handlers may return already-buffered content. Client timeout ends when Send completes; socket body reads retain their own five-second transfer ceiling. Dispose streaming responses even when abandoning the body. Closing the client after successful headers does not own the transferred response connection.</remarks></member>
 <member name="M:System.Web.Http.HttpServer.AcceptHeaders"><summary>Accepts and validates request headers, returning a context with streaming content.</summary><returns>A context or typed HTTP error. Complete or dispose the context.</returns><remarks>Uses CancellationToken.None. The body may be incomplete. TryGetStream returns its input stream; no further receive occurs until a read asks for data. Bounded read-ahead is retained.</remarks></member>
 <member name="M:System.Web.Http.HttpServer.AcceptHeaders(System.Concurrency.CancellationToken)"><summary>Accepts headers and transfers body-read ownership to the context.</summary><param name="cancellationToken">Covers waiting, TLS and headers; pass a token separately to body reads.</param><returns>A context, typed HTTP error, or acknowledged cancellation.</returns><remarks>Uses the same admission queue and limits as Accept. The request read deadline continues during body consumption. Complete/Close closes the body without draining it. Explicit body Close aborts the connection. Fixed-length and bounded chunked bodies are supported; EOF-delimited request bodies are not.</remarks></member>
 <member name="M:System.Data.Json.JsonSerializer.Serialize(System.IO.OutputStream,System.Object,System.Data.Json.JsonSerializerOptions)">
@@ -3743,8 +3649,8 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
 <member name="P:System.Introspection.FieldInfo.ConstantValue"><summary>Gets Some containing the declared boxed Int32 constant, or None for a storage field, without executing type initialization.</summary><remarks>Int32 is the currently supported literal metadata payload.</remarks></member>
 <member name="P:System.Introspection.TypeInfo.IsBeforeFieldInit"><summary>Reports relaxed first-static-field-access initialization timing.</summary><remarks>False denotes strict timing for nominal types. Types without a nominal definition return false.</remarks></member>
 <member name="P:System.Introspection.TypeInfo.TypeInitializer"><summary>Gets the runtime-owned static constructor descriptor, or None if absent.</summary><remarks>This query never executes initialization or grants direct invocation. Native compilation requires explicit constructor-metadata retention.</remarks></member>
-<member name="M:System.Web.Http.HttpServer.Serve(System.Func{System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}})"><summary>Starts server-managed concurrent requests; the returned task represents server lifetime.</summary><param name="handler">Async response callback whose task and returned response are owned by the server.</param><returns>Success after Close and joined handlers, caller cancellation, or startup/listener Error.</returns><remarks>Development after Preview 16. Requires an open idle server and excludes mixed Accept, AcceptHeaders, ServeOne and duplicate Serve. At most 16 exchanges run concurrently. Request errors close that exchange, update FailedRequests/LastRequestError, and serving continues. Close closes connections immediately; Serve waits for handlers and disposes late responses. Handlers must eventually settle. Runtime Faults remain terminal; blocking callbacks block the cooperative dispatcher. This does not introduce keep-alive, implicit retries or one OS thread per handler.</remarks></member>
-<member name="M:System.Web.Http.HttpServer.Serve(System.Func{System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}},System.Concurrency.CancellationToken)"><summary>Starts server-managed concurrent requests; the returned task represents server lifetime.</summary><param name="handler">Async response callback whose task and returned response are owned by the server.</param><param name="cancellationToken">Closes the server on cancellation. Lifetime cancellation waits for started handlers to settle.</param><returns>Success after Close and joined handlers, caller cancellation, or startup/listener Error.</returns><remarks>Development after Preview 16. Requires an open idle server and excludes mixed Accept, AcceptHeaders, ServeOne and duplicate Serve. At most 16 exchanges run concurrently. Request errors close that exchange, update FailedRequests/LastRequestError, and serving continues. Close closes connections immediately; Serve waits for handlers and disposes late responses. Handlers must eventually settle. Runtime Faults remain terminal; blocking callbacks block the cooperative dispatcher. This does not introduce keep-alive, implicit retries or one OS thread per handler.</remarks></member>
+<member name="M:System.Web.Http.HttpServer.Serve(System.Func{System.Web.Http.HttpServerRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpServerResponse,System.Web.Http.HttpError}}})"><summary>Starts server-managed concurrent requests; the returned task represents server lifetime.</summary><param name="handler">Async response callback whose task and returned response are owned by the server.</param><returns>Success after Close and joined handlers, caller cancellation, or startup/listener Error.</returns><remarks>Development after Preview 16. Requires an open idle server and excludes mixed Accept, AcceptHeaders, ServeOne and duplicate Serve. At most 16 exchanges run concurrently. Request errors close that exchange, update FailedRequests/LastRequestError, and serving continues. Close closes connections immediately; Serve waits for handlers and disposes late responses. Handlers must eventually settle. Runtime Faults remain terminal; blocking callbacks block the cooperative dispatcher. This does not introduce keep-alive, implicit retries or one OS thread per handler.</remarks></member>
+<member name="M:System.Web.Http.HttpServer.Serve(System.Func{System.Web.Http.HttpServerRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpServerResponse,System.Web.Http.HttpError}}},System.Concurrency.CancellationToken)"><summary>Starts server-managed concurrent requests; the returned task represents server lifetime.</summary><param name="handler">Async response callback whose task and returned response are owned by the server.</param><param name="cancellationToken">Closes the server on cancellation. Lifetime cancellation waits for started handlers to settle.</param><returns>Success after Close and joined handlers, caller cancellation, or startup/listener Error.</returns><remarks>Development after Preview 16. Requires an open idle server and excludes mixed Accept, AcceptHeaders, ServeOne and duplicate Serve. At most 16 exchanges run concurrently. Request errors close that exchange, update FailedRequests/LastRequestError, and serving continues. Close closes connections immediately; Serve waits for handlers and disposes late responses. Handlers must eventually settle. Runtime Faults remain terminal; blocking callbacks block the cooperative dispatcher. This does not introduce keep-alive, implicit retries or one OS thread per handler.</remarks></member>
 <member name="P:System.Web.Http.HttpServer.CompletedRequests"><summary>Successful responses sent by Serve; excludes explicit Accept and ServeOne calls.</summary></member>
 <member name="P:System.Web.Http.HttpServer.FailedRequests"><summary>Failed Serve exchanges, excluding shutdown-driven cancellations.</summary></member>
 <member name="P:System.Web.Http.HttpServer.LastRequestError"><summary>Most recent Serve request failure, or None before the first failure. Only one error is retained; counts are cumulative.</summary></member>
@@ -4333,35 +4239,7 @@ A method remains in metadata; an omitted call evaluates neither its receiver nor
     <member name="P:System.Introspection.MethodInfo.FunctionType"><summary>Gets the structural function signature, or a function-constrained parameter for an unresolved whole-signature method.</summary><remarks>Development API. Closed materialization exposes ordinary parameter and result reflection.</remarks></member>
     <member name="P:System.Web.Http.HttpContext.RequestAborted"><summary>Gets the transport-owned request cancellation token.</summary><remarks>Monitoring starts on first access. Observed TCP EOF or error, explicit Close and server shutdown cancel it. Successful response completion stops monitoring without cancellation. Unread socket bytes delay EOF detection, including queued TLS records. This read-only development contract does not expose ASP.NET Core's token override.</remarks></member>
     <member name="M:System.Networking.Sockets.Socket.WaitForReadClosure(System.Concurrency.CancellationToken)"><summary>Waits for TCP receive EOF or a transport error without consuming bytes.</summary><param name="cancellationToken">Cancels only the observer after provider acknowledgement; preserves the socket.</param><returns>Ok on receive EOF, or SocketError on admission or transport failure. Cancellation cancels the task.</returns><remarks>One observer per socket, alongside ordinary send/receive. Shares the 64-operation budget. No implicit timeout; unread socket bytes delay EOF observation. Does not interpret TLS close_notify.</remarks></member>
-    <member name="M:System.Web.Http.HttpHeaderCollection.#ctor">
-      <summary>Creates an empty collection.</summary>
-    </member>
-    <member name="M:System.Web.Http.HttpHeaderCollection.#ctor(System.Collections.Sequence{System.Web.Http.HttpHeader})">
-      <summary>Copies fields in order. Subsequent changes to the source sequence do not affect this collection.
-Validation of outgoing field names, values and framing remains the transport's responsibility.</summary>
-    </member>
-    <member name="M:System.Web.Http.HttpHeaderCollection.Contains(System.String)">
-      <summary>Whether a field with this name exists. Invalid or absent names return false.
-Does not materialize entries or allocate a matching-value list.</summary>
-    </member>
-    <member name="M:System.Web.Http.HttpHeaderCollection.GetIterator">
-      <summary>Iterates field entries in their stored order.</summary>
-    </member>
-    <member name="M:System.Web.Http.HttpHeaderCollection.GetSingle(System.String)">
-      <summary>Returns a single raw value, None for an absent field, or Protocol for an invalid name or repeated field.
-An empty field value is Some(""). This does not allocate a matching-value list.</summary>
-    </member>
-    <member name="P:System.Web.Http.HttpHeaderCollection.Count">
-      <summary>Number of field entries, including repeated names.</summary>
-    </member>
-    <member name="P:System.Web.Http.HttpHeaderCollection.Item(System.Int32)">
-      <summary>Gets a field by position. An out-of-range index is a terminal failure.</summary>
-    </member>
-    <member name="P:System.Web.Http.HttpHeaderCollection.Item(System.String)">
-      <summary>Returns all matching values as an independent snapshot, in field order.
-Names use ASCII case-insensitive matching. Missing or invalid names return an empty sequence.
-Values are neither comma-split nor joined, including Set-Cookie fields.</summary>
-    </member>
+
     <member name="P:System.Web.Http.HttpHeaderNames.Accept">
       <summary>The Accept field name.</summary>
     </member>
@@ -4404,18 +4282,247 @@ Values are neither comma-split nor joined, including Set-Cookie fields.</summary
     <member name="P:System.Web.Http.HttpHeaderNames.UserAgent">
       <summary>The UserAgent field name.</summary>
     </member>
-    <member name="T:System.Web.Http.HttpHeaderCollection">
-      <summary>Read-only HTTP fields in original order, preserving repeated names and unsplit values.
-Public construction snapshots its input. Message views preserve the message's retained storage.
-No mutation or synchronization is provided; use message WithHeader methods to derive messages.</summary>
-    </member>
+
     <member name="T:System.Web.Http.HttpHeaderNames">
       <summary>Common HTTP field names. Values are canonical lowercase strings; field lookup is ASCII case-insensitive.
 Custom field names remain supported as strings. Only this fixed catalog is interned.</summary>
     </member>
-    <member name="P:System.Web.Http.HttpHeaderCollection.Empty">
-      <summary>A reusable read-only empty collection, cached within the runtime invocation.
-No mutable implementation is exposed. Public construction remains available for independent snapshots.</summary>
+
+<member name="M:System.Web.Http.HttpClientRequest.Create(System.Web.Http.HttpMethod,System.String)">
+      <summary>Constructs a request using a predefined or custom method, without performing I/O.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Create(System.Web.Http.HttpMethod,System.String,System.Web.Http.HttpContent)">
+      <summary>Constructs a request with explicit method and content; transport bounds apply when sent.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Create(System.Web.Http.HttpMethod,System.Uri)">
+      <summary>Constructs a URI-based request using a predefined or custom method.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Create(System.Web.Http.HttpMethod,System.Uri,System.Web.Http.HttpContent)">
+      <summary>Constructs a URI-based request with explicit method and content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Delete(System.String)">
+      <summary>Constructs an absolute HTTP DELETE request without content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Delete(System.Uri)">
+      <summary>Constructs an absolute HTTP DELETE request without content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Dispose">
+      <summary>Releases owned content without reading or draining it. Safe to repeat.
+Header-derived copies share content; disposal affects every alias.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Get(System.String)">
+      <summary>Parses an absolute HTTP URL and constructs a GET request without performing I/O.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Get(System.Uri)">
+      <summary>Constructs a GET request from an absolute URI; unsupported HTTP forms remain errors.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.GetContentType">
+      <summary>&lt;summary&gt;Parses the message's Content-Type without consuming its body.&lt;/summary&gt;
+&lt;returns&gt;Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.&lt;/returns&gt;
+&lt;remarks&gt;Does not infer a type or perform negotiation; raw headers remain available.&lt;/remarks&gt;</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.GetHeaderValues(System.String)">
+      <summary>Gets all matching field values in order using ASCII case-insensitive names.
+Returns an empty snapshot for absent or invalid names; does not split or join values.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Head(System.String)">
+      <summary>Constructs an absolute HTTP HEAD request without content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Head(System.Uri)">
+      <summary>Constructs an absolute HTTP HEAD request without content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Patch(System.String,System.Web.Http.HttpContent)">
+      <summary>Constructs an absolute HTTP PATCH request with buffered content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Patch(System.Uri,System.Web.Http.HttpContent)">
+      <summary>Constructs an absolute HTTP PATCH request with buffered content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Post(System.String,System.Web.Http.HttpContent)">
+      <summary>Constructs a POST request without performing I/O.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Post(System.Uri,System.Web.Http.HttpContent)">
+      <summary>Constructs a POST request from an absolute HTTP URI.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Put(System.String,System.Web.Http.HttpContent)">
+      <summary>Constructs an absolute HTTP PUT request with buffered content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.Put(System.Uri,System.Web.Http.HttpContent)">
+      <summary>Constructs an absolute HTTP PUT request with buffered content.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientRequest.WithHeader(System.String,System.String)">
+      <summary>Returns a new request with one application header replaced case-insensitively.
+The original request is unchanged; content is shared and framing stays provider-owned.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientResponse.#ctor(System.Int32,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Web.Http.HttpContent)">
+      <summary>Creates a response from a numeric status and an explicit content producer.
+The transport validates framing and length before sending.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientResponse.#ctor(System.Web.Http.HttpStatusCode,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Web.Http.HttpContent)">
+      <summary>Creates a response retaining its body without reading or copying it.
+Content metadata replaces any Content-Type header; other headers are preserved.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientResponse.Dispose">
+      <summary>Closes owned response content, including an unread streaming connection.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientResponse.GetContentType">
+      <summary>&lt;summary&gt;Parses the message's Content-Type without consuming its body.&lt;/summary&gt;
+&lt;returns&gt;Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.&lt;/returns&gt;
+&lt;remarks&gt;Does not infer a type or perform negotiation; raw headers remain available.&lt;/remarks&gt;</summary>
+    </member>
+<member name="M:System.Web.Http.HttpClientResponse.GetHeaderValues(System.String)">
+      <summary>Gets all matching field values in order using ASCII case-insensitive names.
+Returns an empty snapshot for absent or invalid names; does not split or join values.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpHeaderCollection.Contains(System.String)">
+      <summary>Whether a valid ASCII case-insensitive field name is present. Invalid names return false.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpHeaderCollection.GetContentType">
+      <summary>Parses one Content-Type; None when absent, Protocol for malformed or duplicate fields. Does not read the body.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpHeaderCollection.GetSingle(System.String)">
+      <summary>None when absent, Some for a single value (including empty), Protocol for invalid names or repeated fields.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpHeaderCollection.Snapshot(System.Collections.Sequence{System.Web.Http.HttpHeader})">
+      <summary>Copies entries into an independent read-only collection. Does not validate outgoing framing.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerRequest.Dispose">
+      <summary>Releases owned content without reading or draining it. Safe to repeat.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerRequest.GetContentType">
+      <summary>&lt;summary&gt;Parses the message's Content-Type without consuming its body.&lt;/summary&gt;
+&lt;returns&gt;Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.&lt;/returns&gt;
+&lt;remarks&gt;Does not infer a type or perform negotiation; raw headers remain available.&lt;/remarks&gt;</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerRequest.GetHeaderValues(System.String)">
+      <summary>Gets all matching field values in order using ASCII case-insensitive names.
+Returns an empty snapshot for absent or invalid names; does not split or join values.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.#ctor">
+      <summary>Creates an empty status-200 outgoing response.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.#ctor(System.Int32,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Web.Http.HttpContent)">
+      <summary>Creates a response from a numeric status and an explicit content producer.
+The transport validates framing and length before sending.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.#ctor(System.Int32,System.Web.Http.HttpContent)">
+      <summary>Creates an outgoing response from a numeric status and content, without requiring a header collection.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.#ctor(System.Web.Http.HttpStatusCode,System.Collections.Sequence{System.Web.Http.HttpHeader},System.Web.Http.HttpContent)">
+      <summary>Creates a response retaining its body without reading or copying it.
+Content metadata replaces any Content-Type header; other headers are preserved.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.#ctor(System.Web.Http.HttpStatusCode,System.Web.Http.HttpContent)">
+      <summary>Creates an outgoing response with content metadata and no other application fields.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.GetContentType">
+      <summary>&lt;summary&gt;Parses the message's Content-Type without consuming its body.&lt;/summary&gt;
+&lt;returns&gt;Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.&lt;/returns&gt;
+&lt;remarks&gt;Does not infer a type or perform negotiation; raw headers remain available.&lt;/remarks&gt;</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.GetHeaderValues(System.String)">
+      <summary>Gets all matching field values in order using ASCII case-insensitive names.
+Returns an empty snapshot for absent or invalid names; does not split or join values.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.Respond(System.Web.Http.HttpStatusCode)">
+      <summary>Sets the status and empty content. Does not perform network I/O.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.Respond(System.Web.Http.HttpStatusCode,System.Web.Http.HttpContent)">
+      <summary>Sets status and content, replacing Content-Type from the content metadata.
+Other headers are retained. The context validates and snapshots when completed.</summary>
+    </member>
+<member name="M:System.Web.Http.HttpServerResponse.SetHeader(System.String,System.String)">
+      <summary>Replaces fields through the response's mutable header view. Does not perform I/O.</summary>
+    </member>
+<member name="M:System.Web.Http.MutableHttpHeaderCollection.Append(System.String,System.String)">
+      <summary>Appends a separate field value. Does not split or join commas; invalid input fails without mutation.</summary>
+    </member>
+<member name="M:System.Web.Http.MutableHttpHeaderCollection.Create">
+      <summary>Creates an independent collection with name/value validation; framing is validated when sent.</summary>
+    </member>
+<member name="M:System.Web.Http.MutableHttpHeaderCollection.Remove(System.String)">
+      <summary>Removes all matching fields, returning whether any existed. Invalid or controlled names fail without mutation.</summary>
+    </member>
+<member name="M:System.Web.Http.MutableHttpHeaderCollection.Set(System.String,System.String)">
+      <summary>Replaces all fields of this name. Invalid input fails without mutation.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientRequest.Content">
+      <summary>Request body content. Incoming nonempty bodies are consumed asynchronously on demand.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientRequest.Headers">
+      <summary>Mutable outgoing fields. Transport/content controlled fields retain their message-specific policy.
+The view stays attached to this message when its entries are replaced.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientRequest.IsSecure">
+      <summary>Whether the request uses authenticated HTTPS transport.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientRequest.Method">
+      <summary>The validated method value. Its Method property preserves the wire spelling.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientRequest.Version">
+      <summary>The request protocol version, available after headers. Current transport supports HTTP/1.1 only.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientResponse.Headers">
+      <summary>Read-only header view with case-insensitive named lookup. Created lazily and retained.
+Existing retained input sequences remain visible; named lookup returns independent snapshots.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientResponse.IsSuccessStatusCode">
+      <summary>Whether the response status is in the successful 200–299 range.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientResponse.ReasonPhrase">
+      <summary>The exact HTTP/1.1 reason text, including an empty phrase. Success depends only on StatusCode.
+Custom incoming text is decoded on first access and cached; no body read is performed.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientResponse.Request">
+      <summary>The effective client request passed to the handler, including applied defaults.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpClientResponse.Version">
+      <summary>The response protocol version. Current transport accepts and emits HTTP/1.1 only.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpHeaderCollection.Empty">
+      <summary>A reusable immutable empty collection, cached within the runtime invocation.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpHeaderCollection.Item(System.String)">
+      <summary>All matching raw values in order; empty for absent or invalid names. Independent snapshot, without comma splitting.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpServerRequest.Content">
+      <summary>Request body content. Incoming nonempty bodies are consumed asynchronously on demand.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpServerRequest.Headers">
+      <summary>Read-only header view with case-insensitive named lookup. Created lazily and retained.
+Existing retained input sequences remain visible; named lookup returns independent snapshots.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpServerRequest.IsSecure">
+      <summary>Whether the request uses authenticated HTTPS transport.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpServerRequest.Method">
+      <summary>The validated method value. Its Method property preserves the wire spelling.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpServerRequest.Version">
+      <summary>The request protocol version, available after headers. Current transport supports HTTP/1.1 only.</summary>
+    </member>
+<member name="P:System.Web.Http.HttpServerResponse.Headers">
+      <summary>Mutable outgoing fields. Transport/content controlled fields retain their message-specific policy.
+The view stays attached to this message when its entries are replaced.</summary>
+    </member>
+<member name="T:System.Web.Http.HttpHeaderCollection">
+      <summary>Read-only HTTP fields in wire order. Repeated names remain separate.
+Incoming messages expose this contract; use MutableHttpHeaderCollection for outgoing mutation.</summary>
+    </member>
+<member name="T:System.Web.Http.MutableHttpHeaderCollection">
+      <summary>Outgoing header mutation. Message-owned implementations apply their transport/content policy.
+Incoming views and Empty do not implement this interface. No concurrent mutation is supported.</summary>
+    </member>
+<member name="T:System.Web.Http.HttpClientRequest">
+      <summary>Outgoing client request with validated mutable headers and lazy URI/header views.</summary>
+    </member>
+<member name="T:System.Web.Http.HttpClientResponse">
+      <summary>Received client response with read-only headers and lazy response metadata.</summary>
+    </member>
+<member name="T:System.Web.Http.HttpServerRequest">
+      <summary>Accepted server request with read-only headers and lazy request metadata.</summary>
+    </member>
+<member name="T:System.Web.Http.HttpServerResponse">
+      <summary>Outgoing server response with mutable headers and independent response configuration.</summary>
     </member>
 </members>
 </doc>

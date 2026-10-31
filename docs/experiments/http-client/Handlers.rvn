@@ -18,7 +18,7 @@ class RecordingHandler : DelegatingHandler {
         self.events = events
     }
 
-    async override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    async override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         events.Add(String.Concat(name, " before"))
         let outcome = await base.Send(request, cancellationToken)
         events.Add(String.Concat(name, " after"))
@@ -35,17 +35,17 @@ class FakeHandler : HttpHandler {
         self.fail = fail
     }
 
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Calls += 1
         Check(request.Method.Method == "GET")
         Check(request.Host == "example.test")
         Check(request.Port == 80)
         Check(request.Target == "/greeting")
-        let source = Promise<Result<HttpResponse, HttpError>>()
+        let source = Promise<Result<HttpClientResponse, HttpError>>()
         if fail {
             _ = source.Complete(Failure(HttpError.Handler("Fake failure")))
         } else {
-            _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("Café 🌍"))))
+            _ = source.Complete(Ok(HttpClientResponse(200, ArrayList<HttpHeader>(), HttpStringContent("Café 🌍"))))
         }
         return source.Task
     }

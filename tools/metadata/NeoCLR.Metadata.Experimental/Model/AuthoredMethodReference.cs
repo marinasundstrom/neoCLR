@@ -27,6 +27,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="nativePrimitive">Explicit canonical numeric or String owner representation, or null for an ordinary owner.</param>
     /// <param name="visibility">Public by default; Protected is admitted only for constructors and requires a direct derived constructor call.</param>
     /// <param name="isVirtual">True for an ordinary nongeneric method slot on a reference class, including a generic class.</param>
+    /// <param name="isInterfaceHelper">True for a concrete static interface helper; it is not an implementation obligation.</param>
     /// <param name="isAbstract">True for a bodyless new class slot, including on a generic owner; requires isVirtual.</param>
     /// <param name="interfaceBounds">Optional method parameter bounds, limited to output-owned nongeneric nominal interface references. Requires a static generic method or a nonvirtual generic instance method on a reference class.</param>
     /// <param name="functionParameters">Method parameter ordinals constrained to native structural function values. Copied; incompatible with nominal bounds on the same parameter. Native output only.</param>
@@ -35,12 +36,12 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
     /// <exception cref="InvalidOperationException">A new method is added after interface completion.</exception>
-    /// <remarks>The caller supplies resolved class member semantics or an abstract interface contract. No dependency is loaded or verified.
-    /// Authored interfaces require abstract contracts; instance contracts may have unconstrained method parameters. Virtual/interface instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors and generic class virtual and static interface methods are unsupported. Ordinary nonvirtual generic instance methods are supported. Value/nested owners retain managed receiver and physical scope semantics.
+    /// <remarks>The caller supplies resolved class member semantics, an abstract interface contract, or an explicit static interface helper. No dependency is loaded or verified.
+    /// Authored interfaces use abstract contracts unless isInterfaceHelper is true; instance contracts may have unconstrained method parameters. Virtual/interface instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors and generic class virtual and static interface methods are unsupported. Ordinary nonvirtual generic instance methods are supported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null, IReadOnlyList<int>? functionParameters = null)
-        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false, visibility, isVirtual, isAbstract, interfaceBounds, functionParameters);
+        MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null, IReadOnlyList<int>? functionParameters = null, bool isInterfaceHelper = false)
+        => CreateMethodReferenceCore(declaringType, name, signature, isStatic, isOverride, nativePrimitive, false, visibility, isVirtual, isAbstract, interfaceBounds, functionParameters, isInterfaceHelper);
 
     /// <summary>Authors a virtual ToString, GetHashCode or Equals reference on the explicitly selected external Object root.</summary>
     /// <remarks>No dependency is loaded. The host supplies the selected root; runtime linking validates its actual slot. Use Callvirt, not Call.</remarks>
@@ -57,7 +58,7 @@ public sealed partial class AssemblyBuilder
     }
 
     private ImportedMethodReference CreateMethodReferenceCore(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null, IReadOnlyList<int>? functionParameters = null)
+        MethodSignature signature, bool isStatic, bool isOverride, PrimitiveType? nativePrimitive, bool isObjectSlot, MethodVisibility visibility = MethodVisibility.Public, bool isVirtual = false, bool isAbstract = false, IReadOnlyList<GenericMethodTypeConstraint>? interfaceBounds = null, IReadOnlyList<int>? functionParameters = null, bool isInterfaceHelper = false)
     {
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
@@ -87,6 +88,9 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("grapheme members require ordinary methods or exact Object overrides without primitive reinterpretation");
         bool constructor = name == ".ctor";
         bool isInterface = authoredInterfaces.Contains(declaringType);
+        if (isInterfaceHelper && (!isInterface || !isStatic || isVirtual || isAbstract || isOverride || constructor))
+            throw new ArgumentException("interface helpers require an ordinary static interface method", nameof(isInterfaceHelper));
+        bool interfaceContract = isInterface && !isInterfaceHelper;
         if (bounds.Length != 0 && (isInterface || isVirtual || isAbstract || !isStatic && declaringType.IsValueType))
             throw new ArgumentException("interface bounds require a static or nonvirtual reference-class method", nameof(interfaceBounds));
         if (functions.Length != 0 && (isInterface || isVirtual || isAbstract))
@@ -106,7 +110,7 @@ public sealed partial class AssemblyBuilder
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 (existing.Signature.IsDependent || signature.IsDependent ? existing.Signature.FunctionType != signature.FunctionType : !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes))) continue;
-            if (!existing.Target.Definition.SpecialConstraints.OrderBy(pair => pair.Key).SequenceEqual(functions.Select(index => new KeyValuePair<int, TypeParameterConstraints>(index, TypeParameterConstraints.FunctionType))) || !existing.Target.Definition.TypeConstraints.SequenceEqual(bounds) || existing.Target.Visibility != visibility || existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.Target.IsAbstract != (isAbstract || isInterface) || (existing.Target.IsVirtual != (isVirtual || isInterface)) || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
+            if (!existing.Target.Definition.SpecialConstraints.OrderBy(pair => pair.Key).SequenceEqual(functions.Select(index => new KeyValuePair<int, TypeParameterConstraints>(index, TypeParameterConstraints.FunctionType))) || !existing.Target.Definition.TypeConstraints.SequenceEqual(bounds) || existing.Target.Visibility != visibility || existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.Target.IsAbstract != (isAbstract || interfaceContract) || (existing.Target.IsVirtual != (isVirtual || interfaceContract)) || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
@@ -125,8 +129,8 @@ public sealed partial class AssemblyBuilder
         var owner = MaterializeOwner(declaringType);
         if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
         if (IsNativeGrapheme(declaringType)) owner.SetNativeGrapheme();
-        var reference = new ImportedMethodReference(this, isVirtual
-            ? new MethodBuilder(graph.Graph, new MethodDefinition(name, (ushort)(6 | 0x40 | (isOverride ? 0 : 0x100) | (isAbstract ? 0x400 : 0)), signature), owner)
+        var reference = new ImportedMethodReference(this, isVirtual || interfaceContract
+            ? new MethodBuilder(graph.Graph, new MethodDefinition(name, (ushort)(6 | 0x40 | (isStatic ? 0x10 : 0) | (isOverride ? 0 : 0x100) | (isAbstract || interfaceContract ? 0x400 : 0)), signature), owner)
             : new MethodBuilder(graph.Graph, owner, name, signature, visibility: visibility, isStatic: isStatic))
         { DeclaringReference = declaringType, RequiresVirtualDispatch = (isObjectSlot || isInterface || isVirtual || isOverride && !declaringType.IsValueType) && !isStatic };
         reference.Target.ConstraintOwner = this;

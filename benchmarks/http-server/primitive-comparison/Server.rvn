@@ -12,8 +12,8 @@ class Application {
         self.identity = identity
     }
 
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("xxxxxxxxxx")))
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+        return Ok(HttpServerResponse(200, ArrayList<HttpHeader>(), HttpStringContent("xxxxxxxxxx")))
     }
 }
 

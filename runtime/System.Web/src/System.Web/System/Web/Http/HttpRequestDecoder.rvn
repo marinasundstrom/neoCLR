@@ -61,12 +61,12 @@ internal class HttpRequestDecoder {
     internal val Consumed: int => consumed
     internal val BodyLength: int => if chunked { -3 } else { expected }
     internal func EnableStreaming() { headersOnly = true }
-    internal func FinishHeaders() -> Result<HttpRequest, HttpError> {
+    internal func FinishHeaders() -> Result<HttpServerRequest, HttpError> {
         if let Some(parsed) = request { return Ok(parsed) }
         return Failure(HttpError.Protocol("Incomplete headers"))
     }
     private val head: HttpRequestHeaderBuffer
-    private var request: Optional<HttpRequest> = None()
+    private var request: Optional<HttpServerRequest> = None()
     private var complete: bool = false
     private var failed = false
     private var chunked = false
@@ -142,7 +142,7 @@ internal class HttpRequestDecoder {
         return Ok(complete)
     }
 
-    internal func Finish() -> Result<HttpRequest, HttpError> {
+    internal func Finish() -> Result<HttpServerRequest, HttpError> {
         if !Complete {
             return Failure(HttpError.Protocol("Incomplete request"))
         }
@@ -332,7 +332,7 @@ internal class HttpRequestDecoder {
         return Text(start, end, 1)
     }
 
-    private func Parse() -> Result<HttpRequest, HttpError> {
+    private func Parse() -> Result<HttpServerRequest, HttpError> {
         var start = 0
         var end = 0
         var line = 0
@@ -384,7 +384,7 @@ internal class HttpRequestDecoder {
                     chunks = HttpChunkDecoder(body, method == "GET" || method == "DELETE" || method == "HEAD", settings.BodyBytes)
                 }
                 expected = length
-                return HttpRequest.FromIncoming(HttpMethod.FromValidatedToken(method), target, host, headers, body, secure)
+                return HttpServerRequest.FromIncoming(HttpMethod.FromValidatedToken(method), target, host, headers, body, secure)
             } else {
                 if headers.Count >= settings.HeaderCount {
                     return Failure(HttpError.LimitExceeded("Request header count exceeded"))

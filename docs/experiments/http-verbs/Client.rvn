@@ -20,7 +20,7 @@ class InspectHandler : HttpHandler {
     var PatchCalls: int = 0
     var DeleteCalls: int = 0
     var HeadCalls: int = 0
-    override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, token: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Check(request.Target == "/base/item")
         Check(request.Method.Method == "PUT" || request.Method.Method == "PATCH" || request.Method.Method == "DELETE" || request.Method.Method == "HEAD")
         Check(request.Content.Length == (if request.Method.Method == "DELETE" || request.Method.Method == "HEAD" { 0 } else { 5 }))
@@ -37,13 +37,13 @@ class InspectHandler : HttpHandler {
         if token.CanBeCancelled {
             CancellableCalls += 1
         }
-        let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.NotFound, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
+        let source = Promise<Result<HttpClientResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpClientResponse(HttpStatusCode.NotFound, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
         return source.Task
     }
 }
 
-func CheckReply(pending: Task<Result<HttpResponse, HttpError>>) {
+func CheckReply(pending: Task<Result<HttpClientResponse, HttpError>>) {
     let Ok(response) = pending.GetResult() else {
         Panic("Verb hid response status")
         return
@@ -94,20 +94,20 @@ func Contracts() -> Result<unit, HttpError> {
     Check(client.Head(uri, token).IsCancelled)
     Check(handler.Calls == 16)
     let absolute = Uri.Parse("http://example.test/item").MapError((reason: UriError) => HttpError.InvalidUri(reason))?
-    let prepared1 = HttpRequest.Put("http://example.test/item", content)?
+    let prepared1 = HttpClientRequest.Put("http://example.test/item", content)?
     Check(prepared1.Method.Method == "PUT")
-    let prepared2 = HttpRequest.Put(absolute, content)?
+    let prepared2 = HttpClientRequest.Put(absolute, content)?
     Check(prepared2.Method.Method == "PUT")
-    let prepared3 = HttpRequest.Patch("http://example.test/item", content)?
+    let prepared3 = HttpClientRequest.Patch("http://example.test/item", content)?
     Check(prepared3.Method.Method == "PATCH")
-    let prepared4 = HttpRequest.Patch(absolute, content)?
+    let prepared4 = HttpClientRequest.Patch(absolute, content)?
     Check(prepared4.Method.Method == "PATCH")
-    let prepared5 = HttpRequest.Delete("http://example.test/item")?
+    let prepared5 = HttpClientRequest.Delete("http://example.test/item")?
     Check(prepared5.Method.Method == "DELETE")
-    let prepared6 = HttpRequest.Delete(absolute)?
+    let prepared6 = HttpClientRequest.Delete(absolute)?
     Check(prepared6.Method.Method == "DELETE")
-    let head1 = HttpRequest.Head("http://example.test/item")?
-    let head2 = HttpRequest.Head(absolute)?
+    let head1 = HttpClientRequest.Head("http://example.test/item")?
+    let head2 = HttpClientRequest.Head(absolute)?
     Check(head1.Method.Method == "HEAD" && head2.Method.Method == "HEAD")
     Console.WriteLine("Verb contracts passed")
     return Ok(())

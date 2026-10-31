@@ -26,11 +26,11 @@ class ReplyHandler : HttpHandler {
         self.content = content
     }
 
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Calls += 1
         SawToken = cancellationToken.CanBeCancelled
-        let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(status, ArrayList<HttpHeader>(), content)))
+        let source = Promise<Result<HttpClientResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpClientResponse(status, ArrayList<HttpHeader>(), content)))
         return source.Task
     }
 }
@@ -44,11 +44,11 @@ class PendingHandler : HttpHandler {
         Cancel()
     }
 
-    val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
+    val Completion: Promise<Result<HttpClientResponse, HttpError>> = Promise<Result<HttpClientResponse, HttpError>>()
     var Cleaned: bool = false
     private var registration: CancellationRegistration? = null
 
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         registration = cancellationToken.Register(self.Cancel)
         return Completion.Task
     }
@@ -78,7 +78,7 @@ func CheckContracts() {
     }
     Check(client.Get(uri, stopped.Token).IsCancelled)
     Check(client.GetString(uri, stopped.Token).IsCancelled)
-    let Ok(request) = HttpRequest.Get("http://example.test/direct") else {
+    let Ok(request) = HttpClientRequest.Get("http://example.test/direct") else {
         Panic("Fixture request failed")
         return
     }

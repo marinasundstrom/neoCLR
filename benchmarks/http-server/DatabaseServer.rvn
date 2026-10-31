@@ -12,7 +12,7 @@ class DatabaseHandler {
         self.connection = connection
     }
 
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         if request.Method.Method != "GET" || request.Target != "/greeting" {
             Panic("Unexpected benchmark request")
         }

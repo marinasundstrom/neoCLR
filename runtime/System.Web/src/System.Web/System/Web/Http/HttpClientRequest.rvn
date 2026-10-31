@@ -1,0 +1,507 @@
+module System.Web.Http
+
+import System.Runtime.CompilerServices.*
+import System.Optional.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.*
+import System.Networking.*
+import System.Networking.Security.*
+import System.Networking.Sockets.*
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+import System.IO.*
+import System.Time.*
+
+/// Outgoing client request with validated mutable headers and lazy URI/header views.
+public class HttpClientRequest : Disposable {
+    /// The request protocol version, available after headers. Current transport supports HTTP/1.1 only.
+    val Version: HttpVersion => HttpVersion.Http11
+    /// Releases owned content without reading or draining it. Safe to repeat.
+    /// Header-derived copies share content; disposal affects every alias.
+    func Dispose() { storedContent.Dispose() }
+    internal var HeadersOnly: bool = false
+    private var storedContent: HttpContent = HttpMemoryContent(default(ReadOnlyMemory<byte>))
+    /// Request body content. Incoming nonempty bodies are consumed asynchronously on demand.
+    val Content: HttpContent => storedContent
+    private var storedHeaders: Sequence<HttpHeader>
+    /// Mutable outgoing fields. Transport/content controlled fields retain their message-specific policy.
+    /// The view stays attached to this message when its entries are replaced.
+    val Headers: MutableHttpHeaderCollection {
+        get {
+            if storedHeaders is HttpMutableHeaderCollection cached {
+                return cached
+            }
+            let collection = HttpMutableHeaderCollection(storedHeaders, true)
+            storedHeaders = collection
+            return collection
+        }
+    }
+
+    /// Gets all matching field values in order using ASCII case-insensitive names.
+    /// Returns an empty snapshot for absent or invalid names; does not split or join values.
+    func GetHeaderValues(name: string) -> Sequence<string> {
+        return HttpHeader.FindValues(storedHeaders, name)
+    }
+
+    /// <summary>Parses the message's Content-Type without consuming its body.</summary>
+    /// <returns>Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.</returns>
+    /// <remarks>Does not infer a type or perform negotiation; raw headers remain available.</remarks>
+    func GetContentType() -> Result<Optional<MediaType>, HttpError> {
+        var text: string? = null
+        var index = 0
+        while index < storedHeaders.Count {
+            if ReadOnlyHttpHeaderCollection.Matches(ReadOnlyHttpHeaderCollection.NameAt(storedHeaders, index), "content-type") {
+                if text is string {
+                    return Failure(HttpError.Protocol("Duplicate Content-Type"))
+                }
+                text = ReadOnlyHttpHeaderCollection.ValueAt(storedHeaders, index)
+            }
+            index += 1
+        }
+        if text is null {
+            return Ok(None())
+        }
+        let raw = text ?? ""
+        if parsedHeaderText is string previous && String.CompareOrdinal(previous, raw) == 0 {
+            if parsedHeaderType is MediaType cached {
+                return Ok(Some(cached))
+            }
+        }
+        // Outgoing typed content already owns a validated value. Preserve it.
+        if let Some(contentText) = storedContent.MediaTypeText {
+            if String.CompareOrdinal(contentText, raw) == 0 {
+                if let Ok(Some(value)) = storedContent.GetContentType() {
+                    parsedHeaderText = raw
+                    parsedHeaderType = value
+                    return Ok(Some(value))
+                }
+            }
+        }
+        let Ok(value) = MediaType.Parse(raw) else {
+            return Failure(HttpError.Protocol("Malformed Content-Type"))
+        }
+        parsedHeaderText = raw
+        parsedHeaderType = value
+        return Ok(Some(value))
+    }
+
+    private var parsedHeaderText: string?
+    private var parsedHeaderType: MediaType?
+    private var storedMethod: HttpMethod
+    /// The validated method value. Its Method property preserves the wire spelling.
+    val Method: HttpMethod => storedMethod
+    private var storedHost: string
+    val Host: string => storedHost
+    private var secure = false
+    /// Whether the request uses authenticated HTTPS transport.
+    val IsSecure: bool => secure
+    private var storedPort: int
+    val Port: int => storedPort
+    private var storedTarget: string
+    val Target: string => storedTarget
+
+    private init(host: string, port: int, target: string) {
+        storedHeaders = ArrayList<HttpHeader>()
+        storedMethod = HttpMethod.Get
+        storedHost = host
+        storedPort = port
+        storedTarget = target
+    }
+
+    /// Constructs a request using a predefined or custom method, without performing I/O.
+    static func Create(method: HttpMethod, url: string) -> Result<HttpClientRequest, HttpError> {
+        return Create(method, url, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    }
+
+    /// Constructs a request with explicit method and content; transport bounds apply when sent.
+    static func Create(method: HttpMethod, url: string, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        if method is null {
+            return Failure(HttpError.InvalidRequest("HTTP method cannot be null"))
+        }
+        let request = Post(url, content)?
+        request.storedMethod = method
+        return Ok(request)
+    }
+
+    /// Constructs a URI-based request using a predefined or custom method.
+    static func Create(method: HttpMethod, uri: Uri) -> Result<HttpClientRequest, HttpError> {
+        return Create(method, uri, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    }
+
+    /// Constructs a URI-based request with explicit method and content.
+    static func Create(method: HttpMethod, uri: Uri, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        if method is null {
+            return Failure(HttpError.InvalidRequest("HTTP method cannot be null"))
+        }
+        let request = Post(uri, content)?
+        request.storedMethod = method
+        return Ok(request)
+    }
+
+    /// Constructs a POST request without performing I/O.
+    static func Post(url: string, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        let request = Get(url)?
+        request.storedMethod = HttpMethod.Post
+        request.storedContent = content
+        let headers = ArrayList<HttpHeader>()
+        if let Some(contentType) = content.MediaTypeText {
+            headers.Add(HttpHeader("Content-Type", contentType))
+        }
+        request.storedHeaders = headers
+        return Ok(request)
+    }
+
+    /// Constructs a POST request from an absolute HTTP URI.
+    static func Post(uri: Uri, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        let request = Get(uri)?
+        request.storedMethod = HttpMethod.Post
+        request.storedContent = content
+        let headers = ArrayList<HttpHeader>()
+        if let Some(contentType) = content.MediaTypeText {
+            headers.Add(HttpHeader("Content-Type", contentType))
+        }
+        request.storedHeaders = headers
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP PUT request with buffered content.
+    static func Put(url: string, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        let request = Post(url, content)?
+        request.storedMethod = HttpMethod.Put
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP PUT request with buffered content.
+    static func Put(uri: Uri, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        let request = Post(uri, content)?
+        request.storedMethod = HttpMethod.Put
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP PATCH request with buffered content.
+    static func Patch(url: string, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        let request = Post(url, content)?
+        request.storedMethod = HttpMethod.Patch
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP PATCH request with buffered content.
+    static func Patch(uri: Uri, content: HttpContent) -> Result<HttpClientRequest, HttpError> {
+        let request = Post(uri, content)?
+        request.storedMethod = HttpMethod.Patch
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP DELETE request without content.
+    static func Delete(url: string) -> Result<HttpClientRequest, HttpError> {
+        let request = Get(url)?
+        request.storedMethod = HttpMethod.Delete
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP DELETE request without content.
+    static func Delete(uri: Uri) -> Result<HttpClientRequest, HttpError> {
+        let request = Get(uri)?
+        request.storedMethod = HttpMethod.Delete
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP HEAD request without content.
+    static func Head(url: string) -> Result<HttpClientRequest, HttpError> {
+        let request = Get(url)?
+        request.storedMethod = HttpMethod.Head
+        return Ok(request)
+    }
+
+    /// Constructs an absolute HTTP HEAD request without content.
+    static func Head(uri: Uri) -> Result<HttpClientRequest, HttpError> {
+        let request = Get(uri)?
+        request.storedMethod = HttpMethod.Head
+        return Ok(request)
+    }
+
+    /// Returns a new request with one application header replaced case-insensitively.
+    /// The original request is unchanged; content is shared and framing stays provider-owned.
+    func WithHeader(name: string, value: string) -> Result<HttpClientRequest, HttpError> {
+        if storedContent.IsDisposed { return Failure(HttpError.InvalidRequest("Request is disposed")) }
+        let key = HeaderName(name)?
+        if ReservedHeader(key) || key == "content-type" {
+            return Failure(HttpError.InvalidRequest("Header is controlled by transport or content"))
+        }
+        if !HeaderValueValid(value) {
+            return Failure(HttpError.InvalidRequest("Invalid request header value"))
+        }
+        let headers = ArrayList<HttpHeader>()
+        for header in storedHeaders {
+            if HeaderName(header.Name)? != key {
+                headers.Add(header)
+            }
+        }
+        headers.Add(HttpHeader(name, value))
+        if headers.Count > HttpWireLimits.HeaderCount - 3 {
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        let request = HttpClientRequest(storedHost, storedPort, storedTarget)
+        request.secure = secure
+        request.storedMethod = storedMethod
+        request.storedContent = storedContent
+        request.storedHeaders = headers
+        return Ok(request)
+    }
+
+    internal func WithDefaults(defaults: Sequence<HttpHeader>) -> Result<HttpClientRequest, HttpError> {
+        if storedContent.IsDisposed { return Failure(HttpError.InvalidRequest("Request is disposed")) }
+        if defaults.Count == 0 {
+            return Ok(self)
+        }
+        if defaults.Count > HttpWireLimits.HeaderCount - 3 {
+            return Failure(HttpError.LimitExceeded("Default request header count exceeded"))
+        }
+        let headers = ArrayList<HttpHeader>()
+        for header in defaults {
+            let key = HeaderName(header.Name)?
+            if ReservedHeader(key) || key == "content-type" {
+                return Failure(HttpError.InvalidRequest("Default header is controlled by transport or content"))
+            }
+            if !HeaderValueValid(header.Value) {
+                return Failure(HttpError.InvalidRequest("Invalid default request header value"))
+            }
+            if HttpHeader.FindValues(storedHeaders, header.Name).Count == 0 {
+                headers.Add(header)
+            }
+        }
+        if headers.Count == 0 {
+            return Ok(self)
+        }
+        for header in storedHeaders {
+            headers.Add(header)
+        }
+        if headers.Count > HttpWireLimits.HeaderCount - 3 {
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        let request = HttpClientRequest(storedHost, storedPort, storedTarget)
+        request.secure = secure
+        request.storedMethod = storedMethod
+        request.storedContent = storedContent
+        request.storedHeaders = headers
+        request.HeadersOnly = HeadersOnly
+        return Ok(request)
+    }
+
+    internal static func HeaderName(name: string) -> Result<string, HttpError> {
+        let bytes = HttpText.Encode(name)
+        if bytes.Count == 0 || bytes.Count > HttpWireLimits.HeaderBytes {
+            return Failure(HttpError.InvalidRequest("Invalid request header name"))
+        }
+        let lower = ArrayList<byte>()
+        for value in bytes {
+            if !((value >= 48 && value <= 57) || (value >= 65 && value <= 90) ||
+                (value >= 97 && value <= 122) || value == 33 || value == 35 || value == 36 ||
+                value == 37 || value == 38 || value == 39 || value == 42 || value == 43 ||
+                value == 45 || value == 46 || value == 94 || value == 95 || value == 96 ||
+                value == 124 || value == 126) {
+                return Failure(HttpError.InvalidRequest("Invalid request header name"))
+            }
+            lower.Add(if value >= 65 && value <= 90 { (byte)((int)value + 32) } else { value })
+        }
+        if let Ok(text) = HttpText.Decode(lower) {
+            return Ok(text)
+        }
+        return Failure(HttpError.InvalidRequest("Invalid request header name"))
+    }
+
+    internal static func HeaderValueValid(value: string) -> bool {
+        let bytes = HttpText.Encode(value)
+        if bytes.Count > HttpWireLimits.HeaderBytes {
+            return false
+        }
+        for item in bytes {
+            if !(item >= 32 && item <= 126) {
+                return false
+            }
+        }
+        return true
+    }
+
+    internal static func ReservedHeader(name: string) -> bool {
+        return name == "host" || name == "content-length" || name == "transfer-encoding" ||
+            name == "connection" || name == "keep-alive" || name == "proxy-connection" ||
+            name == "te" || name == "trailer" || name == "upgrade" || name == "expect" ||
+            name == "content-encoding"
+    }
+
+    internal func Encode() -> Result<Sequence<byte>, HttpError> {
+        if (String.CompareOrdinalIgnoreCase(storedMethod.Method, "CONNECT") == 0) {
+            return Failure(HttpError.Unsupported("CONNECT tunnelling is not supported"))
+        }
+        let count = storedContent.Length
+        if count < 0 {
+            return Failure(HttpError.Unsupported("Unknown-length uploads are not implemented"))
+        }
+        if storedContent.IsBuffered && count > HttpWireLimits.BodyBytes {
+            return Failure(HttpError.LimitExceeded("Request body limit exceeded"))
+        }
+        let method = storedMethod.Method
+        let noBody = String.CompareOrdinalIgnoreCase(method, "GET") == 0 ||
+            String.CompareOrdinalIgnoreCase(method, "DELETE") == 0 ||
+            String.CompareOrdinalIgnoreCase(method, "HEAD") == 0
+        if noBody && count != 0 {
+            return Failure(HttpError.InvalidRequest("This request method cannot contain content"))
+        }
+        let port = storedPort
+        var wire = String.Concat(String.Concat(storedMethod.Method, " "), storedTarget)
+        wire = String.Concat(wire, String.Concat(" HTTP/1.1\r\nHost: ", storedHost))
+        wire = String.Concat(wire, String.Concat(":", port.ToString()))
+        wire = String.Concat(wire, "\r\nConnection: close\r\n")
+        if !noBody {
+            wire = String.Concat(wire, String.Concat("Content-Length: ", count.ToString()))
+            wire = String.Concat(wire, "\r\n")
+        }
+        if storedHeaders.Count > HttpWireLimits.HeaderCount - 3 {
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        var hasContentType = false
+        for header in storedHeaders {
+            let key = HeaderName(header.Name)?
+            if key == "content-type" {
+                if hasContentType {
+                    return Failure(HttpError.InvalidRequest("Duplicate request Content-Type"))
+                }
+                hasContentType = true
+                _ = MediaTypeSyntax.Validate(header.Value)?
+            }
+            if ReservedHeader(key) {
+                return Failure(HttpError.InvalidRequest("Header is controlled by transport"))
+            }
+            if !HeaderValueValid(header.Value) || (key == "content-type" && header.Value.IsEmpty) {
+                return Failure(HttpError.InvalidRequest("Invalid request header value"))
+            }
+            wire = String.Concat(wire, String.Concat(header.Name, ": "))
+            wire = String.Concat(wire, String.Concat(header.Value, "\r\n"))
+        }
+        let encoded = HttpText.Encode(String.Concat(wire, "\r\n"))
+        if encoded.Count > HttpWireLimits.HeaderBytes {
+            return Failure(HttpError.LimitExceeded("Request header limit exceeded"))
+        }
+        let outgoing = ArrayList<byte>()
+        var cursor = 0
+        while cursor < encoded.Count {
+            outgoing.Add(encoded[cursor])
+            cursor += 1
+        }
+        if storedContent is HttpMemoryContent memoryContent {
+            let body: ReadOnlySlice<byte> = memoryContent.Memory
+            cursor = 0
+            while cursor < count {
+                outgoing.Add(body[cursor])
+                cursor += 1
+            }
+        } else if let Some(body) = storedContent.TryGetBytes() {
+            cursor = 0
+            while cursor < count {
+                outgoing.Add(body[cursor])
+                cursor += 1
+            }
+        }
+        let outgoingBytes: Sequence<byte> = outgoing
+        return Ok(outgoingBytes)
+    }
+
+    private static func Text(bytes: Sequence<byte>, first: int, last: int) -> Result<string, HttpError> {
+        let part = ArrayList<byte>()
+        var index = first
+        while index < last {
+            part.Add(bytes[index])
+            index += 1
+        }
+        if let Ok(text) = HttpText.Decode(part) {
+            return Ok(text)
+        }
+        return Failure(HttpError.InvalidRequest("Invalid URL text"))
+    }
+
+    /// Parses an absolute HTTP URL and constructs a GET request without performing I/O.
+    static func Get(url: string) -> Result<HttpClientRequest, HttpError> {
+        let parsed = Uri.Parse(url)
+        if let Ok(uri) = parsed {
+            return Get(uri)
+        } else if let Failure(reason) = parsed {
+            return Failure(HttpError.InvalidUri(reason))
+        }
+        Panic("URI parser returned no outcome")
+        return Failure(HttpError.InvalidRequest("Invalid URI"))
+    }
+
+    /// Constructs a GET request from an absolute URI; unsupported HTTP forms remain errors.
+    static func Get(uri: Uri) -> Result<HttpClientRequest, HttpError> {
+        if !uri.IsAbsolute {
+            return Failure(HttpError.InvalidRequest("An absolute request URI is required"))
+        }
+        let url = uri.Text
+        let secure = url.StartsWithOrdinal("https://")
+        if !secure && !url.StartsWithOrdinal("http://") {
+            return Failure(HttpError.Unsupported("Only http:// and https:// URLs are supported"))
+        }
+        let authorityStart = if secure { 8 } else { 7 }
+        let bytes = HttpText.Encode(url)
+        if bytes.Count > 1024 {
+            return Failure(HttpError.LimitExceeded("URL limit exceeded"))
+        }
+        var end = authorityStart
+        while end < bytes.Count && bytes[end] != 47 && bytes[end] != 63 && bytes[end] != 35 {
+            end += 1
+        }
+        var colon = authorityStart
+        while colon < end && bytes[colon] != 58 {
+            let value = bytes[colon]
+            if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
+                (value >= 48 && value <= 57) || value == 45 || value == 46) {
+                return Failure(HttpError.Unsupported("Unsupported hostname"))
+            }
+            colon += 1
+        }
+        if colon == authorityStart || colon - authorityStart > 253 {
+            return Failure(HttpError.InvalidRequest("Invalid hostname length"))
+        }
+        let host = Text(bytes, authorityStart, colon)?
+        var port = if secure { 443 } else { 80 }
+        if colon < end {
+            port = 0
+            var index = colon + 1
+            if index == end {
+                return Failure(HttpError.InvalidRequest("Empty port"))
+            }
+            while index < end {
+                let digit = (int)bytes[index] - 48
+                if !(digit >= 0 && digit <= 9) || port > (65535 - digit) / 10 {
+                    return Failure(HttpError.InvalidRequest("Invalid port"))
+                }
+                port = port * 10 + digit
+                index += 1
+            }
+            if port == 0 {
+                return Failure(HttpError.InvalidRequest("Invalid port"))
+            }
+        }
+        var target = "/"
+        if end < bytes.Count {
+            var index = end
+            while index < bytes.Count {
+                let value = bytes[index]
+                if !(value >= 33 && value <= 126) || value == 35 {
+                    return Failure(HttpError.Unsupported("Unsupported request target"))
+                }
+                index += 1
+            }
+            target = Text(bytes, end, bytes.Count)?
+            if bytes[end] == 63 {
+                target = String.Concat("/", target)
+            }
+        }
+        let request = HttpClientRequest(host, port, target)
+        request.secure = secure
+        return Ok(request)
+    }
+}

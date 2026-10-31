@@ -59,7 +59,7 @@ func PrepareReport() -> Result<HttpContent, AppError> {
     return Ok(content)
 }
 
-async func ReadReply(response: HttpResponse) -> Task<Result<string, AppError>> {
+async func ReadReply(response: HttpClientResponse) -> Task<Result<string, AppError>> {
     if response.StatusCode != HttpStatusCode.Created {
         return Failure(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }

@@ -10,7 +10,7 @@ static class HttpJsonBindings
     public static readonly string[] Names = [Extensions, Operations, Reader];
     public static bool IsProvider(string name) => name is Operations or Reader;
     const string Client = "System.Web.Http.HttpClient";
-    const string Response = "System.Web.Http.HttpResponse";
+    const string Response = "System.Web.Http.HttpClientResponse";
     const string Token = "System.Concurrency.CancellationToken";
     static string Result(string value) => $"System.Result<{value},{Error}>";
     static string Task(string value) => $"System.Concurrency.Tasks.Task<{Result(value)}>";

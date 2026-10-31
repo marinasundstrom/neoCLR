@@ -146,19 +146,19 @@ func CheckNamedStatus() {
     let extension = (HttpStatusCode)599
     Check((int)extension == 599)
     Check(extension.ToString() == "599")
-    let response = HttpResponse(named, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
-    let result: Result<HttpResponse, HttpError> = Ok(response)
-    if let Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: headers }) = result {
+    let response = HttpClientResponse(named, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let result: Result<HttpClientResponse, HttpError> = Ok(response)
+    if let Ok(HttpClientResponse { StatusCode: HttpStatusCode.NotFound, Headers: headers }) = result {
         Check(headers.Count == 0)
     } else {
         Panic("Response property pattern failed")
     }
-    let Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: boundHeaders }) = result else {
+    let Ok(HttpClientResponse { StatusCode: HttpStatusCode.NotFound, Headers: boundHeaders }) = result else {
         Panic("Response property binding failed")
         return
     }
     Check(boundHeaders.Count == 0)
-    if result is Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: let headers }) {
+    if result is Ok(HttpClientResponse { StatusCode: HttpStatusCode.NotFound, Headers: let headers }) {
         Check(headers.Count == 0)
     } else {
         Panic("Response is-pattern capture failed")

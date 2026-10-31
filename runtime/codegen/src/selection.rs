@@ -127,10 +127,13 @@ pub(super) fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<us
 }
 
 pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
-    f.owner
-        .as_ref()
-        .and_then(|t| input.type_definition(t))
-        .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
+    // Concrete static helpers belong to the interface but are direct-call bodies,
+    // not implementation obligations or virtual-dispatch contracts.
+    (f.is_abstract || f.body.is_empty())
+        && f.owner
+            .as_ref()
+            .and_then(|t| input.type_definition(t))
+            .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
 }
 
 /// Sealing is descriptive metadata today: also check the complete loaded type set.

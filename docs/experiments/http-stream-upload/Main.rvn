@@ -79,7 +79,7 @@ class GeneratedInput : InputStream {
 
 class ForwardUpload : DelegatingHandler {
     init(inner: HttpHandler) : base(inner) { }
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Check(!request.Content.IsBuffered)
         return base.Send(request, cancellationToken)
     }
@@ -91,7 +91,7 @@ class UploadCase {
     private var input: GeneratedInput
     private var content: HttpContent
     private var client: HttpClient = HttpClient(ForwardUpload(HttpSocketHandler()))
-    private var pending: Task<Result<HttpResponse, HttpError>>
+    private var pending: Task<Result<HttpClientResponse, HttpError>>
     private val completion = Promise<unit>()
     private var url: string
 

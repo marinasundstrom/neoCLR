@@ -20,13 +20,13 @@ class CaptureHandler : HttpHandler {
     var Target: string = ""
     var Port: int = 0
 
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Calls += 1
         Host = request.Host
         Port = request.Port
         Target = request.Target
-        let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(Target))))
+        let source = Promise<Result<HttpClientResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpClientResponse(200, ArrayList<HttpHeader>(), HttpStringContent(Target))))
         return source.Task
     }
 }
@@ -109,7 +109,7 @@ func Main() {
         Panic("Query-only absolute URL failed")
     }
     if let Ok(uri) = Uri.Parse("http://example.test/direct") {
-        if let Ok(request) = HttpRequest.Get(uri) {
+        if let Ok(request) = HttpClientRequest.Get(uri) {
             // Send consumes an already constructed request; BaseUri applies to helpers only.
             client.BaseUri = Some("not an HTTP base")
             _ = client.Send(request).GetResult()

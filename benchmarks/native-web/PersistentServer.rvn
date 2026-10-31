@@ -5,15 +5,15 @@ import System.Concurrency.Tasks.*
 import System.Text.*
 import System.Web.Http.*
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let source = Promise<Result<HttpResponse, HttpError>>()
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+    let source = Promise<Result<HttpServerResponse, HttpError>>()
     if request.Method.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
         _ = source.Complete(Error(HttpError.Handler("Unexpected request")))
         return source.Task
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
-    _ = source.Complete(Ok(HttpResponse(200, headers, Utf8.Encode("Café 🌍"))))
+    _ = source.Complete(Ok(HttpServerResponse(200, headers, Utf8.Encode("Café 🌍"))))
     return source.Task
 }
 

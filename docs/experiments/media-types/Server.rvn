@@ -12,14 +12,14 @@ func OpenServer() -> HttpServer {
     return server
 }
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     let Ok(Some(media)) = request.GetContentType() else { Panic("Request type") }
     let Some(boundary) = media.GetParameter("boundary") else { Panic("Boundary") }
     if boundary != "AbC; 123" {
         Panic("Boundary case or quoting lost")
     }
-    let response = HttpResponse(HttpStatusCode.OK, Array<HttpHeader>.Empty, HttpStringContent("{}", MediaTypes.Application.ProblemJson))
-    let outcome: Result<HttpResponse, HttpError> = Ok(response)
+    let response = HttpServerResponse(HttpStatusCode.OK, Array<HttpHeader>.Empty, HttpStringContent("{}", MediaTypes.Application.ProblemJson))
+    let outcome: Result<HttpServerResponse, HttpError> = Ok(response)
     return Task.FromResult(outcome)
 }
 

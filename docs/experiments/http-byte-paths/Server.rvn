@@ -4,7 +4,7 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     let headers = ArrayList<HttpHeader>()
     var status = 200
     var body = HttpStringContent("Café 🌍")
@@ -30,7 +30,7 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         headers.Add(HttpHeader("X-Test", "good\r\nInjected: bad"))
     }
     headers.Add(HttpHeader("X-Test", "ok"))
-    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(status, headers, body)))
+    return Task.FromResult<Result<HttpServerResponse, HttpError>>(System.Result<HttpServerResponse, HttpError>.Ok(HttpServerResponse(status, headers, body)))
 }
 
 async func Main() -> Task<()> {

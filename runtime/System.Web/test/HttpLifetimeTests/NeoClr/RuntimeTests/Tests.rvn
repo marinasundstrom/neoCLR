@@ -13,13 +13,13 @@ class LifetimeHandler : HttpHandler {
     var DisposeCount: int = 0
     var Calls: int = 0
     var Token: CancellationToken = CancellationToken.None
-    val Completion = Promise<Result<HttpResponse, HttpError>>()
+    val Completion = Promise<Result<HttpClientResponse, HttpError>>()
 
     override func Dispose() {
         DisposeCount += 1
     }
 
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Calls += 1
         Token = cancellationToken
         return Completion.Task
@@ -48,7 +48,7 @@ func `HTTP borrowed handler survives one client and serves another`() -> Result<
     first.Dispose()
     _ = Assert.Equal(0, handler.DisposeCount)?
     use second = HttpClient(handler, false)
-    _ = handler.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
+    _ = handler.Completion.Complete(Ok(HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     let result = second.Get("http://example.test/")
     _ = Assert.True(result.IsCompleted && !result.IsCancelled, "Borrowed handler remains usable")?
     return Assert.Equal(1, handler.Calls)
@@ -85,7 +85,7 @@ func `HTTP caller cancellation propagates without disposing the handler`() -> Re
 [Test]
 func `HTTP completed responses survive disposal and retain request association`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
-    let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = handler.Completion.Complete(Ok(response))
     let client = HttpClient(handler)
     let result = client.Get("http://example.test/answer")
@@ -132,12 +132,12 @@ class RecordingMiddleware : DelegatingHandler {
     }
 
     // This test adapter exposes TaskQueue completion boundaries synchronously.
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         events.Add(String.Concat(name, " before"))
         return base.Send(request, cancellationToken).Map(self.After)
     }
 
-    private func After(response: Result<HttpResponse, HttpError>) -> Result<HttpResponse, HttpError> {
+    private func After(response: Result<HttpClientResponse, HttpError>) -> Result<HttpClientResponse, HttpError> {
         events.Add(String.Concat(name, " after"))
         return response
     }
@@ -154,7 +154,7 @@ func `HTTP delegating handlers run outward and unwind inward`() -> Result<unit, 
     let client = HttpClient(outer)
     let response = client.Get("http://example.test/")
     _ = Assert.Equal(2, events.Count)?
-    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
+    _ = terminal.Completion.Complete(Ok(HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     TaskQueue.Default.Drain()
     _ = Assert.True(response.IsCompleted && !response.IsCancelled, "Pipeline completes")?
     _ = Assert.Equal("outer before", events[0])?
@@ -176,7 +176,7 @@ func `HTTP borrowed delegating pipeline remains reusable`() -> Result<unit, Test
     first.Dispose()
     _ = Assert.Equal(0, terminal.DisposeCount)?
     let second = HttpClient(outer)
-    _ = terminal.Completion.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
+    _ = terminal.Completion.Complete(Ok(HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     let response = second.Get("http://example.test/")
     TaskQueue.Default.Drain()
     _ = Assert.True(response.IsCompleted && !response.IsCancelled, "Borrowed pipeline remains usable")?
@@ -186,10 +186,10 @@ func `HTTP borrowed delegating pipeline remains reusable`() -> Result<unit, Test
 
 class SharedHandler : HttpHandler {
     val Tokens = ArrayList<CancellationToken>()
-    val Completions = ArrayList<Promise<Result<HttpResponse, HttpError>>>()
+    val Completions = ArrayList<Promise<Result<HttpClientResponse, HttpError>>>()
 
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        let completion = Promise<Result<HttpResponse, HttpError>>()
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
+        let completion = Promise<Result<HttpClientResponse, HttpError>>()
         Tokens.Add(cancellationToken)
         Completions.Add(completion)
         return completion.Task
@@ -217,7 +217,7 @@ func `HTTP borrowed clients cancel only their own pending sends`() -> Result<uni
 func `HTTP disposed requests are rejected before invoking a custom handler`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     use client = HttpClient(handler)
-    let Ok(request) = HttpRequest.Get("http://example.test/") else { return Assert.True(false, "Create request") }
+    let Ok(request) = HttpClientRequest.Get("http://example.test/") else { return Assert.True(false, "Create request") }
     request.Dispose()
     let operation = client.Send(request)
     _ = Assert.True(operation.IsCompleted, "Disposed request fails immediately")?

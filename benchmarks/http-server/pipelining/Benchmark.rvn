@@ -24,7 +24,7 @@ func Main() -> Task<unit> {
 
 // Reuse the standard three-field typed JSON workload from ../Model.rvn.
 class BenchmarkApplication {
-    func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         if request.Method.Method != "GET" {
             Panic("Benchmark method")
         }
@@ -38,8 +38,8 @@ class BenchmarkApplication {
         if request.Target != "/plain" {
             Panic("Benchmark route")
         }
-        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(
-            HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!"))))
+        return Task.FromResult<Result<HttpServerResponse, HttpError>>(Result<HttpServerResponse, HttpError>.Ok(
+            HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!"))))
     }
 }
 

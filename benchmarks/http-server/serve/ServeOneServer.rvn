@@ -38,7 +38,7 @@ class ServingLoop {
         self.state = state
     }
 
-    private async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    private async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         // Exercise a genuinely queued await without imposing an artificial timer.
         let resumed = await Task.Run(() => 1)
         if resumed != 1 {
@@ -47,7 +47,7 @@ class ServingLoop {
         stopping = request.Target == "/stop"
         let size = if stopping { 0 } else if request.Target == "/bulk" { 8192 } else { 10 }
         let body: byte[] = [for index in 0..size => (byte)120]
-        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(body)))
+        return Ok(HttpServerResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(body)))
     }
 
     async func Run() -> Task<()> {

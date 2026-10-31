@@ -17,7 +17,7 @@ internal class JsonClientOperations {
         return Ok((T)value)
     }
 
-    private static func Adapt(result: Result<HttpResponse, HttpError>) -> Result<HttpResponse, HttpError | JsonError> {
+    private static func Adapt(result: Result<HttpClientResponse, HttpError>) -> Result<HttpClientResponse, HttpError | JsonError> {
         let response = result?
         return Ok(response)
     }
@@ -26,9 +26,9 @@ internal class JsonClientOperations {
         return client.Get(url, token).Map(JsonClientRead(type).Decode)
     }
 
-    static func Post(client: HttpClient, url: string, value: Object, token: CancellationToken) -> Task<Result<HttpResponse, HttpError | JsonError>> {
+    static func Post(client: HttpClient, url: string, value: Object, token: CancellationToken) -> Task<Result<HttpClientResponse, HttpError | JsonError>> {
         if token.IsCancellationRequested {
-            let cancelled = Promise<Result<HttpResponse, HttpError | JsonError>>()
+            let cancelled = Promise<Result<HttpClientResponse, HttpError | JsonError>>()
             _ = cancelled.Cancel()
             return cancelled.Task
         }
@@ -36,7 +36,7 @@ internal class JsonClientOperations {
         if let Ok(content) = created {
             return client.Post(url, content, token).Map(Adapt)
         } else if let Failure(error) = created {
-            let failed = Promise<Result<HttpResponse, HttpError | JsonError>>()
+            let failed = Promise<Result<HttpClientResponse, HttpError | JsonError>>()
             _ = failed.Complete(Failure(error))
             return failed.Task
         }
@@ -47,9 +47,9 @@ internal class JsonClientOperations {
         return client.Get(url, token).Map(JsonClientRead(type).Decode)
     }
 
-    static func Post(client: HttpClient, url: Uri, value: Object, token: CancellationToken) -> Task<Result<HttpResponse, HttpError | JsonError>> {
+    static func Post(client: HttpClient, url: Uri, value: Object, token: CancellationToken) -> Task<Result<HttpClientResponse, HttpError | JsonError>> {
         if token.IsCancellationRequested {
-            let cancelled = Promise<Result<HttpResponse, HttpError | JsonError>>()
+            let cancelled = Promise<Result<HttpClientResponse, HttpError | JsonError>>()
             _ = cancelled.Cancel()
             return cancelled.Task
         }
@@ -57,7 +57,7 @@ internal class JsonClientOperations {
         if let Ok(content) = created {
             return client.Post(url, content, token).Map(Adapt)
         } else if let Failure(error) = created {
-            let failed = Promise<Result<HttpResponse, HttpError | JsonError>>()
+            let failed = Promise<Result<HttpClientResponse, HttpError | JsonError>>()
             _ = failed.Complete(Failure(error))
             return failed.Task
         }
@@ -72,7 +72,7 @@ internal class JsonClientRead {
         self.type = type
     }
 
-    func Decode(result: Result<HttpResponse, HttpError>) -> Result<Object, HttpError | JsonError> {
+    func Decode(result: Result<HttpClientResponse, HttpError>) -> Result<Object, HttpError | JsonError> {
         let response = result?
         if !response.IsSuccessStatusCode {
             return Failure(HttpError.UnsuccessfulStatus(response.StatusCode))

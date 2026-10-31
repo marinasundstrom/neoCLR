@@ -11,8 +11,8 @@ func Check(condition: bool) {
     if !condition { Panic("HTTP timeout check failed") }
 }
 
-func Response() -> HttpResponse {
-    return HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+func Response() -> HttpClientResponse {
+    return HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
 }
 
 async func Pause() -> Task<()> {
@@ -25,7 +25,7 @@ async func Pause() -> Task<()> {
 
 // Cancellation-outcome observation is intentional: awaiting a cancelled task
 // would cancel the test instead of letting it assert the outcome.
-func Observe(task: Task<Result<HttpResponse, HttpError>>) -> Task<()> {
+func Observe(task: Task<Result<HttpClientResponse, HttpError>>) -> Task<()> {
     let done = Promise<()>()
     task.OnCompleted(() => { done.Complete(()) })
     return done.Task
@@ -33,7 +33,7 @@ func Observe(task: Task<Result<HttpResponse, HttpError>>) -> Task<()> {
 
 class Pending : Disposable {
     val Observed: Promise<()> = Promise<()>()
-    val Result: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
+    val Result: Promise<Result<HttpClientResponse, HttpError>> = Promise<Result<HttpClientResponse, HttpError>>()
     val Token: CancellationToken
     private val registration: CancellationRegistration
 
@@ -49,7 +49,7 @@ class Pending : Disposable {
 class ControlledHandler : HttpHandler {
     val Requests: ArrayList<Pending> = ArrayList<Pending>()
 
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         let pending = Pending(cancellationToken)
         Requests.Add(pending)
         return pending.Result.Task
@@ -61,8 +61,8 @@ class ControlledHandler : HttpHandler {
 }
 
 class ImmediateHandler : HttpHandler {
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(Response()))
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
+        return Task.FromResult<Result<HttpClientResponse, HttpError>>(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
     }
 }
 
@@ -112,7 +112,7 @@ async func DisabledAndCompleted() -> Task<()> {
     let pending = handler.Requests[0]
     await Pause()
     Check(!task.IsCompleted && !pending.Token.IsCancellationRequested)
-    pending.Result.Complete(System.Result<HttpResponse, HttpError>.Ok(Response()))
+    pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
     let result = await task
     let Ok(response) = result else { Panic("Expected response") }
     Check((int)response.StatusCode == 200)
@@ -126,7 +126,7 @@ async func CompletionWins() -> Task<()> {
     client.Timeout = Some(Duration.FromTicks(1L))
     let task = client.Get("http://example.test/")
     let pending = handler.Requests[0]
-    pending.Result.Complete(System.Result<HttpResponse, HttpError>.Ok(Response()))
+    pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
     await ExpectSuccess(task)
     await Pause()
     Check(!pending.Token.IsCancellationRequested)
@@ -134,12 +134,12 @@ async func CompletionWins() -> Task<()> {
     Console.WriteLine("PASS completed response removes pending timeout")
 }
 
-async func ExpectSuccess(task: Task<Result<HttpResponse, HttpError>>) -> Task<()> {
+async func ExpectSuccess(task: Task<Result<HttpClientResponse, HttpError>>) -> Task<()> {
     let result = await task
     let Ok(response) = result else { Panic("Expected response") }
 }
 
-async func ExpectTimeout(task: Task<Result<HttpResponse, HttpError>>) -> Task<()> {
+async func ExpectTimeout(task: Task<Result<HttpClientResponse, HttpError>>) -> Task<()> {
     let result = await task
     let Failure(HttpError.TimedOut) = result else { Panic("Expected timeout") }
 }
@@ -150,7 +150,7 @@ async func IndependentRequests() -> Task<()> {
     client.Timeout = Some(Duration.FromTicks(10000L))
     let first = client.Get("http://example.test/first")
     let second = client.Get("http://example.test/second")
-    handler.Requests[0].Result.Complete(System.Result<HttpResponse, HttpError>.Ok(Response()))
+    handler.Requests[0].Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
     await ExpectSuccess(first)
     await handler.Requests[1].Observed.Task
     Check(!handler.Requests[0].Token.IsCancellationRequested)
@@ -160,8 +160,8 @@ async func IndependentRequests() -> Task<()> {
     Console.WriteLine("PASS concurrent requests own independent countdowns")
 }
 
-func PreparedRequest() -> HttpRequest {
-    let Ok(request) = HttpRequest.Get("http://example.test/") else { Panic("Invalid fixture URL") }
+func PreparedRequest() -> HttpClientRequest {
+    let Ok(request) = HttpClientRequest.Get("http://example.test/") else { Panic("Invalid fixture URL") }
     return request
 }
 
@@ -185,7 +185,7 @@ async func NormalResultAfterTimeout() -> Task<()> {
     let task = client.Get("http://example.test/")
     let pending = handler.Requests[0]
     await pending.Observed.Task
-    pending.Result.Complete(System.Result<HttpResponse, HttpError>.Ok(Response()))
+    pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
     await ExpectSuccess(task)
     client.Dispose()
     Console.WriteLine("PASS normally completing handler retains its result after cancellation request")
@@ -196,7 +196,7 @@ async func LongRequest() -> Task<()> {
     let client = HttpClient(handler)
     let task = client.Get("http://example.test/")
     let pending = handler.Requests[0]
-    let timer = Timer(() => { pending.Result.Complete(System.Result<HttpResponse, HttpError>.Ok(Response())) })
+    let timer = Timer(() => { pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response())) })
     timer.Start(Duration.FromTicks(160000000L))
     let result = await task
     let Ok(response) = result else { Panic("Long request failed") }

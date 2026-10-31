@@ -5,12 +5,12 @@ import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 // A buffered echo handler: the same content contract is used in each direction.
-func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+func Echo(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     let status = if request.Method.Method == "DELETE" { HttpStatusCode.NoContent } else { HttpStatusCode.OK }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-Method", request.Method.Method))
-    let source = Promise<Result<HttpResponse, HttpError>>()
-    _ = source.Complete(Ok(HttpResponse(status, headers, if request.Method.Method == "HEAD" { HttpStringContent("Café") } else { request.Content })))
+    let source = Promise<Result<HttpServerResponse, HttpError>>()
+    _ = source.Complete(Ok(HttpServerResponse(status, headers, if request.Method.Method == "HEAD" { HttpStringContent("Café") } else { request.Content })))
     return source.Task
 }
 

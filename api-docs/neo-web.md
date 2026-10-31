@@ -145,8 +145,8 @@ Service-dependent streaming responses are not yet qualified.
 
 | Member | Contract |
 | --- | --- |
-| `Response: System.Web.Http.HttpResponse` | The response being configured; borrowed for the pipeline lifetime. |
-| `Request: System.Web.Http.HttpRequest` | Incoming request/body, borrowed for this handler's lifetime. |
+| `Response: System.Web.Http.HttpServerResponse` | The response being configured; borrowed for the pipeline lifetime. |
+| `Request: System.Web.Http.HttpServerRequest` | Incoming request/body, borrowed for this handler's lifetime. |
 | `Services: ServiceProvider` | Per-request scope. The application owns disposal; handlers must not dispose it. |
 | `RouteValues: System.Web.Http.RouteMatch` | Decoded captures; use Get/GetInt32 for explicit binding. |
 | `RequestAborted: CancellationToken` | Transport-owned cancellation, observed peer closure/error, explicit context closure or server shutdown. Normal completion does not cancel it; unread socket bytes delay EOF detection. |
@@ -206,7 +206,7 @@ No runtime code generation is required.
 Parameters bind in this order:
 
 1. `FromRoute`, `FromQuery`, `FromBody` or `FromServices` explicitly selects the source.
-2. `CancellationToken` receives `context.RequestAborted`. `Neo.Web.HttpContext`, `System.Web.Http.HttpRequest` and `HttpResponse` receive
+2. `CancellationToken` receives `context.RequestAborted`. `Neo.Web.HttpContext`, `System.Web.Http.HttpServerRequest` and `HttpServerResponse` receive
    the active request's framework values.
 3. Required `string`, `int` and `bool` parameters use matching route captures,
    otherwise query values. Missing values and invalid conversions return 400.

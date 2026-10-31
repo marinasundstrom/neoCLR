@@ -13,7 +13,7 @@ async func Main(arguments: string[]) -> Task<()> {
     let client = HttpClient()
     if arguments[0] == "invalid" {
         let content = HttpMemoryContent(default(ReadOnlyMemory<byte>), arguments[1])
-        let Ok(request) = HttpRequest.Post("http://invalid.invalid/", content) else { Panic("Construct legacy") }
+        let Ok(request) = HttpClientRequest.Post("http://invalid.invalid/", content) else { Panic("Construct legacy") }
         let invalidResult = await client.Send(request)
         client.Dispose()
         let Failure(HttpError.InvalidRequest(_)) = invalidResult else { Panic("Invalid media type must fail before DNS") }
@@ -21,7 +21,7 @@ async func Main(arguments: string[]) -> Task<()> {
         return
     }
     let Ok(media) = MediaTypes.Application.Json.WithParameter("profile", "A; B") else { Panic("Parameter") }
-    let Ok(request) = HttpRequest.Post(arguments[0], HttpStringContent("{}", media)) else { Panic("Request") }
+    let Ok(request) = HttpClientRequest.Post(arguments[0], HttpStringContent("{}", media)) else { Panic("Request") }
     let result = await client.Send(request)
     client.Dispose()
     let Ok(response) = result else { Panic("Send") }

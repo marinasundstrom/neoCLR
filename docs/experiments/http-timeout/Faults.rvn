@@ -8,8 +8,8 @@ import System.Time.*
 import System.Web.Http.*
 
 class ImmediateHandler : HttpHandler {
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
+        return Task.FromResult<Result<HttpClientResponse, HttpError>>(System.Result<HttpClientResponse, HttpError>.Ok(HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))))
     }
 }
 

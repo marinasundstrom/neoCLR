@@ -6,8 +6,8 @@ import System.Networking.Sockets.*
 import System.Web.Http.*
 
 class Application {
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!")))
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+        return Ok(HttpServerResponse(200, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!")))
     }
 }
 

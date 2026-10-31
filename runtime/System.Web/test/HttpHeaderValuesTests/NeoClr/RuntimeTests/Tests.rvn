@@ -15,7 +15,7 @@ func `HTTP header lookup preserves repeated values without splitting commas`() -
     headers.Add(HttpHeader("set-cookie", "b=2"))
     headers.Add(HttpHeader("X-List", "one, two"))
     headers.Add(HttpHeader("x-list", "three"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let cookies = response.GetHeaderValues("sEt-CoOkIe")
     _ = Assert.Equal(2, cookies.Count)?
     _ = Assert.Equal(headers[0].Value, cookies[0])?
@@ -30,7 +30,7 @@ func `HTTP header lookup preserves repeated values without splitting commas`() -
 func `HTTP header lookup distinguishes empty values from absent fields`() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-Empty", ""))
-    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let values = response.GetHeaderValues("x-empty")
     _ = Assert.Equal(1, values.Count)?
     _ = Assert.Equal("", values[0])?
@@ -42,7 +42,7 @@ func `HTTP header lookup rejects invalid names`() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-List", "one"))
     headers.Add(HttpHeader("X-İ", "invalid name"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     for name in ["", " X-List", "X-List:", "X-İ", "X-List\r\n"] {
         _ = Assert.Equal(0, response.GetHeaderValues(name).Count)?
     }
@@ -54,7 +54,7 @@ func `HTTP header lookup snapshots remain independent of later additions`() -> R
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Set-Cookie", "a=1"))
     headers.Add(HttpHeader("set-cookie", "b=2"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let snapshot = response.GetHeaderValues("set-cookie")
     headers.Add(HttpHeader("SET-COOKIE", "c=3"))
     _ = Assert.Equal(2, snapshot.Count)?
@@ -63,13 +63,13 @@ func `HTTP header lookup snapshots remain independent of later additions`() -> R
 
 [Test]
 func `HTTP request lookup exposes content headers without inventing provider headers`() -> Result<unit, TestFailure> {
-    let Ok(post) = HttpRequest.Post("http://example.test/echo", HttpStringContent("Hello")) else {
+    let Ok(post) = HttpClientRequest.Post("http://example.test/echo", HttpStringContent("Hello")) else {
         return Assert.True(false, "Construct POST request")
     }
     let types = post.GetHeaderValues("content-type")
     _ = Assert.Equal(1, types.Count)?
     _ = Assert.Equal("text/plain; charset=utf-8", types[0])?
-    let Ok(get) = HttpRequest.Get("http://example.test/") else {
+    let Ok(get) = HttpClientRequest.Get("http://example.test/") else {
         return Assert.True(false, "Construct GET request")
     }
     return Assert.Equal(0, get.GetHeaderValues("Host").Count)
@@ -84,7 +84,7 @@ func `HTTP response constructors retain memory content and replace only content 
     headers.Add(HttpHeader("content-TYPE", "old"))
     headers.Add(HttpHeader("X-Preserved", "yes"))
     headers.Add(HttpHeader("Content-Type", "duplicate"))
-    let response = HttpResponse(HttpStatusCode.OK, headers, content)
+    let response = HttpClientResponse(HttpStatusCode.OK, headers, content)
     _ = Assert.True(Object.ReferenceEquals(content, response.Content), "Content identity retained")?
     _ = Assert.Equal(3, headers.Count)?
     _ = Assert.Equal("old", headers[0].Value)?
@@ -97,7 +97,7 @@ func `HTTP response constructors retain memory content and replace only content 
     let selected: ReadOnlySlice<byte> = retained.Memory
     _ = Assert.Equal(2, selected.Length)?
     _ = Assert.Equal((byte)90, selected[0])?
-    let numeric = HttpResponse(201, headers, content)
+    let numeric = HttpClientResponse(201, headers, content)
     return Assert.True(Object.ReferenceEquals(content, numeric.Content), "Numeric constructor retains producer")
 }
 
@@ -129,7 +129,7 @@ func `HTTP byte producers allocate runtime sized arrays with ordered single endp
     _ = Assert.Equal(0, InclusiveBytes(5, 2).Length)?
     _ = Assert.Equal(1, InclusiveBytes(2147483647, 2147483647).Length)?
     let body = HttpMemoryContent(bytes)
-    let response = HttpResponse(200, ArrayList<HttpHeader>(), body)
+    let response = HttpClientResponse(200, ArrayList<HttpHeader>(), body)
     return Assert.Equal(3, response.Content.Length)
 }
 
@@ -153,7 +153,7 @@ func `HTTP response construction never reads or changes stream ownership`() -> R
     let Ok(content) = HttpStreamContent.Create(input, 7, false) else {
         return Assert.True(false, "Stream content constructed")
     }
-    let response = HttpResponse(200, ArrayList<HttpHeader>(), content)
+    let response = HttpClientResponse(200, ArrayList<HttpHeader>(), content)
     _ = Assert.True(Object.ReferenceEquals(content, response.Content), "Stream identity retained")?
     _ = Assert.Equal(7, response.Content.Length)?
     _ = Assert.Equal(0, input.Reads)?
@@ -167,7 +167,7 @@ func `HTTP response construction never reads or changes stream ownership`() -> R
 func `HTTP messages expose HTTP 1.1 and dispose owned content without reading`() -> Result<unit, TestFailure> {
     let input = ResponseInput()
     let Ok(content) = HttpStreamContent.Create(input, 3, false) else { return Assert.True(false, "Create stream content") }
-    let Ok(request) = HttpRequest.Post("http://example.test/", content) else { return Assert.True(false, "Create request") }
+    let Ok(request) = HttpClientRequest.Post("http://example.test/", content) else { return Assert.True(false, "Create request") }
     _ = Assert.Equal(1, request.Version.Major)?
     _ = Assert.Equal(1, request.Version.Minor)?
     _ = Assert.True(request.Version.Equals(HttpVersion.Http11), "Version value equality")?
@@ -182,7 +182,7 @@ func `HTTP messages expose HTTP 1.1 and dispose owned content without reading`()
     _ = Assert.True(request.WithHeader("X-Test", "other") is Failure(_), "Disposed request rejects derivation")?
     let borrowed = ResponseInput()
     let Ok(body) = HttpStreamContent.Create(borrowed, 3, true) else { return Assert.True(false, "Create borrowed stream") }
-    let response = HttpResponse(200, ArrayList<HttpHeader>(), body)
+    let response = HttpClientResponse(200, ArrayList<HttpHeader>(), body)
     _ = Assert.True(response.Version.Equals(request.Version), "Response protocol version")?
     let responseResource: Disposable = response
     responseResource.Dispose()
@@ -196,7 +196,7 @@ func `Header collections expose named snapshots and ordered fields`() -> Result<
     let source = ArrayList<HttpHeader>()
     source.Add(HttpHeader("Set-Cookie", "a=1; Expires=Wed, 21 Oct 2030 07:28:00 GMT"))
     source.Add(HttpHeader("set-cookie", "b=2"))
-    let headers = HttpHeaderCollection(source)
+    let headers = HttpHeaderCollection.Snapshot(source)
     source.Add(HttpHeader("SET-COOKIE", "c=3"))
     _ = Assert.Equal(2, headers.Count)?
     let values = headers[HttpHeaderNames.SetCookie]
@@ -215,7 +215,7 @@ func `Header collections expose named snapshots and ordered fields`() -> Result<
 
 [Test]
 func `Single header access distinguishes absence empty duplicate and invalid names`() -> Result<unit, TestFailure> {
-    let headers = HttpHeaderCollection([
+    let headers = HttpHeaderCollection.Snapshot([
         HttpHeader("X-Empty", ""),
         HttpHeader("Content-Type", "text/plain; charset=utf-8"),
         HttpHeader("Set-Cookie", "a=1"),
@@ -235,26 +235,26 @@ func `Single header access distinguishes absence empty duplicate and invalid nam
     }
     _ = Assert.Equal("text", mediaType.Type)?
     _ = Assert.Equal("plain", mediaType.SubType)?
-    _ = Assert.True(HttpHeaderCollection().GetContentType() is Ok(None), "Absent type")?
-    let malformed = HttpHeaderCollection([HttpHeader("Content-Type", "bad")])
+    _ = Assert.True(HttpHeaderCollection.Empty.GetContentType() is Ok(None), "Absent type")?
+    let malformed = HttpHeaderCollection.Snapshot([HttpHeader("Content-Type", "bad")])
     _ = Assert.True(malformed.GetContentType() is Failure(_), "Malformed type")?
-    let duplicate = HttpHeaderCollection([HttpHeader("Content-Type", "text/plain"), HttpHeader("content-type", "text/plain")])
+    let duplicate = HttpHeaderCollection.Snapshot([HttpHeader("Content-Type", "text/plain"), HttpHeader("content-type", "text/plain")])
     return Assert.True(duplicate.GetContentType() is Failure(_), "Duplicate type")
 }
 
 [Test]
-func `Message header views retain source behavior and follow replacement on next access`() -> Result<unit, TestFailure> {
+func `Outgoing header views remain attached across message mutations`() -> Result<unit, TestFailure> {
     let source = ArrayList<HttpHeader>()
     source.Add(HttpHeader("X-Test", "one"))
-    let response = HttpResponse(200, source, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpServerResponse(200, source, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let view = response.Headers
     _ = Assert.True(Object.ReferenceEquals(view, response.Headers), "View cached")?
     source.Add(HttpHeader("x-test", "two"))
     _ = Assert.Equal(2, view["X-Test"].Count)?
     _ = Assert.True(response.SetHeader("x-test", "replacement") is Ok(_), "Replace field")?
-    _ = Assert.Equal(2, view["x-test"].Count)?
+    _ = Assert.Equal(1, view["x-test"].Count)?
     _ = Assert.Equal("replacement", response.Headers["X-Test"][0])?
-    let Ok(request) = HttpRequest.Post("http://example.test/", HttpStringContent("hello")) else {
+    let Ok(request) = HttpClientRequest.Post("http://example.test/", HttpStringContent("hello")) else {
         return Assert.True(false, "Construct request")
     }
     _ = Assert.Equal("text/plain; charset=utf-8", request.Headers[HttpHeaderNames.ContentType][0])?
@@ -272,8 +272,73 @@ func `Empty header collections are reusable read only message inputs`() -> Resul
     _ = Assert.Equal(0, empty.Count)?
     _ = Assert.True(!empty.Contains(HttpHeaderNames.ContentType), "No fields")?
     _ = Assert.True(empty.GetSingle(HttpHeaderNames.ContentType) is Ok(None), "No single value")?
-    let response = HttpResponse(200, empty, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpServerResponse(200, empty, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = Assert.True(response.SetHeader("X-Test", "one") is Ok(_), "Message derives storage")?
     _ = Assert.Equal("one", response.Headers["X-Test"][0])?
     return Assert.Equal(0, HttpHeaderCollection.Empty.Count)
+}
+
+[Test]
+func `Mutable outgoing headers preserve repeated values and validate atomically`() -> Result<unit, TestFailure> {
+    let response = HttpServerResponse()
+    let headers = response.Headers
+    _ = Assert.True(headers.Append(HttpHeaderNames.SetCookie, "a=1") is Ok(_), "Append first")?
+    _ = Assert.True(headers.Append("SET-COOKIE", "b=2") is Ok(_), "Append second")?
+    let snapshot = headers[HttpHeaderNames.SetCookie]
+    _ = Assert.True(headers.Set("set-cookie", "c=3") is Ok(_), "Replace all")?
+    _ = Assert.Equal(2, snapshot.Count)?
+    _ = Assert.Equal(1, headers[HttpHeaderNames.SetCookie].Count)?
+    _ = Assert.True(headers.Set("bad name", "bad") is Failure(_), "Invalid name")?
+    _ = Assert.True(headers.Append("X-Test", "bad\r\nInjected: true") is Failure(_), "Invalid value")?
+    _ = Assert.Equal(1, headers.Count)?
+    _ = Assert.True(headers.Remove("missing") is Ok(false), "Absent removal")?
+    _ = Assert.True(headers.Remove("Set-Cookie") is Ok(true), "Remove all")?
+    response.Respond(HttpStatusCode.Created, HttpStringContent("hello"))
+    _ = Assert.True(Object.ReferenceEquals(headers, response.Headers), "View retained through Respond")?
+    _ = Assert.Equal("text/plain; charset=utf-8", headers[HttpHeaderNames.ContentType][0])?
+    _ = Assert.Equal(201, (int)response.StatusCode)?
+    _ = Assert.True(headers.Append("X-Keep", "value") is Ok(_), "Retain unrelated fields")?
+    response.Respond(HttpStatusCode.OK)
+    _ = Assert.True(!headers.Contains(HttpHeaderNames.ContentType), "Respond clears old content type without replacement")?
+    _ = Assert.Equal("value", headers["X-Keep"][0])?
+    let explicit = HttpServerResponse(HttpStatusCode.OK,
+        HttpHeaderCollection.Snapshot([HttpHeader("Content-Type", "application/custom")]),
+        HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    return Assert.Equal("application/custom", explicit.Headers[HttpHeaderNames.ContentType][0])
+}
+
+[Test]
+func `Client request headers enforce transport ownership and derived request independence`() -> Result<unit, TestFailure> {
+    let Ok(request) = HttpClientRequest.Get("http://example.test/") else {
+        return Assert.True(false, "Create client request")
+    }
+    let headers = request.Headers
+    _ = Assert.True(headers.Set("X-Test", "one") is Ok(_), "Set application field")?
+    _ = Assert.True(headers.Append("x-test", "two") is Ok(_), "Append application field")?
+    for name in ["Host", "Content-Length", "Transfer-Encoding", "Content-Type", "Connection"] {
+        _ = Assert.True(headers.Set(name, "forbidden") is Failure(_), "Controlled set")?
+        _ = Assert.True(headers.Append(name, "forbidden") is Failure(_), "Controlled append")?
+        _ = Assert.True(headers.Remove(name) is Failure(_), "Controlled remove")?
+    }
+    _ = Assert.True(headers.Set("X-Test", "bad\r\n") is Failure(_), "Invalid value is atomic")?
+    _ = Assert.Equal(2, headers["x-test"].Count)?
+    let Ok(copy) = request.WithHeader("X-Test", "copy") else {
+        return Assert.True(false, "Derive client request")
+    }
+    _ = Assert.True(headers.Set("X-Test", "original") is Ok(_), "Mutate original")?
+    _ = Assert.Equal("copy", copy.Headers["X-Test"][0])?
+    return Assert.Equal("original", request.Headers["x-test"][0])
+}
+
+[Test]
+func `Incoming response views and Empty never expose outgoing mutation`() -> Result<unit, TestFailure> {
+    let mutable = MutableHttpHeaderCollection.Create()
+    _ = Assert.True(mutable.Append("X-Test", "one") is Ok(_), "Create supplied fields")?
+    let response = HttpClientResponse(200, mutable, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    _ = Assert.True(response.Headers is not MutableHttpHeaderCollection, "Read-only incoming facade")?
+    _ = Assert.True(HttpHeaderCollection.Empty is not MutableHttpHeaderCollection, "Immutable Empty")?
+    let snapshot = HttpHeaderCollection.Snapshot(mutable)
+    _ = Assert.True(mutable.Set("X-Test", "two") is Ok(_), "Source mutation")?
+    _ = Assert.Equal("one", snapshot["x-test"][0])?
+    return Assert.Equal("two", response.Headers["x-test"][0])
 }

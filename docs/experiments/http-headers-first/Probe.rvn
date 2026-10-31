@@ -8,7 +8,7 @@ import System.Networking.Sockets.*
 import System.Web.Http.*
 import System.Web.Http.Json.*
 
-async func Configure(request: HttpRequest, response: HttpResponse) -> Task<Result<unit, HttpError>> {
+async func Configure(request: HttpServerRequest, response: HttpServerResponse) -> Task<Result<unit, HttpError>> {
     if request.Version.Major != 1 || request.Version.Minor != 1 {
         Panic("Incoming HTTP version unavailable")
     }
@@ -33,8 +33,8 @@ async func Handle(context: HttpContext) -> Task<Result<unit, HttpError>> {
     return await Configure(context.Request, context.Response)
 }
 
-async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+    let response = HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = await Configure(request, response)?
     return Ok(response)
 }

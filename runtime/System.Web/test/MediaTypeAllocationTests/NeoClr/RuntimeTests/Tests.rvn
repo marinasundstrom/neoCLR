@@ -20,7 +20,7 @@ func `Warm media type access performs no managed allocations`() -> Result<unit, 
     let profileName = "PROFILE"
     let expectedType = "application"
     let expectedSubType = "problem+json"
-    let Ok(request) = HttpRequest.Post("http://example.test/", content) else { return Assert.True(false, "Request") }
+    let Ok(request) = HttpClientRequest.Post("http://example.test/", content) else { return Assert.True(false, "Request") }
     _ = request.GetContentType()
     let wireText = custom.ToString()
     let before = System.Runtime.GC.AllocatedObjectCount

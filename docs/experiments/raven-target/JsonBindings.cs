@@ -127,10 +127,10 @@ public static class HttpClientJsonExtensions {
     public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpClient self, string url, Concurrency.CancellationToken cancellationToken) => default;
     public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpClient self, Uri url) => default;
     public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpClient self, Uri url, Concurrency.CancellationToken cancellationToken) => default;
-    public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, string url, T value) => default;
-    public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, string url, T value, Concurrency.CancellationToken cancellationToken) => default;
-    public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, Uri url, T value) => default;
-    public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, Uri url, T value, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<HttpClientResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, string url, T value) => default;
+    public static Concurrency.Tasks.Task<Result<HttpClientResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, string url, T value, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<HttpClientResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, Uri url, T value) => default;
+    public static Concurrency.Tasks.Task<Result<HttpClientResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, Uri url, T value, Concurrency.CancellationToken cancellationToken) => default;
 }
 // Reference surface only; execution uses native System.Web metadata.
 public static class HttpContentJsonExtensions {
@@ -149,13 +149,13 @@ internal sealed class JsonClientOperations {
     public JsonClientOperations() { }
     public static Result<T, Union<HttpError, Data.Json.JsonError>> Convert<T>(Result<object, Union<HttpError, Data.Json.JsonError>> result) => default;
     public static Concurrency.Tasks.Task<Result<object, Union<HttpError, Data.Json.JsonError>>> Get(HttpClient client, string url, [Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type, Concurrency.CancellationToken token) => default;
-    public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> Post(HttpClient client, string url, object value, Concurrency.CancellationToken token) => default;
+    public static Concurrency.Tasks.Task<Result<HttpClientResponse, Union<HttpError, Data.Json.JsonError>>> Post(HttpClient client, string url, object value, Concurrency.CancellationToken token) => default;
     public static Concurrency.Tasks.Task<Result<object, Union<HttpError, Data.Json.JsonError>>> Get(HttpClient client, Uri url, [Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type, Concurrency.CancellationToken token) => default;
-    public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> Post(HttpClient client, Uri url, object value, Concurrency.CancellationToken token) => default;
+    public static Concurrency.Tasks.Task<Result<HttpClientResponse, Union<HttpError, Data.Json.JsonError>>> Post(HttpClient client, Uri url, object value, Concurrency.CancellationToken token) => default;
 }
 internal sealed class JsonClientRead {
     public JsonClientRead([Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type) { }
-    public Result<object, Union<HttpError, Data.Json.JsonError>> Decode(Result<HttpResponse, HttpError> result) => default;
+    public Result<object, Union<HttpError, Data.Json.JsonError>> Decode(Result<HttpClientResponse, HttpError> result) => default;
 }
 }
 """;

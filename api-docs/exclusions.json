@@ -37,5 +37,10 @@
   "T:System.Union`3": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
   "T:System.Union`4": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
   "T:System.Union`5": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
-  "M:System.Runtime.CompilerServices.RuntimeHelpers.GetSubArray``1(``0[],System.Range)": "Legacy CLI compiler scaffold only. Native array ranges now use GetSlice and return Slice<T>; see /docs/memory-views.html."
+  "M:System.Runtime.CompilerServices.RuntimeHelpers.GetSubArray``1(``0[],System.Range)": "Legacy CLI compiler scaffold only. Native array ranges now use GetSlice and return Slice<T>; see /docs/memory-views.html.",
+  "M:System.Web.Http.HttpClientRequest.GetContentType": "Legacy facade only: MediaType is native-reference-only. The complete native API includes this member; see /docs/http-headers.html for its checked media-type contract.",
+  "M:System.Web.Http.HttpClientResponse.GetContentType": "Legacy facade only: MediaType is native-reference-only. The complete native API includes this member; see /docs/http-headers.html for its checked media-type contract.",
+  "M:System.Web.Http.HttpServerRequest.GetContentType": "Legacy facade only: MediaType is native-reference-only. The complete native API includes this member; see /docs/http-headers.html for its checked media-type contract.",
+  "M:System.Web.Http.HttpServerResponse.GetContentType": "Legacy facade only: MediaType is native-reference-only. The complete native API includes this member; see /docs/http-headers.html for its checked media-type contract.",
+  "M:System.Web.Http.HttpHeaderCollection.GetContentType": "Legacy facade only: MediaType is native-reference-only. The complete native API includes this member; see /docs/http-headers.html for its checked media-type contract."
 }

@@ -102,8 +102,8 @@ internal class HandlerPlan {
                     return Failure(WebError.InvalidOptions("Unsupported service type: " + parameter.Name))
                 }
             } else if type.Equals(typeof(HttpContext)) { binding = 1 }
-            else if type.Equals(typeof(HttpRequest)) { binding = 5 }
-            else if type.Equals(typeof(HttpResponse)) { binding = 6 }
+            else if type.Equals(typeof(HttpServerRequest)) { binding = 5 }
+            else if type.Equals(typeof(HttpServerResponse)) { binding = 6 }
             else if type.Equals(typeof(CancellationToken)) { binding = 7 }
             else if scalar { binding = if route { 2 } else { 3 } }
             else if services.IsService(type) { binding = 0 }

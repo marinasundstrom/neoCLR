@@ -12,7 +12,7 @@ class Application {
         self.identity = identity
     }
 
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         let person = Person()
         person.id = 42
         person.name = "Café team"

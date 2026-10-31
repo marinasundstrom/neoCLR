@@ -1,0 +1,174 @@
+module System.Web.Http
+
+import System.Runtime.CompilerServices.*
+import System.Optional.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.*
+import System.Networking.*
+import System.Networking.Security.*
+import System.Networking.Sockets.*
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+import System.IO.*
+import System.Time.*
+
+/// Received client response with read-only headers and lazy response metadata.
+public class HttpClientResponse : Disposable {
+    /// The response protocol version. Current transport accepts and emits HTTP/1.1 only.
+    val Version: HttpVersion => HttpVersion.Http11
+    private var reasonPhrase: string? = null
+    private var reasonSource: ArrayList<byte>? = null
+    private var reasonEnd: int = 0
+
+    /// The exact HTTP/1.1 reason text, including an empty phrase. Success depends only on StatusCode.
+    /// Custom incoming text is decoded on first access and cached; no body read is performed.
+    val ReasonPhrase: string {
+        get {
+            if reasonPhrase is string cached { return cached }
+            if reasonSource is ArrayList<byte> source {
+                let bytes: ReadOnlySlice<byte> = source[13..reasonEnd]
+                if let Ok(text) = HttpText.Decode(bytes) {
+                    reasonPhrase = text
+                    reasonSource = null
+                    return text
+                }
+                Panic("Validated HTTP reason text could not be decoded")
+            }
+            return if storedStatusCode == 200 { "OK" } else { "" }
+        }
+    }
+
+    internal func SetReason(source: ArrayList<byte>, end: int) {
+        reasonEnd = end
+        if end == 13 {
+            reasonPhrase = ""
+        } else if end == 15 && source[13] == 79 && source[14] == 75 {
+            reasonPhrase = "OK"
+        } else {
+            reasonSource = source
+        }
+    }
+
+    /// Closes owned response content, including an unread streaming connection.
+    func Dispose() { storedContent.Dispose() }
+
+    internal func SetContent(content: HttpContent) { storedContent = content }
+    private var originatingRequest: Optional<HttpClientRequest> = None()
+    /// The effective client request passed to the handler, including applied defaults.
+    val Request: Optional<HttpClientRequest> {
+        get {
+            if let Some(request) = originatingRequest {
+                return Some(request)
+            }
+            return None()
+        }
+    }
+
+    internal func Associate(request: HttpClientRequest) {
+        originatingRequest = Some(request)
+    }
+
+    private var storedStatusCode: int
+    val StatusCode: HttpStatusCode => (HttpStatusCode)storedStatusCode
+    /// Whether the response status is in the successful 200–299 range.
+    val IsSuccessStatusCode: bool => storedStatusCode >= 200 && storedStatusCode <= 299
+    private var storedHeaders: Sequence<HttpHeader>
+    /// Read-only header view with case-insensitive named lookup. Created lazily and retained.
+    /// Existing retained input sequences remain visible; named lookup returns independent snapshots.
+    val Headers: HttpHeaderCollection {
+        get {
+            if storedHeaders is HttpHeaderCollection cached && storedHeaders is not MutableHttpHeaderCollection {
+                return cached
+            }
+            let collection = ReadOnlyHttpHeaderCollection.Retain(storedHeaders)
+            storedHeaders = collection
+            return collection
+        }
+    }
+
+    /// Gets all matching field values in order using ASCII case-insensitive names.
+    /// Returns an empty snapshot for absent or invalid names; does not split or join values.
+    func GetHeaderValues(name: string) -> Sequence<string> {
+        return HttpHeader.FindValues(storedHeaders, name)
+    }
+
+    /// <summary>Parses the message's Content-Type without consuming its body.</summary>
+    /// <returns>Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.</returns>
+    /// <remarks>Does not infer a type or perform negotiation; raw headers remain available.</remarks>
+    func GetContentType() -> Result<Optional<MediaType>, HttpError> {
+        var text: string? = null
+        var index = 0
+        while index < storedHeaders.Count {
+            if ReadOnlyHttpHeaderCollection.Matches(ReadOnlyHttpHeaderCollection.NameAt(storedHeaders, index), "content-type") {
+                if text is string {
+                    return Failure(HttpError.Protocol("Duplicate Content-Type"))
+                }
+                text = ReadOnlyHttpHeaderCollection.ValueAt(storedHeaders, index)
+            }
+            index += 1
+        }
+        if text is null {
+            return Ok(None())
+        }
+        let raw = text ?? ""
+        if parsedHeaderText is string previous && String.CompareOrdinal(previous, raw) == 0 {
+            if parsedHeaderType is MediaType cached {
+                return Ok(Some(cached))
+            }
+        }
+        // Outgoing typed content already owns a validated value. Preserve it.
+        if let Some(contentText) = storedContent.MediaTypeText {
+            if String.CompareOrdinal(contentText, raw) == 0 {
+                if let Ok(Some(value)) = storedContent.GetContentType() {
+                    parsedHeaderText = raw
+                    parsedHeaderType = value
+                    return Ok(Some(value))
+                }
+            }
+        }
+        let Ok(value) = MediaType.Parse(raw) else {
+            return Failure(HttpError.Protocol("Malformed Content-Type"))
+        }
+        parsedHeaderText = raw
+        parsedHeaderType = value
+        return Ok(Some(value))
+    }
+
+    private var parsedHeaderText: string?
+    private var parsedHeaderType: MediaType?
+    private var storedContent: HttpContent
+    val Content: HttpContent => storedContent
+
+    /// Creates a response retaining its body without reading or copying it.
+    /// Content metadata replaces any Content-Type header; other headers are preserved.
+    init(statusCode: HttpStatusCode, headers: Sequence<HttpHeader>, content: HttpContent) {
+        storedStatusCode = (int)statusCode
+        storedHeaders = ContentHeaders(headers, content)
+        storedContent = content
+    }
+
+    /// Creates a response from a numeric status and an explicit content producer.
+    /// The transport validates framing and length before sending.
+    init(statusCode: int, headers: Sequence<HttpHeader>, content: HttpContent) {
+        storedStatusCode = statusCode
+        storedHeaders = ContentHeaders(headers, content)
+        storedContent = content
+    }
+
+    private static func ContentHeaders(headers: Sequence<HttpHeader>, content: HttpContent) -> Sequence<HttpHeader> {
+        let Some(mediaType) = content.MediaTypeText else {
+            return headers
+        }
+        let result = ArrayList<HttpHeader>()
+        for header in headers {
+            if String.CompareOrdinalIgnoreCase(header.Name, "content-type") != 0 {
+                result.Add(header)
+            }
+        }
+        result.Add(HttpHeader("Content-Type", mediaType))
+        return result
+    }
+
+}

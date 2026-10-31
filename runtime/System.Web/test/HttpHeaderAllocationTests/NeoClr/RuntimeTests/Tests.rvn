@@ -9,8 +9,8 @@ import NeoClr.Testing.*
 
 [Test]
 func `Single header lookup and cached views allocate no managed objects`() -> Result<unit, TestFailure> {
-    let headers = HttpHeaderCollection([HttpHeader("X-Test", "value"), HttpHeader("Other", "ignored")])
-    let response = HttpResponse(200, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let headers = HttpHeaderCollection.Snapshot([HttpHeader("X-Test", "value"), HttpHeader("Other", "ignored")])
+    let response = HttpClientResponse(200, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let name = "x-TEST"
     let missing = "missing"
     _ = response.Headers.GetSingle(name)
@@ -56,10 +56,10 @@ func CheckParsed(headers: HttpHeaderCollection) -> Result<unit, TestFailure> {
 
 class HeaderProbe {
     var Check: Result<unit, TestFailure> = Ok(())
-    func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         Check = CheckParsed(request.Headers)
-        let response = HttpResponse(200, HttpHeaderCollection(), HttpStringContent("headers"))
-        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+        let response = HttpServerResponse(200, HttpHeaderCollection.Empty, HttpStringContent("headers"))
+        return Task.FromResult<Result<HttpServerResponse, HttpError>>(Result<HttpServerResponse, HttpError>.Ok(response))
     }
 }
 

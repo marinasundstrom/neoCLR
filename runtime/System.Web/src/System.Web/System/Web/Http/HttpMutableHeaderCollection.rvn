@@ -1,0 +1,109 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Optional.*
+
+// Outgoing storage policy. A message keeps this view attached across mutations.
+internal class HttpMutableHeaderCollection : ReadOnlyHttpHeaderCollection, MutableHttpHeaderCollection {
+    private val requestHeaders: bool
+
+    init(headers: Sequence<HttpHeader>, requestHeaders: bool) : base(headers, true) {
+        self.requestHeaders = requestHeaders
+    }
+
+    internal func Replace(headers: Sequence<HttpHeader>) { ReplaceEntries(headers) }
+
+    // Content metadata retains the existing deferred transport-validation contract.
+    // Constructors preserve explicit fields when content has no media type;
+    // Respond clears the previous content type even when the new content has none.
+    internal static func WithContentType(headers: Sequence<HttpHeader>, content: HttpContent, clearWhenAbsent: bool) -> Sequence<HttpHeader> {
+        let mediaType = content.MediaTypeText
+        if !clearWhenAbsent && mediaType is not Some(_) {
+            return headers
+        }
+        let result = ArrayList<HttpHeader>()
+        for header in headers {
+            if !ReadOnlyHttpHeaderCollection.Matches(header.Name, HttpHeaderNames.ContentType) {
+                result.Add(header)
+            }
+        }
+        if let Some(value) = mediaType {
+            result.Add(HttpHeader("Content-Type", value))
+        }
+        return result
+    }
+
+
+    private func ValidateName(name: string) -> Result<unit, HttpError> {
+        if requestHeaders {
+            let key = HttpClientRequest.HeaderName(name)?
+            if HttpClientRequest.ReservedHeader(key) || key == "content-type" {
+                return Failure(HttpError.InvalidRequest("Header is controlled by transport or content"))
+            }
+        } else if !ReadOnlyHttpHeaderCollection.ValidName(name) {
+            return Failure(HttpError.InvalidRequest("Invalid header name"))
+        }
+        return Ok(())
+    }
+
+    private func Validate(name: string, value: string) -> Result<unit, HttpError> {
+        ValidateName(name)?
+        if requestHeaders {
+            if !HttpClientRequest.HeaderValueValid(value) {
+                return Failure(HttpError.InvalidRequest("Invalid request header value"))
+            }
+        } else {
+            let bytes = value.Utf8Bytes
+            for index in 0..bytes.Length {
+                if bytes[index] == 127 || bytes[index] < 32 && bytes[index] != 9 {
+                    return Failure(HttpError.InvalidRequest("Invalid header value"))
+                }
+            }
+        }
+        return Ok(())
+    }
+
+    func Set(name: string, value: string) -> Result<unit, HttpError> {
+        Validate(name, value)?
+        let next = ArrayList<HttpHeader>()
+        for header in StoredEntries {
+            if !ReadOnlyHttpHeaderCollection.Matches(header.Name, name) {
+                next.Add(header)
+            }
+        }
+        next.Add(HttpHeader(name, value))
+        if requestHeaders && next.Count > HttpWireLimits.HeaderCount - 3 {
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        ReplaceEntries(next)
+        return Ok(())
+    }
+
+    func Append(name: string, value: string) -> Result<unit, HttpError> {
+        Validate(name, value)?
+        if requestHeaders && StoredEntries.Count >= HttpWireLimits.HeaderCount - 3 {
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
+        }
+        let next = ArrayList<HttpHeader>(StoredEntries)
+        next.Add(HttpHeader(name, value))
+        ReplaceEntries(next)
+        return Ok(())
+    }
+
+    func Remove(name: string) -> Result<bool, HttpError> {
+        ValidateName(name)?
+        if !Contains(name) {
+            return Ok(false)
+        }
+        let next = ArrayList<HttpHeader>()
+        for header in StoredEntries {
+            if !ReadOnlyHttpHeaderCollection.Matches(header.Name, name) {
+                next.Add(header)
+            }
+        }
+        ReplaceEntries(next)
+        return Ok(true)
+    }
+}

@@ -8,13 +8,25 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
-- Expose read-only HttpHeaderCollection on request/response Headers and publish the
-  existing HttpHeaderNames catalog. Add reusable Empty, multiple-value lookup, Contains, checked
-  GetSingle and typed GetContentType. Parsers retain compact name/value strings;
-  named access avoids eager HttpHeader objects and temporary name encodings.
-  Positional access/iteration projects entries on demand. Existing input aliases,
-  message mutation and lookup snapshots remain supported; rebuild System.Web
-  consumers for the changed Headers return type. Update WebDemo, tests and API docs.
+- Separate HTTP client/server message implementations into HttpClientRequest,
+  HttpClientResponse, HttpServerRequest and HttpServerResponse. Incoming headers
+  expose the HttpHeaderCollection interface; outgoing headers expose
+  MutableHttpHeaderCollection with validated Set/Append/Remove. Preserve lazy views
+  and shared immutable Empty; outgoing views stay attached across response changes.
+  Server responses delegate content-type replacement to the header implementation.
+  Reuse the existing HttpHeaderNames catalog with multiple-value lookup, Contains,
+  checked GetSingle and typed GetContentType. Parsers retain compact name/value
+  strings; named lookup avoids eager HttpHeader objects and temporary name encodings.
+  Positional access/iteration projects entries on demand; lookups return snapshots.
+  Migrate Neo.Web, samples and active tests/benchmarks. This breaks the old
+  HttpRequest/HttpResponse names and concrete header constructors; rebuild consumers
+  and use Snapshot/Create factories. Retain HttpContent in this slice; independent
+  server body handling and performance gains remain future work.
+- Support concrete static interface helpers in the native metadata producer,
+  preserving helper/abstract-contract identity across authoring, reading and imports.
+  Exclude concrete helpers from code-generator dispatch-table discovery. This enables
+  Raven's matching native interface factory support; instance helper bodies remain
+  unsupported by this producer API.
 
 - Investigate Neo.Web JIT startup and steady execution with matched hosts. Retain
   a static-layout candidate and its code-equivalence tests as an unselected

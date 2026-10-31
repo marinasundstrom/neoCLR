@@ -3,7 +3,7 @@ module System.Web.Http
 import System.*
 
 internal static class HttpConnectionPolicy {
-    internal static func CanReuse(request: HttpRequest) -> bool {
+    internal static func CanReuse(request: HttpServerRequest) -> bool {
         for header in request.Headers {
             // Protocol switching is not supported by this HTTP/1 session.
             if String.CompareOrdinalIgnoreCase(header.Name, "upgrade") == 0 { return false }

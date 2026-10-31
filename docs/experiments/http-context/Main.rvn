@@ -33,14 +33,14 @@ func ObserveAcceptCancellation(pending: Task<Result<HttpContext, HttpError>>) ->
     return completed.Task
 }
 
-func FailedHandler(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let source = Promise<Result<HttpResponse, HttpError>>()
+func FailedHandler(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+    let source = Promise<Result<HttpServerResponse, HttpError>>()
     _ = source.Complete(Failure(HttpError.Handler("application rejected request")))
     return source.Task
 }
 
-func CancelledHandler(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let source = Promise<Result<HttpResponse, HttpError>>()
+func CancelledHandler(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+    let source = Promise<Result<HttpServerResponse, HttpError>>()
     _ = source.Cancel()
     return source.Task
 }
@@ -150,7 +150,7 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
     let handlerStop = CancellationTokenSource()
     let handlerWait = server.ServeOne(request => {
         TaskQueue.Default.Post(() => handlerStop.Cancel())
-        return Promise<Result<HttpResponse, HttpError>>().Task
+        return Promise<Result<HttpServerResponse, HttpError>>().Task
     }, handlerStop.Token)
     Check(await ObserveCancellation(handlerWait))
     handlerStop.Dispose()

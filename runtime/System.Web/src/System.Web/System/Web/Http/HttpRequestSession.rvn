@@ -14,9 +14,9 @@ internal class HttpRequestSession {
     private val connection: HttpConnection
     private val settings: HttpServerSettings
     private val secure: bool
-    private var active: HttpRequest? = null
+    private var active: HttpServerRequest? = null
     private var body: HttpBodyInput? = null
-    private var reading: Task<Result<HttpRequest, HttpError>>? = null
+    private var reading: Task<Result<HttpServerRequest, HttpError>>? = null
     private var closed = false
     private var inputReleased = false
     private var orderlyEof = false
@@ -28,10 +28,10 @@ internal class HttpRequestSession {
         self.secure = secure
     }
 
-    internal func Read(token: CancellationToken) -> Task<Result<HttpRequest, HttpError>> {
+    internal func Read(token: CancellationToken) -> Task<Result<HttpServerRequest, HttpError>> {
         ObserveCompletedRead()
-        if closed || active is HttpRequest || reading is Task<Result<HttpRequest, HttpError>> {
-            return Task.FromResult<Result<HttpRequest, HttpError>>(Result<HttpRequest, HttpError>.Failure(HttpError.InvalidRequest("Session is not ready for another request")))
+        if closed || active is HttpServerRequest || reading is Task<Result<HttpServerRequest, HttpError>> {
+            return Task.FromResult<Result<HttpServerRequest, HttpError>>(Result<HttpServerRequest, HttpError>.Failure(HttpError.InvalidRequest("Session is not ready for another request")))
         }
         let pending = ReadCore(token)
         reading = pending
@@ -46,12 +46,12 @@ internal class HttpRequestSession {
     }
 
     private func ObserveCompletedRead() {
-        if reading is Task<Result<HttpRequest, HttpError>> pending {
+        if reading is Task<Result<HttpServerRequest, HttpError>> pending {
             if pending.IsCompleted { OnRead(pending) }
         }
     }
 
-    private func OnRead(pending: Task<Result<HttpRequest, HttpError>>) {
+    private func OnRead(pending: Task<Result<HttpServerRequest, HttpError>>) {
         // A queued observer for a retired read must not clear a newer read.
         if Object.ReferenceEquals(reading, pending) {
             reading = null
@@ -60,9 +60,9 @@ internal class HttpRequestSession {
         }
     }
 
-    private async func ReadCore(token: CancellationToken) -> Task<Result<HttpRequest, HttpError>> {
+    private async func ReadCore(token: CancellationToken) -> Task<Result<HttpServerRequest, HttpError>> {
         if token.IsCancellationRequested {
-            let cancelled = Promise<Result<HttpRequest, HttpError>>()
+            let cancelled = Promise<Result<HttpServerRequest, HttpError>>()
             _ = cancelled.Cancel()
             return await cancelled.Task
         }
@@ -117,8 +117,8 @@ internal class HttpRequestSession {
     // terminates the connection; it must never be parsed as the following request.
     internal func Retire() -> bool {
         ObserveCompletedRead()
-        if closed || reading is Task<Result<HttpRequest, HttpError>> { return false }
-        if active is HttpRequest request {
+        if closed || reading is Task<Result<HttpServerRequest, HttpError>> { return false }
+        if active is HttpServerRequest request {
             if !PrepareReuse() { Close(); return false }
             body = null
             active = null
@@ -132,7 +132,7 @@ internal class HttpRequestSession {
     // Check before encoding a persistent response, but retire only after sending.
     internal func PrepareReuse() -> bool {
         ObserveCompletedRead()
-        if closed || active is null || reading is Task<Result<HttpRequest, HttpError>> { return false }
+        if closed || active is null || reading is Task<Result<HttpServerRequest, HttpError>> { return false }
         if inputReleased { return true }
         if body is HttpBodyInput stream {
             if !stream.TryReleaseForReuse() { return false }
@@ -145,7 +145,7 @@ internal class HttpRequestSession {
         if closed { return }
         closed = true
         connection.Close()
-        if active is HttpRequest request { request.Dispose() }
+        if active is HttpServerRequest request { request.Dispose() }
         active = null
         body = null
     }

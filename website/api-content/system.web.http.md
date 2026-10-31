@@ -19,7 +19,7 @@ or disposal cancellation remains task cancellation. Independent transport phase 
 still apply. See [HTTP contracts](/features/web/) for limits and handler responsibilities.
 
 HttpMethod provides canonical method properties, custom token construction and typed
-Parse. HttpRequest.Method returns HttpMethod; Create accepts it with URL/Uri and optional
+Parse. HttpClientRequest.Method returns HttpMethod; Create accepts it with URL/Uri and optional
 content. Exact spelling is available through Method.Method; value equality ignores
 ASCII case. CONNECT is representable but the socket transport does not implement tunnelling.
 
@@ -54,13 +54,13 @@ with the typed HTTP content constructors. Presets and formatted strings are cach
 custom inputs are not globally interned. `WithParameter` returns a changed value,
 and equality preserves case-sensitive boundary/unknown parameter values.
 
-`HttpRequest.GetContentType()` and `HttpResponse.GetContentType()` return
+`GetContentType()` on client and server request/response types return
 `Result<Optional<MediaType>, HttpError>`: missing and malformed headers remain distinct.
 `HttpContent.GetContentType()` reads producer metadata. None of these reads consumes
 a body. Content-Type is a concrete media type, not an Accept range or quality weight.
 See the [media type contract](/features/web/#media-types-development) for limits.
 
-Development `HttpResponse.SetHeader(name: string, value: string) -> Result<unit, HttpError>`
+Development `HttpServerResponse.SetHeader(name: string, value: string) -> Result<unit, HttpError>`
 replaces matching fields without replacing the response or its content. Names are
 HTTP tokens; prohibited controls return InvalidRequest without mutation. Response
 framing/content validation still happens on send. Neo.Web uses this to preserve
@@ -79,3 +79,6 @@ Parsed fields retain compact name/value storage. Named access avoids constructin
 The view is read-only, and existing message mutation/ownership behavior remains.
 See the [header collection contract](/docs/http-headers.html) for exact errors,
 snapshot behavior and allocation tradeoffs.
+
+See [HTTP message roles](/docs/http-messages.html) for the independent client/server
+contracts, mutation rules and migration from the provisional shared message types.

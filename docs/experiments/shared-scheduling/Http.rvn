@@ -24,7 +24,7 @@ func Main() -> Task<unit> {
 
 // Reuse the standard three-field typed JSON workload from ../Model.rvn.
 class BenchmarkApplication {
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         if request.Method.Method != "GET" {
             Panic("Benchmark method")
         }
@@ -60,7 +60,7 @@ class BenchmarkApplication {
         if value != 42 || state.id != 42 {
             Panic("Task.Run capture mutation lost")
         }
-        return Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!")))
+        return Ok(HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!")))
     }
 }
 

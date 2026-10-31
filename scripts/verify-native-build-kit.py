@@ -59,7 +59,7 @@ def serve(command, directory, request, fragmented=False):
 
 
 def inject_http_handler_fault(source):
-    handler = 'func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n'
+    handler = 'func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {\n'
     if source.count(handler) != 1:
         raise ValueError('Expected exactly one HTTP Respond handler for fault injection')
     return source.replace(handler, handler +

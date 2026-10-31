@@ -66,7 +66,7 @@ the synchronous provider pump borrows them only for the duration of each call.
 
 `HttpSocketHandler(sslOptions)` borrows client trust configuration. Use it with
 `HttpClient(handler)` for HTTPS. The default handler supports HTTP and rejects HTTPS
-without explicit trust before opening a connection. `HttpRequest.IsSecure` retains
+without explicit trust before opening a connection. `HttpClientRequest.IsSecure` retains
 HTTPS through WithHeader and default-header copies and identifies authenticated incoming requests; the default HTTPS port is 443.
 
 Set `HttpServerOptions.SslOptions` before Listen to enable HTTPS. Listen snapshots

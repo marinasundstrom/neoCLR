@@ -953,7 +953,7 @@ public sealed partial class NativeAssemblyDefinition
                 bool objectSlot = ownerIndex >= 0 && types[ownerIndex].IsObjectRoot && isVirtual && !isOverride;
                 Require(!objectSlot || instance && !isAbstract && visibility == MethodVisibility.Public &&
                     MethodDefinition.IsNativeObjectSlot(name, new(resultType, parameterTypes, genericNames), signatureGraph.Types[ownerIndex]), "invalid native Object slot");
-                Require(!interfaceOwner || name == ".cctor" || isAbstract && isVirtual == instance, "interface method flags mismatch");
+                Require(!interfaceOwner || name == ".cctor" || isAbstract && isVirtual == instance || !instance && !isAbstract && !isVirtual && !isOverride, "interface method flags mismatch");
                 Require(!isAbstract || interfaceOwner || instance && types[ownerIndex].IsAbstractClass && isVirtual && !isOverride, "abstract method requires an abstract owner");
                 Require(!isAbstract || visibility == MethodVisibility.Public && name != ".ctor" && (genericArity == 0 || interfaceOwner && instance) &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract method");
@@ -1340,7 +1340,7 @@ public sealed partial class NativeAssemblyDefinition
             var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap), method.Signature.GenericParameterNames, method.Signature.OutParameters);
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
                 : method.Name == ".cctor" ? owners[method.Owner].AddTypeInitializer()
-                : owners[method.Owner].IsInterface ? owners[method.Owner].AddInterfaceMethod(method.Name, signature, !method.Instance)
+                : owners[method.Owner].IsInterface && method.Abstract ? owners[method.Owner].AddInterfaceMethod(method.Name, signature, !method.Instance)
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
                 : method.ObjectSlot ? owners[method.Owner].AddNativeObjectSlot(method.Name, signature)
                 : method.Override ? owners[method.Owner].AddOverride(method.Name, signature)

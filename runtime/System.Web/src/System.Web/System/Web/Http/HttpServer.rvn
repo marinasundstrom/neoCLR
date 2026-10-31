@@ -25,7 +25,7 @@ public class HttpServer {
 
     // Experimental driver admission remains internal until shutdown/fairness and
     // the public option contract have been qualified together.
-    internal func ServePersistent(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>,
+    internal func ServePersistent(handler: (HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>>,
         connections: int, handlers: int, token: CancellationToken) -> Task<Result<unit, HttpError>> {
         if closed || serving is HttpServerRun || persistent is HttpPersistentRun || active != 0 ||
             connections < 1 || connections > 1024 || handlers < 1 || handlers > connections {
@@ -234,7 +234,7 @@ public class HttpServer {
     /// Up to 16 exchanges run concurrently; request failures are recorded and do not stop serving.
     /// Cancellation closes the server. Completion waits for every started handler task to settle.
     /// Close completes normally; caller cancellation cancels the lifetime task; listener failure returns Error.
-    func Serve(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
+    func Serve(handler: (HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>>, cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
         return StartServing(HttpResponseCallback(handler), cancellationToken)
     }
 
@@ -261,7 +261,7 @@ public class HttpServer {
 
     /// Handles one accepted context and sends the callback's buffered or known-length stream response.
     /// Cancellation ends this exchange, including an outstanding handler wait.
-    func ServeOne(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
+    func ServeOne(handler: (HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>>, cancellationToken: CancellationToken = default) -> Task<Result<System.Void, HttpError>> {
         return HttpServeOperation(self, HttpResponseCallback(handler), cancellationToken).Start()
     }
 
@@ -277,11 +277,11 @@ public class HttpServer {
         listener.Close()
     }
 
-    internal static func EncodeResponse(response: HttpResponse, headOnly: int) -> Result<byte[], HttpError> {
+    internal static func EncodeResponse(response: HttpServerResponse, headOnly: int) -> Result<byte[], HttpError> {
         return EncodeResponse(response, headOnly, true)
     }
 
-    internal static func EncodeResponse(response: HttpResponse, headOnly: int, closeConnection: bool) -> Result<byte[], HttpError> {
+    internal static func EncodeResponse(response: HttpServerResponse, headOnly: int, closeConnection: bool) -> Result<byte[], HttpError> {
         let status = (int)response.StatusCode
         if !(status >= 200 && status <= 599) {
             return Failure(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
@@ -493,8 +493,8 @@ public class HttpContext : Disposable {
     internal func AttachSession(value: HttpRequestSession) { session = value }
     private var owner: HttpServer
     private var connection: HttpConnection
-    private var request: HttpRequest
-    private var response: HttpResponse = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    private var request: HttpServerRequest
+    private var response: HttpServerResponse = HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     private var closed: bool = false
     private var started: bool = false
     private var completedNormally = false
@@ -519,7 +519,7 @@ public class HttpContext : Disposable {
     private var contentOffset = 0
     private var readingContent: Task<Result<int, HttpError>>? = null
 
-    internal init(owner: HttpServer, connection: HttpConnection, request: HttpRequest) {
+    internal init(owner: HttpServer, connection: HttpConnection, request: HttpServerRequest) {
         self.owner = owner
         self.connection = connection
         self.request = request
@@ -527,10 +527,10 @@ public class HttpContext : Disposable {
     }
 
     /// The incoming headers and body, readable only during this context's lifetime.
-    val Request: HttpRequest => request
+    val Request: HttpServerRequest => request
 
     /// The outgoing response configuration. Initially status 200 with empty content.
-    val Response: HttpResponse => response
+    val Response: HttpServerResponse => response
 
     /// Cancels on observed peer read closure, transport failure, explicit Close or server shutdown.
     /// Monitoring starts lazily. Queued unread bytes delay peer closure detection.
@@ -584,7 +584,7 @@ public class HttpContext : Disposable {
         return Send(response, cancellationToken)
     }
 
-    internal func Send(response: HttpResponse, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+    internal func Send(response: HttpServerResponse, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
         if started || closed {
             let rejected = Promise<Result<System.Void, HttpError>>()
             _ = rejected.Complete(Failure(HttpError.InvalidRequest("Context is closed or response already started")))
@@ -1062,8 +1062,8 @@ internal abstract class HttpServerCallback {
 }
 
 internal class HttpResponseCallback : HttpServerCallback {
-    private val handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>
-    internal init(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) { self.handler = handler }
+    private val handler: (HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>>
+    internal init(handler: (HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>>) { self.handler = handler }
     override func Dispatch(context: HttpContext, operation: HttpServeOperation) {
         operation.ObserveResponse(handler(context.Request))
     }
@@ -1081,14 +1081,14 @@ internal class HttpServeOperation {
     private val managed: bool
     private var stopping: bool = false
     private var invoking: bool = false
-    private var managedResponse: HttpResponse? = null
+    private var managedResponse: HttpServerResponse? = null
     private var server: HttpServer
     private var handler: HttpServerCallback
     private var token: CancellationToken
     private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
     private var context: Optional<HttpContext> = None()
     private var accepting: Optional<Task<Result<HttpContext, HttpError>>> = None()
-    private var handling: Optional<Task<Result<HttpResponse, HttpError>>> = None()
+    private var handling: Optional<Task<Result<HttpServerResponse, HttpError>>> = None()
     private var configuring: Optional<Task<Result<System.Void, HttpError>>> = None()
     private var sending: Optional<Task<Result<System.Void, HttpError>>> = None()
     private var callerRegistration: CancellationRegistration? = null
@@ -1132,7 +1132,7 @@ internal class HttpServeOperation {
         context = None()
         handling = None()
         configuring = None()
-        if managedResponse is HttpResponse response {
+        if managedResponse is HttpServerResponse response {
             response.Dispose()
         }
         managedResponse = null
@@ -1196,7 +1196,7 @@ internal class HttpServeOperation {
         }
     }
 
-    internal func ObserveResponse(pending: Task<Result<HttpResponse, HttpError>>) {
+    internal func ObserveResponse(pending: Task<Result<HttpServerResponse, HttpError>>) {
         handling = Some(pending)
         pending.OnCompleted(self.OnHandled)
     }

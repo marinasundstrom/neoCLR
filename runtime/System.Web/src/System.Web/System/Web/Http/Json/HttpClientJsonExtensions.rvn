@@ -34,12 +34,12 @@ public extension HttpClientJsonExtensions for HttpClient {
     }
 
     /// Serializes a supported flat model and returns the HTTP response, including non-success status.
-    func PostAsJson<T>(url: string, value: T, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError | JsonError>> {
+    func PostAsJson<T>(url: string, value: T, cancellationToken: CancellationToken = default) -> Task<Result<HttpClientResponse, HttpError | JsonError>> {
         return JsonClientOperations.Post(self, url, value, cancellationToken)
     }
 
     /// Serializes a supported flat model and returns the HTTP response, including non-success status.
-    func PostAsJson<T>(url: Uri, value: T, cancellationToken: CancellationToken = default) -> Task<Result<HttpResponse, HttpError | JsonError>> {
+    func PostAsJson<T>(url: Uri, value: T, cancellationToken: CancellationToken = default) -> Task<Result<HttpClientResponse, HttpError | JsonError>> {
         return JsonClientOperations.Post(self, url, value, cancellationToken)
     }
 

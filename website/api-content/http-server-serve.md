@@ -14,7 +14,7 @@ canonical application API. The request callback returns a separately constructed
 ## Parameters
 
 `handler`: An asynchronous context callback returning `Task<Result<(), HttpError>>`,
-or a request callback returning `Task<Result<HttpResponse, HttpError>>`.
+or a request callback returning `Task<Result<HttpServerResponse, HttpError>>`.
 The server observes every started task and owns each successful response, including
 late or invalid responses and their owned content. It does not create an OS thread
 per handler; blocking synchronous code blocks the cooperative dispatcher.

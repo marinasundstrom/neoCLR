@@ -10,7 +10,7 @@ import System.Web.Http.*
 import System.Web.Http.Json.*
 import System.Data.Json.*
 
-async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+async func Echo(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     if !request.IsSecure { return Failure(HttpError.Handler("Expected HTTPS request")) }
     let result = await request.Content.ReadJsonNode()
     let Ok(node) = result else {
@@ -20,7 +20,7 @@ async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let Ok(content) = JsonContent.CreateNode(node) else {
         return Failure(HttpError.Handler("Cannot encode JSON"))
     }
-    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     response.Respond(HttpStatusCode.OK, content)
     return Ok(response)
 }
@@ -72,7 +72,7 @@ async func Main() -> Task<int> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8, options) else { return 3 }
     let Ok(port) = server.GetLocalPort() else { return 4 }
     let url = String.Concat(String.Concat("https://localhost:", port.ToString()), "/echo")
-    let Ok(request) = HttpRequest.Get(url) else { return 5 }
+    let Ok(request) = HttpClientRequest.Get(url) else { return 5 }
     if !request.IsSecure { return 6 }
     let Ok(copied) = request.WithHeader("X-Test", "secure") else { return 7 }
     if !copied.IsSecure { return 8 }

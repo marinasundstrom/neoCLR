@@ -14,19 +14,19 @@ func Check(condition: bool) {
 
 class InspectHandler : HttpHandler {
 
-    override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, token: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Check(request.Method.Method == "POST")
         Check(request.GetHeaderValues("accept")[0] == "text/plain")
         Check(request.GetHeaderValues("X-REQUEST-ID")[0] == "sample-42")
         Check(request.GetHeaderValues("content-type")[0] == "text/plain; charset=utf-8")
-        let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
+        let source = Promise<Result<HttpClientResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpClientResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
         return source.Task
     }
 }
 
 func CheckContracts() -> Result<unit, HttpError> {
-    let original = HttpRequest.Post("http://not-resolved.invalid/", HttpStringContent("Café"))?
+    let original = HttpClientRequest.Post("http://not-resolved.invalid/", HttpStringContent("Café"))?
     let first = original.WithHeader("X-Tag", "one")?
     let replaced = first.WithHeader("x-TAG", "two")?
     Check(original.GetHeaderValues("x-tag").Count == 0)
@@ -79,7 +79,7 @@ func CheckContracts() -> Result<unit, HttpError> {
         }
         Panic("Header byte bound did not fail before DNS")
     }
-    let invalidContent = HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nBad: yes"))?
+    let invalidContent = HttpClientRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nBad: yes"))?
     if let Failure(HttpError.InvalidRequest(_)) = HttpClient().Send(invalidContent).GetResult() {
         Check(true)
     } else {
@@ -117,7 +117,7 @@ class ClientProbe {
         })
     }
     func SendGet() {
-        let Ok(request) = HttpRequest.Get("http://127.0.0.1:19091/read") else {
+        let Ok(request) = HttpClientRequest.Get("http://127.0.0.1:19091/read") else {
             Panic("GET construction failed")
             return
         }

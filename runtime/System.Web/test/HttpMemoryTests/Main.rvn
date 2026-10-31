@@ -80,7 +80,7 @@ func ResponseUrl(port: int) -> string {
 
 async func CheckClient(server: HttpServer, port: int) -> Task<int> {
     use client = HttpClient()
-    let Ok(request) = HttpRequest.Get(ResponseUrl(port)) else { return 90 }
+    let Ok(request) = HttpClientRequest.Get(ResponseUrl(port)) else { return 90 }
     let accepting = server.Accept()
     let receiving = client.Send(request, HttpCompletionOption.ResponseHeadersRead)
     let Ok(context) = await accepting else { return 91 }

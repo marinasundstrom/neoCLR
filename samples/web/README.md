@@ -183,3 +183,10 @@ token to cancellable I/O. The sample logic tests invoke this function with an
 already-cancelled token; the HTTP validator opens and closes a real TCP client.
 Server shutdown also cancels active request tokens. Normal response completion
 does not; unread socket data can delay EOF detection.
+
+The development HTTP split gives Neo.Web handlers `HttpServerRequest` and
+`HttpServerResponse` when those primitives are injected. `Neo.Web.HttpContext`
+exposes the same server-owned pair. Incoming headers are read-only; response headers
+support validated mutation. The `HttpClientRequest`/`HttpClientResponse` pair belongs
+to HTTP consumers and is not an endpoint context contract. Both roles retain lazy
+header views; separate representations do not yet imply a measured speedup.

@@ -12,17 +12,17 @@ class SampleHandler : HttpHandler {
     init(mode: int) {
         self.mode = mode
     }
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
-        let source = Promise<Result<HttpResponse, HttpError>>()
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
+        let source = Promise<Result<HttpClientResponse, HttpError>>()
         if mode == 1 {
             _ = source.Complete(Failure(HttpError.Protocol("peer")))
         } else if mode == 2 {
             let bytes: byte[] = [(byte)255]
-            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), HttpMemoryContent(bytes))))
+            _ = source.Complete(Ok(HttpClientResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), HttpMemoryContent(bytes))))
         } else if mode == 3 {
             _ = source.Cancel()
         } else {
-            _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
+            _ = source.Complete(Ok(HttpClientResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
         }
         return source.Task
     }

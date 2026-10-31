@@ -1,0 +1,261 @@
+{
+  "passed": true,
+  "sources": {
+    "extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.retention.json": "be62cce9d955e26b06c9d616e26da8f97cee36ac111bc54b40ca2a9ec04f8894",
+    "extensions/Neo.Web/test/Neo.Web.Tests/Tests.rvn": "d2978e70e4058fd69e331cb0eed86820400067722bbf4631fb003deeb474eb20",
+    "extensions/Neo.Web/test/Neo.Web.Tests/ResultTests.rvn": "b538c6ae17da2be807bfb8fceabff7ca87bc27a97782d6ea183abf2368ac7078",
+    "extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.rvnproj": "446c7a4dfa88a4304a6a80b70509d75649d0e624578f5a613c6a7d972a2f1e05",
+    "extensions/Neo.Web/test/Neo.Web.Tests/AbortTests.rvn": "2f9ba07c837c84fed86909637188f6d619ef9a3558a696e601e43d6d3b49b552",
+    "extensions/Neo.Web/test/Neo.Web.Tests/MiddlewareTests.rvn": "feeb5e55bc8cdbb0ee710c9c0ef085455f9e9a03a743ff7d0a12be1a995d2985",
+    "extensions/Neo.Web/src/Neo.Web/Neo.Web.rvnproj": "31b4f79d827ba8d77370402503283adc3971e3e234d5fb1ae1a2c8e594e4e628",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/BindingAttributes.rvn": "24633a7fe2841ae34f5912c89d38d8b67dc16f6a57617f1d108357859e79911b",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/HttpResults.rvn": "06a003e215918b4d9a5c551339aeda8eaab073c21b8af5a452774abe75e222ef",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplication.rvn": "8f74780caa6c069092469ff899e9ce5e36f62bae8895b9e9ef3def0531a0cf0a",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/HandlerPlan.rvn": "24cfea4f34ff35209498f77c3391cff40eb8e29ea58c062fb84449afa235efd5",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/EndpointDescriptor.rvn": "5f623e50e622992c320447669ae41412c15e0bbd8899b8176c4fa80cf37df24d",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/Middleware.rvn": "a7f89aa2e6239b93253b33fd5df69b6fd52a636a39c0e2287b4777d081541dbd",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/JsonBodyPlan.rvn": "91584869aa837e07f0b49c45c0db3419a819ac93e17c1067d7c6483e7a7c70e9",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebApplicationBuilder.rvn": "0046d159cac2a02e5535ba0d10a429feb384db926a14abb8e2dcd2a4880298dd",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/WebContracts.rvn": "5aea59de28e9143082ebd351e3720eccb0a468af644039258aef4975846a8c5a",
+    "extensions/Neo.Web/src/Neo.Web/Neo/Web/QueryValues.rvn": "d5467a857efe056d29f78cf6d14024df05f07da1a4b0fa3672743584bb2fd601",
+    "samples/web/test/WebDemo.Tests/Tests.rvn": "9329f4b075b08ff1a7894ccb9eb3a443dff10576b660b46b0e85480ee59455da",
+    "samples/web/test/WebDemo.Tests/WebDemo.Tests.rvnproj": "7ce16d2f38a4b2af99f693fb0c1a091c3708f43d1411f39493e624d1dc075364",
+    "samples/web/src/WebDemo.Logic/WebDemo.Logic.rvnproj": "cb4cc7eea1373f61a4e947a02efa11e52c3032da8dd745f97f1e03a2baca4bc7",
+    "samples/web/src/WebDemo.Logic/ResponseCache.rvn": "76d7fc50d5d262be5dc56f4e9bdaa09995219680e1ae9d4aa62cae673e9dc601",
+    "samples/web/src/WebDemo.Logic/Endpoints.rvn": "ca8e0820b1d6736322008af717fd7fb0e9753f2a90061a410c81eaf964e1c164",
+    "samples/web/src/WebDemo/WebDemo.retention.json": "e84a7d5bad34f27087590af3dc562535a9ada416f9b41c289ec683a9f37ca3f8",
+    "samples/web/src/WebDemo/Main.rvn": "21c5ffc99cdeafb772230fa1d2a3c41b13a82e630b32999cb3a126899b1704fa",
+    "samples/web/src/WebDemo/WebDemo.rvnproj": "77ba19e05e39b3f2378c2fa8a1e61ca4712222c8333c6540a8af78438be4909c"
+  },
+  "commands": [
+    {
+      "name": "library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-message-surfaces/web9-sample/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-message-surfaces/web9-sample/Neo.Web.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "sample-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/http-message-surfaces/web9-sample/bundle",
+        "--project",
+        "/Users/robert/Projects/neoclr/samples/web/src/WebDemo/WebDemo.rvnproj",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/http-message-surfaces/web9-sample/bundle/bin/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/http-message-surfaces/web9-sample/sample"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "sample",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "LISTENING http://127.0.0.1:64641\ninfo: WebDemo.Request[0] Request GET /\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/Ada\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/current\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 2\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/42\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/7\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/-1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/nope\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /missing/path\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /search?q=Ada+Lovelace&page=2\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /search?Q=%C3%85sa&page=3\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /search?q=Ada\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /search?q=Ada&page=bad\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /search?q=Ada&page=1&page=2\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /search?q=%FF&page=1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /greetings\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /greetings\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /greetings\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /greetings\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /json-text\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /json-text\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /cached\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /cached\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /cache-stats\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /uncached\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /cached\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /cache-stats\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /wait-for-abort\nWAITING FOR REQUEST ABORT\nREQUEST ABORT OBSERVED\ninfo: WebDemo.Request[0] Request pipeline completed\nSTOPPED\n",
+      "stderr": "",
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/",
+          "status": 200,
+          "body": "Hello, neoCLR!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/Ada",
+          "status": 200,
+          "body": "Hello, Ada!"
+        },
+        {
+          "method": "GET",
+          "path": "/hello/current",
+          "status": 200,
+          "body": "The current visitor is neoCLR"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 1"
+        },
+        {
+          "method": "POST",
+          "path": "/visits",
+          "status": 201,
+          "body": "Visit 2"
+        },
+        {
+          "method": "GET",
+          "path": "/items/42",
+          "status": 200,
+          "body": "The answer"
+        },
+        {
+          "method": "GET",
+          "path": "/items/7",
+          "status": 404,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/-1",
+          "status": 400,
+          "body": ""
+        },
+        {
+          "method": "GET",
+          "path": "/items/nope",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "GET:hello"
+        },
+        {
+          "method": "POST",
+          "path": "/echo/hello",
+          "status": 200,
+          "body": "POST:hello"
+        },
+        {
+          "method": "GET",
+          "path": "/missing/path",
+          "status": 404,
+          "body": "No endpoint matched"
+        },
+        {
+          "method": "GET",
+          "path": "/search?q=Ada+Lovelace&page=2",
+          "status": 200,
+          "body": "Hello, Ada Lovelace! Page 2"
+        },
+        {
+          "method": "GET",
+          "path": "/search?Q=%C3%85sa&page=3",
+          "status": 200,
+          "body": "Hello, \u00c5sa! Page 3"
+        },
+        {
+          "method": "GET",
+          "path": "/search?q=Ada",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/search?q=Ada&page=bad",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/search?q=Ada&page=1&page=2",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/search?q=%FF&page=1",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "POST",
+          "path": "/greetings",
+          "status": 201,
+          "body": "Hello, Grace!"
+        },
+        {
+          "method": "POST",
+          "path": "/greetings",
+          "status": 201,
+          "body": "Hello, Ada!"
+        },
+        {
+          "method": "POST",
+          "path": "/greetings",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "POST",
+          "path": "/greetings",
+          "status": 415,
+          "body": "Unsupported media type"
+        },
+        {
+          "method": "POST",
+          "path": "/json-text",
+          "status": 200,
+          "body": "plain value"
+        },
+        {
+          "method": "POST",
+          "path": "/json-text",
+          "status": 400,
+          "body": "Bad request"
+        },
+        {
+          "method": "GET",
+          "path": "/cached",
+          "status": 200,
+          "body": "Computed 894"
+        },
+        {
+          "method": "GET",
+          "path": "/cached",
+          "status": 200,
+          "body": "Computed 894"
+        },
+        {
+          "method": "GET",
+          "path": "/cache-stats",
+          "status": 200,
+          "body": "hits=1;misses=1;executions=1"
+        },
+        {
+          "method": "GET",
+          "path": "/uncached",
+          "status": 200,
+          "body": "Computed 894"
+        },
+        {
+          "method": "GET",
+          "path": "/cached",
+          "status": 200,
+          "body": "Computed 894"
+        },
+        {
+          "method": "GET",
+          "path": "/cache-stats",
+          "status": 200,
+          "body": "hits=1;misses=1;executions=3"
+        },
+        {
+          "method": "GET",
+          "path": "/wait-for-abort",
+          "outcome": "client disconnect observed"
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "codegenSha256": "287f9084a50ed48569c76431fecbd711d5cd6bd103d1af466f724293e81b61ec",
+  "originalManifestSha256": "f21e2badc0890d414cf882ef91d9d8024f45761197e621576c7a574bb027e2c9",
+  "compilerSha256": "19402b2945bb09360a64a4fe95d2259461753928cc7a680f8b9538d75df0d806"
+}

@@ -1,0 +1,155 @@
+module System.Web.Http
+
+import System.Runtime.CompilerServices.*
+import System.Optional.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.*
+import System.Networking.*
+import System.Networking.Security.*
+import System.Networking.Sockets.*
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+import System.IO.*
+import System.Time.*
+
+/// Outgoing server response with mutable headers and independent response configuration.
+public class HttpServerResponse : Disposable {
+    val Version: HttpVersion => HttpVersion.Http11
+    func Dispose() { storedContent.Dispose() }
+    private var storedStatusCode: int
+    val StatusCode: HttpStatusCode => (HttpStatusCode)storedStatusCode
+    private var storedHeaders: Sequence<HttpHeader>
+    /// Mutable outgoing fields. Transport/content controlled fields retain their message-specific policy.
+    /// The view stays attached to this message when its entries are replaced.
+    val Headers: MutableHttpHeaderCollection {
+        get {
+            if storedHeaders is HttpMutableHeaderCollection cached {
+                return cached
+            }
+            let collection = HttpMutableHeaderCollection(storedHeaders, false)
+            storedHeaders = collection
+            return collection
+        }
+    }
+
+    private func ReplaceHeaders(headers: Sequence<HttpHeader>) {
+        if storedHeaders is HttpMutableHeaderCollection view {
+            view.Replace(headers)
+        } else {
+            storedHeaders = headers
+        }
+    }
+
+    /// Gets all matching field values in order using ASCII case-insensitive names.
+    /// Returns an empty snapshot for absent or invalid names; does not split or join values.
+    func GetHeaderValues(name: string) -> Sequence<string> {
+        return HttpHeader.FindValues(storedHeaders, name)
+    }
+
+    /// <summary>Parses the message's Content-Type without consuming its body.</summary>
+    /// <returns>Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.</returns>
+    /// <remarks>Does not infer a type or perform negotiation; raw headers remain available.</remarks>
+    func GetContentType() -> Result<Optional<MediaType>, HttpError> {
+        var text: string? = null
+        var index = 0
+        while index < storedHeaders.Count {
+            if ReadOnlyHttpHeaderCollection.Matches(ReadOnlyHttpHeaderCollection.NameAt(storedHeaders, index), "content-type") {
+                if text is string {
+                    return Failure(HttpError.Protocol("Duplicate Content-Type"))
+                }
+                text = ReadOnlyHttpHeaderCollection.ValueAt(storedHeaders, index)
+            }
+            index += 1
+        }
+        if text is null {
+            return Ok(None())
+        }
+        let raw = text ?? ""
+        if parsedHeaderText is string previous && String.CompareOrdinal(previous, raw) == 0 {
+            if parsedHeaderType is MediaType cached {
+                return Ok(Some(cached))
+            }
+        }
+        // Outgoing typed content already owns a validated value. Preserve it.
+        if let Some(contentText) = storedContent.MediaTypeText {
+            if String.CompareOrdinal(contentText, raw) == 0 {
+                if let Ok(Some(value)) = storedContent.GetContentType() {
+                    parsedHeaderText = raw
+                    parsedHeaderType = value
+                    return Ok(Some(value))
+                }
+            }
+        }
+        let Ok(value) = MediaType.Parse(raw) else {
+            return Failure(HttpError.Protocol("Malformed Content-Type"))
+        }
+        parsedHeaderText = raw
+        parsedHeaderType = value
+        return Ok(Some(value))
+    }
+
+    private var parsedHeaderText: string?
+    private var parsedHeaderType: MediaType?
+    private var storedContent: HttpContent
+    val Content: HttpContent => storedContent
+
+    /// Creates an empty status-200 outgoing response.
+    init() {
+        storedStatusCode = 200
+        storedHeaders = HttpHeaderCollection.Empty
+        storedContent = HttpMemoryContent(default(ReadOnlyMemory<byte>))
+    }
+
+    /// Creates an outgoing response with content metadata and no other application fields.
+    init(statusCode: HttpStatusCode, content: HttpContent) {
+        storedStatusCode = (int)statusCode
+        storedHeaders = HttpMutableHeaderCollection.WithContentType(HttpHeaderCollection.Empty, content, false)
+        storedContent = content
+    }
+
+    /// Creates an outgoing response from a numeric status and content, without requiring a header collection.
+    init(statusCode: int, content: HttpContent) {
+        storedStatusCode = statusCode
+        storedHeaders = HttpMutableHeaderCollection.WithContentType(HttpHeaderCollection.Empty, content, false)
+        storedContent = content
+    }
+
+    /// Creates a response retaining its body without reading or copying it.
+    /// Content metadata replaces any Content-Type header; other headers are preserved.
+    init(statusCode: HttpStatusCode, headers: Sequence<HttpHeader>, content: HttpContent) {
+        storedStatusCode = (int)statusCode
+        storedHeaders = HttpMutableHeaderCollection.WithContentType(headers, content, false)
+        storedContent = content
+    }
+
+    /// Creates a response from a numeric status and an explicit content producer.
+    /// The transport validates framing and length before sending.
+    init(statusCode: int, headers: Sequence<HttpHeader>, content: HttpContent) {
+        storedStatusCode = statusCode
+        storedHeaders = HttpMutableHeaderCollection.WithContentType(headers, content, false)
+        storedContent = content
+    }
+
+    /// Replaces fields through the response's mutable header view. Does not perform I/O.
+    func SetHeader(name: string, value: string) -> Result<unit, HttpError> {
+        return Headers.Set(name, value)
+    }
+
+    /// Sets the status and empty content. Does not perform network I/O.
+    func Respond(statusCode: HttpStatusCode) {
+        Respond(statusCode, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    }
+
+    /// Sets status and content, replacing Content-Type from the content metadata.
+    /// Other headers are retained. The context validates and snapshots when completed.
+    func Respond(statusCode: HttpStatusCode, content: HttpContent) {
+        let headers = HttpMutableHeaderCollection.WithContentType(storedHeaders, content, true)
+        storedStatusCode = (int)statusCode
+        storedContent = content
+        ReplaceHeaders(headers)
+    }
+
+
+}

@@ -86,12 +86,12 @@ func `HTTP methods retain case-insensitive identity in a set`() -> Result<unit, 
 
 [Test]
 func `HTTP request factories retain predefined and custom methods`() -> Result<unit, TestFailure> {
-    let Ok(get) = HttpRequest.Get("http://example.test/") else {
+    let Ok(get) = HttpClientRequest.Get("http://example.test/") else {
         return Assert.True(false, "GET construction")
     }
     _ = Assert.True(get.Method.Equals(HttpMethod.Get), "GET method value")?
     let custom = HttpMethod("FETCH")
-    let Ok(request) = HttpRequest.Create(custom, "http://example.test/", HttpStringContent("body")) else {
+    let Ok(request) = HttpClientRequest.Create(custom, "http://example.test/", HttpStringContent("body")) else {
         return Assert.True(false, "Custom request construction")
     }
     _ = Assert.True(Object.ReferenceEquals(custom, request.Method), "Method retained")?
@@ -107,15 +107,15 @@ func `HTTP URI request factories support custom methods and empty content`() -> 
     let Ok(uri) = Uri.Parse("http://example.test/") else {
         return Assert.True(false, "URI parse")
     }
-    let Ok(request) = HttpRequest.Create(HttpMethod.Options, uri) else {
+    let Ok(request) = HttpClientRequest.Create(HttpMethod.Options, uri) else {
         return Assert.True(false, "URI request construction")
     }
     _ = Assert.Equal("OPTIONS", request.Method.Method)?
     _ = Assert.Equal(0, request.Content.Length)?
-    let Ok(withContent) = HttpRequest.Create(HttpMethod("FETCH"), uri, HttpStringContent("body")) else {
+    let Ok(withContent) = HttpClientRequest.Create(HttpMethod("FETCH"), uri, HttpStringContent("body")) else {
         return Assert.True(false, "URI content construction")
     }
-    let Ok(empty) = HttpRequest.Create(HttpMethod("FETCH"), "http://example.test/") else {
+    let Ok(empty) = HttpClientRequest.Create(HttpMethod("FETCH"), "http://example.test/") else {
         return Assert.True(false, "URL empty construction")
     }
     _ = Assert.Equal(0, empty.Content.Length)?
@@ -124,16 +124,16 @@ func `HTTP URI request factories support custom methods and empty content`() -> 
 
 [Test]
 func `HTTP coffee requests retain BREW and unnamed status codes`() -> Result<unit, TestFailure> {
-    let Ok(request) = HttpRequest.Create(HttpMethod("BREW"), "http://example.test/pot-1", HttpStringContent("start")) else {
+    let Ok(request) = HttpClientRequest.Create(HttpMethod("BREW"), "http://example.test/pot-1", HttpStringContent("start")) else {
         return Assert.True(false, "BREW request construction")
     }
     _ = Assert.Equal("BREW", request.Method.Method)?
-    let response = HttpResponse(418, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(418, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = Assert.Equal(418, (int)response.StatusCode)?
     _ = Assert.True(!response.IsSuccessStatusCode, "Teapot response is unsuccessful")?
     response.Respond((HttpStatusCode)471, HttpStringContent("Custom failure"))
     _ = Assert.Equal(471, (int)response.StatusCode)?
     _ = Assert.True(!response.IsSuccessStatusCode, "Custom client error is unsuccessful")?
-    let extensionSuccess = HttpResponse((HttpStatusCode)299, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let extensionSuccess = HttpClientResponse((HttpStatusCode)299, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     return Assert.True(extensionSuccess.IsSuccessStatusCode, "Unnamed success follows its status class")
 }

@@ -12,7 +12,7 @@ class Application {
         self.identity = identity
     }
 
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         if request.Target == "/fault" {
             Panic("Injected HTTP worker failure")
         }
@@ -20,7 +20,7 @@ class Application {
         if resumed != 42 {
             Panic("Worker continuation failed")
         }
-        return Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(identity)))
+        return Ok(HttpServerResponse(200, ArrayList<HttpHeader>(), HttpStringContent(identity)))
     }
 }
 

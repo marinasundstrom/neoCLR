@@ -6,9 +6,12 @@ Reuse the existing HttpHeaderNames catalog. Parsed name/value storage defers ent
 objects until positional access; see the [contract](../api-docs/http-headers.md) and
 [qualification](validation/http-header-collection-20261031/README.md). This bounded
 HTTP follow-up does not change the selected release JIT/collector direction.
-The author now directs separate client/server request and response surfaces as the
-next boundary task; the [migration plan](http-server-design.md#separate-client-and-server-message-surfaces-author-direction-2026-10-31)
-is recorded separately from the implemented header view.
+The author-directed client/server split now provides four independent message types,
+with read-only incoming and mutable outgoing headers. Static interface helper gaps
+are fixed in Raven main and the metadata/codegen layers. See the
+[migration reference](../api-docs/http-messages.md) and
+[three-mode qualification](validation/http-message-surfaces-20261031/README.md).
+Server-specific body handling and measured throughput gains remain follow-up work.
 
 **HTTP throughput and execution continuity (author direction, 2026-10-31):**
 Make direct `System.Web.Http.HttpServer` request/response throughput the primary

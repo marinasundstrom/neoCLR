@@ -11,11 +11,11 @@ public class Person {
     var active: bool { get; set; } = false
 }
 
-func RespondWithPerson(person: Person) -> Result<HttpResponse, HttpError> {
+func RespondWithPerson(person: Person) -> Result<HttpServerResponse, HttpError> {
     let Ok(text) = JsonSerializer.Serialize(person) else {
         Panic("JSON serialization failed")
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "application/json; charset=utf-8"))
-    return Ok(HttpResponse(200, headers, HttpStringContent(text, "application/json; charset=utf-8")))
+    return Ok(HttpServerResponse(200, headers, HttpStringContent(text, "application/json; charset=utf-8")))
 }

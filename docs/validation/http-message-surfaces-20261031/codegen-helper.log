@@ -1,0 +1,9 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.75s
+     Running tests/console.rs (target/debug/deps/console-d00f319c73ddd86c)
+
+running 1 test
+test concrete_static_interface_helpers_are_direct_call_bodies ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 184 filtered out; finished in 1.52s

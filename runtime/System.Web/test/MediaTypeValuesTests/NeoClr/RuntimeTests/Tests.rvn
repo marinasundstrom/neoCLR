@@ -169,11 +169,11 @@ func `Legacy content parsing caches values and distinguishes absence from errors
 
 [Test]
 func `HTTP messages expose actual Content-Type and reject duplicate fields`() -> Result<unit, TestFailure> {
-    let Ok(request) = HttpRequest.Post("http://example.test/", HttpStringContent("{}", MediaTypes.Application.Json)) else { return Assert.True(false, "Request construction") }
+    let Ok(request) = HttpClientRequest.Post("http://example.test/", HttpStringContent("{}", MediaTypes.Application.Json)) else { return Assert.True(false, "Request construction") }
     let Ok(Some(media)) = request.GetContentType() else { return Assert.True(false, "Request content type") }
     _ = Assert.True(Object.ReferenceEquals(media, MediaTypes.Application.Json), "Request retains typed value")?
     let headers = ArrayList<HttpHeader>()
-    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = Assert.True(response.GetContentType() is Ok(None), "Missing header")?
     headers.Add(HttpHeader("CONTENT-TYPE", "multipart/form-data; boundary=AbC"))
     let Ok(Some(received)) = response.GetContentType() else { return Assert.True(false, "Incoming header") }
@@ -186,6 +186,6 @@ func `HTTP messages expose actual Content-Type and reject duplicate fields`() ->
     headers.Add(HttpHeader("content-type", "text/plain"))
     _ = Assert.True(response.GetContentType() is Failure(HttpError.Protocol(_)), "Duplicate header")?
     let invalidHeaders = [HttpHeader("Content-Type", "broken")]
-    let invalid = HttpResponse(HttpStatusCode.OK, invalidHeaders, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let invalid = HttpClientResponse(HttpStatusCode.OK, invalidHeaders, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     return Assert.True(invalid.GetContentType() is Failure(HttpError.Protocol(_)), "Malformed header")
 }

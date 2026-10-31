@@ -184,6 +184,8 @@
       href: docs/sequence-access.md
     - name: HTTP header collections
       href: docs/http-headers.md
+    - name: HTTP message roles
+      href: docs/http-messages.md
     - name: HTTP body streams
       href: docs/http-body-streams.md
     - name: HTTP server lifetime and concurrency

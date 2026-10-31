@@ -31,7 +31,7 @@ Its signature is `(HttpContext) -> Task<Result<unit, HttpError>>`. Serve sends t
 configured response after the handler succeeds, and owns completion and cleanup.
 The handler must not call Complete or retain the context after returning.
 The response-returning variant,
-`(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`, remains available.
+`(HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>>`, remains available.
 The server observes the original task in both variants; the context callback adds
 no per-request Promise mapping wrapper. Development after Preview 16
 admits up to 16 exchanges; suspended async handlers allow other requests to advance.
@@ -77,8 +77,8 @@ An async entry point awaits the operation and handles its Result:
 
 | Need | API and behavior |
 | --- | --- |
-| Send a request | Get, Head, Post, Put, Patch and Delete; Send accepts a prepared HttpRequest |
-| Inspect a response | Get returns HttpResponse with status, headers, content and its associated request; non-2xx responses remain available to inspect |
+| Send a request | Get, Head, Post, Put, Patch and Delete; Send accepts a prepared HttpClientRequest |
+| Inspect a response | Get returns HttpClientResponse with status, headers, content and its associated request; non-2xx responses remain available to inspect |
 | Read text | GetString checks the status and decodes a buffered UTF-8 body |
 | Exchange JSON | `GetFromJson<T>` reads a successful JSON response; `PostAsJson` serializes a model and returns the response for explicit status/body handling |
 | Set addresses and headers | String or Uri addresses, optional BaseUri, DefaultRequestHeaders and per-request WithHeader |
@@ -149,7 +149,7 @@ fresh Windows and TLS streaming checks remain open.
 
 ## Customize requests
 
-Use `HttpRequest`, headers and content when a convenience method is not enough.
+Use `HttpClientRequest`, headers and content when a convenience method is not enough.
 `Send` returns the response even for non-success status codes; `GetString` and
 `GetFromJson<T>` check success before decoding. Method values allow custom names.
 
@@ -296,7 +296,7 @@ parameters can be parsed with `MediaType.Parse`; `WithParameter` returns a modif
 value without mutating the original. Presets, formatted strings and hashes are
 cached, and parameter views do not copy their contents on access.
 
-`HttpRequest.GetContentType()` and `HttpResponse.GetContentType()` distinguish absent
+`HttpClientRequest.GetContentType()` and `HttpClientResponse.GetContentType()` distinguish absent
 headers from malformed or duplicate Content-Type fields. Typed content retains its
 media type; string content still encodes UTF-8 and rejects a conflicting charset.
 Media types describe content; they do not select serializers or add multipart or
@@ -321,3 +321,16 @@ reads it directly, while positional access or iteration materializes `HttpHeader
 entries on demand. Message mutation and ownership contracts remain unchanged.
 WebDemo's cache middleware uses this API for its credential and cache-control checks.
 See the [API contract](/docs/http-headers.html) for errors, snapshots and allocation tradeoffs.
+
+### Independent client and server messages (development)
+
+The client uses `HttpClientRequest` and `HttpClientResponse`; the server uses
+`HttpServerRequest` and `HttpServerResponse`. They have independent contracts and
+implementations. Incoming headers expose the read-only `HttpHeaderCollection`
+interface; outgoing headers expose `MutableHttpHeaderCollection`. Both share the
+existing `HttpHeaderNames` catalog. Use `HttpHeaderCollection.Empty` for no fields.
+
+This separation permits role-specific body storage and allocation work without
+requiring matching client/server APIs. Both currently retain `HttpContent`; a
+server-specific body API remains future work. The split alone is not a measured
+performance gain. See the [header contract](/docs/http-headers.html).

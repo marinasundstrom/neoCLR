@@ -326,7 +326,7 @@ Import `System.Web.Http.Json.*` to use
 [HttpClientJsonExtensions](xref:System.Web.Http.Json.HttpClientJsonExtensions).
 `GetFromJson<T>` sends GET, requires a 2xx response, and reads the model with the
 same buffered mapping rules as `JsonContent.Read<T>`. `PostAsJson<T>` serializes a
-model before sending and returns `HttpResponse`, preserving non-success statuses
+model before sending and returns `HttpClientResponse`, preserving non-success statuses
 and content for the application to inspect. Both accept string or Uri addresses,
 with a final `cancellationToken: CancellationToken = default`, and honor BaseUri and DefaultRequestHeaders.
 

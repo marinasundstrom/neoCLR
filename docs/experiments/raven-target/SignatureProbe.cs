@@ -465,7 +465,7 @@ static class SignatureProbe
         Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.Storage.FileReadError.NotFound");
         Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.Time.InvalidDateError") && !ErrorBindings.IsEmpty("System.NumberParseError"));
         ErrorBindings.Reset(module);
-        foreach (var httpOwner in new[] { "System.Web.Http.HttpClient", "System.Web.Http.HttpRequest" })
+        foreach (var httpOwner in new[] { "System.Web.Http.HttpClient", "System.Web.Http.HttpClientRequest" })
             foreach (var get in module.GetType(httpOwner).Methods.Where(m => m.Name == "Get"))
                 Check("HTTP address overload " + get.FullName,
                     HttpBindings.Bind(get, get, false, false) is not null);
@@ -492,7 +492,7 @@ static class SignatureProbe
         memorySeek.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Memory seek requires Int64", () => StreamBindings.Bind(memorySeek, memorySeek, false, false));
         memorySeek.Parameters[0].ParameterType = memoryPositionType;
-        foreach (var httpOwner in new[] { "HttpServer", "HttpContext", "HttpResponse" })
+        foreach (var httpOwner in new[] { "HttpServer", "HttpContext", "HttpServerResponse" })
             foreach (var member in module.GetType(HttpBindings.Prefix + httpOwner).Methods.Where(m => m.IsPublic && !m.IsConstructor))
                 Check("HTTP lifecycle member " + member.FullName, HttpBindings.Bind(member, member, false, false) is not null);
         Check("Context is disposable", InterfaceBindings.Converts(HttpBindings.Prefix + "HttpContext", CollectionBindings.Disposable));
@@ -500,11 +500,11 @@ static class SignatureProbe
         foreach (var hiddenOwner in new[] { "HttpContext", "HttpServer" })
             foreach (var member in module.GetType(HttpBindings.Prefix + hiddenOwner).Methods.Where(m => m.IsAssembly))
                 Reject("HTTP lifecycle internals are private to the library " + member.FullName, () => HttpBindings.Bind(member, member, member.IsConstructor, false));
-        var requestType = module.GetType("System.Web.Http.HttpRequest");
+        var requestType = module.GetType("System.Web.Http.HttpClientRequest");
         foreach (var post in requestType.Methods.Where(m => m.Name is "Post" or "Put" or "Patch" or "Delete" or "Head")) {
             Check("HTTP request factory " + post.FullName, HttpBindings.Bind(post, post, false, false) is not null);
         }
-        foreach (var headerOwner in new[] { "HttpRequest", "HttpResponse" }) {
+        foreach (var headerOwner in new[] { "HttpClientRequest", "HttpClientResponse", "HttpServerRequest", "HttpServerResponse" }) {
             var lookup = module.GetType(HttpBindings.Prefix + headerOwner).Methods.Single(m => m.Name == "GetHeaderValues");
             Check("HTTP header lookup " + headerOwner, HttpBindings.Bind(lookup, lookup, false, false)?.Result == "System.Collections.Sequence<String>");
         }
@@ -512,7 +512,7 @@ static class SignatureProbe
         Reject("Header lookup helper is internal", () => HttpBindings.Bind(findValues, findValues, false, false));
         Check("Header lookup helper available to library", HttpBindings.Bind(findValues, findValues, false, true) is not null);
         var withHeader = requestType.Methods.Single(m => m.Name == "WithHeader");
-        Check("Request header construction", HttpBindings.Bind(withHeader, withHeader, false, false)?.Result == "System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>");
+        Check("Request header construction", HttpBindings.Bind(withHeader, withHeader, false, false)?.Result == "System.Result<System.Web.Http.HttpClientRequest,System.Web.Http.HttpError>");
         var requestContent = requestType.Methods.Single(m => m.Name == "get_Content");
         Check("Request content contract", HttpBindings.Bind(requestContent, requestContent, false, false)?.Result == "System.Web.Http.HttpContent");
         foreach (var member in new[] { requestType.Methods.Single(m => m.Name == "Encode"),
@@ -538,7 +538,7 @@ static class SignatureProbe
         Reject("HTTP default headers reject forged setter", () => HttpBindings.Bind(defaultsSetter, defaultsSetter, false, false));
         defaultsSetter.Parameters[0].ParameterType = defaultsArgument;
         foreach (var helper in new[] { requestType.Methods.Single(m => m.Name == "WithDefaults"),
-            module.GetType(HttpBindings.Prefix + "HttpResponse").Methods.Single(m => m.Name == "Associate") }) {
+            module.GetType(HttpBindings.Prefix + "HttpClientResponse").Methods.Single(m => m.Name == "Associate") }) {
             Check("HTTP association helper remains internal " + helper.Name, helper.IsAssembly);
             Reject("HTTP association helper excludes consumers " + helper.Name, () => HttpBindings.Bind(helper, helper, false, false));
             Check("HTTP association helper binds in library " + helper.Name, HttpBindings.Bind(helper, helper, false, true) is not null);
@@ -568,7 +568,7 @@ static class SignatureProbe
         statusNotFound.Constant = 405;
         Reject("HTTP status rejects changed constants", () => EnumBindings.Validate(module, EnumBindings.HttpStatusCode));
         statusNotFound.Constant = 404;
-        var successStatus = module.GetType("System.Web.Http.HttpResponse").Methods.Single(m => m.Name == "get_IsSuccessStatusCode");
+        var successStatus = module.GetType("System.Web.Http.HttpClientResponse").Methods.Single(m => m.Name == "get_IsSuccessStatusCode");
         Check("HTTP success status property", HttpBindings.Bind(successStatus, successStatus, false, false)?.Result == "Boolean");
         var httpError = module.GetType("System.Web.Http.HttpError");
         var statusCase = httpError.NestedTypes.Single(t => t.Name == "UnsuccessfulStatus");

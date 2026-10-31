@@ -29,7 +29,7 @@ class DriverApplication {
 
     func Release() { _ = gate.Complete(()) }
 
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         if request.Target == "/body" {
             let Some(stream) = request.Content.TryGetStream() else { Panic("Body stream") }
             let bytes: byte[] = [(byte)0, (byte)0]
@@ -45,7 +45,7 @@ class DriverApplication {
             active -= 1
         }
         GC.Collect()
-        return Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent(request.Target)))
+        return Ok(HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent(request.Target)))
     }
 }
 

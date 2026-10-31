@@ -15,8 +15,8 @@ func OpenServer() -> HttpServer {
     return server
 }
 
-func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), request.Content)))
+func Echo(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+    return Task.FromResult<Result<HttpServerResponse, HttpError>>(System.Result<HttpServerResponse, HttpError>.Ok(HttpServerResponse(200, ArrayList<HttpHeader>(), request.Content)))
 }
 
 func ValidateServer(result: Result<System.Void, HttpError>, expected: string) {

@@ -1,0 +1,270 @@
+module System.Web.Http
+
+import System.Runtime.CompilerServices.*
+import System.Optional.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.*
+import System.Networking.*
+import System.Networking.Security.*
+import System.Networking.Sockets.*
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+import System.IO.*
+import System.Time.*
+
+/// Accepted server request with read-only headers and lazy request metadata.
+public class HttpServerRequest : Disposable {
+    /// The request protocol version, available after headers. Current transport supports HTTP/1.1 only.
+    val Version: HttpVersion => HttpVersion.Http11
+    /// Releases owned content without reading or draining it. Safe to repeat.
+    func Dispose() { storedContent.Dispose() }
+    internal func SetContent(content: HttpContent) { storedContent = content }
+    private var storedContent: HttpContent = HttpMemoryContent(default(ReadOnlyMemory<byte>))
+    /// Request body content. Incoming nonempty bodies are consumed asynchronously on demand.
+    val Content: HttpContent => storedContent
+    private var storedHeaders: Sequence<HttpHeader>
+    /// Read-only header view with case-insensitive named lookup. Created lazily and retained.
+    /// Existing retained input sequences remain visible; named lookup returns independent snapshots.
+    val Headers: HttpHeaderCollection {
+        get {
+            if storedHeaders is HttpHeaderCollection cached && storedHeaders is not MutableHttpHeaderCollection {
+                return cached
+            }
+            let collection = ReadOnlyHttpHeaderCollection.Retain(storedHeaders)
+            storedHeaders = collection
+            return collection
+        }
+    }
+
+    /// Gets all matching field values in order using ASCII case-insensitive names.
+    /// Returns an empty snapshot for absent or invalid names; does not split or join values.
+    func GetHeaderValues(name: string) -> Sequence<string> {
+        return HttpHeader.FindValues(storedHeaders, name)
+    }
+
+    /// <summary>Parses the message's Content-Type without consuming its body.</summary>
+    /// <returns>Some for a valid value, None when absent, or Protocol for malformed or duplicate fields.</returns>
+    /// <remarks>Does not infer a type or perform negotiation; raw headers remain available.</remarks>
+    func GetContentType() -> Result<Optional<MediaType>, HttpError> {
+        var text: string? = null
+        var index = 0
+        while index < storedHeaders.Count {
+            if ReadOnlyHttpHeaderCollection.Matches(ReadOnlyHttpHeaderCollection.NameAt(storedHeaders, index), "content-type") {
+                if text is string {
+                    return Failure(HttpError.Protocol("Duplicate Content-Type"))
+                }
+                text = ReadOnlyHttpHeaderCollection.ValueAt(storedHeaders, index)
+            }
+            index += 1
+        }
+        if text is null {
+            return Ok(None())
+        }
+        let raw = text ?? ""
+        if parsedHeaderText is string previous && String.CompareOrdinal(previous, raw) == 0 {
+            if parsedHeaderType is MediaType cached {
+                return Ok(Some(cached))
+            }
+        }
+        // Outgoing typed content already owns a validated value. Preserve it.
+        if let Some(contentText) = storedContent.MediaTypeText {
+            if String.CompareOrdinal(contentText, raw) == 0 {
+                if let Ok(Some(value)) = storedContent.GetContentType() {
+                    parsedHeaderText = raw
+                    parsedHeaderType = value
+                    return Ok(Some(value))
+                }
+            }
+        }
+        let Ok(value) = MediaType.Parse(raw) else {
+            return Failure(HttpError.Protocol("Malformed Content-Type"))
+        }
+        parsedHeaderText = raw
+        parsedHeaderType = value
+        return Ok(Some(value))
+    }
+
+    private var parsedHeaderText: string?
+    private var parsedHeaderType: MediaType?
+    private var storedMethod: HttpMethod
+    /// The validated method value. Its Method property preserves the wire spelling.
+    val Method: HttpMethod => storedMethod
+    private var storedHost: string
+    val Host: string => storedHost
+    private var secure = false
+    /// Whether the request uses authenticated HTTPS transport.
+    val IsSecure: bool => secure
+    private var storedPort: int
+    val Port: int => storedPort
+    private var storedTarget: string
+    val Target: string => storedTarget
+
+    private init(host: string, port: int, target: string) {
+        storedHeaders = ArrayList<HttpHeader>()
+        storedMethod = HttpMethod.Get
+        storedHost = host
+        storedPort = port
+        storedTarget = target
+    }
+
+    internal static func FromIncoming(method: HttpMethod, target: string, host: string, headers: Sequence<HttpHeader>, body: Sequence<byte>, secure: bool) -> Result<HttpServerRequest, HttpError> {
+        let request = IncomingRequest(target, host, secure)?
+        request.storedHeaders = headers
+        request.storedMethod = method
+        request.storedContent = HttpMemoryContent(HttpText.Snapshot(body))
+        var index = 0
+        while index < headers.Count {
+            if ReadOnlyHttpHeaderCollection.NameAt(headers, index) == "content-type" {
+                request.storedContent = HttpMemoryContent(HttpText.Snapshot(body), ReadOnlyHttpHeaderCollection.ValueAt(headers, index))
+            }
+            index += 1
+        }
+        return Ok(request)
+    }
+
+    // Incoming origin-form requests already own their authority and target. Do not
+    // reconstruct an absolute URL or allocate a Uri merely to recover those fields.
+    // Keep the existing URI grammar/error precedence, including malformed Host
+    // suffixes, before applying the narrower HTTP authority and 1024-byte quota.
+    private static func IncomingCharacters(bytes: Sequence<byte>) -> Result<(), HttpError> {
+        var index = 0
+        while index < bytes.Count {
+            let value = bytes[index]
+            if value == 37 {
+                if index + 2 >= bytes.Count {
+                    return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
+                }
+                for offset in 1..3 {
+                    let digit = bytes[index + offset]
+                    if !((digit >= 48 && digit <= 57) || (digit >= 65 && digit <= 70) || (digit >= 97 && digit <= 102)) {
+                        return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
+                    }
+                }
+                index += 3
+                continue
+            }
+            if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
+                (value >= 48 && value <= 57) || value == 45 || value == 46 || value == 95 || value == 126 ||
+                value == 58 || value == 47 || value == 63 || value == 35 || value == 64 ||
+                value == 33 || value == 36 || value == 38 || value == 39 || value == 40 || value == 41 ||
+                value == 42 || value == 43 || value == 44 || value == 59 || value == 61) {
+                if value == 91 || value == 93 {
+                    return Failure(HttpError.InvalidUri(UriError.UnsupportedAuthority()))
+                }
+                return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
+            }
+            index += 1
+        }
+        return Ok(())
+    }
+
+    private static func IncomingRequest(target: string, authority: string, secure: bool) -> Result<HttpServerRequest, HttpError> {
+        // The decoder admits only nonempty origin-form targets (starting with /),
+        // with no fragment. Thus percent escapes cannot cross these two fields.
+        let prefixLength = if secure { 8 } else { 7 }
+        let length = prefixLength + authority.GetUtf8ByteCount() + target.GetUtf8ByteCount()
+        if length > 4096 {
+            return Failure(HttpError.InvalidUri(UriError.TooLong()))
+        }
+        let hostBytes = HttpText.Encode(authority)
+        let targetBytes = HttpText.Encode(target)
+        IncomingCharacters(hostBytes)?
+        IncomingCharacters(targetBytes)?
+        var end = 0
+        var at = -1
+        var lastColon = -1
+        while end < hostBytes.Count && hostBytes[end] != 47 && hostBytes[end] != 63 && hostBytes[end] != 35 {
+            if hostBytes[end] == 64 {
+                if at >= 0 {
+                    return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
+                }
+                at = end
+                lastColon = -1
+            } else if hostBytes[end] == 58 {
+                lastColon = end
+            }
+            end += 1
+        }
+        var position = at + 1
+        while position < end {
+            let value = hostBytes[position]
+            if (value == 58 && position != lastColon) ||
+                (lastColon >= 0 && position > lastColon && !(value >= 48 && value <= 57)) {
+                return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
+            }
+            position += 1
+        }
+        var fragment = false
+        position = end
+        while position < hostBytes.Count {
+            if hostBytes[position] == 35 {
+                if fragment {
+                    return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
+                }
+                fragment = true
+            }
+            position += 1
+        }
+        if length > 1024 {
+            return Failure(HttpError.LimitExceeded("URL limit exceeded"))
+        }
+        var colon = 0
+        while colon < end && hostBytes[colon] != 58 {
+            let value = hostBytes[colon]
+            if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
+                (value >= 48 && value <= 57) || value == 45 || value == 46) {
+                return Failure(HttpError.Unsupported("Unsupported hostname"))
+            }
+            colon += 1
+        }
+        if colon == 0 || colon > 253 {
+            return Failure(HttpError.InvalidRequest("Invalid hostname length"))
+        }
+        var port = if secure { 443 } else { 80 }
+        var host = authority
+        if colon < end {
+            port = 0
+            position = colon + 1
+            if position == end {
+                return Failure(HttpError.InvalidRequest("Empty port"))
+            }
+            while position < end {
+                let digit = (int)hostBytes[position] - 48
+                if !(digit >= 0 && digit <= 9) || port > (65535 - digit) / 10 {
+                    return Failure(HttpError.InvalidRequest("Invalid port"))
+                }
+                port = port * 10 + digit
+                position += 1
+            }
+            if port == 0 {
+                return Failure(HttpError.InvalidRequest("Invalid port"))
+            }
+            host = Text(hostBytes, 0, colon)?
+        }
+        if fragment {
+            return Failure(HttpError.Unsupported("Unsupported request target"))
+        }
+        if end != hostBytes.Count {
+            return Failure(HttpError.InvalidRequest("Invalid Host authority"))
+        }
+        let request = HttpServerRequest(host, port, target)
+        request.secure = secure
+        return Ok(request)
+    }
+
+    private static func Text(bytes: Sequence<byte>, first: int, last: int) -> Result<string, HttpError> {
+        let part = ArrayList<byte>()
+        var index = first
+        while index < last {
+            part.Add(bytes[index])
+            index += 1
+        }
+        if let Ok(text) = HttpText.Decode(part) {
+            return Ok(text)
+        }
+        return Failure(HttpError.InvalidRequest("Invalid URL text"))
+    }
+
+}

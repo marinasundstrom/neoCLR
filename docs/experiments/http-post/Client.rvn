@@ -26,7 +26,7 @@ func ContentFor(index: int) -> HttpContent {
 class InspectHandler : HttpHandler {
 
     var Calls: int = 0
-    override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Calls += 1
         Check(request.Method.Method == "POST")
         Check(request.Target == "/base/echo")
@@ -34,8 +34,8 @@ class InspectHandler : HttpHandler {
         Check(request.Headers.Count == 1)
         Check(request.Headers[0].Value == "text/plain; charset=utf-8")
         Check(cancellationToken.CanBeCancelled)
-        let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
+        let source = Promise<Result<HttpClientResponse, HttpError>>()
+        _ = source.Complete(Ok(HttpClientResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), request.Content)))
         return source.Task
     }
 }
@@ -61,7 +61,7 @@ func CheckContracts() {
 
     // Persistent views have a fixed length: reject an oversized body at construction.
     let bytes = (byte[])[for index in 0..1048577 => (byte)1]
-    Check(HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(bytes)) is Failure(HttpError.LimitExceeded(_)))
+    Check(HttpClientRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(bytes)) is Failure(HttpError.LimitExceeded(_)))
     let bad = HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nInjected: yes")
     if let Failure(HttpError.InvalidRequest(_)) = HttpClient().Post("http://not-resolved.invalid/", bad).GetResult() {
         Check(true)

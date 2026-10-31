@@ -139,7 +139,7 @@ text-model rule. Reader cancellation overloads remain pending. The decoder still
 creates text fragments and concatenates them; this is not allocation-free reading. Creating text content does not retain the original String after encoding.
 
 Memory content stores its window directly without a Sequence wrapper or byte copy.
-Wire code and JSON reads borrow that selected window directly. Both HttpResponse
+Wire code and JSON reads borrow that selected window directly. Both HttpClientResponse and HttpServerResponse
 constructors take HttpContent and retain that exact producer without reading or
 copying its body. Memory aliases remain visible, and streams remain unconsumed.
 Content metadata replaces all Content-Type headers without mutating the caller's
@@ -157,7 +157,7 @@ pending, as do optional wide lengths and unknown-length outgoing framing.
 
 ## Message ownership and version (development, 2026-10-19)
 
-`HttpRequest` and `HttpResponse` implement `Disposable`. Disposal releases their
+`HttpClientRequest`, `HttpClientResponse`, `HttpServerRequest` and `HttpServerResponse` implement `Disposable`. Disposal releases their
 content without reading or draining it and is safe to repeat. Client callers own
 requests and returned responses; sending does not dispose a caller-owned request.
 `HttpContext` owns incoming requests and outgoing responses. Serve manages the
@@ -180,7 +180,7 @@ reference and does not expose a version setter while only HTTP/1.1 is supported.
 The cost is a distinct value API and no version-selection policy yet; it avoids
 per-message version allocations without claiming support for other protocols.
 
-`HttpResponse` exposes `StatusCode`, `IsSuccessStatusCode`, `Version` and
+`HttpClientResponse` exposes `StatusCode`, `IsSuccessStatusCode`, `Version` and
 `ReasonPhrase`. Incoming HTTP/1.1 reason text is preserved exactly within the
 current ASCII-header contract, including tabs, trailing spaces and an empty
 phrase. Informational phrases do not replace final-response metadata. Custom

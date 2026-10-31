@@ -11,7 +11,7 @@ func Check(value: bool) {
 async func Main(arguments: string[]) -> Task<()> {
     let client = HttpClient()
     for mode in 0..5 {
-        let Ok(request) = HttpRequest.Get(arguments[0]) else { Panic("Invalid address") }
+        let Ok(request) = HttpClientRequest.Get(arguments[0]) else { Panic("Invalid address") }
         let Ok(response) = await client.Send(request, HttpCompletionOption.ResponseHeadersRead) else { Panic("Headers failed") }
         Check(!response.Content.IsBuffered)
         let destination = MemoryStream()

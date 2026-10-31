@@ -15,6 +15,7 @@ import NeoClr.Testing.*
 import System.Web.Http.*
 
 func CheckParsedHeaderView(headers: HttpHeaderCollection) -> Result<unit, TestFailure> {
+    _ = Assert.True(headers is not MutableHttpHeaderCollection, "Incoming headers are read-only")?
     let missing = "x-absent-for-allocation-test"
     let host = HttpHeaderNames.Host
     _ = headers.Contains(host)
@@ -85,7 +86,7 @@ func ExplicitRoute([FromRoute] id: int) -> HttpResult<string> => HttpResult<stri
 
 [Test]
 func `Invalid options and ambiguous routes fail without registration`() -> Result<unit, TestFailure> {
-    use response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(""))
+    use response = HttpServerResponse(200, ArrayList<HttpHeader>(), HttpStringContent(""))
     _ = Assert.True(response.SetHeader("X-Test", "one") is Ok(_), "Header accepted")?
     _ = Assert.True(response.SetHeader("x-test", "two") is Ok(_), "Header replaced ignoring case")?
     _ = Assert.Equal(1, response.GetHeaderValues("X-Test").Count)?
@@ -127,7 +128,7 @@ class Handlers {
     val Entered = Promise<unit>()
     val Release = Promise<unit>()
 
-    async func Generic(id: int, probe: ScopedProbe, context: HttpContext, request: HttpRequest, response: HttpResponse) -> Task<HttpResult<string>> {
+    async func Generic(id: int, probe: ScopedProbe, context: HttpContext, request: HttpServerRequest, response: HttpServerResponse) -> Task<HttpResult<string>> {
         if !Object.ReferenceEquals(request, context.Request) || !Object.ReferenceEquals(response, context.Response) {
             Panic("Framework parameter identity differs from context")
         }
@@ -269,9 +270,9 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
 
 async func TerminalChecks(client: HttpClient, secondUrl: string) -> Task<Result<unit, TestFailure>> {
     _ = Assert.Equal("terminal", ResponseText(await client.GetString(secondUrl + "/missing/path"))?)?
-    use terminalPost = (await client.Send(HttpRequest.Create(HttpMethod.Post, secondUrl + "/other")!))!
+    use terminalPost = (await client.Send(HttpClientRequest.Create(HttpMethod.Post, secondUrl + "/other")!))!
     _ = Assert.Equal(200, (int)terminalPost.StatusCode)?
-    use rejectedPost = (await client.Send(HttpRequest.Create(HttpMethod.Post, secondUrl + "/only")!))!
+    use rejectedPost = (await client.Send(HttpClientRequest.Create(HttpMethod.Post, secondUrl + "/only")!))!
     _ = Assert.Equal(405, (int)rejectedPost.StatusCode)?
     return Ok(())
 }
@@ -289,7 +290,7 @@ async func RunningChecks(app: WebApplication, client: HttpClient, url: string, h
     _ = (await CheckStatus(client, url + "/bindings/nope", 400))?
     _ = Assert.Equal(2, handlers.AnnotatedCalls)?
     _ = Assert.Equal("literal", ResponseText(await client.GetString(url + "/any/42"))?)?
-    use anyPost = (await client.Send(HttpRequest.Create(HttpMethod.Post, url + "/any/42")!))!
+    use anyPost = (await client.Send(HttpClientRequest.Create(HttpMethod.Post, url + "/any/42")!))!
     _ = Assert.Equal(200, (int)anyPost.StatusCode)?
     _ = Assert.Equal("literal", ResponseText(await client.GetString(url + "/items/current"))?)?
     let first = client.GetString(url + "/items/41")
@@ -313,7 +314,7 @@ async func RunningChecks(app: WebApplication, client: HttpClient, url: string, h
     _ = (await CheckStatus(client, url + "/failure", 500))?
     _ = (await CheckStatus(client, url + "/absent", 404))?
     _ = (await CheckStatus(client, url + "/items/%2F", 400))?
-    let request = HttpRequest.Create(HttpMethod.Post, url + "/items/current")!
+    let request = HttpClientRequest.Create(HttpMethod.Post, url + "/items/current")!
     use rejected = (await client.Send(request))!
     _ = Assert.Equal(405, (int)rejected.StatusCode)?
     _ = Assert.Equal("GET", rejected.GetHeaderValues("Allow")[0])?

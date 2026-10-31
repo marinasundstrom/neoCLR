@@ -4,11 +4,11 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let result: Result<HttpResponse, HttpError> = if request.IsSecure {
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+    let result: Result<HttpServerResponse, HttpError> = if request.IsSecure {
         Failure(HttpError.Handler("Cleartext request marked secure"))
     } else {
-        Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("plain")))
+        Ok(HttpServerResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("plain")))
     }
     return Task.FromResult(result)
 }

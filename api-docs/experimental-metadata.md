@@ -10727,3 +10727,19 @@ Raven's ParameterInfo.GetCustomAttributesData uses the parameter's declared modu
 when its function has no nominal owner. Its public signature is unchanged. The
 [project retention contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-retention.md) describes explicit native/JIT
 attribute retention; no new CLI bridge encoding is introduced.
+
+### Static interface helper bodies — development 2026-10-31
+
+`TypeBuilder.AddMethod(name, signature[, visibility])` can author a concrete static
+helper on an interface. `AddInterfaceMethod` continues to author an abstract
+contract; `MethodBuilder.IsAbstract` reflects that distinction. Concrete helpers
+must have valid bodies and are excluded from implementation obligations. Instance
+interface helper bodies remain unsupported by this producer API.
+
+`AssemblyBuilder.CreateMethodReference(..., isInterfaceHelper: true)` imports a
+concrete static interface helper. The flag requires an interface owner, static
+method and no abstract/virtual/override flags. Its default is false, preserving
+existing abstract-interface import behavior. Native roundtrips retain these flags;
+Raven's native backend uses the explicit helper flag for imported concrete members.
+No new temporary CLI encoding is required. Matching compiler/producer builds are
+required; older producers reject bodies or classify helpers as abstract contracts.

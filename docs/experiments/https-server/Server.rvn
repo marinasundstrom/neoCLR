@@ -6,13 +6,13 @@ import System.Concurrency.Tasks.*
 import System.Time.*
 import System.Web.Http.*
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     if request.Target != "/greeting" {
         Panic("Unexpected HTTPS request")
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
-    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, HttpStringContent("Café 🌍 over TLS")))
+    let result: Result<HttpServerResponse, HttpError> = Ok(HttpServerResponse(200, headers, HttpStringContent("Café 🌍 over TLS")))
     return Task.FromResult(result)
 }
 

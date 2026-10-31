@@ -30,13 +30,13 @@ public class WebServerOptions {
 /// A request-owned view with buffered response operations. Do not retain it after the request pipeline settles.
 public class HttpContext {
     private val transport: System.Web.Http.HttpContext
-    private val response: HttpResponse
+    private val response: HttpServerResponse
     private var route: RouteMatch
     private var active = true
     /// The active response configuration; do not retain it beyond the pipeline.
-    val Response: HttpResponse => response
+    val Response: HttpServerResponse => response
     /// The incoming request; content is valid until the request pipeline settles.
-    val Request: HttpRequest
+    val Request: HttpServerRequest
     /// The scope owned by this request. Do not dispose it yourself.
     val Services: ServiceProvider
     /// Captured and decoded route parameters; empty before routing and for terminal fallback.
@@ -96,7 +96,7 @@ public class HttpContext {
         _ = response.SetHeader("Allow", String.Join(", ", methods))!
     }
 
-    internal func Finish() -> HttpResponse {
+    internal func Finish() -> HttpServerResponse {
         active = false
         Services.Dispose()
         return response

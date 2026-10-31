@@ -3,7 +3,7 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
-func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
     if request.Method.Method != "GET" || request.Target != "/greeting" {
         Panic("Unexpected benchmark request")
     }

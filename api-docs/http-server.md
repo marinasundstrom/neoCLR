@@ -15,7 +15,7 @@ Development after Preview 16 adds:
 - `Serve(handler, cancellationToken) -> Task<Result<System.Void, HttpError>>`
 - `CompletedRequests: long`, `FailedRequests: long`, `LastRequestError: Optional<HttpError>`
 
-Serve accepts either `(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`
+Serve accepts either `(HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>>`
 (the same callback as ServeOne) or `(HttpContext) -> Task<Result<unit, HttpError>>`.
 Both accept an optional CancellationToken defaulting to the non-cancellable token. A context handler configures
 `context.Response` or calls `context.Respond(...)`, then returns `Ok(())`.
@@ -154,3 +154,20 @@ Later framing, EOF, size and read errors surface during consumption. A handler t
 does not read the body does not validate its unread framing. Declared-length and
 header validation still happen before dispatch. Keep-alive draining/reuse is not
 implemented. Lower buffering is an allocation benefit; throughput needs measurement.
+
+## Client/server message migration (development)
+
+Use `HttpServerRequest` and `HttpServerResponse` in callback annotations and response
+construction. `HttpContext.Request` and `.Response` expose those types. HTTP client
+calls and custom HttpHandler implementations use `HttpClientRequest` and
+`HttpClientResponse` instead. The old HttpRequest/HttpResponse names are removed;
+rebuild dependent libraries and applications together.
+
+These are independent types, without a shared message base. Incoming server requests
+expose read-only headers; outgoing server responses expose MutableHttpHeaderCollection.
+`HttpServerResponse()` creates an empty OK response; status/content and
+status/headers/content constructors remain available. Use Respond or SetHeader to
+configure a response, or mutate its header collection. A view remains attached
+across response changes. All four message roles may cache or lazily project values.
+Body handling retains HttpContent for this slice; server-specific body storage and
+APIs may evolve independently. See [header ownership](http-headers.html).

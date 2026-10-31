@@ -5,7 +5,7 @@ import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 async func Check(client: HttpClient, url: string, code: int, reason: string, streamed: bool, disposeFirst: bool) -> Task<unit> {
-    let Ok(request) = HttpRequest.Get(url) else { Panic("Request creation failed") }
+    let Ok(request) = HttpClientRequest.Get(url) else { Panic("Request creation failed") }
     use ownedRequest = request
     let mode = if streamed { HttpCompletionOption.ResponseHeadersRead } else { HttpCompletionOption.ResponseContentRead }
     let Ok(response) = await client.Send(request, mode) else { Panic("HTTP request failed") }
@@ -28,7 +28,7 @@ async func Check(client: HttpClient, url: string, code: int, reason: string, str
 }
 
 async func Main(arguments: string[]) -> Task<int> {
-    let local = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let local = HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     if local.ReasonPhrase != "OK" { Panic("Local status phrase mismatch") }
     local.Respond(HttpStatusCode.Created)
     if local.ReasonPhrase != "" { Panic("Changed status phrase mismatch") }

@@ -47,11 +47,11 @@ func Main() {
     let zero: HttpVersion = default
     Check(zero.Equals(HttpVersion(0, 0)), "default value")
     Check(HttpVersion.Http11.Equals(HttpVersion(1, 1)), "HTTP 1.1 constant")
-    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    let response = HttpClientResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     let version: Object = response.Version
     Check(version.Equals(HttpVersion.Http11) && version.ToString() == "1.1", "response version")
     response.Dispose()
-    let Ok(request) = HttpRequest.Get("http://localhost/") else {
+    let Ok(request) = HttpClientRequest.Get("http://localhost/") else {
         Panic("request creation")
     }
     let requestVersion: Object = request.Version

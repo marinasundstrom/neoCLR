@@ -4,15 +4,15 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
-func MakeRequest(url: string, size: int) -> HttpRequest {
+func MakeRequest(url: string, size: int) -> HttpClientRequest {
     let bytes = (byte[])[for index in 0..size => (byte)(index % 256)]
-    let Ok(request) = HttpRequest.Create(HttpMethod.Post, url, HttpMemoryContent(bytes)) else {
+    let Ok(request) = HttpClientRequest.Create(HttpMethod.Post, url, HttpMemoryContent(bytes)) else {
         Panic("Request construction failed")
     }
     return request
 }
 
-func Validate(result: Result<HttpResponse, HttpError>, size: int, expected: string) {
+func Validate(result: Result<HttpClientResponse, HttpError>, size: int, expected: string) {
     if let Ok(response) = result {
         if expected != "ok" || (int)response.StatusCode != 200 || response.Content.Length != size {
             Panic("Unexpected response")

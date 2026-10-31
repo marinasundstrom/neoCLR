@@ -13409,3 +13409,46 @@ int main(void) {
         String::from_utf8_lossy(&result.stderr)
     );
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn concrete_static_interface_helpers_are_direct_call_bodies() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = r#"
+.module InterfaceHelper
+.interface Reader
+.method static Empty() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Calculate(Int32 ignored) -> Int32
+call Reader::Empty()
+ret
+.end
+"#;
+    let result = compile_source(
+        &dir,
+        &seed,
+        source,
+        &["--compile-system", "--reference-arena"],
+        false,
+    );
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert!(report["interfaceDispatch"].as_array().unwrap().is_empty());
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap())
+        .unwrap();
+    let result = method
+        .invoke(vec![neoclr::Value::Int32(0)], neoclr::Limits::default())
+        .unwrap();
+    assert!(matches!(result.value, neoclr::Value::Int32(42)));
+}

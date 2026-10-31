@@ -194,7 +194,9 @@ public sealed partial class AssemblyBuilder
             return result;
         }
         var owner = MakeOwner(type);
-        var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, visibility: (definition.Attributes & 7) == 4 ? MethodVisibility.Protected : MethodVisibility.Public, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
+        var reference = new ImportedMethodReference(this, isInterface && isAbstract
+            ? new MethodBuilder(imported.Graph, new MethodDefinition(function.Name, (ushort)(0x546 | (definition.IsStatic ? 0x10 : 0)), signature!), owner)
+            : new MethodBuilder(imported.Graph, owner, function.Name, signature!, visibility: (definition.Attributes & 7) == 4 ? MethodVisibility.Protected : MethodVisibility.Public, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
         if (type is null && definition.ImplementationAttributes == 0x1000)
         {
             reference.Target.SetInternalCall();

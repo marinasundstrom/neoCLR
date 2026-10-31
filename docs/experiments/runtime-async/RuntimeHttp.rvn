@@ -7,7 +7,7 @@ module RuntimeHttpSample {
 
     func ProduceBody() -> string => "Café 🌍"
 
-    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    async func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
         if request.Method.Method != "GET" || request.Target != "/greeting" {
             Panic("Unexpected request")
         }
@@ -15,7 +15,7 @@ module RuntimeHttpSample {
         System.Runtime.GC.Collect()
         let headers = ArrayList<HttpHeader>()
         headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
-        return Ok(HttpResponse(200, headers, HttpStringContent(body)))
+        return Ok(HttpServerResponse(200, headers, HttpStringContent(body)))
     }
 
     async func Main() -> Task<int> {

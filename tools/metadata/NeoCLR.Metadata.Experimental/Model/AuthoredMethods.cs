@@ -268,7 +268,7 @@ public sealed partial class TypeBuilder
         if (slotFlags != 0 && !IsInterface && !IsNativeObjectRoot &&
             (IsStatic || IsValueType && (slotFlags != 0x40 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot, Assembly.ExternalObjectRoot))))
             throw new InvalidOperationException("virtual slots require a reference class or supported Object value override");
-        if (definition.Producer is null && (IsInterface && definition.Name != ".cctor" && slotFlags != 0x540 || !IsInterface && slotFlags == 0x540 && (!IsAbstract || definition.IsStatic)))
+        if (definition.Producer is null && (IsInterface && definition.Name != ".cctor" && slotFlags != 0x540 && !(definition.IsStatic && slotFlags == 0) || !IsInterface && slotFlags == 0x540 && (!IsAbstract || definition.IsStatic)))
             throw new InvalidOperationException("abstract methods require an abstract class or interface");
         if (definition.Name == ".ctor" && definition.AuthoredSignature!.ParameterTypes.Any(p => p.ByReferenceElement is not null)) throw new InvalidOperationException("byref constructor parameters unsupported");
         if (!definition.IsStatic && IsStatic) throw new InvalidOperationException("instance methods require a nonstatic owner");

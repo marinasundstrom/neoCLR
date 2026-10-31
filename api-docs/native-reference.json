@@ -5,17 +5,17 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "2b179506b0edd7fcac269d25a81a061da0f0df1c7cd6ef3e530b5f6ed2c4557d",
+  "sha256": "58fa76adb169cea4b3d82b1a5c7fffe71728c617e29753078cd758560958eca2",
   "librarySourceRevision": "6228d0be91564fc7b320d8e5bf0b7c750ce23be6",
   "compilerRevision": "4f7619fd8-working",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "001d028c0bee048d2daa40275293d714918f142a3ad42fe18324ff23dccf50eb"
+    "sha256": "158a8b50b94feb0b12e042255b72ee486abb3dc007763a0c22671c9b5c89e436"
   },
-  "rendererRevision": "977eda4d5247df44a5078bc45c12c12783b2f9a2",
+  "rendererRevision": "a1f2c8588c0db37ee1dba141b18d7e00f2756c16",
   "libraryArtifacts": {
-    "System.Web.dll": "4b5e7a60c2180f671f3c5e297d7e4f45a130b4b73c9c044a309355ad2967ee22",
-    "Neo.Web.dll": "d8d00b3f5fcd2593826b0316d496d327a92b11713bb8685f0341319c273002af",
+    "System.Web.dll": "227ea912f1b91fb3152ecb2048d8c1856cec8a7a6d16c905cbefcfd4d008d523",
+    "Neo.Web.dll": "b78f9dd519d28d467406125ccfd9fd5a21257415d22a4aaabb8a9db0751d5e56",
     "Neo.DependencyInjection.Abstractions.dll": "3428f0dc49cad595e33d95a7fd4c8df583be697c3dc107261aab4056b3c492a6",
     "Neo.DependencyInjection.dll": "3af89fec3a573938624f38f5a2a356bc5c56b618c8b3cd5deefad107e5fee7fc",
     "Neo.Logging.Abstractions.dll": "742e2fdb3adf0f046e37ad1afa086818c75025a1754e16fd24821879eebbf7fd",
@@ -32,8 +32,8 @@
     "Neo.Configuration.Abstractions.dll": "615237ff5d50a4ad5bc83046de3c2374c2024ee144426560cb34cf71673a98eb"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "f64e2d2bce6661687da43414020fffdc7cba469e85d3f280e624ccaf1704013c",
-    "restored-xml-comments.json": "6b537f2d9dac34ada60ebf897e02dbc633adfc423ca1af776a3fa5ea1ce9e1c1"
+    "normalized-sidecars.json": "b424c165456cb42a2bfbc8961385a6a742b1d5451d8eb90be036c7f2d140ea8b",
+    "restored-xml-comments.json": "bcdd28045ae6da6f3b3032ca8f4c8208dfdd4edc54582650e1881a5f83950b1b"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

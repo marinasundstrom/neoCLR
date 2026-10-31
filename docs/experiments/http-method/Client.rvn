@@ -3,15 +3,15 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
-func Request(url: string) -> HttpRequest {
-    let Ok(request) = HttpRequest.Create(HttpMethod("m-SEARCH"), url, HttpStringContent("body")) else {
+func Request(url: string) -> HttpClientRequest {
+    let Ok(request) = HttpClientRequest.Create(HttpMethod("m-SEARCH"), url, HttpStringContent("body")) else {
         Panic("Custom request construction failed")
     }
     return request
 }
 
-func ConnectRequest() -> HttpRequest {
-    let Ok(request) = HttpRequest.Create(HttpMethod.Connect, "http://example.test/") else {
+func ConnectRequest() -> HttpClientRequest {
+    let Ok(request) = HttpClientRequest.Create(HttpMethod.Connect, "http://example.test/") else {
         Panic("CONNECT request construction failed")
     }
     return request

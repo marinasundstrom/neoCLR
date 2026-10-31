@@ -1,5 +1,37 @@
 # Development conversation record
 
+## 2026-10-31 — Independent HTTP message roles and lazy views
+
+- **Author:** Directed separate client/server representations and header contracts,
+  then revised the client names from HttpRequestMessage/HttpResponseMessage to
+  `HttpClientRequest`/`HttpClientResponse`, mirroring `HttpServerRequest` and
+  `HttpServerResponse`.
+- **Author:** These APIs need not conform to a common message contract. Server body
+  handling need not use client content classes. Asked to “reinforce variance” and
+  noted that the separation could also help performance.
+- **Assistant interpretation:** Specialize by role and ownership, rather than impose
+  a common message base or imply generic covariance. Independent storage permits
+  deferred header/URI/body views; allocation or throughput gains require measurement.
+- **Author clarification, confirmed:** Client requests are mutable and client
+  responses read-only; the server relationship is reversed. All four may evaluate
+  lazily. Read-only public access does not prohibit internal parsing/caching.
+- **Assistant actions/outcome:** Split the four implementations and migrate HTTP,
+  Neo.Web, samples, tests and active benchmark consumers. Retain HttpContent while
+  preserving the option of a server-specific body contract. Fix static-interface
+  factory gaps in Raven main (`a1f2c8588`), the metadata producer and codegen dispatch
+  classification. Header/framework/sample checks and real HTTP pass in interpreter,
+  JIT and AOT; allocation checks preserve deferred entry materialization. Update
+  the native API snapshot and website. See [qualification](validation/http-message-surfaces-20261031/README.md).
+  No throughput gain or release-default change is established by this API split.
+- **Author review:** Noted that HttpServerResponse did not appear to use
+  HttpHeaderCollection. The assistant clarified that Headers exposes the mutable
+  subtype, then moved content-type replacement out of the response into the header
+  implementation. Private sequence storage remains behind a lazily created public
+  view; constructor preservation and Respond clearing rules remain distinct.
+- **Open:** Independent server body APIs, middleware rewriting over received data,
+  and measured performance specialization. The read-only incoming contract is an
+  author-directed difference from ASP.NET Core's mutable middleware request view.
+
 ## 2026-10-31 — Typed middleware and explicit binding attributes
 
 - **Author:** Selected `TMiddleware : Middleware` with Middleware an interface.

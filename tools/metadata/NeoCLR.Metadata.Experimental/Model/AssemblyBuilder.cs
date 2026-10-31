@@ -1165,7 +1165,7 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or method limit exceeded.</exception>
     public MethodBuilder AddMethod(string name, MethodSignature signature)
         => AddMethod(name, signature, MethodVisibility.Public);
-    /// <summary>Adds a static primitive method with explicit visibility.</summary>
+    /// <summary>Adds a static method with explicit visibility, including an interface helper with a body.</summary>
     /// <param name="name">Nonempty metadata name.</param>
     /// <param name="signature">The primitive/owned-class parameter and result contract.</param>
     /// <param name="visibility">Public, internal or private access.</param>
@@ -1218,7 +1218,8 @@ public sealed partial class TypeBuilder
     }
     private MethodBuilder AddMethodCore(string name, MethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor, bool abstractContract = false)
     {
-        if (IsInterface != abstractContract) throw new InvalidOperationException("interface owners require abstract contract methods");
+        if (abstractContract && !IsInterface || IsInterface && !abstractContract && (!isStatic || constructor))
+            throw new InvalidOperationException("interface owners require abstract contracts or static helper bodies");
         if (!isStatic && IsStatic) throw new InvalidOperationException("instance methods require a nonstatic nominal type");
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private or MethodVisibility.Protected)) throw new ArgumentOutOfRangeException(nameof(visibility));
@@ -1228,7 +1229,11 @@ public sealed partial class TypeBuilder
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && (m.Signature.IsDependent || signature.IsDependent ? m.Signature.FunctionType == signature.FunctionType : m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes))))
             throw new ArgumentException($"invalid or duplicate method: {Namespace}.{Name}.{name}");
-        var method = new MethodBuilder(Assembly, this, name, signature, visibility, isStatic: isStatic); Definition.Methods.Add(method.Definition); return method;
+        var flags = (ushort)((visibility switch { MethodVisibility.Public => 6, MethodVisibility.Internal => 3, MethodVisibility.Protected => 4, _ => 1 }) |
+            (isStatic ? 0x10 : 0) | (abstractContract ? 0x540 : 0));
+        var definition = new MethodDefinition(name, flags, signature);
+        Definition.Methods.Add(definition);
+        return MethodBuilder.ForDefinition(definition);
     }
 }
 

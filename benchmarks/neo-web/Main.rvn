@@ -18,8 +18,8 @@ func ContextValue(context: HttpContext) -> Task<Result<unit, WebError>> {
     return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
 }
 
-func Direct(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("42"))))
+func Direct(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+    return Task.FromResult<Result<HttpServerResponse, HttpError>>(Result<HttpServerResponse, HttpError>.Ok(HttpServerResponse(200, ArrayList<HttpHeader>(), HttpStringContent("42"))))
 }
 
 // Paired cases isolate transport callbacks, scopes and selected binding paths.

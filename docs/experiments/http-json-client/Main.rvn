@@ -23,18 +23,18 @@ public class Report {
 
 class ReplyHandler : HttpHandler {
 
-    val Completion: Promise<Result<HttpResponse, HttpError>> = Promise<Result<HttpResponse, HttpError>>()
-    val Response: HttpResponse
+    val Completion: Promise<Result<HttpClientResponse, HttpError>> = Promise<Result<HttpClientResponse, HttpError>>()
+    val Response: HttpClientResponse
     var Calls: int = 0
     var SawToken: bool = false
     private var pending: bool
 
     init(status: int, text: string, pending: bool) {
-        Response = HttpResponse(status, ArrayList<HttpHeader>(), HttpStringContent(text))
+        Response = HttpClientResponse(status, ArrayList<HttpHeader>(), HttpStringContent(text))
         self.pending = pending
     }
 
-    override func Send(request: HttpRequest, token: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+    override func Send(request: HttpClientRequest, token: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
         Calls += 1
         SawToken = token.CanBeCancelled
         if !pending {
