@@ -1,0 +1,66 @@
+module Examples.WebTests
+
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import Neo.Configuration.*
+import Neo.Logging.*
+import Neo.Web.*
+import NeoClr.Testing.*
+import Examples.Web.*
+
+[Test]
+func `Greeting uses the supplied configuration and name`() -> Result<unit, TestFailure> {
+    let configuration = DefaultConfigurationBuilder()
+    _ = configuration.AddInMemoryCollection([ConfigurationEntry("Greeting", "Welcome")])
+    use root = configuration.Build()
+    use service = GreetingService(root)
+    let result = Greeting("Ada", service)
+    _ = Assert.True(result is HttpResult<string>.Ok(_), "Greeting returns Ok")?
+    return Assert.Equal("Welcome, Ada!", Describe(result))
+}
+
+[Test]
+func `Visits retain application state and return created results`() -> Result<unit, TestFailure> {
+    let visits = VisitStore()
+    use logging = DefaultLoggerFactory()
+    let first = Visit(visits, logging)
+    let second = Visit(visits, logging)
+    _ = Assert.True(first is HttpResult<string>.Created(_), "First visit returns Created")?
+    _ = Assert.True(second is HttpResult<string>.Created(_), "Second visit returns Created")?
+    _ = Assert.Equal("Visit 1", Describe(first))?
+    return Assert.Equal("Visit 2", Describe(second))
+}
+
+func Describe(result: HttpResult<string>) -> string => match result {
+    HttpResult<string>.Ok(let value) => value
+    HttpResult<string>.Created(let value) => value
+    HttpResult<string>.BadRequest => "400"
+    HttpResult<string>.NotFound => "404"
+}
+
+[Test]
+func `Item lookup chooses among the closed result alternatives`() -> Result<unit, TestFailure> {
+    _ = Assert.Equal("The answer", Describe(Item(42)))?
+    _ = Assert.True(Item(7) is HttpResult<string>.NotFound, "Unknown item returns NotFound")?
+    return Assert.True(Item(-1) is HttpResult<string>.BadRequest, "Negative ID returns BadRequest")
+}
+
+async func AsyncGreeting() -> Task<Result<unit, TestFailure>> {
+    use root = DefaultConfigurationBuilder().Build()
+    use service = GreetingService(root)
+    let result = await Home(service)
+    _ = Assert.True(result is HttpResult<string>.Ok(_), "Home returns Ok after await")?
+    return Assert.Equal("Hello, neoCLR!", Describe(result))
+}
+
+async func Main() -> Task<int> {
+    let pending = AsyncGreeting()
+    _ = await pending
+    let suite = TestSuite()
+    suite.Add("sample.greeting", "Greeting uses the supplied configuration and name", `Greeting uses the supplied configuration and name`)
+    suite.Add("sample.visits", "Visits retain application state and return created results", `Visits retain application state and return created results`)
+    suite.Add("sample.item", "Item lookup chooses among the closed result alternatives", `Item lookup chooses among the closed result alternatives`)
+    suite.Add("sample.async", "Awaited greeting returns a typed result", () => pending.GetResult())
+    return TestRunner.Run(suite, [])
+}

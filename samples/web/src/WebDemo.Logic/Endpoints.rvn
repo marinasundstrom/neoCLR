@@ -1,0 +1,76 @@
+module Examples.Web
+
+import System.*
+import System.Result.*
+import System.Time.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import Neo.Configuration.*
+import Neo.DependencyInjection.*
+import Neo.Logging.*
+import Neo.Web.*
+
+// Shared application state; cooperative request continuations access this on one dispatcher.
+public class VisitStore {
+    private var count = 0
+    func Record() -> int {
+        count += 1
+        return count
+    }
+}
+
+// One instance per request. Later slices can replace the greeting with an actual data service.
+public class GreetingService : Disposable {
+    private val configuration: Configuration
+    private var disposed = false
+    init(configuration: Configuration) { self.configuration = configuration }
+    func Greet(name: string) -> string {
+        if disposed { Panic("GreetingService used after request completion") }
+        return (configuration["Greeting"] ?? "Hello") + ", " + name + "!"
+    }
+    func Dispose() { disposed = true }
+}
+
+// Handlers are ordinary functions: explicit inputs and typed response values.
+public async func Home(service: GreetingService) -> Task<HttpResult<string>> {
+    let name = await Task.Run(() => "neoCLR")
+    return HttpResult<string>.Ok(service.Greet(name))
+}
+
+public func Greeting(name: string, service: GreetingService) -> HttpResult<string> {
+    return HttpResult<string>.Ok(service.Greet(name))
+}
+
+public func Current() -> HttpResult<string> => HttpResult<string>.Ok("The current visitor is neoCLR")
+
+public func Visit(visits: VisitStore, logging: LoggerFactory) -> HttpResult<string> {
+    let count = visits.Record()
+    logging.CreateLogger("WebDemo").LogInformation("Recorded visit " + count.ToString())
+    return HttpResult<string>.Created("Visit " + count.ToString())
+}
+
+public func Item(id: int) -> HttpResult<string> {
+    if id < 0 { return HttpResult<string>.BadRequest }
+    if id == 42 { return HttpResult<string>.Ok("The answer") }
+    return HttpResult<string>.NotFound
+}
+
+// Fixed context handlers are terminal building blocks for the request pipeline.
+public func Echo(context: HttpContext) -> Task<Result<unit, WebError>> {
+    context.RespondText(context.Request.Method.Method + ":" + context.RouteValues.Get("value")!)
+    return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
+}
+
+public func Unmatched(context: HttpContext) -> Task<Result<unit, WebError>> {
+    context.RespondText(404, "No endpoint matched")
+    return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
+}
+
+public async func LogRequest(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+    let logging = context.Services.GetRequiredService<LoggerFactory>()!
+    let logger = logging.CreateLogger("WebDemo.Request")
+    logger.LogInformation("Request " + context.Request.Method.Method + " " + context.Request.Target)
+    let result = await next(context)
+    logger.LogInformation("Request pipeline completed")
+    return result
+}

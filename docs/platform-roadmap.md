@@ -1,12 +1,15 @@
 # neoCLR platform roadmap
 
-**Experimental Neo.Web slice (author direction, 2026-10-31):** Implement the first
-builder/application/context-handler layer over HttpServer, with a real HTTP consumer,
-an evolving reference app and API/website documentation. Keep Neo.Web provisional;
-the next handler goal is ASP.NET Core-like dependency injection into parameters.
-See the [API contract](../api-docs/neo-web.md), [reference app](../samples/web/README.md)
-and [validation record](validation/neo-web-20261031/README.md). This bounded task
-does not permanently reprioritize the roadmap.
+**Experimental Neo.Web follow-on (author direction, 2026-10-31):** Build on the
+committed builder/application/context foundation with structural generic handlers,
+cached registration-time binding, typed `HttpResult<T>` alternatives and separate
+framework/sample tests. The author additionally requested any-method routes,
+terminal handling and middleware; `Map`, `Run` and ordered `Use` now form the
+bounded pipeline. Keep Neo.Web provisional and qualify compiler/runtime changes
+on unified Raven main. See the [API contract](../api-docs/neo-web.md),
+[reference app](../samples/web/README.md) and
+[follow-on evidence](validation/neo-web-generic-20261031/README.md).
+This author-directed task does not permanently reprioritize the roadmap.
 
 **Neo.Web design proposal (2026-10-30):** At the author's request, the
 [concrete proposal](design/neo-web.md) revisits WebApplicationBuilder and

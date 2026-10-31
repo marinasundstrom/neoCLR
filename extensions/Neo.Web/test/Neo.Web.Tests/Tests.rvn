@@ -61,13 +61,39 @@ func `Invalid options and ambiguous routes fail without registration`() -> Resul
     _ = Assert.True(app.MapContext("GET", "/items/current", Empty) is Ok(_), "Literal outranks capture")?
     _ = Assert.True(app.MapContext("POST", "/items/{id}", Empty) is Ok(_), "Distinct method accepted")?
     _ = Assert.True(app.MapContext("bad method", "/", Empty) is Failure(_), "Invalid method rejected")?
+    _ = Assert.True(app.Map("/open/{id}", Empty) is Ok(_), "All-method route accepted")?
+    _ = Assert.True(app.Map("/open/{name}", Empty) is Failure(_), "All-method ambiguity rejected")?
     return Assert.True(app.MapContext("GET", "/{", Empty) is Failure(_), "Invalid pattern rejected")
 }
+
+class MissingDependency {}
 
 class Handlers {
     val Tracker = Counts()
     val Entered = Promise<unit>()
     val Release = Promise<unit>()
+
+    async func Generic(id: int, probe: ScopedProbe, context: HttpContext) -> Task<HttpResult<string>> {
+        let value = await Task.Run(() => id)
+        if probe.Disposed { Panic("Injected scope ended before await") }
+        if context.RouteValues.Get("id")! != id.ToString() { Panic("Context and route binding disagree") }
+        return HttpResult<string>.Ok(value.ToString())
+    }
+    func Choice(id: int) -> HttpResult<string> {
+        if id == 42 { return HttpResult<string>.Ok("found") }
+        return HttpResult<string>.NotFound
+    }
+    func Missing(service: MissingDependency) -> HttpResult<string> => HttpResult<string>.Ok("unexpected")
+    func Unsupported(id: int) -> int => id
+    func Any(context: HttpContext) -> Task<Result<unit, WebError>> {
+        context.RespondText(context.Request.Method.Method + ":" + context.RouteValues.Get("id")!)
+        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
+    }
+    func Terminal(context: HttpContext) -> Task<Result<unit, WebError>> {
+        if context.RouteValues.Get("id") is Ok(_) { Panic("Terminal handler inherited route values") }
+        context.RespondText("terminal")
+        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
+    }
 
     async func Capture(context: HttpContext) -> Task<Result<unit, WebError>> {
         let probe = context.Services.GetRequiredService<ScopedProbe>()!
@@ -105,9 +131,16 @@ class Handlers {
     }
 }
 
+func ResponseText(response: Result<string, HttpError>) -> Result<string, TestFailure> {
+    return match response {
+        Ok(let text) => Ok(text)
+        Failure(let error) => Failure(TestFailure("HTTP text request failed: " + error.ToString(), "successful response", error.ToString()))
+    }
+}
+
 async func CheckStatus(client: HttpClient, url: string, status: int) -> Task<Result<unit, TestFailure>> {
     let response = await client.Get(url)
-    let Ok(value) = response else { return Failure(TestFailure("HTTP request failed", "response", "failure")) }
+    let Ok(value) = response else { return Failure(TestFailure("HTTP request failed: " + url, "response", "failure")) }
     use owned = value
     return Assert.Equal(status, (int)value.StatusCode)
 }
@@ -125,6 +158,13 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
     _ = app.MapContext("GET", "/failure", (context) => handlers.Failed(context))!
     _ = app.MapContext("GET", "/cancel", (context) => handlers.Cancelled(context))!
     _ = app.MapContext("GET", "/pending", (context) => handlers.Pending(context))!
+    _ = app.MapGet("/generic/{id}", handlers.Generic)!
+    _ = app.MapGet("/choice/{id}", handlers.Choice)!
+    _ = app.MapGet("/missing-service", handlers.Missing)!
+    _ = app.Map("/any/{id}", handlers.Any)!
+    _ = app.MapContext("GET", "/any/{id}", handlers.Literal)!
+    let unsupported = app.MapGet("/unsupported/{id}", handlers.Unsupported)
+    _ = Assert.True(unsupported is Result<unit, WebError>.Failure(_), "Unsupported return rejected at registration")?
     use cancellation = CancellationTokenSource()
     cancellation.Cancel()
     let precancelled = app.RunAsync(cancellation.Token)
@@ -132,7 +172,8 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
     let lifetime = app.RunAsync()
     let url = "http://127.0.0.1:" + app.GetLocalPort()!.ToString()
     use timeout = Timer(() => { app.Stop() })
-    timeout.Start(Duration.FromTicks(200000000L))
+    // Allow the interpreter to execute the same HTTP contract under instrumentation.
+    timeout.Start(Duration.FromTicks(3000000000L))
     use client = HttpClient()
     // Accumulate assertions before shutdown; always stop/join before returning a test failure.
     let result = await RunningChecks(app, client, url, handlers, lifetime)
@@ -144,27 +185,58 @@ async func HttpContract() -> Task<Result<unit, TestFailure>> {
     secondBuilder.Server.Port = 0
     use secondApp = secondBuilder.Build()!
     use stopSource = CancellationTokenSource()
+    _ = secondApp.MapContext("GET", "/only", Empty)!
+    _ = secondApp.Run(handlers.Terminal)!
+    _ = Assert.True(secondApp.Run(handlers.Terminal) is Failure(_), "Duplicate terminal handler rejected")?
     let stopped = secondApp.RunAsync(stopSource.Token)
+    let secondUrl = "http://127.0.0.1:" + secondApp.GetLocalPort()!.ToString()
+    let terminalResult = await TerminalChecks(client, secondUrl)
     let observed = Promise<unit>()
     // Outcome observation: a cancelled lifetime cannot be awaited for a normal result.
     stopped.OnCompleted(() => { _ = observed.Complete(()) })
     stopSource.Cancel()
     _ = await observed.Task
+    _ = terminalResult?
     _ = Assert.True(stopped.IsCancelled, "Caller cancellation remains a cancelled task")?
     return Assert.True(secondApp.GetLocalPort() is Failure(_), "Cancellation settles the run before disposal")
+}
+
+async func TerminalChecks(client: HttpClient, secondUrl: string) -> Task<Result<unit, TestFailure>> {
+    _ = Assert.Equal("terminal", ResponseText(await client.GetString(secondUrl + "/missing/path"))?)?
+    use terminalPost = (await client.Send(HttpRequest.Create(HttpMethod.Post, secondUrl + "/other")!))!
+    _ = Assert.Equal(200, (int)terminalPost.StatusCode)?
+    use rejectedPost = (await client.Send(HttpRequest.Create(HttpMethod.Post, secondUrl + "/only")!))!
+    _ = Assert.Equal(405, (int)rejectedPost.StatusCode)?
+    return Ok(())
 }
 
 async func RunningChecks(app: WebApplication, client: HttpClient, url: string, handlers: Handlers,
     lifetime: Task<Result<unit, WebError>>) -> Task<Result<unit, TestFailure>> {
     _ = Assert.True(app.MapContext("GET", "/late", Empty) is Failure(_), "Registry frozen")?
     _ = Assert.True(app.RunAsync().GetResult() is Failure(_), "Duplicate run rejected")?
-    _ = Assert.Equal("literal", (await client.GetString(url + "/items/current"))!)?
+    _ = Assert.True(app.Map("/late-any", Empty) is Failure(_), "All-method registration frozen")?
+    _ = Assert.True(app.Run(Empty) is Failure(_), "Terminal registration frozen")?
+    _ = Assert.Equal("literal", ResponseText(await client.GetString(url + "/any/42"))?)?
+    use anyPost = (await client.Send(HttpRequest.Create(HttpMethod.Post, url + "/any/42")!))!
+    _ = Assert.Equal(200, (int)anyPost.StatusCode)?
+    _ = Assert.Equal("literal", ResponseText(await client.GetString(url + "/items/current"))?)?
     let first = client.GetString(url + "/items/41")
     let second = client.GetString(url + "/items/42")
-    _ = Assert.Equal("41", (await first)!)?
-    _ = Assert.Equal("42", (await second)!)?
+    _ = Assert.Equal("41", ResponseText(await first)?)?
+    _ = Assert.Equal("42", ResponseText(await second)?)?
     _ = Assert.Equal(2, handlers.Tracker.Created)?
     _ = Assert.Equal(2, handlers.Tracker.Disposed)?
+    let genericFirst = client.GetString(url + "/generic/41")
+    let genericSecond = client.GetString(url + "/generic/42")
+    _ = Assert.Equal("41", ResponseText(await genericFirst)?)?
+    _ = Assert.Equal("42", ResponseText(await genericSecond)?)?
+    _ = Assert.Equal(4, handlers.Tracker.Created)?
+    _ = Assert.Equal(4, handlers.Tracker.Disposed)?
+    _ = (await CheckStatus(client, url + "/generic/nope", 400))?
+    _ = Assert.Equal("found", ResponseText(await client.GetString(url + "/choice/42"))?)?
+    _ = (await CheckStatus(client, url + "/choice/7", 404))?
+    _ = (await CheckStatus(client, url + "/missing-service", 500))?
+    _ = (await CheckStatus(client, url + "/unsupported/42", 404))?
     _ = (await CheckStatus(client, url + "/bad", 400))?
     _ = (await CheckStatus(client, url + "/failure", 500))?
     _ = (await CheckStatus(client, url + "/absent", 404))?
@@ -175,26 +247,30 @@ async func RunningChecks(app: WebApplication, client: HttpClient, url: string, h
     _ = Assert.Equal("GET", rejected.GetHeaderValues("Allow")[0])?
     let cancelled = await client.Get(url + "/cancel")
     _ = Assert.True(cancelled is Failure(_), "Cancelled handler closes exchange")?
-    _ = Assert.Equal(5, handlers.Tracker.Disposed)?
+    _ = Assert.Equal(7, handlers.Tracker.Disposed)?
     let pending = client.Get(url + "/pending")
     _ = await handlers.Entered.Task
     app.Stop()
     _ = Assert.True(!lifetime.IsCompleted, "Shutdown waits for started handler")?
-    _ = Assert.Equal(5, handlers.Tracker.Disposed)?
+    _ = Assert.Equal(7, handlers.Tracker.Disposed)?
     _ = handlers.Release.Complete(())
     _ = await lifetime
     _ = await pending
-    _ = Assert.Equal(6, handlers.Tracker.Disposed)?
+    _ = Assert.Equal(8, handlers.Tracker.Disposed)?
     return Assert.True(app.GetLocalPort() is Failure(_), "Stopped application has no active port")
 }
 
 async func Main() -> Task<int> {
     let http = HttpContract()
     _ = await http
+    let middleware = MiddlewareContract()
+    _ = await middleware
     let suite = TestSuite()
+    suite.Add("web.results", "Typed results preserve content and exhaustively describe response alternatives", `Typed results preserve content and exhaustively describe response alternatives`)
     suite.Add("web.builder", "Builder snapshots options and transfers ownership once", `Builder snapshots options and transfers ownership once`)
     suite.Add("web.routing", "Invalid options and ambiguous routes fail without registration", `Invalid options and ambiguous routes fail without registration`)
     // Async consumer completes before registration; assertions still use the framework's Result contract.
     suite.Add("web.http", "HTTP consumer covers routing scopes cancellation and joined shutdown", () => http.GetResult())
+    suite.Add("web.middleware", "Middleware wraps routing and retains one scope through completion", () => middleware.GetResult())
     return TestRunner.Run(suite, [])
 }

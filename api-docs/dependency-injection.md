@@ -132,7 +132,7 @@ explicit factories can construct types already supported by ordinary codegen.
 Missing constructor metadata remains an explicit runtime fault, not an empty
 constructor list. General reflective method invocation is a separate capability.
 
-## Keyed services and function objects
+## Keyed services and function values
 
 `ServiceDescriptor.ServiceKey` is an optional Object key. The four-argument
 constructor accepts `(service, key, source, lifetime)`. Null denotes the ordinary
@@ -156,13 +156,13 @@ Automatic constructor parameters currently resolve unkeyed dependencies; keyed
 parameter annotations and key inheritance are not implemented. A factory can
 explicitly resolve a keyed dependency.
 
-Bound Function objects are services. Register a value of `(int) -> int` with
+Bound Function values are services. Register a value of `(int) -> int` with
 `AddKeyedSingleton<(int) -> int>(key, function)`, retrieve that same type, and invoke
 the returned function normally. The registration does not execute the function.
 Multiple methods sharing one structural signature can therefore use different
 keys. Bound instance methods retain their receiver. Registering a function does
 not transfer disposal ownership of its captured receiver; register an owned
-receiver separately when the provider should dispose it. Function objects have no
+receiver separately when the provider should dispose it. Function values have no
 automatic-constructor registration: use instance or factory registration.
 
 The key model follows [.NET keyed DI](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/overview).

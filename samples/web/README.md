@@ -2,17 +2,18 @@
 
 Neo.Web is an experimental web framework built on top of
 `System.Web.Http.HttpServer`. This is its reference application. Keep it
-small and evolve it alongside hosting, context APIs and eventually generic minimal
-API handlers. It currently demonstrates explicit configuration, logging, a scoped
-greeting service, singleton visit state, awaited work and joined shutdown.
+small and evolve it alongside hosting and generic minimal API handlers. It demonstrates
+explicit configuration, logging, injected scoped services, singleton state, typed
+buffered results, awaited work and joined shutdown. The follow-on implementation
+requires the matching development compiler/runtime and is under qualification.
 
-The complete source is [Main.rvn](src/WebDemo/Main.rvn). Normal application code
-imports `Neo.Web.*` and uses `HttpContext`, `RespondText` and integer status codes;
-`System.Web.Http` is unnecessary here. No automatic parameter binding is implied:
-handlers explicitly read `context.RouteValues` and resolve `context.Services`.
-The intended minimal API experience is handler parameters populated from routes
-and request-scoped services, similar to ASP.NET Core. This app will migrate to
-that form when the generic binding slice is qualified.
+Composition and lifetime live in [Main.rvn](src/WebDemo/Main.rvn); the handler
+functions and application services live in [Endpoints.rvn](src/WebDemo.Logic/Endpoints.rvn). Normal application code
+imports `Neo.Web.*`; `System.Web.Http` is unnecessary here. `MapGet` and `MapPost`
+accept function values through `T: func`, inspect `handler.Function` at registration,
+and cache route/service bindings. The greeting handler receives `name: string` and
+`GreetingService` directly. `Home` returns `Task<HttpResult<string>>`; `Item` declares
+`HttpResult<string>` and chooses Ok, BadRequest or NotFound from the closed union.
 
 ## Build and run
 
@@ -63,7 +64,13 @@ curl -X POST http://127.0.0.1:8080/visits
 | First `POST /visits` | 201, `Visit 1`, with a log entry |
 | Second `POST /visits` | 201, `Visit 2`; singleton state survives requests |
 | `GET /visits` | 405 with `Allow: POST` |
-| Unknown path | 404 |
+| `GET /items/42` | 200, `The answer` |
+| `GET /items/7` | Empty 404 |
+| `GET /items/-1` | Empty 400 returned by the handler |
+| `GET /items/nope` | 400; handler is not invoked |
+| `GET /echo/hello` | 200, `GET:hello` |
+| `POST /echo/hello` | 200, `POST:hello`; the same all-method route |
+| Unknown path | 404, `No endpoint matched`, from the terminal handler |
 
 Change the in-memory `Greeting` entry to change greeting text. Each greeting
 request creates its own GreetingService, retained across await and disposed when
@@ -72,5 +79,35 @@ requiring constructor-reflection retention in this first sample. All responses a
 buffered text; no service-dependent stream outlives a scope.
 
 The listener is loopback-only by default. There is no authentication, JSON binding,
-persistent storage or general middleware in this slice. Visit state is local to one
+persistent storage in this slice. Visit state is local to one
 process and uses the existing cooperative dispatcher model.
+
+The handlers in `Endpoints.rvn` are ordinary functions with explicit arguments.
+The sample's `test/WebDemo.Tests` project calls those functions without starting a
+server and asserts the payloads and closed HTTP outcomes. Shared testing helpers
+remain local to the sample. Framework behavior has its own NeoClr.Testing project
+under `extensions/Neo.Web/test`.
+
+Build the direct handler tests with the same bundle:
+
+```sh
+python3 scripts/build-native-project.py --profile http \
+  --bundle target/neo-web-check/bundle \
+  --project samples/web/test/WebDemo.Tests/WebDemo.Tests.rvnproj \
+  --aot target/neo-web-check/bundle/bin/neoclr-codegen \
+  --output target/web-demo-tests
+./target/web-demo-tests/app
+```
+
+This reference to the sample project retains the actual handler implementations;
+the tests do not copy them. No HTTP listener is started by these logic tests.
+
+`Map("/echo/{value}", Echo)` demonstrates an all-method context endpoint.
+`Run(Unmatched)` installs the unpatterned terminal stage, distinct from `RunAsync`.
+Use(LogRequest) wraps routing and terminal handling with awaited before/after logging;
+the sample's typed business handlers remain directly testable ordinary functions.
+
+The host and test project both reference `src/WebDemo.Logic/WebDemo.Logic.rvnproj`.
+This library owns the named handlers and application state; the executable owns
+composition and lifetime. Native project references currently require library
+outputs, so the tests reference this shared logic instead of the executable.

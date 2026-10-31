@@ -14,7 +14,11 @@ import Neo.Web.HttpContext
 
 /// A single-run, cooperative HTTP application. Stop and await RunAsync before disposal.
 public class WebApplication : Disposable {
+    private var middleware = ArrayList<WebMiddleware>()
+    private var pipeline: WebRequestPipeline? = null
     private var endpoints = ArrayList<WebEndpoint>()
+    private val emptyRoute: RouteMatch
+    private var terminal: WebEndpoint? = null
     private val validator: RoutePattern
     private val ownedLogging: LoggerFactory
     private val logger: Logger
@@ -42,6 +46,8 @@ public class WebApplication : Disposable {
         self.port = port
         self.backlog = backlog
         validator = RoutePattern.Parse("/")!
+        let Some(route) = validator.Match("/")! else { Panic("Empty route match unavailable") }
+        emptyRoute = route
     }
 
     /// Creates an empty configuration/default-DI builder with an empty Information-level logger factory.
@@ -54,16 +60,78 @@ public class WebApplication : Disposable {
         if started || disposed { return Failure(WebError.InvalidState) }
         let parsedMethod = HttpMethod.Parse(method)
         if let Failure(error) = parsedMethod { return Failure(WebError.Transport(error)) }
+        return Register(parsedMethod!, pattern, handler)
+    }
+
+    /// Registers a fixed context handler for every HTTP method matching this route pattern.
+    /// A method-specific endpoint wins at equal route precedence; equal all-method overlaps reject.
+    func Map(pattern: string, handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError> {
+        return Register(null, pattern, handler)
+    }
+
+    /// Registers the terminal context handler for requests left unmatched by routing.
+    /// This configures the request pipeline; RunAsync controls application lifetime.
+    /// Only one terminal handler is allowed. Malformed targets and method mismatches retain 400/405.
+    func Run(handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError> {
+        if started || disposed || terminal is not null { return Failure(WebError.InvalidState) }
+        terminal = WebEndpoint(null, validator, "/", handler)
+        return Ok(())
+    }
+
+    private func Register(method: HttpMethod?, pattern: string,
+        handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError> {
+        if started || disposed { return Failure(WebError.InvalidState) }
         let parsed = RoutePattern.Parse(pattern)
         if let Failure(patternError) = parsed { return Failure(WebError.Routing(patternError)) }
-        let endpoint = WebEndpoint(parsedMethod!, parsed!, pattern, handler)
+        let endpoint = WebEndpoint(method, parsed!, pattern, handler)
         for existing in endpoints {
-            if existing.Method.Equals(endpoint.Method) && existing.Priority == endpoint.Priority && existing.Pattern.Overlaps(endpoint.Pattern) {
+            var sameMethod = existing.Method is null && method is null
+            if existing.Method is HttpMethod previous && method is HttpMethod current {
+                sameMethod = previous.Equals(current)
+            }
+            if sameMethod && existing.Priority == endpoint.Priority && existing.Pattern.Overlaps(endpoint.Pattern) {
                 return Failure(WebError.Routing("Ambiguous route: " + pattern))
             }
         }
         endpoints.Add(endpoint)
         return Ok(())
+    }
+
+    /// Adds middleware in registration order. Await next(context) to continue, or return to short-circuit.
+    /// Pass the supplied context to next and await it at most once; do not retain the continuation.
+    /// The request scope remains alive until the outermost middleware settles. Registration freezes on RunAsync.
+    func Use(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>) -> Result<unit, WebError> {
+        if started || disposed { return Failure(WebError.InvalidState) }
+        middleware.Add(WebMiddleware(handler))
+        return Ok(())
+    }
+
+    private func BuildPipeline() -> WebRequestPipeline {
+        var current = WebRequestPipeline(self.Route)
+        var index = middleware.Count
+        while index > 0 {
+            index -= 1
+            let step = BoundWebMiddleware(middleware[index].Handler, current.Handler)
+            current = WebRequestPipeline(step.Invoke)
+        }
+        return current
+    }
+
+    /// Registers a GET function value. Reflection and binding planning happen once at registration.
+    /// Binds HttpContext, named string/int route parameters and request-scoped services.
+    func MapGet<T: func>(pattern: string, handler: T) -> Result<unit, WebError> {
+        return Map("GET", pattern, handler)
+    }
+
+    /// Registers a POST function value with the same binding and typed-result contract as MapGet.
+    func MapPost<T: func>(pattern: string, handler: T) -> Result<unit, WebError> {
+        return Map("POST", pattern, handler)
+    }
+
+    private func Map<T: func>(method: string, pattern: string, handler: T) -> Result<unit, WebError> {
+        if started || disposed { return Failure(WebError.InvalidState) }
+        let plan = HandlerPlan.Create(pattern, handler, handler.Function)?
+        return MapContext(method, pattern, plan.Execute)
     }
 
     /// Gets the listener's assigned port while running, including when configured with port zero.
@@ -87,6 +155,7 @@ public class WebApplication : Disposable {
             return cancelled.Task
         }
         started = true
+        pipeline = BuildPipeline()
         let listening = HttpServer.Listen(address, port, backlog)
         if let Failure(error) = listening {
             return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Failure(WebError.Transport(error)))
@@ -123,11 +192,11 @@ public class WebApplication : Disposable {
         if server is HttpServer active { active.Close() }
     }
 
-    private func Dispatch(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(""))
+    private func Route(context: HttpContext) -> Task<Result<unit, WebError>> {
+        let request = context.Request
         if let Failure(_) = validator.Match(request.Target) {
-            response.Respond(HttpStatusCode.BadRequest, HttpStringContent("Bad request"))
-            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+            context.RespondText(400, "Bad request")
+            return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
         }
         var selected: WebEndpoint? = null
         var captured: RouteMatch? = null
@@ -135,14 +204,21 @@ public class WebApplication : Disposable {
         for endpoint in endpoints {
             let matched = endpoint.Pattern.Match(request.Target)!
             if let Some(route) = matched {
-                var present = false
-                for method in allowed {
-                    if method == endpoint.Method.Method { present = true }
+                var matchesMethod = endpoint.Method is null
+                if endpoint.Method is HttpMethod required {
+                    var present = false
+                    for method in allowed {
+                        if method == required.Method { present = true }
+                    }
+                    if !present { allowed.Add(required.Method) }
+                    matchesMethod = required.Equals(request.Method)
                 }
-                if !present { allowed.Add(endpoint.Method.Method) }
-                if endpoint.Method.Equals(request.Method) {
+                if matchesMethod {
                     var choose = true
-                    if selected is WebEndpoint previous { choose = endpoint.Priority > previous.Priority }
+                    if selected is WebEndpoint previous {
+                        choose = endpoint.Priority > previous.Priority ||
+                            endpoint.Priority == previous.Priority && previous.Method is null && endpoint.Method is not null
+                    }
                     if choose {
                         selected = endpoint
                         captured = route
@@ -152,50 +228,50 @@ public class WebApplication : Disposable {
         }
         if selected is WebEndpoint chosen {
             if captured is RouteMatch route {
-                return Invoke(chosen, request, response, route)
+                context.SetRouteValues(route)
+                return chosen.Handler(context)
             }
         }
         if allowed.Count == 0 {
-            response.Respond(HttpStatusCode.NotFound, HttpStringContent("Not found"))
+            if terminal is WebEndpoint fallback {
+                return fallback.Handler(context)
+            }
+            context.RespondText(404, "Not found")
         } else {
-            let headers = ArrayList<HttpHeader>()
             let methods: string[] = [for index in 0..allowed.Count => allowed[index]]
-            headers.Add(HttpHeader("Allow", String.Join(", ", methods)))
-            response.Dispose()
-            let rejection = HttpResponse(405, headers, HttpStringContent("Method not allowed"))
-            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(rejection))
+            context.RespondMethodNotAllowed(methods)
         }
-        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
     }
 
-    private func Invoke(chosen: WebEndpoint, request: HttpRequest, response: HttpResponse,
-        route: RouteMatch) -> Task<Result<HttpResponse, HttpError>> {
+    private func Dispatch(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(""))
         let scope = Services.CreateScope()
         if let Failure(_) = scope {
             logger.LogError("Request scope creation failed")
             response.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))
             return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
         }
-        let view = Neo.Web.HttpContext(request, response, scope!, route, stopping.Token)
-        let pending = chosen.Handler(view)
+        let view = Neo.Web.HttpContext(request, response, scope!, emptyRoute, stopping.Token)
+        let pending = pipeline!.Handler(view)
         let result = Promise<Result<HttpResponse, HttpError>>()
         // Outcome adapter: release the scope on success, typed failure and cancellation.
         // All exposed response operations own buffered data before this callback settles.
         pending.OnCompleted(() => {
-            view.Finish()
+            let completedResponse = view.Finish()
             if pending.IsCancelled {
-                response.Dispose()
+                completedResponse.Dispose()
                 _ = result.Cancel()
             } else {
                 if let Failure(error) = pending.GetResult() {
                     if error is WebError.BadRequest(_) {
-                        response.Respond(HttpStatusCode.BadRequest, HttpStringContent("Bad request"))
+                        completedResponse.Respond(HttpStatusCode.BadRequest, HttpStringContent("Bad request"))
                     } else {
                         logger.LogError("Request handler failed")
-                        response.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))
+                        completedResponse.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))
                     }
                 }
-                _ = result.Complete(Result<HttpResponse, HttpError>.Ok(response))
+                _ = result.Complete(Result<HttpResponse, HttpError>.Ok(completedResponse))
             }
         })
         return result.Task
@@ -207,6 +283,9 @@ public class WebApplication : Disposable {
         if running { Panic("Stop and await RunAsync before disposing WebApplication") }
         disposed = true
         endpoints = ArrayList<WebEndpoint>()
+        terminal = null
+        middleware = ArrayList<WebMiddleware>()
+        pipeline = null
         Services.Dispose()
         ownedLogging.Dispose()
         Configuration.Dispose()
@@ -216,12 +295,12 @@ public class WebApplication : Disposable {
 }
 
 internal class WebEndpoint {
-    val Method: HttpMethod
+    val Method: HttpMethod?
     val Pattern: RoutePattern
     val Priority: int
     val Handler: (HttpContext) -> Task<Result<unit, WebError>>
 
-    init(method: HttpMethod, pattern: RoutePattern, source: string,
+    init(method: HttpMethod?, pattern: RoutePattern, source: string,
         handler: (HttpContext) -> Task<Result<unit, WebError>>) {
         Method = method
         Pattern = pattern
@@ -239,4 +318,25 @@ internal class WebEndpoint {
         }
         Priority = priority
     }
+}
+
+internal class WebRequestPipeline {
+    val Handler: (HttpContext) -> Task<Result<unit, WebError>>
+    init(handler: (HttpContext) -> Task<Result<unit, WebError>>) { Handler = handler }
+}
+
+internal class WebMiddleware {
+    val Handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>
+    init(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>) { Handler = handler }
+}
+
+internal class BoundWebMiddleware {
+    private val handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>
+    private val next: (HttpContext) -> Task<Result<unit, WebError>>
+    init(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>,
+        next: (HttpContext) -> Task<Result<unit, WebError>>) {
+        self.handler = handler
+        self.next = next
+    }
+    func Invoke(context: HttpContext) -> Task<Result<unit, WebError>> => handler(context, next)
 }

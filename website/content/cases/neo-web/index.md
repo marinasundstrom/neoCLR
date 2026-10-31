@@ -29,9 +29,10 @@ The timer is a demonstration of application-controlled shutdown, not a hosting l
 {{NEO_WEB_HOME}}
 ```
 
-Home resolves a request-scoped service, awaits queued work, and responds with text.
-The scope remains valid across await. `Neo.Web.HttpContext` supplies the web-facing
-operations; the sample does not import `System.Web.Http`.
+Home receives an injected request-scoped service, awaits queued work, and returns
+a typed text result. The scope remains valid across await. Registration inspects
+the structural function contract and caches bindings. The sample does not import
+`System.Web.Http`. This follow-on development slice is under qualification.
 
 | Request | Result |
 | --- | --- |
@@ -40,6 +41,8 @@ operations; the sample does not import `System.Web.Http`.
 | `GET /hello/current` | Literal route wins: `The current visitor is neoCLR` |
 | `POST /visits` | 201 with `Visit 1`, then `Visit 2`; a console log accompanies each visit |
 | `GET /visits` | 405 with `Allow: POST` |
+| `GET /items/42` | `The answer`; other integers produce an empty 404 |
+| `GET /items/nope` | 400 without entering the handler |
 | Unknown route | 404 |
 
 ```sh
@@ -50,3 +53,9 @@ curl -X POST http://127.0.0.1:8080/visits
 All responses are buffered text. State is local to the process; there is no database,
 authentication, automatic body binding or general middleware. The
 [Neo.Web guide](/features/neo-web/) explains the current boundaries and lifecycle.
+
+The handlers in `Endpoints.rvn` are ordinary functions with explicit arguments.
+The sample's `test/WebDemo.Tests` project calls those functions without starting a
+server and asserts the payloads and closed HTTP outcomes. Shared testing helpers
+remain local to the sample. Framework behavior has its own NeoClr.Testing project
+under `extensions/Neo.Web/test`.

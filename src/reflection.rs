@@ -1538,12 +1538,30 @@ pub(crate) fn bound_function(
     target: &Function,
     limits: &Limits,
 ) -> Result<Value, Fault> {
+    bound_function_shape(module, &binding.ty, target, limits)
+}
+
+pub(crate) fn bound_function_shape(
+    module: &Module,
+    shape: &Type,
+    target: &Function,
+    limits: &Limits,
+) -> Result<Value, Fault> {
     let context = QueryContext {
         module,
-        source: false,
+        // Source-owned descriptors have scoped physical names after linking.
+        // Inspect their source identity rather than treating that as the legacy
+        // System.Type profile with a shorter MethodInfo layout.
+        source: module.types.iter().any(|definition| {
+            definition.representation == Representation::Interface
+                && definition
+                    .origin
+                    .as_ref()
+                    .is_some_and(|origin| origin.name == "System.Introspection.TypeInfo")
+        }),
     };
     let module = &context;
-    let owner = target.owner.as_ref().unwrap_or(&binding.ty);
+    let owner = target.owner.as_ref().unwrap_or(shape);
     // A module function has no nominal owner. Use the shape only as the internal
     // parameter identity key, and clear the public declaring type below.
     let mut result = method(module, owner, target, &[], limits)?;

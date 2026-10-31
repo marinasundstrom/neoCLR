@@ -7,7 +7,8 @@ Neo.Web is an experimental web framework built on top of
 `System.Web.Http.HttpServer`, available as an optional development extension.
 It is not part of published Preview 19.
 Its API is provisional. It composes the existing extension services and HttpServer;
-there is no generic minimal API handler binding yet. All public types are in the
+generic handlers use the structural `func` contract. The follow-on implementation
+is under qualification; matching compiler/runtime changes are required. All public types are in the
 `Neo.Web` module and `Neo.Web.dll` assembly.
 
 ## WebApplicationBuilder
@@ -47,6 +48,11 @@ not automatically bound. HttpServer's default transport options remain in effect
 | `Configuration: ConfigurationRoot` | Application-owned live root. |
 | `MapContext(method: string, pattern: string, handler: (Neo.Web.HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Registers one callback atomically; invalid method/pattern, ambiguous overlap or frozen/disposed state returns failure. |
 | `RunAsync(cancellationToken: CancellationToken = default) -> Task<Result<unit, WebError>>` | Freezes registration, opens a listener and returns its joined lifetime. A listen attempt consumes the single-run application. |
+| `Use(handler: (HttpContext, (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Adds middleware around routing and terminal handling, in registration order. Await next(context) to continue, or return to short-circuit. Frozen/disposed registration returns InvalidState. |
+| `Map(pattern: string, handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Registers a fixed context handler for all HTTP methods at a route pattern. |
+| `Run(handler: (HttpContext) -> Task<Result<unit, WebError>>) -> Result<unit, WebError>` | Installs the single terminal handler for requests left unmatched by routing; does not start the server. Duplicate/frozen/disposed registration returns InvalidState. |
+| `MapGet<T: func>(pattern: string, handler: T) -> Result<unit, WebError>` | Registers a GET function value after inspecting its bound signature and caching its binding plan. |
+| `MapPost<T: func>(pattern: string, handler: T) -> Result<unit, WebError>` | Registers a POST function value under the same binding/result contract. |
 | `GetLocalPort() -> Result<int, WebError>` | Actual listener port while running; otherwise InvalidState. |
 | `Stop()` | Requests application cancellation and closes connections; no effect before running or after completion. |
 | `Dispose()` | Idempotent outside a run. Disposes root services, default logging and configuration. Active disposal is terminal misuse: Stop and await the lifetime first. |
@@ -64,6 +70,38 @@ Same-method, equal-precedence overlapping registrations fail; registration order
 never resolves ambiguity. Methods use HttpMethod's existing comparison contract.
 Malformed targets produce 400, unmatched paths 404, and unmatched methods on a
 matching path 405 with Allow. HEAD and OPTIONS require explicit registration.
+
+## Pipeline foundation
+
+The fixed terminal shape is `(HttpContext) -> Task<Result<unit, WebError>>`.
+`Map` registers an all-method route; `Run` installs an unpatterned terminal handler.
+`RunAsync` remains the application lifetime operation. Registration freezes when
+listening begins. Middleware is composed once when RunAsync starts. The first registered middleware
+runs first and resumes last after `await next(context)`. The innermost continuation
+performs target validation, routing, then terminal handling. Middleware may respond
+and return without calling next. `Result` failures propagate through the same
+sanitized 400/500 response policy; cancellation closes the exchange.
+
+One request scope covers all middleware and the selected handler, including work
+after awaiting next, and is disposed after the outermost task settles. The same
+context flows through every stage. RouteValues is empty before routing and contains
+the selected captures after next returns. Pass the supplied context to next; call
+and await it at most once. Retaining the continuation or context after completion,
+fire-and-forget next calls, and reentrant execution are unsupported.
+
+Literal route precedence applies across method-specific and all-method routes.
+At equal route precedence, a matching method-specific endpoint wins over an
+all-method endpoint. Equal-precedence overlapping all-method registrations reject.
+The terminal handler receives empty route values and the same request scope,
+awaited lifetime and buffered-response contract as a routed handler. It runs when
+no route matches; requests reaching routing with malformed targets receive 400 and route method mismatches receive
+405 with Allow. Without a terminal handler, unmatched paths remain 404.
+
+Unlike ASP.NET Core's path-prefix `Map` middleware branch, this `Map` performs
+full route-pattern matching. Unlike an ordered middleware builder, registering
+`Run` before routes does not make them unreachable: it configures the fixed final
+stage. Middleware ordering applies to Use registrations; explicit routing-stage insertion
+and path-prefix branches remain future work.
 
 ## Neo.Web.HttpContext
 
@@ -85,9 +123,9 @@ context, direct completion and mutable streaming content are not exposed.
 Explicit status must be 100–599; invalid values and response mutation after handler
 completion call Panic. Transport-specific status/body validation still applies
 when sending. There is no public constructor: Neo.Web creates the view per matched
-request. Request values must not escape the handler lifetime.
+request. Request values must not escape the pipeline lifetime.
 
-The request scope survives all handler awaits, then is disposed on success, typed
+The request scope survives handler and middleware awaits, then is disposed on success, typed
 failure or cancellation. Responses own buffered data independently of services.
 A successful callback sends its configured response (default 200 empty). BadRequest
 returns sanitized 400; other WebError values produce a logged sanitized 500.
@@ -109,13 +147,71 @@ The [reference app](/cases/neo-web/) demonstrates DI factories, configuration,
 logging, awaited handlers and shutdown. See the
 [feature guide](/features/neo-web/) for the supported slice.
 
-General hosting, automatic parameter/result binding, streaming/custom responses,
-middleware, authentication, automatic HTTPS, configuration binding and process signal
-integration remain future work. Existing libraries stay independently usable. No
-compiler or runtime semantic extension is required by this context-handler layer.
+General hosting, query/body binding, arbitrary result serialization, streaming,
+authentication, automatic HTTPS, configuration binding and process signal
+integration remain future work. Existing libraries stay independently usable.
+The generic handler layer requires matching development compiler/runtime support.
+See the [follow-on validation record](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/neo-web-generic-20261031/README.md)
+for execution-mode evidence and limitations. The earlier context-only foundation
+has [separate historical evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/neo-web-20261031/README.md).
 
-This slice is qualified on macOS ARM64 with source-built native code generation.
-The combined graph needs grouped type-shape lowering; no Raven syntax or runtime
-metadata contract was added. The interpreter probe currently fails at Build despite
-successful metadata verification. See the [validation record](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/neo-web-20261031/README.md)
-for exact compiler/bundle revisions and execution-mode evidence.
+## Generic handler contract
+
+`T: func` supplies a structural member contract, including the read-only `Function`
+property. It does not require a nominal delegate or invent a callable signature.
+Neo.Web reads `handler.Function` once during registration. Parameter metadata,
+route-name matching and result adaptation are retained in the endpoint plan.
+Each request supplies its own argument array and uses checked dynamic invocation;
+boxing, argument validation and ordinary DI resolution still occur per request.
+No runtime code generation is required.
+
+Parameters bind in this order:
+
+1. `Neo.Web.HttpContext` receives the active request context.
+2. A parameter whose name matches a route capture binds as `string` or `int`.
+   Invalid integer text produces 400 without invoking the handler.
+3. Remaining reference parameters resolve through the request service provider.
+   Missing services produce 500. Registration does not instantiate services to
+   determine availability, and does not currently validate the entire DI graph.
+
+Open signatures, ref/out parameters, unsupported route types, unbound scalar
+parameters and unsupported return types fail registration with `InvalidOptions`.
+No query/body binding, default argument substitution, optional service policy or
+conversion beyond route `int` parsing is provided. Source parameter names matter;
+generated adapters without useful names cannot infer route binding.
+
+## Typed buffered results
+
+`HttpResult<T>` is a standard Raven union, closed over four alternatives:
+
+| Case | Payload and response |
+| --- | --- |
+| `Ok(value: T)` | Typed payload, HTTP 200. |
+| `Created(value: T)` | Typed payload, HTTP 201. |
+| `BadRequest` | No payload, HTTP 400. |
+| `NotFound` | No payload, HTTP 404. |
+
+Values preserve `T` independently of hosting. The initial endpoint adapter accepts
+`HttpResult<string>` and `Task<HttpResult<string>>`; successful strings become
+UTF-8 `text/plain` responses and the other cases have empty bodies. Other payload
+types can be constructed and tested, but fail endpoint registration until a writer
+is supported. No implicit JSON serialization or arbitrary `Task<T>` adaptation is
+provided. A match can cover all four alternatives without a wildcard:
+
+```raven
+func Status(result: HttpResult<string>) -> int => match result {
+    HttpResult<string>.Ok(_) => 200
+    HttpResult<string>.Created(_) => 201
+    HttpResult<string>.BadRequest => 400
+    HttpResult<string>.NotFound => 404
+}
+```
+
+The generic union is the bounded implementation of the proposed closed result
+hierarchy. The payload type is on the union; nongeneric `HttpResult.Ok<T>` nested
+class cases and existential generic-case patterns are not part of this API.
+
+Framework behavior is tested in `extensions/Neo.Web/test`. WebDemo's separate test
+project references the sample and calls its ordinary handler functions directly,
+providing configuration/services as arguments and matching the returned results.
+It needs no test server or separate web testing framework.

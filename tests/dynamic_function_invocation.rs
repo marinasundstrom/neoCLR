@@ -103,3 +103,36 @@ fn unit_value_result_invokes_and_returns_null() {
         .replace("function.bind fn<void>", "function.bind fn<Void>");
     assert_eq!(run(&source).unwrap().value, Value::Int32(42));
 }
+
+#[test]
+fn buffered_value_result_preserves_typed_fields_through_boxing() {
+    let prefix = SOURCE.split(".type class Counter").next().unwrap();
+    let source = format!(
+        r#"{prefix}
+.type Reply
+.field Text String
+.field Code Int32
+.end
+.function Respond() -> Reply
+ldstr "typed payload"
+ldc.i4 42
+newobj Reply
+ret
+.end
+.function Main() -> String
+function.bind fn<Reply> = Respond()
+castclass System.Object
+ldc.i4 0
+array.reserve System.Object
+call neoCLR.Runtime.InvokeFunction(System.Object,arrayref<System.Object>)
+unbox.any Reply
+ldfld Reply::Text
+ret
+.end
+"#
+    );
+    assert_eq!(
+        run(&source).unwrap().value,
+        Value::String("typed payload".into())
+    );
+}

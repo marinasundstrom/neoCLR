@@ -1,5 +1,79 @@
 # Development conversation record
 
+## 2026-10-31 — Neo.Web follow-on, structural function values and cached registration
+
+- **Author pipeline direction:** Requested registration handling any request, with
+  or without a route pattern, possibly through a fixed function shape, and future
+  middleware modeled after ASP.NET Core.
+- **Assistant design/action:** Added `Map(pattern, contextHandler)` for all methods
+  and `Run(contextHandler)` for one terminal unpatterned stage. Kept `RunAsync` as
+  lifetime control, route validation/405 before terminal handling, and the same
+  scoped invocation adapter. Documented full-pattern versus ASP.NET path-prefix
+  Map and the then-fixed ordering; Use/next was still unimplemented at that point.
+- **Author follow-up:** Explicitly requested middleware support.
+- **Assistant implementation:** Added fixed-shape Use(context, next) registration,
+  immutable startup composition, and one scope around the complete pipeline.
+  Added WebDemo request logging and framework HTTP checks for ordering,
+  short-circuiting, failure/cancellation and scope retention. Validation is tracked
+  separately below; source changes alone are not execution evidence.
+- **Compiler outcome:** Committed structural member discovery, named-handler inference
+  and emission fixes on unified Raven main as `8e9bb96ec`; 28 focused compiler tests
+  pass. Runtime/HTTP and website qualification are recorded separately, without
+  implying execution-mode support from compiler availability.
+- **Author result examples:** Requested `HttpResult.Ok(_)`, `HttpResult.BadRequest`
+  and `HttpResult.NotFound`, with exhaustive outcome matching in direct handler tests.
+- **Assistant bounded implementation choice:** Used the previously allowed standard
+  union alternative, `HttpResult<T>`, with Ok, Created, BadRequest and NotFound.
+  Native nested generic record cases compile only with further emitter/metadata
+  changes, and existential generic-case patterns exposed another emission gap.
+  Those exploratory changes were removed. The union retains the payload type and
+  supports exhaustive matches with explicit `HttpResult<string>` qualification;
+  initial HTTP adaptation is limited to string payloads. This is an assistant
+  implementation choice, not a claim that the author explicitly chose that spelling.
+
+- **Author:** Directed continuing to the next slice after the foundation commit.
+  Demonstrated `func MapGet<T: func>(handler: T)` and `handler.Function`, explaining
+  that `func` is the basic structural function contract without nominal bounds;
+  its details may be revisited later. Requested reflection/binding costs at endpoint
+  registration, cached mappings during execution, and interpreter/JIT/AOT benchmarks
+  after execution gaps are fixed.
+- **Author terminology clarification:** References to functions should be described
+  as function values, with value identity, rather than function objects. Requested
+  that terminology in documentation and on the website.
+- **Author structural-contract clarification:** A variable or slot typed as a
+  function type holds a function value. In the example `MapGet<T: func>`, the
+  constraint guarantees the shape category; `Function` belongs to the value's
+  structural contract even without a nominal base. The assistant adopted this
+  distinction between the unknown concrete invocation signature and the known
+  inspection member, while retaining the compiler support gap explicitly.
+- **Author continuation:** Explicitly requested the next slice using this contract,
+  compiler/runtime gap fixes, real sample validation, docs/website updates and a
+  commit. Clarified that Raven main now unifies .NET and neoCLR. Also required
+  function-constrained variables to enumerate the contract members for both binder
+  lookup and IDE presentation. This supersedes the earlier branch-separation rule;
+  target-specific capability checks remain required.
+- **Author testing direction:** Keep `extensions/Neo.Web/test` focused on framework
+  behavior using NeoClr.Testing. Give WebDemo its own test project. View handlers as
+  ordinary functions with explicit inputs and typed outputs; tests supply compatible
+  arguments and assert results, including exhaustive matches over sealed HttpResult.
+  Keep any convenience helpers local to WebDemo for now rather than creating a
+  separate web testing framework. Query/body inputs describe the eventual model;
+  the bounded binding implementation still starts with route values and DI.
+- **Assistant action so far:** Committed the foundation as `6228d0be9`. Began the
+  follow-on by reducing interpreter transitive-reference failures and probing native
+  Raven Function-property support. Updated maintained documentation terminology;
+  historical proposals/validation retain their original wording with a current-term
+  note where applicable.
+- **Assistant outcome:** Generic handlers, typed results, middleware and separate
+  sample/framework tests are implemented. Raven `9cd1c94ae` adds imported module
+  function values for the shared WebDemo.Logic library. Native/JIT framework tests
+  pass 5/5; direct sample tests pass 4/4 and independent HTTP consumers pass 12/12
+  in all three modes. Interpreter framework testing remains 4/5 because its
+  in-process HTTP consumer times out; middleware passes. API snapshots and website
+  validation pass. See [bounded evidence](validation/neo-web-generic-20261031/README.md).
+  Throughput benchmarks, broader binding/serialization and remaining native
+  inspection gaps are still open; these checks do not establish performance gains.
+
 ## 2026-10-31 — First experimental Neo.Web hosting slice
 
 - **Author:** Requested implementation of WebApplicationBuilder, WebApplication

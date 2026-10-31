@@ -400,10 +400,10 @@ impl<'a> Profile<'a> {
                 || f.parameters.len() > 32
             {
                 return Err(format!(
-                    "{}: unsupported value member contract (owner {:?}, virtual {}, abstract {}, override {}, impl {}, generics {}/{}, readonly {:?}/{})",
+                    "{}: unsupported value member contract (owner {:?}, virtual {}, abstract {}, override {}, impl {}, generics {}/{}, readonly {:?}/{}, instructions {}, locals {}, origin {:?})",
                     f.name, f.owner, f.is_virtual, f.is_abstract, f.is_override,
                     f.impl_flags, f.generic_parameters.len(), f.generic_arguments.len(),
-                    f.readonly_parameters, f.receiver_readonly
+                    f.readonly_parameters, f.receiver_readonly, f.body.len(), f.locals.len(), f.origin
                 ).into());
             }
             if f.out_parameters

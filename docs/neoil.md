@@ -688,7 +688,7 @@ See [managed constructor chaining](constructor-chaining.md) for byref .ctor rece
 base/this call validation, partial initialization and managed stfld writes.
 
 
-## Structural Function objects
+## Structural Function values
 
 `fn<P0,...,R>` describes a shape independently of nominal type declarations.
 Ordered types, readonly/out/outtrue parameter contracts and the return convention

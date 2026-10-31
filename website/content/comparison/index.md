@@ -76,6 +76,6 @@ type. Matching signatures share a Function type, so callbacks can use that contr
 directly without sharing a named delegate declaration. .NET delegate types instead
 have nominal identity.
 
-Function objects support value equality, typed Invoke and target inspection through
+Function values support value equality, typed Invoke and target inspection through
 the Function property, which returns MethodInfo. FunctionTypeInfo describes the
 signature independently of the bound target.

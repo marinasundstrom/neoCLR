@@ -1,7 +1,7 @@
 # Raven Functions and lambdas on neoCLR
 
 Development after Preview 11 imports Raven function syntax as structural Function
-shapes and checked Function objects. CLI Func/Action are transport metadata only;
+shapes and checked Function values. CLI Func/Action are transport metadata only;
 no nominal delegate declarations enter runtime artifacts. The tested source forms,
 extensions and async behavior are in the [Function migration evidence](experiments/function-types/README.md)
 and [API reference](../api-docs/functions.md). The remaining text records earlier

@@ -1,0 +1,10 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.16s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-998c8f9905fce89d)
+
+running 2 tests
+test reflection_snapshots::function_inspection_reachability::unused_inspection_does_not_retain_factories_but_bound_targets_and_roots_do ... ok
+test reflection_snapshots::function_inspection_reachability::virtual_slot_candidates_keep_inspection_reachable ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 259 filtered out; finished in 0.25s

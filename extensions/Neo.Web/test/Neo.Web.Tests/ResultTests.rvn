@@ -1,0 +1,29 @@
+module NeoClr.WebTests
+
+import System.*
+import System.Result.*
+import Neo.Web.*
+import NeoClr.Testing.*
+
+// No wildcard: all outcomes are covered, independent of the payload type.
+func StatusOf<T>(result: HttpResult<T>) -> int => match result {
+    HttpResult<T>.Ok(_) => 200
+    HttpResult<T>.Created(_) => 201
+    HttpResult<T>.BadRequest => 400
+    HttpResult<T>.NotFound => 404
+}
+
+[Test]
+func `Typed results preserve content and exhaustively describe response alternatives`() -> Result<unit, TestFailure> {
+    let created = HttpResult<string>.Created("created")
+    let number = HttpResult<int>.Ok(42)
+    let actual = match number {
+        HttpResult<int>.Ok(let value) => value
+        _ => 0
+    }
+    _ = Assert.Equal(42, actual)?
+    _ = Assert.Equal(200, StatusOf(number))?
+    _ = Assert.Equal(201, StatusOf(created))?
+    _ = Assert.Equal(404, StatusOf(HttpResult<string>.NotFound))?
+    return Assert.Equal(400, StatusOf(HttpResult<string>.BadRequest))
+}

@@ -8,21 +8,40 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
-- Add experimental Neo.Web, a web framework built on System.Web.Http.HttpServer,
-  with WebApplicationBuilder, WebApplication and request-scoped context handlers.
-  Compose configuration and logging, validate and freeze route registration, and
-  support buffered responses, 400/404/405 dispatch and joined shutdown. Provide
-  Neo.Web.HttpContext without requiring transport imports in normal applications.
-  Add an evolving reference app, real HTTP consumer, API reference and website
-  walkthrough. Generic handler injection, streaming and general hosting remain
-  later slices; API and assembly boundaries remain provisional. Record the author's
-  next-slice direction toward HTTP results typed from construction, with response
-  alternatives using a sealed hierarchy or union. The interpreter probe remains
-  blocked at Build; native execution is the default validation path.
+- Extend experimental Neo.Web, a web framework built on top of
+  System.Web.Http.HttpServer, with registration-time generic function handler
+  inspection and cached route/context/service bindings. Add the closed
+  `HttpResult<T>` union; HTTP adaptation currently supports string payloads and
+  their task form. Add all-method `Map`, terminal `Run`, and ordered `Use`
+  middleware with short-circuiting and a request scope spanning the entire awaited
+  pipeline. Registration freezes on `RunAsync`; shutdown joins middleware work.
+  WebDemo demonstrates named handlers, middleware and direct handler tests in its
+  own NeoClr.Testing project; framework behavior remains under `extensions/Neo.Web/test`.
+  Query/body binding, general serialization and streaming remain future work.
+- Expose the structural function-value `Function` contract through the matching
+  unified Raven compiler and runtime metadata service. Preserve function-value
+  terminology and binding value identity in maintained documentation. Support
+  ordinary record results in checked dynamic function invocation, and repair
+  transitive loaded type identity for interpreter initialization/reflection.
+  Extend authored native instance-method references with function constraints;
+  nominal bounds on the same parameter and CLI erasure remain rejected. Add
+  consumer-owned imported function binding for shared handler libraries.
+  Native descriptor retention and execution-mode qualification are documented in
+  `docs/validation/neo-web-generic-20261031`.
 - Share identical closed type-shape reflection result blocks in native codegen,
   preserving token checks, selector errors and the existing instruction bound.
-  This admits the combined hosting graph without raising backend limits or changing
-  reflection semantics; use a matching development code generator for Neo.Web.
+  This admitted the context-only foundation within its existing backend limits;
+  use a matching development code generator for Neo.Web.
+
+- Share repeated generic-argument dispatch results and partition oversized native
+  reflection dispatchers at complete token groups, preserving checked errors and
+  the per-method instruction bound. Raise the experimental native type budget to
+  2,048 for the combined web/testing graph; matching native/JIT hosts are required.
+  Avoid retaining bound-target descriptor factories when function inspection is
+  unreachable, so direct handler tests do not pull in unused metadata graphs.
+  Native/JIT framework and sample tests pass, as do independent HTTP consumers in
+  all three modes. The interpreter in-process HTTP test still reaches a transport
+  timeout; its middleware test and the independent HTTP sample pass.
 
 - Publish Preview 19 after final source-asset upload crosses midnight in Stockholm.
   Verify all 12 public asset hashes/sizes and the checksum download; qualified

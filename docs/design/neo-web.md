@@ -42,6 +42,17 @@ Internally it uses HttpServer's response callback so 405 responses can carry All
 through existing public APIs; no transport extension or friend grant is needed.
 The remaining sketches below preserve the broader proposal, not the implemented API.
 
+## Implemented follow-on (2026-10-31 development)
+
+The bounded follow-on now includes generic MapGet/MapPost with cached route,
+context and service binding, the closed HttpResult<T> union, all-method Map,
+terminal Run, and fixed-shape Use middleware. A single scope spans the outermost
+middleware task, including work after next returns. The host and direct handler
+tests share WebDemo.Logic. See the [implemented contract](../../api-docs/neo-web.md)
+and [execution evidence](../validation/neo-web-generic-20261031/README.md);
+query/body binding, general serialization and broader hosting remain future work.
+The proposal sketches below retain their exploratory status.
+
 ## Baseline and deliberate differences
 
 ASP.NET Core's [WebApplication and WebApplicationBuilder](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication?view=aspnetcore-10.0)
@@ -483,3 +494,54 @@ unrepresentable generic signatures. Publish feature content only from tested
 samples, clearly marking development scope. This proposal does not require a website
 build. Baseline HTTP/allocation measurements become relevant when choosing the
 optimized adapter path; no benchmark is needed to establish this design document.
+
+## Pipeline direction and bounded terminal registrations (2026-10-31)
+
+The author requested a way to handle any request, with or without a route pattern,
+and to think of Neo.Web as a pipeline with future middleware, similar to ASP.NET
+Core. The [ASP.NET Core middleware contract](https://learn.microsoft.com/aspnet/core/fundamentals/middleware)
+uses terminal Run handlers and wrapping middleware with a next continuation.
+Its Map middleware branches by path prefix; endpoint routing is a separate concern.
+
+Neo.Web's bounded foundation uses the existing structural context function shape:
+
+```raven
+(HttpContext) -> Task<Result<unit, WebError>>
+```
+
+`Map(pattern, handler)` registers a full route pattern for every method. `Run(handler)`
+sets the one terminal, unpatterned stage; `RunAsync` still owns listening/lifetime.
+Malformed targets terminate with 400, method-only mismatches with 405, and unmatched
+paths reach the terminal handler (or default 404). Both terminal and endpoint
+handlers use the same scope and response-completion adapter. Empty terminal route
+values are obtained once through the public route matcher and reused; request
+paths are not reparsed to manufacture an empty match on the hot path.
+
+A method-specific route wins over an all-method route at equal pattern precedence.
+Overlapping all-method routes of equal precedence reject. The terminal stage is
+configured once and always follows routing, independent of registration order.
+These are deliberate bounded differences from an ordered middleware builder and
+path-prefix Map: predictable routing now, but no arbitrary pipeline insertion yet.
+
+Future `Use` can wrap a fixed next function with the same context/result contract.
+Define before/after ordering, short-circuiting, scoped lifetime across the whole
+pipeline, cancellation and response completion before adding it. Generic endpoint
+binding remains an adapter into this terminal contract; it is not the pipeline
+contract itself. General hosting and streaming are still separate work.
+
+The author then explicitly requested middleware implementation in this slice.
+`Use(handler)` now takes `(HttpContext, next) -> Task<Result<unit, WebError>>`, where
+next has the terminal function shape above. RunAsync composes immutable wrapper
+steps once, reversing the registration list to make the first middleware outermost.
+The innermost step performs validation/routing/terminal handling. A single request
+scope and response adapter surround the complete composed pipeline; post-next work
+therefore retains scoped services. RouteValues starts empty and is populated by
+routing on the same context. Failure and cancellation remain observable through
+the task/result contract. Middleware may short-circuit before routing.
+
+Call next at most once with the supplied context and await it. Retained/reentrant
+continuations and fire-and-forget execution are outside the contract. No general
+middleware service activation, explicit UseRouting insertion or branch-builder API
+is introduced. WebDemo's LogRequest function demonstrates before/after logging;
+framework tests cover ordering, short-circuiting, failure, cancellation and scope
+lifetime with real HTTP requests.

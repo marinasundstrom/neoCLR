@@ -5089,6 +5089,7 @@ fn interpret_instructions_with_dispatch(
                         if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)
+                                | crate::native::Binding::FunctionInfo
                                 | crate::native::Binding::AssemblyInfo(_)
                                 | crate::native::Binding::ExecutingAssembly
                                 | crate::native::Binding::UnixTimeToLocal
@@ -5386,6 +5387,7 @@ fn interpret_instructions_with_dispatch(
                         let value = if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)
+                                | crate::native::Binding::FunctionInfo
                                 | crate::native::Binding::AssemblyInfo(_)
                                 | crate::native::Binding::ExecutingAssembly
                         ) {
@@ -5526,7 +5528,7 @@ fn interpret_instructions_with_dispatch(
                         }
                     }
                     if let Some(owner) = &frame.initializing_type {
-                        let key = crate::type_identity::resolve(module, owner)?;
+                        let key = crate::type_identity::resolve_loaded(module, owner)?;
                         invocation
                             .statics
                             .lock()

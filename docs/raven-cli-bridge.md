@@ -8883,7 +8883,7 @@ present on Raven main; the fix stays on the native compiler line with focused
 shared-emitter tests, to accompany any future promotion of that infrastructure.
 
 Temporary encoding remains source-local exact InternalCall services and structural
-function objects. Native metadata/backend await lowering must replace the explicit
+function values. Native metadata/backend await lowering must replace the explicit
 wrapper/notification/cleanup code; integer handle lifetime, legacy queue callbacks
 and hand-written cancellation returns are not permanent platform contracts.
 The runtime owns retention/dispatch, the managed layer owns Task/Promise outcomes,
@@ -16317,3 +16317,37 @@ that fix is required; published Preview 19 binaries are unchanged. The native
 metadata/query implementation remains the owner of this lowering; it is not a
 permanent API limit or a Neo.Web-specific runtime operation. See the
 [focused qualification](validation/neo-web-20261031/README.md).
+
+## Function values: structural inspection (2026-10-31 development)
+
+The unified Raven main compiler now synthesizes `Function` on structural function
+slots and `T: func`. The member is discoverable through symbols, binder lookup and
+IDE completion. A constraint specifies a function category, not a concrete call
+signature. Ordinary .NET compilation remains unchanged.
+
+The explicit Runtime TypeOf context optionally supplies public nonvirtual
+`GetFunctionInfo(Object) -> MethodInfo`. Compiler lowering evaluates the receiver
+once and converts it to Object; `RuntimeContext.Current` supplies the context.
+The source runtime delegates to the reserved `neoCLR.Runtime.FunctionInfo`
+InternalCall. It inspects a managed binding without invoking the target, retaining
+closed signature/parameter metadata. Null faults; arbitrary nonfunction objects
+are not admitted. Function values retain binding value identity.
+
+This is a temporary compiler/runtime adapter, not a nominal Function or Delegate
+base. Native metadata remains authoritative. Raven owns semantic synthesis and
+emission; neoCLR owns interpretation and retained native descriptor factories.
+A future intrinsic/native backend can replace the helper call. See Raven's
+matching compiler document for configuration and semantic tests. Execution-mode
+qualification belongs to the Neo.Web validation record, not compiler availability.
+
+The combined test/application graph also requires the matching native backend and
+host type budget (2,048). Metadata query dispatch shares argument sequences and
+partitions oversized dispatchers between complete token checks, preserving the
+8,192-instruction method bound and unknown-token/selector errors. These are
+backend resource policies, not permanent source-language restrictions.
+
+The native compiler also admits references to nongeneric module-level functions
+from an explicitly referenced library, using the metadata writer's imported
+BindFunction overload. WebDemo and WebDemo.Tests share WebDemo.Logic rather than
+referencing an executable (native project references currently require libraries).
+Imported generic/instance method-group binding remains separate work.

@@ -415,6 +415,27 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise RuntimeError('Raven did not report a valid native project output')
         assembly = output / 'app.dll'
         shutil.copy2(paths[-1], assembly)
+        # Project references are executable dependencies, not merely compiler inputs.
+        # Stage them separately from the verified platform bundle and retain hashes.
+        project_modules = []
+        known_modules = {path.name: sha(path) for path in libraries}
+        for dependency in dict.fromkeys(paths[:-1]):
+            dependency = Path(dependency)
+            if not dependency.is_absolute() or not dependency.is_file():
+                raise RuntimeError('Raven reported an invalid project dependency output')
+            digest = sha(dependency)
+            if dependency.name in known_modules:
+                if known_modules[dependency.name] != digest:
+                    raise ValueError('Project dependency conflicts with an existing module: ' + dependency.name)
+                continue
+            destination = output / 'modules' / dependency.name
+            destination.parent.mkdir(exist_ok=True)
+            shutil.copy2(dependency, destination)
+            known_modules[dependency.name] = digest
+            libraries.append(destination)
+            project_modules.append(str(destination))
+            report['inputs'][str(dependency)] = digest
+        report['projectModules'] = project_modules
         if reflection_types or reflection_constructor_types or reflection_method_types or retention_entries:
             bundle_manifest = json.loads((bundle / 'manifest.json').read_text())
             runtime = bundle / bundle_manifest['runtime']

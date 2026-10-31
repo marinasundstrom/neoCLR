@@ -14,7 +14,7 @@ its constructor is internal, and it exposes no publishing operation.
 <a id="subscribe"></a>
 ### `Subscribe(handler: T) -> Disposable`
 
-Registers the supplied function object, retaining its receiver/captures. Returns
+Registers the supplied function value, retaining its receiver/captures. Returns
 an idempotent handle that removes exactly this registration. Duplicate function
 objects are independent registrations. A removal does not retract an entry from
 an already active dispatch snapshot. The handle can be retained for explicit

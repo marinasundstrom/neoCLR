@@ -6,5 +6,8 @@
     <AssemblyName>WebDemo</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
-  <ItemGroup><Compile Include="*.rvn" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../WebDemo.Logic/WebDemo.Logic.rvnproj" />
+    <Compile Include="*.rvn" />
+  </ItemGroup>
 </Project>

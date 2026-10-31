@@ -171,6 +171,13 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     void BindFunction(SignatureType functionType, MethodBuilder target);
+    /// <summary>Binds a consumer-owned imported method to its exact structural function shape.</summary>
+    /// <param name="functionType">The exact structural signature.</param>
+    /// <param name="target">A method reference owned by this output assembly.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Invalid shape, target or ownership.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
+    void BindFunction(SignatureType functionType, ImportedMethodReference target);
     /// <summary>Binds an instantiated generic method to an exact structural signature.</summary>
     /// <param name="functionType">The exact substituted Function shape.</param>
     /// <param name="target">The output-owned instantiated method.</param>

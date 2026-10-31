@@ -9,7 +9,7 @@ _Static_assert(NEOCLR_NATIVE_BYTE_ARRAY_LIMIT > 0 && NEOCLR_NATIVE_BYTE_ARRAY_LI
 /* Heap payloads do not expand inline-value or record-array ABI lanes. */
 #define NEOCLR_NATIVE_OBJECT_LANES 256
 /* Shared with the selected-type budget in runtime/codegen/src/limits.rs. */
-#define NEOCLR_NATIVE_TYPE_LIMIT 1024
+#define NEOCLR_NATIVE_TYPE_LIMIT 2048
 #define NEOCLR_NATIVE_OBJECT_BYTES (8 + 8 * NEOCLR_NATIVE_OBJECT_LANES)
 #define NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT 5
 #define NEOCLR_AOT_FAULT_NULL_REFERENCE 6

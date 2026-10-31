@@ -172,3 +172,51 @@ fn legacy_metadata_keeps_load_set_visibility() {
         Value::Int32(42)
     );
 }
+
+#[test]
+fn transitive_library_statics_initialize_without_granting_host_type_access() {
+    use neoclr::metadata::{Instruction as Op, StaticField, Visibility};
+    let root = ".module App\n.references (Middle)\n.entry Main\n.function Main() -> Int32\ncall Middle.Get()\ncall Middle.Get()\nadd\nret\n.end";
+    let middle = ".module Middle\n.references (Helpers)\n.function Middle.Get() -> Int32\ncall Helpers.Get()\nret\n.end";
+    let helpers = ".module Helpers\n.references ()\n.type class Cache\n.method private static .cctor() -> void\nret\n.end\n.end\n.function Helpers.Get() -> Int32\nldc.i4 0\nret\n.end";
+    let mut modules = assemble_modules(&[root, middle, helpers]).unwrap();
+    let helper = &mut modules[2];
+    helper.types[0].static_fields.push(StaticField {
+        name: "Value".into(),
+        ty: Type::Int32,
+        visibility: Visibility::Public,
+        readonly: true,
+    });
+    let owner = Type::Named("Cache".into());
+    let load = Op::StaticField {
+        owner: owner.clone(),
+        index: 0,
+    };
+    helper.functions[0].body = vec![
+        load.clone(),
+        Op::Int(42),
+        Op::Add,
+        Op::SetStaticField {
+            owner: owner.clone(),
+            index: 0,
+        },
+        Op::Return,
+    ];
+    helper.functions[1].body = vec![Op::LoadTypeToken(owner.clone()), Op::Pop, load, Op::Return];
+    let program =
+        LoadedProgram::with_modules(&modules[0], library::system().unwrap(), &modules[1..])
+            .unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(84)
+    );
+    // Transitive execution does not let the application or host name that type.
+    assert!(
+        program
+            .resolve_type_identity(&owner)
+            .unwrap_err()
+            .message
+            .contains("does not reference Helpers")
+    );
+}

@@ -446,6 +446,8 @@ fn bind_generic_arguments(
         }
     }
     let mut bindings = Vec::new();
+    let helper_start = input.functions.len();
+    let mut helpers = Vec::new();
     for row in queries {
         let index = row["compiledIndex"].as_u64().ok_or("missing query index")? as usize;
         let f = &mut input.functions[index];
@@ -487,6 +489,7 @@ fn bind_generic_arguments(
             );
         }
         let mut body = Vec::new();
+        let mut boundaries = Vec::new();
         for (owner, ordinal, argument, result) in &transitions {
             let mut skips = Vec::new();
             for (position, expected) in [
@@ -502,6 +505,7 @@ fn bind_generic_arguments(
             for skip in skips {
                 body[skip] = Op::BranchFalse(body.len());
             }
+            boundaries.push(body.len());
         }
         if check {
             body.extend([Op::Int(2), Op::Return]);
@@ -510,11 +514,92 @@ fn bind_generic_arguments(
                 "generic type construction was not retained".into(),
             ));
         }
-        f.body = body;
-        f.impl_flags = 0;
+        partition_query(f, index, body, boundaries, helper_start, &mut helpers)?;
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,"implementation":"retained-generic-argument-application-v1","transitionCount":transitions.len()}));
     }
+    input.functions.extend(helpers);
     Ok(bindings)
+}
+
+fn partition_query(
+    f: &mut neoclr::metadata::Function,
+    index: usize,
+    body: Vec<neoclr::metadata::Instruction>,
+    boundaries: Vec<usize>,
+    helper_start: usize,
+    helpers: &mut Vec<neoclr::metadata::Function>,
+) -> Result<(), Error> {
+    use neoclr::metadata::Instruction as Op;
+    f.impl_flags = 0;
+    if body.len() <= 8192 {
+        f.body = body;
+    } else {
+        // Split only between complete token groups: the stack is empty and
+        // their only continuation is fall-through to the next group. Each
+        // helper preserves the checked unknown-token/ordinal failure path.
+        let mut starts = vec![0];
+        while body.len() - starts.last().unwrap() > 8000 {
+            let start = *starts.last().unwrap();
+            let cut = boundaries
+                .iter()
+                .copied()
+                .filter(|cut| *cut > start && *cut - start <= 7900)
+                .last()
+                .ok_or("native descriptor dispatch group exceeds method bound")?;
+            starts.push(cut);
+        }
+        let template = f.clone();
+        let mut chunks = Vec::new();
+        for part in 0..starts.len() {
+            let start = starts[part];
+            let end = starts.get(part + 1).copied().unwrap_or(body.len());
+            let mut function = template.clone();
+            function.body = body[start..end].to_vec();
+            for op in &mut function.body {
+                match op {
+                    Op::Branch(target) | Op::BranchTrue(target) | Op::BranchFalse(target) => {
+                        if *target < start || *target > end {
+                            return Err("native descriptor split crosses token group".into());
+                        }
+                        *target -= start;
+                    }
+                    _ => (),
+                }
+            }
+            if part > 0 {
+                function.name = format!("$RuntimeQuery.{index}.{part}");
+                function.definition = Some(neoclr::metadata::MemberId {
+                    module: template
+                        .definition
+                        .as_ref()
+                        .ok_or("query identity missing")?
+                        .module
+                        .clone(),
+                    revision: template.definition.as_ref().unwrap().revision.clone(),
+                    index: (helper_start + helpers.len() + part - 1) as u32,
+                });
+                function.origin = None;
+            }
+            chunks.push(function);
+        }
+        for part in 0..chunks.len() - 1 {
+            let next = &chunks[part + 1];
+            let target = FunctionRef {
+                definition: next.definition.clone(),
+                name: next.name.clone(),
+                owner: None,
+                instance: false,
+                parameters: next.parameters.clone(),
+                generic_arguments: vec![],
+            };
+            let chunk = &mut chunks[part];
+            chunk.body.extend((0..chunk.parameters.len()).map(Op::Arg));
+            chunk.body.extend([Op::Call(target), Op::Return]);
+        }
+        f.body = chunks.remove(0).body;
+        helpers.extend(chunks);
+    }
+    Ok(())
 }
 
 /// Bind descriptor queries over the admitted token producers. The catalogue is
@@ -761,6 +846,8 @@ pub fn bind_queries(
         }
     }
     let mut bindings = generic_bindings;
+    let helper_start = input.functions.len();
+    let mut helpers = Vec::new();
     for row in queries {
         let index = row["compiledIndex"].as_u64().ok_or("missing query index")? as usize;
         let assignable = row["name"] == "neoCLR.Runtime.ReflectionAssignable";
@@ -885,6 +972,21 @@ pub fn bind_queries(
         // adding library types does not duplicate every target test per source type.
         let groups = if relationship {
             relationship_groups(&related)
+        } else if arguments {
+            // Closed types sharing the same argument sequence share the checked
+            // ordinal dispatcher, including the empty-sequence failure case.
+            let mut groups: Vec<Vec<usize>> = Vec::new();
+            for index in 0..descriptors.len() {
+                if let Some(group) = groups
+                    .iter_mut()
+                    .find(|group| argument_rows[group[0]] == argument_rows[index])
+                {
+                    group.push(index);
+                } else {
+                    groups.push(vec![index]);
+                }
+            }
+            groups
         } else if shapes {
             // Shape queries depend only on the flags, not type identity. Keep all
             // token checks, but share the mask result for identical descriptors.
@@ -903,6 +1005,7 @@ pub fn bind_queries(
         } else {
             (0..descriptors.len()).map(|index| vec![index]).collect()
         };
+        let mut boundaries = Vec::new();
         for group in groups {
             let descriptor = group[0];
             let (token, name, count, flags, metadata_token) = &descriptors[descriptor];
@@ -1029,12 +1132,16 @@ pub fn bind_queries(
                 ]);
             }
             body[branch] = Op::BranchFalse(body.len());
+            boundaries.push(body.len());
         }
         // All guest token producers are enumerated above. Foreign/forged handles
         // are not admitted by this closed profile; never fabricate an empty name.
         body.push(Op::Fault("Unknown native type descriptor".into()));
         if !prefix.is_empty() {
             let offset = prefix.len();
+            for boundary in &mut boundaries {
+                *boundary += offset;
+            }
             for op in &mut body {
                 match op {
                     Op::Branch(target) | Op::BranchTrue(target) | Op::BranchFalse(target) => {
@@ -1047,20 +1154,12 @@ pub fn bind_queries(
             combined.extend(body);
             body = combined;
         }
-        if body.len() > 8192 {
-            return Err(format!(
-                "{} generated {} instructions, exceeding the 8192 instruction method bound",
-                f.name,
-                body.len()
-            )
-            .into());
-        }
-        f.impl_flags = 0;
-        f.body = body;
+        partition_query(f, index, body, boundaries, helper_start, &mut helpers)?;
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
             "implementation":if assignable { "type-assignable-closed-v1" } else if subclass { "type-subclass-closed-v1" } else if metadata_tokens { "type-metadata-token-closed-v1" } else if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else if arguments { "type-argument-closed-v1" } else { "type-argument-count-closed-v1" },
             "descriptorCount":descriptors.len(),"openDescriptorCount":open_tokens.len(),"policy":"closed tokens and retained descriptive definitions/parameters; semantic source names; no accessor reachability"}));
     }
+    input.functions.extend(helpers);
     Ok(bindings)
 }
 
@@ -1856,6 +1955,41 @@ mod open_query_tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn large_descriptor_dispatch_preserves_results_across_helper_boundaries() {
+        let mut text = String::from(".module LargeQueries\n.entry Main\n");
+        for index in 0..1600 {
+            text.push_str(&format!(".type class Example.C{index}\n.end\n"));
+        }
+        text.push_str(".function neoCLR.Runtime.TypeName(RuntimeTypeHandle) -> String\n.methodimpl InternalCall\n.end\n.function Main() -> String\nldtoken Example.C1599\ncall neoCLR.Runtime.TypeName(RuntimeTypeHandle)\nret\n.end\n");
+        let source = neoclr::assemble(&text).unwrap();
+        let mut input = source.clone();
+        let mut tokens = Vec::new();
+        for index in 0..1600 {
+            tokens.extend([
+                Op::LoadTypeToken(Type::Named(format!("Example.C{index}"))),
+                Op::Pop,
+            ]);
+        }
+        tokens.extend(input.functions[1].body.clone());
+        input.functions[1].body = tokens;
+        let report = json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.TypeName","definition":source.functions[0].definition}], "sourceMetadata":{"types":source.types.iter().enumerate().map(|(index, ty)| json!({"compiledTypeIndex":index,"name":ty.name,"typeArguments":[]})).collect::<Vec<_>>()}});
+        bind_queries(&mut input, &source, &report).unwrap();
+        assert!(input.functions.len() > source.functions.len());
+        assert!(
+            input
+                .functions
+                .iter()
+                .all(|function| function.body.len() <= 8192)
+        );
+        localize_bound_queries(&mut input);
+        let program = neoclr::LoadedProgram::new(&input).unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::String("Example.C1599".into())
+        );
     }
 
     #[test]

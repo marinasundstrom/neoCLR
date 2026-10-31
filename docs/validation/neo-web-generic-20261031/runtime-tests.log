@@ -1,0 +1,56 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.44s
+     Running tests/function_types.rs (target/debug/deps/function_types-94e36c2ef566201f)
+
+running 21 tests
+test functions_with_identical_shapes_share_a_storage_contract ... ok
+test generic_void_function_returns_retain_the_original_value_abi ... ok
+test function_identity_uses_loaded_component_identities ... ok
+test incompatible_structural_binding_is_rejected ... ok
+test artifacts_cannot_redefine_the_synthesized_invoke_contract ... ok
+test generic_library_invokes_function_with_callers_internal_type ... ok
+test function_display_includes_closed_target_signature ... ok
+test function_object_retains_shared_receiver_under_collection ... ok
+test legacy_delegate_artifacts_and_source_declarations_are_rejected ... ok
+test function_object_roundtrip_preserves_value_and_reference_contracts ... ok
+test higher_order_generic_functions_accept_structural_shapes ... ok
+test named_generic_parameters_bind_inside_function_shapes ... ok
+test structural_binding_still_rejects_frame_receivers ... ok
+test structural_shapes_preserve_parameter_modes_and_generic_substitution ... ok
+test function_property_describes_bound_target_and_null_access_faults ... ok
+test no_result_invoke_preserves_the_caller_stack ... ok
+test structural_inspection_service_preserves_target_without_invocation ... ok
+test nominal_classification_follows_identity_not_display_names ... ok
+test structural_call_requires_no_nominal_declaration ... ok
+test repeated_bindings_compare_by_target_not_creation ... ok
+test qualified_void_function_shapes_bind_and_invoke_like_the_keyword ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.45s
+
+     Running tests/references.rs (target/debug/deps/references-0677e11c669e774e)
+
+running 8 tests
+test empty_list_rejects_calls_even_with_an_explicit_definition_row ... ok
+test transitive_library_statics_initialize_without_granting_host_type_access ... ok
+test lists_reject_missing_unused_duplicates_self_and_invalid_syntax ... ok
+test legacy_metadata_keeps_load_set_visibility ... ok
+test attributes_and_entry_references_do_not_bypass_module_lists ... ok
+test explicit_references_roundtrip_and_preserve_execution ... ok
+test references_are_direct_and_checked_in_each_declaring_module ... ok
+test type_fields_signatures_operands_and_queries_require_references ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.79s
+
+     Running tests/reflection_construction.rs (target/debug/deps/reflection_construction-826339bc2b753ed9)
+
+running 8 tests
+test binding_requires_exact_signature ... ok
+test host_boundary_does_not_expose_the_private_type_handle_service ... ok
+test construction_retains_receiver_during_collection ... ok
+test reachability_reports_dynamic_execution_and_allocation_services ... ok
+test executes_real_constructor_and_round_trips_artifact ... ok
+test constructor_faults_and_frame_limits_are_not_hidden ... ok
+test imported_construction_requires_explicit_public_source_access ... ok
+test rejects_unsupported_types_and_nonpublic_or_absent_constructors ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 17.02s

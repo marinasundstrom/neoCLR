@@ -2,6 +2,7 @@ module Neo.Web
 
 import System.*
 import System.Concurrency.*
+import System.Collections.*
 import Neo.DependencyInjection.*
 import System.Web.Http.*
 
@@ -25,16 +26,17 @@ public class WebServerOptions {
     var Backlog: int = 128
 }
 
-/// A request-owned view with buffered response operations. Do not retain it after the handler settles.
+/// A request-owned view with buffered response operations. Do not retain it after the request pipeline settles.
 public class HttpContext {
-    private val response: HttpResponse
+    private var response: HttpResponse
+    private var route: RouteMatch
     private var active = true
-    /// The incoming request; content is valid only during this handler.
+    /// The incoming request; content is valid until the request pipeline settles.
     val Request: HttpRequest
     /// The scope owned by this request. Do not dispose it yourself.
     val Services: ServiceProvider
-    /// Captured and decoded route parameters.
-    val RouteValues: RouteMatch
+    /// Captured and decoded route parameters; empty before routing and for terminal fallback.
+    val RouteValues: RouteMatch => route
     /// Application shutdown, not client-disconnect cancellation.
     val ApplicationStopping: CancellationToken
 
@@ -42,7 +44,7 @@ public class HttpContext {
         Request = request
         self.response = response
         Services = services
-        RouteValues = route
+        self.route = route
         ApplicationStopping = stopping
     }
 
@@ -74,8 +76,22 @@ public class HttpContext {
         if statusCode < 100 || statusCode > 599 { Panic("Expected HTTP status 100..599") }
     }
 
-    internal func Finish() {
+    internal func SetRouteValues(route: RouteMatch) {
+        EnsureActive()
+        self.route = route
+    }
+
+    internal func RespondMethodNotAllowed(methods: string[]) {
+        EnsureActive()
+        let headers = ArrayList<HttpHeader>()
+        headers.Add(HttpHeader("Allow", String.Join(", ", methods)))
+        response.Dispose()
+        response = HttpResponse(405, headers, HttpStringContent("Method not allowed"))
+    }
+
+    internal func Finish() -> HttpResponse {
         active = false
         Services.Dispose()
+        return response
     }
 }

@@ -1,5 +1,9 @@
 # neoCLR Function Types and Function Objects
 
+**Terminology update, 2026-10-31:** Current documentation uses **function types**
+and **function values**, with value identity. The older “function object” wording
+below is preserved as proposal history; see [the current guide](../function-types.md).
+
 ## Status
 
 **Open proposal — not implemented on main.**

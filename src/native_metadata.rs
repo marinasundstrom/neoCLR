@@ -1329,3 +1329,20 @@ pub fn apply_generic_argument(
 pub fn describe_type(module: &Module, owner: &Type) -> Result<crate::TypeDescriptor, Fault> {
     crate::type_identity::describe_loaded(module, owner)
 }
+
+/// Resolve an already verified bound function for native inspection planning.
+pub fn function_target(
+    module: &Module,
+    target: &crate::metadata::FunctionRef,
+) -> Result<crate::metadata::Function, Fault> {
+    crate::vm::resolve(module, target)
+}
+
+/// Describe a bound managed target without invoking it or retaining its receiver.
+pub fn function_snapshot(
+    module: &Module,
+    shape: &Type,
+    target: &crate::metadata::Function,
+) -> Result<Value, Fault> {
+    crate::reflection::bound_function_shape(module, shape, target, &Limits::default())
+}

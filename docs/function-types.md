@@ -1,9 +1,28 @@
-# Function types and Function objects
+# Function types and values
+
+**Terminology clarification, 2026-10-31:** Use function types and function values.
+A value identifies a binding by signature, target and retained environment, not by
+a separately allocated object identity. Older Object-inheritance and reference-view
+sections below record implementation history; those mechanisms do not redefine
+value identity. The author also identifies `func` as the basic structural contract,
+including `Function` inspection, without nominal type bounds.
+
+A variable or slot typed as a function type holds a function value. In
+`func MapGet<T: func>(handler: T)`, the constraint guarantees that structural
+contract even though the concrete signature is unknown in the generic body.
+With the matching development compiler/runtime, `handler.Function` is a member of that contract;
+it does not require a nominal base class. The constraint alone does not establish
+the parameter and return types needed for a statically typed invocation.
+The unified Raven compiler exposes this optional member through binding, semantic
+member enumeration and completion, on both concrete function types and constrained
+parameters. Ordinary .NET behavior is unchanged. The source runtime supplies the
+explicit introspection capability; see the [Neo.Web follow-on evidence](validation/neo-web-generic-20261031/README.md)
+for execution qualification and remaining native retention limits.
 
 **Author-selected direction, 2026-09-28; structural Function replacement and the
 common/nominal descriptor split are implemented on the development feature branch.**
 
-The author selects structural Function types, Function objects instantiated from
+The author selects structural Function types, Function values instantiated from
 those types, replacement and removal of delegates, and a nominal/structural
 introspection split. `NominalTypeInfo` will hold `Name`, `Namespace` and other
 declaration-specific information; `TypeInfo` will expose `IsNominalType`.
@@ -23,18 +42,18 @@ callable contracts.
 
 ## Shape and instance
 
-A Function type describes the invocation contract. A Function object is an instance
+A Function type describes the invocation contract. A Function value is an instance
 of that shape and holds the method reference required for invocation, together
 with a receiver or closure environment when needed. Its `Invoke` contract follows
 the shape. The selected method is instance data, not part of type identity.
-Two methods with the same shape can therefore produce objects of the same Function
+Two methods with the same shape can therefore produce values of the same Function
 type, even when their names, declaring types or modules differ.
 
 For example, `(Int32) -> String` identifies one shape within a resolved type
 universe. Parameter names and source aliases do not create distinct shapes.
 Nominal types used as components retain their existing module-scoped identities:
 unrelated nominal classes with identical fields are still different parameters.
-The bound receiver is not an exposed parameter; it is retained by the object.
+The bound receiver is not an exposed parameter; it is retained by the value.
 The symbolic target method is distinct from the shape's `Invoke` operation.
 
 Assistant recommendation for the first implementation: exact structural matching
@@ -48,14 +67,14 @@ a separate recursive-type contract is designed.
 
 Reuse existing checked binding behavior: validate method access at binding, resolve
 virtual/interface implementations, retain heap receivers and shared captures, and
-reject frame-backed captures and forged host bindings. Function objects must work
+reject frame-backed captures and forged host bindings. Function values must work
 as arguments, results, fields and generic arguments, with GC tracing through those
-containers. Direct method calls need no Function object. Calling an object uses
+containers. Direct method calls need no Function value. Invoking a function value uses
 the checked target and ordinary argument/result checks.
 
 These recommendations preserve existing execution safety. Author clarification on
 2026-09-28 fixes the value contract: the same signature denotes the same Function
-type, and independently created Function objects bound to the same closed target
+type, and independently created Function values bound to the same closed target
 and receiver compare equal. Receiver/capture identity participates; equal current
 capture contents do not make different environments equal. Equality does not compare
 function outputs or imply referential purity. Allocation strategy and a generalized
@@ -75,7 +94,7 @@ The current descriptor responsibilities are:
 | `TypeInfo` | Common type identity, equality, shape queries, `IsNominalType` and `IsFunctionType`; usable for parameter/result/component types. |
 | `NominalTypeInfo : TypeInfo, MemberInfo` | Nominal declaration name, namespace and declaration identity metadata. |
 | `FunctionTypeInfo : TypeInfo` | One specific signature and its synthesized instance `Invoke`; ordered parameter contracts and return type, without invented nominal declaration metadata. |
-| Function object | Bound target and environment, plus its Function type and typed invocation. |
+| Function value | Bound target and environment, plus its Function type and typed invocation. |
 
 `IsNominalType` must agree with whether the descriptor implements `NominalTypeInfo`.
 Structural descriptors must not implement that interface with empty placeholders.
@@ -85,8 +104,8 @@ not unconditionally cast to the current `RuntimeTypeInfo` implementation.
 
 Author clarification: `FunctionTypeInfo` describes a specific Function signature,
 not just the Function family. For `(Int32) -> String`, it describes that shape and
-its synthesized instance method `Invoke(Int32) -> String`. Each Function object
-created from the type has that method; invocation dispatches to the object's bound
+its synthesized instance method `Invoke(Int32) -> String`. Each Function value
+created from the type has that method; invocation dispatches to the value's bound
 target and environment. The synthesized Invoke descriptor belongs to the shape,
 while the selected target method belongs to the instance's binding. Different
 bound targets do not create different Invoke signatures or Function types.
@@ -242,7 +261,7 @@ and a `void` result preserve the current calling distinctions.
 
 Resolved identity recursively includes component identities and reference/output
 contracts. Type substitution, module-reference checks and visibility checks visit
-the components. The checked Function object retains its target and receiver using
+the components. The checked Function value retains its target and receiver using
 the existing collector and invocation paths. The native host names are `Function`
 and `Value::Function`; this is a host-source compatibility change.
 
@@ -356,13 +375,13 @@ structural renderer. Earlier checkpoint sections above remain historical evidenc
 
 ## Bound target inspection and open object-model questions
 
-Author direction, 2026-09-28: a Function object is a value binding to a method or
+Author direction, 2026-09-28: a Function value is a value binding to a method or
 function, typed by a structural signature. The synthesized read-only instance
 property `Function: MethodInfo` reports that target. `InvokeMethod` remains the
 shape's invocation descriptor. `GetProperties()` discovers `Function`, and
 `GetMethods()` discovers `Invoke` and `get_Function`. Repeated target descriptors
 compare by closed method identity, including generic substitutions; receivers are
-part of Function-object equality, not MethodInfo equality. A module-level target
+part of Function-value equality, not MethodInfo equality. A module-level target
 has no DeclaringType; its module and definition metadata remain available.
 
 This is transitional. The author explicitly defers a shared `FunctionInfo`
@@ -401,7 +420,7 @@ and their members; that does not turn each constructed shape into a nominal type
 
 ### Object inheritance and target display
 
-Author follow-up: Function objects should inherit Object despite being structural,
+Author follow-up: Function values should inherit Object despite being structural,
 as arrays already can; other structural families require their own contracts.
 The assistant's initial suggestion of a standalone ToString without Object was
 superseded by this explicit direction. Structural identity is independent of
@@ -449,7 +468,7 @@ names and declarations.
 
 ## Execution machinery reassessment — 2026-10-08
 
-The author asks that Function objects and runtime approaches be reconsidered alongside
+The author asks that Function values and runtime approaches be reconsidered alongside
 future async suspension and green threads. See the
 [cross-runtime review](runtime-scheduling-design.md#cross-runtime-reassessment--author-direction-2026-10-08).
 The current callable contract remains in force; private target IDs, closure allocation

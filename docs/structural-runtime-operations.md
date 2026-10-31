@@ -25,7 +25,7 @@ Function signatures also preserve parameter modes and no-result conventions;
 A union remains a value when its payload is an object reference: copying that union
 copies the reference, preserving the object's identity. It does not give the union
 Object inheritance. Tuples likewise have value semantics without nominal ancestry.
-Function objects have their own Object-compatible callable contract. Arrays are
+Function values have their own Object-compatible callable contract. Arrays are
 structural at runtime and also representable through nominal `Array<T>`; that
 spelling does not require an additional wrapper object.
 

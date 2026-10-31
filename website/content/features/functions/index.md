@@ -2,13 +2,13 @@
 
 ## Delegates evolved
 
-Function types evolve the familiar delegate model: a callable object holds a target
+Function types evolve the familiar delegate model: a callable value retains a target
 method or function, retains its receiver or captured environment when needed, and
 calls it through Invoke. The signature itself becomes a structural type.
 
 For a signature such as `(int) -> int`, matching parameter types, return type and
 reference-passing contracts mean the same Function type. Callers can share that
-contract directly, without declaring a named delegate type. A Function object is
+contract directly, without declaring a named delegate type. A Function value is
 an instance of the signature, bound to a particular target.
 
 **Development API:** use a matching development runtime and Raven toolchain.
@@ -32,13 +32,13 @@ Check is its assertion helper.
 The methods differ, but their Function type is the same. Parameter names, method
 names and declaring types do not contribute to signature identity. Ordered parameter
 types, return type and reference-passing contracts do. Nominal component types keep
-their own identities. Calling the object uses its synthesized, typed `Invoke` method.
+their own identities. Invoking the value uses its synthesized, typed `Invoke` method.
 
 See [the neoIL walkthrough](../neoil/) for the underlying signature, binding and invocation instructions.
 
 ## Value bindings and target inspection
 
-Function objects have value equality: separately created bindings to the same
+Function values have value equality: separately created bindings to the same
 closed target and receiver compare equal. Different receivers or capture environments
 remain distinct, even when their current contents match. Equality does not compare
 computed results, and mutable captures remain mutable.
@@ -63,15 +63,16 @@ names and module paths. Collections can narrow descriptor results with
 See [introspection](../introspection/) and the [Function API reference](../../docs/functions.html)
 for exact contracts and limits.
 
-## Function objects and Object
+## Value identity and runtime representation
 
 Function types inherit Object while remaining structural. Object views support
 GetType, value Equals/GetHashCode, and casts back to the matching signature.
 ToString displays the bound target's qualified name and closed signature without
-printing captured values. Separate equal bindings have distinct reference identity;
-copies retain it.
+printing captured values. Function identity is the value of the binding, not the
+identity of a separately allocated object. Object views and allocated capture
+environments are runtime representation details.
 
-Typed invocation and property access use the Function object's bound target.
+Typed invocation and property access use the Function value's bound target.
 Null member access raises NullReference.
 
 
@@ -84,6 +85,13 @@ Only structural function signatures satisfy the constraint; nominal delegates an
 objects with an Invoke member do not. A function-kind constraint allows storage and
 forwarding but does not supply a callable signature to the generic body.
 Signature bounds such as `where T: () -> T2` remain unsupported.
+
+**Development contract:** a function-typed slot holds a function value. For
+`MapGet<T: func>(handler: T)`, the matching compiler/runtime exposes the structural
+contract's read-only `Function` property as `handler.Function`, including semantic
+member enumeration and completion. No nominal base or concrete invocation signature
+is implied. [Neo.Web](/features/neo-web/) uses it to plan handler binding once at
+registration; the API remains experimental.
 
 Native signature substitution and imported callbacks retain their function types.
 The .NET target keeps its standard delegate representation and rejects `func`

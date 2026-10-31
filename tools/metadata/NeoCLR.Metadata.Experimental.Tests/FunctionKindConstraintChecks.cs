@@ -6,6 +6,8 @@ internal static class FunctionKindConstraintChecks
 {
     internal static void Run()
     {
+        ImportedFunctionBinding();
+        AuthoredInstanceConstraint();
         FunctionTypeTokens();
         MethodConstraints();
         var host = typeof(object).Assembly.GetName();
@@ -39,6 +41,51 @@ internal static class FunctionKindConstraintChecks
         catch (InvalidDataException) { }
         Console.WriteLine("PASS native function-kind constraint and introspection");
     }
+    private static void ImportedFunctionBinding()
+    {
+        var provider = new AssemblyBuilder(new("BindingProvider", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var method = provider.AddFunction("Answer", new(PrimitiveType.Int32, []));
+        method.LoadConstant(42); method.Return();
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(provider));
+        var consumer = new AssemblyBuilder(new("BindingConsumer", new(1, 0, 0, 0)), provider.CoreLibrary);
+        var imported = consumer.ImportReference(snapshot.MainModule.Functions.Single(), provider.CoreLibrary);
+        var shape = SignatureType.Function(new(PrimitiveType.Int32, []));
+        // Higher-order module contracts must preserve the nested structural shape.
+        var higherOrder = consumer.CreateFunctionReference(new("HigherOrderProvider", new(1, 0, 0, 0)), provider.CoreLibrary,
+            new string('1', 64), "", "Use", new(PrimitiveType.Int32, [shape]));
+        if (higherOrder.Signature.ParameterTypes.Single() != shape)
+            throw new Exception("lost imported structural callback signature");
+        var get = consumer.AddFunction("Get", new(shape, []));
+        get.BindFunction(shape, imported); get.Return();
+        NativeModuleContainer.WriteLibraryBinary(consumer);
+        var foreign = new AssemblyBuilder(new("ForeignBinding", new(1, 0, 0, 0)), provider.CoreLibrary);
+        var wrong = foreign.AddFunction("Get", new(shape, []));
+        Reject(() => wrong.BindFunction(shape, imported));
+        Expect<ArgumentNullException>(() => get.BindFunction(shape, (ImportedMethodReference)null!));
+    }
+
+    private static void AuthoredInstanceConstraint()
+    {
+        var core = new AssemblyIdentity("System.Runtime", new(10, 0, 0, 0));
+        var graph = new AssemblyBuilder(new("InstanceFunctionConsumer", new(1, 0, 0, 0)), core);
+        var owner = graph.CreateTypeReference(new("WebProvider", new(1, 0, 0, 0)), core,
+            new string('0', 64), "Example", "Registry", 0);
+        var signature = new MethodSignature(PrimitiveType.Int32, [SignatureType.MethodParameter(0)], ["F"]);
+        var method = graph.CreateMethodReference(owner, "Map", signature, functionParameters: [0]);
+        var function = SignatureType.Function(new(PrimitiveType.Int32, [PrimitiveType.Int32]));
+        method.MakeGenericInstance(function);
+        Reject(() => method.MakeGenericInstance(PrimitiveType.Int32));
+        if (!ReferenceEquals(method, graph.CreateMethodReference(owner, "Map", signature, functionParameters: [0])))
+            throw new Exception("identical function-constrained member was not interned");
+        Expect<InvalidDataException>(() => graph.CreateMethodReference(owner, "Map", signature));
+        Expect<ArgumentException>(() => graph.CreateMethodReference(owner, "Invalid", signature, functionParameters: [1]));
+        Expect<ArgumentException>(() => graph.CreateMethodReference(owner, "Duplicate", signature, functionParameters: [0, 0]));
+        var use = graph.AddFunction("Use", new(PrimitiveType.Int32, [owner, function]));
+        use.LoadArgument(0); use.LoadArgument(1); use.Call(method.MakeGenericInstance(function)); use.Return();
+        AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteLibraryBinary(graph));
+        Expect<InvalidDataException>(() => graph.Write());
+    }
+
     private static void FunctionTypeTokens()
     {
         var graph = new AssemblyBuilder(new("FunctionTokens", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));

@@ -10,7 +10,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="artifactSha256">64 hexadecimal digits identifying the selected native dependency image.</param>
     /// <param name="namespace">Function namespace; empty for global functions.</param>
     /// <param name="name">Simple function name.</param>
-    /// <param name="signature">Primitive, bounded unmanaged pointer, method-parameter, external top-level nominal construction and single-vector signature; no byrefs.</param>
+    /// <param name="signature">Primitive, structural function, bounded unmanaged pointer, method-parameter, external top-level nominal construction and single-vector signature; no byrefs.</param>
     /// <param name="interfaceBounds">Optional generic parameter bounds limited to output-owned nongeneric nominal interface references.</param>
     /// <param name="isInternalCall">Whether the resolved function is a bodyless runtime service, preserving its exact native service name.</param>
     /// <returns>An interned output-owned callable reference.</returns>
@@ -66,6 +66,7 @@ public sealed partial class AssemblyBuilder
         return reference;
 
         static bool Supported(SignatureType type, bool result) =>
+            type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(parameter => Supported(parameter, false)) :
             type.PointerElement is not null ? true : type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
             type.ImportedType is { DeclaringType: null } nominal
                 ? nominal.TypeArguments.All(argument => Supported(argument, false)) :

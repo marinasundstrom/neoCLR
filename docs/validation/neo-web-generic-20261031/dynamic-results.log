@@ -1,0 +1,21 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 25.40s
+     Running tests/dynamic_function_invocation.rs (target/debug/deps/dynamic_function_invocation-c1590f3dbb29b733)
+
+running 7 tests
+test bound_receiver_and_boxed_result has been running for over 60 seconds
+test buffered_value_result_preserves_typed_fields_through_boxing has been running for over 60 seconds
+test invocation_check_returns_errors_without_entering_target has been running for over 60 seconds
+test null_callback_and_null_arguments_reject has been running for over 60 seconds
+test target_fault_is_not_wrapped has been running for over 60 seconds
+test unit_value_result_invokes_and_returns_null has been running for over 60 seconds
+test wrong_count_and_wrong_box_reject_before_call has been running for over 60 seconds
+test buffered_value_result_preserves_typed_fields_through_boxing ... ok
+test target_fault_is_not_wrapped ... ok
+test unit_value_result_invokes_and_returns_null ... ok
+test bound_receiver_and_boxed_result ... ok
+test null_callback_and_null_arguments_reject ... ok
+test wrong_count_and_wrong_box_reject_before_call ... ok
+test invocation_check_returns_errors_without_entering_target ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 116.82s

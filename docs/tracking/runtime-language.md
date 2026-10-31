@@ -38,7 +38,7 @@ Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
 InvokeMethod remains the member-reflection view; no generalized function-info
 interface is introduced.
 
-Function objects now expose Function: MethodInfo for the closed bound target and
+Function values now expose Function: MethodInfo for the closed bound target and
 inherit Object without becoming nominal. Object views preserve GetType, exact-shape
 cast-back, value equality/hash and diagnostic qualified-target ToString. Copies
 preserve reference identity; separate equal bindings have distinct reference identity.

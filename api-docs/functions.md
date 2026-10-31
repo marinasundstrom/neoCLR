@@ -1,13 +1,13 @@
-# Function shapes and objects
+# Function types and values
 
 A Function type describes a callable shape. A
-Function object is an instance of that shape, holding a checked method target and
+Function value is an instance of that shape, holding a checked method target and
 any bound receiver or captured environment. This page documents the structural
 family; “Function” is a documentation label, not a nominal type declaration.
 
 Function types are another data-composition family: their structure is the callable
-signature rather than a nominal declaration. They retain their own Object and
-invocation contract; that does not impose reference semantics on tuples or unions.
+signature rather than a nominal declaration. Their values retain the bound target
+and environment. Value identity does not depend on allocating a separate object; that does not impose reference semantics on tuples or unions.
 See [all structural families](structural-types.md).
 
 ## Members
@@ -52,7 +52,7 @@ bound method and returns its result. Ordinary call syntax, such as `first(41)`,
 uses the same operation. Arguments must match the parameter contracts, and binding
 an incompatible method is rejected during compilation or artifact validation.
 The object retains its receiver/environment across collection. Frame-bound
-references cannot escape through a retained Function object.
+references cannot escape through a retained Function value.
 
 Structural types can have members and extension members. For example:
 
@@ -81,9 +81,9 @@ The transport carrier types are explicitly excluded from generated type pages;
 member signatures retain their matching CLI documentation IDs. Function equality compares shape, closed method and retained receiver identity.
 Copies share captures; they do not copy a receiver. Default Function slots contain
 null and Invoke faults with NullReference. Constructors must initialize their
-Function fields before publication. Function objects inherit Object, support Object views and cast-back, and preserve
-their precise signature through GetType. Separate bindings have separate reference
-identity even when value-equal; copies retain reference identity.
+Function fields before publication. Function values inherit Object, support Object views and cast-back, and preserve
+their precise signature through GetType. The binding defines value identity. The current Object projection is a runtime
+representation and interop facility, not a separate language-level identity.
 There is no multicast combination or native function-pointer interop contract.
 Use FunctionComparer and FunctionEqualityComparer to adapt callable values to
 comparison contracts. The legacy `.delegate`, `delegate.bind` and serialized
@@ -118,7 +118,7 @@ remain future design work.
 ## Bound target property
 
 Every Function signature synthesizes a read-only public instance property
-`Function: MethodInfo`. Read it on a Function object to inspect the actual bound
+`Function: MethodInfo`. Read it on a Function value to inspect the actual bound
 method/function. The signature's `FunctionTypeInfo.InvokeMethod` continues to
 represent `Invoke`; it is not the bound target. `GetProperties()` exposes Function,
 and `GetMethods()` includes its `get_Function` accessor as well as Invoke.
@@ -136,10 +136,10 @@ The descriptor describes the method independently of a bound receiver.
 Repeated reads return equal descriptors, without promising wrapper identity.
 Null Function property access raises NullReference.
 
-Same signature means same Function type. Function objects are value bindings:
+Same signature means same Function type. Function values are value bindings:
 the same closed target and receiver/capture identity compare equal, regardless
 of when the bindings were created. Different targets, generic instantiations or
-receivers differ. Equal computed results do not imply equal Function objects.
+receivers differ. Equal computed results do not imply equal Function values.
 A future common FunctionInfo interface is deferred; Function returns MethodInfo now.
 
 <a id="object-members-development"></a>
@@ -153,7 +153,9 @@ closed target and receiver identity, equal values hash equally, and ToString dis
 the module-qualified target name with its closed signature. GetType on an Object
 view returns the actual Function signature. Type tests and casts back require the
 exact compatible shape; a different signature does not become callable by casting.
-Object.ReferenceEquals compares binding creation identity, not value equality.
+Object.ReferenceEquals currently exposes binding-allocation identity through the
+Object projection. That implementation behavior does not define function-value
+identity; use Equals/GetHashCode for the callable-value contract.
 
 ToString does not invoke user code, inspect receiver state or serialize captures.
 Lambdas may display compiler-generated target names. The diagnostic spelling may
@@ -179,7 +181,7 @@ static func Invoke(function: Object?, arguments: Object?[])
 
 The argument is an existing native structural function reference, retaining its bound
 receiver/captures. Supply a non-null argument array, including an empty array for a
-zero-parameter function. A successful call returns `Ok` with the boxed scalar result,
+zero-parameter function. A successful call returns `Ok` with the boxed scalar or supported value-record result,
 original reference, or null for a no-result call. Null reference arguments/results
 are supported when the signature admits reference values.
 
@@ -190,8 +192,11 @@ are supported when the signature admits reference values.
 | `UnsupportedType` | The function signature requires unsupported marshalling. |
 
 Validation does not enter the target. Exact scalar boxes and assignable references
-are supported; numeric coercion, optional arguments, ref/out copyback and arbitrary
-value record/tuple/union marshalling are not. **Faults raised by the function itself
+are supported as arguments. Development result adaptation additionally boxes ordinary
+nonborrowed value records, including standard Raven union carriers. It retains
+the exact closed result type and managed fields; this does not admit aggregate
+arguments. Numeric coercion, optional arguments, ref/out copyback, borrowed storage
+and arbitrary tuple/union marshalling remain unsupported. **Faults raised by the function itself
 propagate**, rather than becoming `ReflectionError`. The Object overload does not
 infer a return type; the generic overload below retains the signature explicitly.
 

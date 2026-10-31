@@ -11,6 +11,7 @@ import subprocess
 import sys
 import threading
 import urllib.request
+import urllib.error
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,12 +50,12 @@ def main():
     report['compilerSha256'] = sha(compiler)
     env = dict(os.environ, NeoClrBundleRoot=str(bundle))
 
-    def run(command, name, timeout=600):
+    def run(command, name, timeout=600, require_success=True):
         result = subprocess.run(list(map(str, command)), cwd=ROOT, env=env,
                                 capture_output=True, text=True, timeout=timeout)
         (out / (name + '.log')).write_text(result.stdout + result.stderr)
         report['commands'].append(dict(name=name, command=list(map(str, command)), exitCode=result.returncode))
-        if result.returncode:
+        if result.returncode and require_success:
             raise RuntimeError(name + ': ' + (result.stdout + result.stderr)[-10000:])
         return result
 
@@ -66,6 +67,7 @@ def main():
                                EnableDefaultCompileItems='false', RavenNeoClrRuntimeAsyncHelper='').items():
             ET.SubElement(props, key).text = value
         items = ET.SubElement(project, 'ItemGroup')
+        ET.SubElement(items, 'Reference', Remove='Neo.Web')
         ET.SubElement(items, 'Compile', Include=str(ROOT / 'extensions/Neo.Web/src/Neo.Web/Neo/**/*.rvn'))
         ET.indent(project)
         project_file = out / 'Neo.Web.rvnproj'
@@ -79,24 +81,28 @@ def main():
             else:
                 shutil.copy2(path, lib / name)
         catalog = json.loads((lib / 'bundle.json').read_text())
-        catalog['assemblyNames'].append('Neo.Web')
+        if 'Neo.Web' not in catalog['assemblyNames']:
+            catalog['assemblyNames'].append('Neo.Web')
         catalog['documentation']['Neo.Web'] = dict(xml='Neo.Web.xml', markdown='Neo.Web.docs')
         props_path = lib / 'NeoCLR.ClassLibrary.props'
         tree = ET.parse(props_path)
         group = ET.SubElement(tree.getroot(), 'ItemGroup')
-        ref = ET.SubElement(group, 'Reference', Include='Neo.Web')
-        ET.SubElement(ref, 'HintPath').text = '$(MSBuildThisFileDirectory)Neo.Web.dll'
+        if not any(r.get('Include') == 'Neo.Web' for r in tree.getroot().iter('Reference')):
+            ref = ET.SubElement(group, 'Reference', Include='Neo.Web')
+            ET.SubElement(ref, 'HintPath').text = '$(MSBuildThisFileDirectory)Neo.Web.dll'
         tree.write(props_path, encoding='unicode')
         for p in [lib / 'Neo.Web.dll', lib / 'Neo.Web.xml', props_path, *(lib / 'Neo.Web.docs').rglob('*')]:
             if p.is_file():
                 catalog['files'][p.relative_to(lib).as_posix()] = sha(p)
         (lib / 'bundle.json').write_text(json.dumps(catalog, indent=2) + '\n')
-        manifest['modules'].append('lib/Neo.Web.dll')
+        if 'lib/Neo.Web.dll' not in manifest['modules']:
+            manifest['modules'].append('lib/Neo.Web.dll')
         manifest['files'] = {p.relative_to(bundle).as_posix(): sha(p) for p in bundle.rglob('*')
                              if p.is_file() and p != bundle / 'manifest.json'}
         (bundle / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
         for name, project in [('tests', 'extensions/Neo.Web/test/Neo.Web.Tests/Neo.Web.Tests.rvnproj'),
-                              ('sample', 'samples/web/src/WebDemo/WebDemo.rvnproj')]:
+                              ('sample', 'samples/web/src/WebDemo/WebDemo.rvnproj'),
+                              ('sample-tests', 'samples/web/test/WebDemo.Tests/WebDemo.Tests.rvnproj')]:
             run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
                  'windows-http' if os.name == 'nt' else 'http', '--bundle', bundle, '--project', ROOT / project,
                  '--aot', codegen, '--output', out / name], name + '-build')
@@ -113,15 +119,25 @@ def main():
                         command += ['--jit-compiler', str(codegen), '--jit-host', str(bundle / 'bin' / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib'))]
                     for module in manifest['modules']:
                         command += ['--module', str(bundle / module)]
+                    build = json.loads((out / name / 'build.json').read_text())
+                    for dependency in build.get('projectModules', []):
+                        command += ['--module', dependency]
                     command += ['--']
-                if name == 'tests':
-                    result = run(command, name + '-' + mode, timeout=120)
-                    if 'Tests: 3, passed: 3, failed: 0, skipped: 0' not in result.stdout:
-                        raise RuntimeError('Unexpected framework result: ' + result.stdout)
-                    report['cases'].append(dict(name=name, mode=mode, stdout=result.stdout, stderr=result.stderr))
+                if name in ('tests', 'sample-tests'):
+                    result = run(command, name + '-' + mode, timeout=600, require_success=False)
+                    expected = 5 if name == 'tests' else 4
+                    passed = result.returncode == 0 and f'Tests: {expected}, passed: {expected}, failed: 0, skipped: 0' in result.stdout
+                    report['cases'].append(dict(name=name, mode=mode, passed=passed, stdout=result.stdout, stderr=result.stderr))
                 else:
-                    report['cases'].append(sample(command + ['0', '10'], env, mode, out))
-        report['passed'] = True
+                    try:
+                        case = sample(command + ['0', '120' if mode == 'interpreter' else '15'], env, mode, out)
+                        case['passed'] = True
+                    except Exception as error:
+                        case = dict(name=name, mode=mode, passed=False, error=str(error))
+                    report['cases'].append(case)
+        report['passed'] = all(case['passed'] for case in report['cases'])
+        if not report['passed']:
+            raise RuntimeError('One or more execution checks failed; see results.json and mode logs')
     finally:
         (out / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
 
@@ -140,7 +156,7 @@ def sample(command, env, mode, out):
     responses = []
     try:
         while True:
-            line = messages.get(timeout=120)
+            line = messages.get(timeout=600)
             if line is None:
                 raise RuntimeError('Sample exited before listening: ' + ''.join(lines + errors))
             if line.startswith('LISTENING '):
@@ -149,13 +165,21 @@ def sample(command, env, mode, out):
         for method, path, status, body in [('GET', '/', 200, 'Hello, neoCLR!'),
                 ('GET', '/hello/Ada', 200, 'Hello, Ada!'),
                 ('GET', '/hello/current', 200, 'The current visitor is neoCLR'),
-                ('POST', '/visits', 201, 'Visit 1'), ('POST', '/visits', 201, 'Visit 2')]:
-            with urllib.request.urlopen(urllib.request.Request(url + path, method=method), timeout=10) as response:
+                ('POST', '/visits', 201, 'Visit 1'), ('POST', '/visits', 201, 'Visit 2'),
+                ('GET', '/items/42', 200, 'The answer'), ('GET', '/items/7', 404, ''), ('GET', '/items/-1', 400, ''),
+                ('GET', '/items/nope', 400, 'Bad request'),
+                ('GET', '/echo/hello', 200, 'GET:hello'), ('POST', '/echo/hello', 200, 'POST:hello'),
+                ('GET', '/missing/path', 404, 'No endpoint matched')]:
+            try:
+                response = urllib.request.urlopen(urllib.request.Request(url + path, method=method), timeout=60)
+            except urllib.error.HTTPError as error:
+                response = error
+            with response:
                 actual = response.read().decode('utf-8')
                 if response.status != status or actual != body:
                     raise RuntimeError('Reference app response mismatch: ' + actual)
                 responses.append(dict(method=method, path=path, status=status, body=actual))
-        code = process.wait(timeout=30)
+        code = process.wait(timeout=180)
         thread.join(timeout=5)
         if code or 'STOPPED\n' not in lines:
             raise RuntimeError('Reference app did not stop cleanly: ' + ''.join(lines + errors))

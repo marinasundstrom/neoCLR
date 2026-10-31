@@ -1772,3 +1772,309 @@ mod catalog_tests {
         assert_eq!(retention["snapshotFactories"], json!([]));
     }
 }
+
+// Source rows and closed arguments survive private body renumbering and naming.
+fn function_snapshot_name(source: usize, types: &[Type], methods: &[Type]) -> String {
+    use std::hash::{Hash, Hasher};
+    let mut key = std::collections::hash_map::DefaultHasher::new();
+    format!("{types:?}{methods:?}").hash(&mut key);
+    format!("$FunctionInfo.{source}.{:016x}", key.finish())
+}
+
+// Conservative declaration reachability avoids retaining a descriptor factory graph
+// in consumers that never inspect a function value. Generic arguments do not change
+// call edges. Bound targets, explicit retention roots and type initializers are roots;
+// virtual calls include same-slot declarations and explicit implementations.
+fn uses_function_inspection(input: &neoclr::Module, root: &str, roots: &[usize]) -> bool {
+    let mut pending = roots.to_vec();
+    pending.extend(
+        input
+            .functions
+            .iter()
+            .enumerate()
+            .filter_map(|(index, function)| {
+                (function.name == root || function.name.ends_with("..cctor")).then_some(index)
+            }),
+    );
+    let mut visited = std::collections::HashSet::new();
+    while let Some(index) = pending.pop() {
+        if !visited.insert(index) {
+            continue;
+        }
+        let function = &input.functions[index];
+        if function.name == "neoCLR.Runtime.FunctionInfo" {
+            return true;
+        }
+        for operation in &function.body {
+            let (target, virtual_call) = match operation {
+                Op::Call(target) | Op::Construct(target) | Op::BindFunction { target, .. } => {
+                    (target, false)
+                }
+                Op::CallVirtual(target) | Op::CallSelf { target, .. } => (target, true),
+                _ => continue,
+            };
+            // Closed-world function calls can only invoke the reachable bindings,
+            // already followed through BindFunction above.
+            if crate::selection::callable_invoke(target).is_some() {
+                continue;
+            }
+            let suffix = target.name.rsplit('.').next().unwrap_or(&target.name);
+            for (index, candidate) in input.functions.iter().enumerate() {
+                let direct = target
+                    .definition
+                    .as_ref()
+                    .is_some_and(|id| candidate.definition.as_ref() == Some(id))
+                    || candidate.name == target.name;
+                let slot = virtual_call
+                    && candidate.instance == target.instance
+                    && (candidate.name.rsplit('.').next() == Some(suffix)
+                        || candidate
+                            .interface_implementations
+                            .iter()
+                            .any(|slot| slot.name == target.name));
+                if direct || slot {
+                    pending.push(index);
+                }
+            }
+        }
+    }
+    false
+}
+
+/// Retain metadata recipes for bound targets before ordinary body selection.
+/// No function is invoked, and receiver identity is not part of the descriptor.
+pub(super) fn bind_functions(
+    input: &mut neoclr::Module,
+    source: &neoclr::Module,
+    projections: &mut Vec<Value>,
+    root: &str,
+    roots: &[usize],
+) -> Result<Vec<usize>, Error> {
+    if !uses_function_inspection(input, root, roots) {
+        return Ok(vec![]);
+    }
+    let Some(service_index) = input
+        .functions
+        .iter()
+        .position(|f| f.name == "neoCLR.Runtime.FunctionInfo")
+    else {
+        return Ok(vec![]);
+    };
+    let service = input.functions[service_index].clone();
+    if service.impl_flags != 0x1000
+        || !service.body.is_empty()
+        || service.instance
+        || service.owner.is_some()
+        || service.parameters.len() != 1
+        || name(source, &service.parameters[0]) != Some("System.Object")
+        || name(source, &service.returns) != Some("System.Introspection.MethodInfo")
+        || service.no_result
+        || !service.generic_parameters.is_empty()
+        || service.pinvoke.is_some()
+    {
+        return Err("function inspection requires exact reserved InternalCall contract".into());
+    }
+    let bindings: Vec<_> = input
+        .functions
+        .iter()
+        .flat_map(|f| &f.body)
+        .filter_map(|op| {
+            if let Op::BindFunction {
+                function_type,
+                target,
+            } = op
+            {
+                Some((function_type.clone(), target.clone()))
+            } else {
+                None
+            }
+        })
+        .collect();
+    let mut retained = vec![];
+    let mut keys = std::collections::HashMap::new();
+    for (shape, target) in bindings {
+        if !concrete(&shape)
+            || target.owner.as_ref().is_some_and(|owner| !concrete(owner))
+            || target
+                .generic_arguments
+                .iter()
+                .any(|argument| !concrete(argument))
+        {
+            continue;
+        }
+        let bound = neoclr::native_metadata::function_target(input, &target)
+            .map_err(|error| error.to_string())?;
+        let source_index = bound
+            .definition
+            .as_ref()
+            .ok_or("missing bound declaration identity")?
+            .index as usize;
+        let declaration = source
+            .functions
+            .get(source_index)
+            .ok_or("missing bound source target")?;
+        let mut source_target = target.clone();
+        source_target.definition = declaration.definition.clone();
+        let resolved = neoclr::native_metadata::function_target(source, &source_target)
+            .map_err(|e| e.to_string())?;
+        let types = match &target.owner {
+            Some(Type::Constructed { arguments, .. }) => arguments.as_slice(),
+            _ => &[],
+        };
+        let key = function_snapshot_name(source_index, types, &target.generic_arguments);
+        let identity = format!("{:?}", target);
+        if let Some(previous) = keys.insert(key.clone(), identity.clone()) {
+            if previous != identity {
+                return Err("function inspection snapshot key collision".into());
+            }
+            continue;
+        }
+        let recipe = neoclr::native_metadata::function_snapshot(source, &shape, &resolved)
+            .map_err(|e| e.to_string())?;
+        let mut factory = Factory {
+            input,
+            source,
+            body: vec![],
+            locals: vec![],
+            trusted: vec![],
+        };
+        factory.emit(&recipe, &service.returns)?;
+        factory.body.push(Op::Return);
+        let index = factory.input.functions.len();
+        let mut function = service.clone();
+        function.name = key;
+        function.definition = Some(neoclr::metadata::MemberId {
+            module: factory.input.name.clone(),
+            revision: factory.input.revision.clone(),
+            index: index as u32,
+        });
+        function.origin = None;
+        function.parameters.clear();
+        function.parameter_names.clear();
+        function.parameter_defaults.clear();
+        function.impl_flags = 0;
+        function.body = factory.body;
+        function.locals = factory.locals;
+        function.local_names.clear();
+        projections.extend(factory.trusted);
+        factory.input.functions.push(function);
+        retained.push(index);
+    }
+    input.functions[service_index].impl_flags = 0;
+    input.functions[service_index].body = vec![Op::Fault(
+        "unreachable native function inspection body".into(),
+    )];
+    Ok(retained)
+}
+
+pub(super) fn select_function_snapshots(
+    input: &neoclr::Module,
+    report: &mut Value,
+) -> Result<(), Error> {
+    let Some(service) = input
+        .functions
+        .iter()
+        .position(|f| f.name == "neoCLR.Runtime.FunctionInfo")
+    else {
+        return Ok(());
+    };
+    let mut targets = vec![];
+    for op in input.functions.iter().flat_map(|f| &f.body) {
+        let Op::BindFunction { target, .. } = op else {
+            continue;
+        };
+        let index = crate::selection::resolve(input, target)?;
+        let row = report["functions"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|r| r["compiledIndex"].as_u64() == Some(index as u64))
+            .ok_or("missing selected target source")?;
+        let types: Vec<Type> = if row["typeArguments"].is_null() {
+            vec![]
+        } else {
+            serde_json::from_value(row["typeArguments"].clone())?
+        };
+        let methods: Vec<Type> = if row["methodArguments"].is_null() {
+            vec![]
+        } else {
+            serde_json::from_value(row["methodArguments"].clone())?
+        };
+        let key = function_snapshot_name(
+            row["sourceIndex"].as_u64().ok_or("missing source index")? as usize,
+            &types,
+            &methods,
+        );
+        let Some(factory) = input.functions.iter().position(|f| f.name == key) else {
+            continue;
+        };
+        if !targets.contains(&(index, factory)) {
+            targets.push((index, factory));
+        }
+    }
+    report["nativeBindings"].as_array_mut().ok_or("missing native binding inventory")?.push(json!({
+        "compiledIndex": service, "name": "neoCLR.Runtime.FunctionInfo", "implementation": "function-info-closed-v1", "targets": targets,
+        "policy": "checked managed binding target; retained metadata factories; no receiver invocation"
+    }));
+    Ok(())
+}
+
+#[cfg(test)]
+mod function_inspection_reachability {
+    use super::*;
+
+    #[test]
+    fn unused_inspection_does_not_retain_factories_but_bound_targets_and_roots_do() {
+        let mut input = neoclr::assemble(".module InspectionRoots\n.entry Main\n.function InspectService() -> Int32\nldc.i4 42\nret\n.end\n.function Inspect() -> Int32\ncall InspectService()\nret\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+        input.functions[0].name = "neoCLR.Runtime.FunctionInfo".into();
+        if let Op::Call(target) = &mut input.functions[1].body[0] {
+            target.name = "neoCLR.Runtime.FunctionInfo".into();
+        }
+        assert!(!uses_function_inspection(&input, "Main", &[]));
+        assert!(uses_function_inspection(&input, "Main", &[1]));
+        let target = FunctionRef {
+            definition: input.functions[1].definition.clone(),
+            name: "Inspect".into(),
+            owner: None,
+            instance: false,
+            parameters: vec![],
+            generic_arguments: vec![],
+        };
+        input.functions[2].body.insert(
+            0,
+            Op::BindFunction {
+                function_type: Type::Function(Box::new(neoclr::metadata::FunctionType {
+                    parameters: vec![],
+                    returns: Type::Int32,
+                    no_result: false,
+                    out_parameters: vec![],
+                    out_when_true: vec![],
+                })),
+                target,
+            },
+        );
+        assert!(uses_function_inspection(&input, "Main", &[]));
+    }
+
+    #[test]
+    fn virtual_slot_candidates_keep_inspection_reachable() {
+        let mut input = neoclr::assemble(".module InspectionSlots\n.entry Main\n.function InspectService() -> Int32\nldc.i4 42\nret\n.end\n.function Implementation.Inspect() -> Int32\ncall InspectService()\nret\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+        input.functions[0].name = "neoCLR.Runtime.FunctionInfo".into();
+        if let Op::Call(target) = &mut input.functions[1].body[0] {
+            target.name = "neoCLR.Runtime.FunctionInfo".into();
+        }
+        input.functions[1].instance = true;
+        input.functions[2].body.insert(
+            0,
+            Op::CallVirtual(FunctionRef {
+                definition: None,
+                name: "Contract.Inspect".into(),
+                owner: None,
+                instance: true,
+                parameters: vec![],
+                generic_arguments: vec![],
+            }),
+        );
+        assert!(uses_function_inspection(&input, "Main", &[]));
+    }
+}

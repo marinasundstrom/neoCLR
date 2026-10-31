@@ -54,7 +54,7 @@ class is declared. The signature determines the type, so another function with
 the same contract can be stored in `transform` too.
 
 `function.bind` creates a callable object bound to `AddTwo`. The runtime supplies
-its typed `Invoke` contract. The call consumes the function object and its argument
+its typed `Invoke` contract. The call consumes the function value and its argument
 and pushes the result. Binding an instance method also retains its receiver;
 that lifetime is part of the callable contract, not just a raw code address.
 

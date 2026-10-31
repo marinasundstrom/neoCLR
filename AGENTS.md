@@ -14,13 +14,12 @@
 
 ## Raven integration work
 
-- Keep Raven main and the neoCLR compiler branch separate (author direction,
-  2026-10-11). Develop general fixes on main and carry them deliberately to the
-  neoCLR line with its own validation; a full branch merge is not the default plan.
-  Native Self integration is authorized. The validated structural Function work is
-  integrated into neoCLR main and Raven codex/neoclr (author direction, 2026-10-16).
-  Keep broader structural work parked; provisional APIs and remaining gaps are
-  documented separately from integration status.
+- Develop Raven compiler work on unified main, which now contains both .NET and
+  neoCLR targets (author clarification, 2026-10-31). This supersedes the earlier
+  separate-branch direction. Preserve explicit target ownership and validate the
+  affected targets; integration does not qualify every experimental capability.
+  Keep provisional APIs and remaining gaps documented separately from integration
+  status, and do not infer authorization for unrelated structural work.
 - Keep target-specific mappings and capability checks behind explicit contracts;
   ordinary .NET behavior remains the default. Document temporary bridge encoding,
   its limitations, validation and eventual native metadata/backend replacement.

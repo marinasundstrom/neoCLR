@@ -10,56 +10,6 @@ import Neo.DependencyInjection.*
 import Neo.Logging.*
 import Neo.Web.*
 
-// Shared application state; cooperative request continuations access this on one dispatcher.
-class VisitStore {
-    private var count = 0
-    func Record() -> int {
-        count += 1
-        return count
-    }
-}
-
-// One instance per request. Later slices can replace the greeting with an actual data service.
-class GreetingService : Disposable {
-    private val configuration: Configuration
-    private var disposed = false
-    init(configuration: Configuration) { self.configuration = configuration }
-    func Greet(name: string) -> string {
-        if disposed { Panic("GreetingService used after request completion") }
-        return (configuration["Greeting"] ?? "Hello") + ", " + name + "!"
-    }
-    func Dispose() { disposed = true }
-}
-
-class Endpoints {
-    async func Home(context: HttpContext) -> Task<Result<unit, WebError>> {
-        let service = context.Services.GetRequiredService<GreetingService>()!
-        let name = await Task.Run(() => "neoCLR")
-        context.RespondText(service.Greet(name))
-        return Ok(())
-    }
-
-    func Greeting(context: HttpContext) -> Task<Result<unit, WebError>> {
-        let service = context.Services.GetRequiredService<GreetingService>()!
-        context.RespondText(service.Greet(context.RouteValues.Get("name")!))
-        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
-    }
-
-    func Current(context: HttpContext) -> Task<Result<unit, WebError>> {
-        context.RespondText("The current visitor is neoCLR")
-        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
-    }
-
-    func Visit(context: HttpContext) -> Task<Result<unit, WebError>> {
-        let visits = context.Services.GetRequiredService<VisitStore>()!
-        let count = visits.Record()
-        let logger = context.Services.GetRequiredService<LoggerFactory>()!.CreateLogger("WebDemo")
-        logger.LogInformation("Recorded visit " + count.ToString())
-        context.RespondText(201, "Visit " + count.ToString())
-        return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
-    }
-}
-
 // Arguments: optional port (default 8080), optional run duration in seconds (default 60).
 // A finite timer makes shutdown explicit and testable without a process signal adapter.
 async func Main(arguments: string[]) -> Task<int> {
@@ -78,11 +28,14 @@ async func Main(arguments: string[]) -> Task<int> {
     })!
     let Ok(app) = builder.Build() else { return 1 }
     use application = app
-    let endpoints = Endpoints()
-    _ = app.MapContext("GET", "/", (context) => endpoints.Home(context))!
-    _ = app.MapContext("GET", "/hello/{name}", (context) => endpoints.Greeting(context))!
-    _ = app.MapContext("GET", "/hello/current", (context) => endpoints.Current(context))!
-    _ = app.MapContext("POST", "/visits", (context) => endpoints.Visit(context))!
+    _ = app.Use(LogRequest)!
+    _ = app.MapGet("/", Home)!
+    _ = app.MapGet("/hello/{name}", Greeting)!
+    _ = app.MapGet("/hello/current", Current)!
+    _ = app.MapPost("/visits", Visit)!
+    _ = app.MapGet("/items/{id}", Item)!
+    _ = app.Map("/echo/{value}", Echo)!
+    _ = app.Run(Unmatched)!
     let lifetime = app.RunAsync()
     let Ok(actualPort) = app.GetLocalPort() else {
         _ = await lifetime

@@ -1,0 +1,26 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.26s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-998c8f9905fce89d)
+
+running 18 tests
+test reflection_metadata::object_tests::object_query_requires_exact_contract_and_excludes_private_backings ... ok
+test reflection_metadata::relationship_group_tests::equal_target_sets_share_a_body_without_merging_distinct_relationships ... ok
+test reflection_metadata::object_tests::object_query_retains_exact_function_shapes_without_nominal_rows ... ok
+test reflection_metadata::tests::array_construction_discovers_executable_cast_shapes ... ok
+test reflection_metadata::tests::catalogue_retains_generic_declarations_across_distinct_constructions ... ok
+test reflection_metadata::open_query_tests::partial_generic_arguments_use_the_selected_nominal_identity ... ok
+test reflection_metadata::tests::descriptor_names_use_source_origin_and_require_exact_contract ... ok
+test reflection_metadata::shape_tests::source_shape_facts_preserve_closed_union_and_origin_visibility ... ok
+test reflection_metadata::tests::function_generic_arguments_preserve_closed_identity_and_shape ... ok
+test reflection_metadata::tests::metadata_tokens_preserve_source_rows_instead_of_native_type_indices ... ok
+test reflection_metadata::tests::union_generic_arguments_preserve_closed_identity_and_visibility ... ok
+test reflection_metadata::tests::descriptor_queries_reject_missing_metadata_and_unadmitted_shapes ... ok
+test reflection_metadata::tests::relationship_queries_bind_identity_and_reject_inexact_contracts ... ok
+test reflection_metadata::open_query_tests::large_descriptor_dispatch_preserves_results_across_helper_boundaries ... ok
+test reflection_metadata::open_query_tests::open_argument_results_extend_the_inventory_and_coexist_with_closed_tokens ... ok
+test reflection_metadata::open_query_tests::open_queries_preserve_source_metadata_without_executable_types ... ok
+test reflection_metadata::open_query_tests::open_queries_preserve_invalid_selector_and_argument_faults ... ok
+test reflection_metadata::open_query_tests::many_closed_shape_tokens_share_results_without_losing_identity_checks ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 241 filtered out; finished in 14.81s

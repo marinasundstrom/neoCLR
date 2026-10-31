@@ -1,0 +1,6 @@
+PASS Typed results preserve content and exhaustively describe response alternatives
+PASS Builder snapshots options and transfers ownership once
+PASS Invalid options and ambiguous routes fail without registration
+FAIL HTTP consumer covers routing scopes cancellation and joined shutdown: HTTP text request failed: TimedOut
+PASS Middleware wraps routing and retains one scope through completion
+Tests: 5, passed: 4, failed: 1, skipped: 0

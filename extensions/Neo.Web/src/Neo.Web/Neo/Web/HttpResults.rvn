@@ -1,0 +1,28 @@
+module Neo.Web
+
+import System.*
+import System.Result.*
+
+/// Closed HTTP outcomes with a statically typed success payload.
+/// The experimental endpoint adapter writes string payloads as UTF-8 text/plain.
+public union HttpResult<T> {
+    /// A 200 response carrying a typed payload.
+    case Ok(value: T)
+    /// A 201 response carrying a typed payload.
+    case Created(value: T)
+    /// An empty 400 response.
+    case BadRequest
+    /// An empty 404 response.
+    case NotFound
+}
+
+internal static class HttpResultWriter {
+    static func Write(result: HttpResult<string>, context: HttpContext) {
+        match result {
+            HttpResult<string>.Ok(let value) => context.RespondText(200, value)
+            HttpResult<string>.Created(let value) => context.RespondText(201, value)
+            HttpResult<string>.BadRequest => context.Respond(400)
+            HttpResult<string>.NotFound => context.Respond(404)
+        }
+    }
+}

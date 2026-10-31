@@ -389,3 +389,37 @@ fn generic_void_function_returns_retain_the_original_value_abi() {
         parse_type("fn<System.Void>").unwrap()
     );
 }
+
+#[test]
+fn structural_inspection_service_preserves_target_without_invocation() {
+    let source = r#"
+.module Inspection
+.entry Main
+.type class abstract System.Object
+.end
+.function neoCLR.Runtime.FunctionInfo(System.Object) -> System.Introspection.MethodInfo
+.methodimpl InternalCall
+.end
+.function Identity<T>(T value) -> T
+fault "inspection must not invoke target"
+.end
+.function Main() -> System.Introspection.MethodInfo
+function.bind fn<Int32,Int32> = Identity<Int32>(Int32)
+castclass System.Object
+call neoCLR.Runtime.FunctionInfo(System.Object)
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    let result = run(&module, Limits::default()).unwrap();
+    let Value::Object { fields, .. } = result.value else {
+        panic!("expected method snapshot");
+    };
+    assert_eq!(fields[0], Value::String("Identity".into()));
+    let null = source.replace(
+        "function.bind fn<Int32,Int32> = Identity<Int32>(Int32)\ncastclass System.Object",
+        ".local System.Object empty\nldloca empty\ninitobj System.Object\nldloc empty",
+    );
+    let fault = run(&assemble(&null).unwrap(), Limits::default()).unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::NullReference);
+}

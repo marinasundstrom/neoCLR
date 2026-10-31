@@ -18,4 +18,10 @@ public class RuntimeContext {
     func GetTypeInfoFromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
         return System.Introspection.RuntimeTypeInfo.FromHandle(handle)
     }
+    /// Resolves the bound managed target of a structural function value.
+    /// Used by the compiler for the structural Function property, including T: func.
+    /// A null value raises NullReference; a non-function value is outside this contract.
+    func GetFunctionInfo(value: Object) -> MethodInfo {
+        return neoCLR.Runtime.FunctionInfo(value)
+    }
 }

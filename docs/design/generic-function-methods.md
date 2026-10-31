@@ -128,7 +128,7 @@ The author explicitly connects this property to the general direction of exposin
 actual function signatures in type form. It belongs on ordinary methods as well
 as methods declared through a generic signature, complementing the existing
 FunctionTypeInfo invocation descriptor without conflating method identity and shape.
-This property describes a signature, not a bound function object or a pointer to
+This property describes a signature, not a bound function value or a pointer to
 executable code. Instance-method binding still supplies a receiver separately.
 
 | Substitution | FunctionType view | Parameter/result view |

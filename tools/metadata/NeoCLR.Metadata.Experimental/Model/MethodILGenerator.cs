@@ -146,6 +146,15 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         Append(new(baseConstructor ? "call.constructed" : operand.Definition.IsConstructor ? "new.constructed" : opCode == OpCode.Callvirt ? "call.virtual.constructed" : "call.constructed", Target: operand.Definition, ConstructedTarget: operand, Type: baseConstructor ? receiver : null));
     }
 
+    public void BindFunction(SignatureType functionType, ImportedMethodReference target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!ReferenceEquals(target.Owner, Assembly))
+            throw new ArgumentException("reference belongs to another output builder", nameof(target));
+        var binding = new FunctionBinding(functionType, target.Target);
+        binding.FunctionType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+        Append(new("function.bind", Target: target.Target, Type: binding.FunctionType));
+    }
     public void BindFunction(SignatureType functionType, MethodBuilder target) => Emit(OpCode.BindFunction, new FunctionBinding(functionType, target));
     public void BindFunction(SignatureType functionType, GenericMethodInstance target) => Emit(OpCode.BindFunction, new FunctionBinding(functionType, target));
     public void BindFunction(SignatureType functionType, ConstructedMethodReference target) => Emit(OpCode.BindFunction, new FunctionBinding(functionType, target));

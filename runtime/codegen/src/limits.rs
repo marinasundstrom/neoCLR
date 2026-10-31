@@ -1,7 +1,7 @@
 //! Experimental native selection bounds, shared by lowering and code generation.
 // HTTP + JSON + managed TLS requires more than the original small POC budget.
 // Match NEOCLR_NATIVE_TYPE_LIMIT in the native host header.
-pub const TYPES: usize = 1024;
+pub const TYPES: usize = 2048;
 // Match NEOCLR_NATIVE_FUNCTION_LIMIT in the native root-probe header.
 // The source-built HTTP JSON sample currently selects 2,055 methods.
 pub const FUNCTIONS: usize = 4096;

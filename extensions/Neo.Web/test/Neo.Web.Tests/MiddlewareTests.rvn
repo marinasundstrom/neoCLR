@@ -1,0 +1,114 @@
+module NeoClr.WebTests
+
+import System.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import System.Web.Http.*
+import Neo.DependencyInjection.*
+import Neo.Web.*
+import Neo.Web.HttpContext
+import NeoClr.Testing.*
+
+class MiddlewareProbe {
+    val Tracker = Counts()
+    var Trace = ""
+    val Entered = Promise<unit>()
+    val Release = Promise<unit>()
+
+    async func Outer(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+        let service = context.Services.GetRequiredService<ScopedProbe>()!
+        Trace += "outer>"
+        let result = await next(context)
+        if context.Request.Target == "/hold" {
+            _ = Entered.Complete(())
+            _ = await Release.Task
+        }
+        if service.Disposed { return Failure(WebError.InvalidOptions("Scope ended inside middleware")) }
+        Trace += "<outer"
+        return result
+    }
+
+    async func Inner(context: HttpContext, next: (HttpContext) -> Task<Result<unit, WebError>>) -> Task<Result<unit, WebError>> {
+        Trace += "inner>"
+        if context.Request.Target == "/short" {
+            Trace += "short"
+            context.RespondText("short")
+            return Ok(())
+        }
+        if context.Request.Target == "/middleware-failure" {
+            return Failure(WebError.BadRequest("private middleware detail"))
+        }
+        let result = await next(context)
+        Trace += "<inner"
+        return result
+    }
+
+    async func Endpoint(context: HttpContext) -> Task<Result<unit, WebError>> {
+        _ = await Task.Run(() => 1)
+        Trace += "endpoint"
+        context.RespondText(context.RouteValues.Get("id")!)
+        return Ok(())
+    }
+
+    func Cancel(context: HttpContext) -> Task<Result<unit, WebError>> {
+        let promise = Promise<Result<unit, WebError>>()
+        _ = promise.Cancel()
+        return promise.Task
+    }
+}
+
+async func MiddlewareChecks(app: WebApplication, probe: MiddlewareProbe, client: HttpClient, url: string, lifetime: Task<Result<unit, WebError>>) -> Task<Result<unit, TestFailure>> {
+    _ = Assert.True(app.Use(probe.Outer) is Failure(_), "Middleware registration freezes")?
+    _ = Assert.Equal("42", ResponseText(await client.GetString(url + "/ordered/42"))?)?
+    _ = Assert.Equal("outer>inner>endpoint<inner<outer", probe.Trace)?
+    _ = Assert.Equal(1, probe.Tracker.Created)?
+    _ = Assert.Equal(1, probe.Tracker.Disposed)?
+    probe.Trace = ""
+    _ = Assert.Equal("short", ResponseText(await client.GetString(url + "/short"))?)?
+    _ = Assert.Equal("outer>inner>short<outer", probe.Trace)?
+    _ = Assert.Equal(2, probe.Tracker.Disposed)?
+    probe.Trace = ""
+    _ = (await CheckStatus(client, url + "/middleware-failure", 400))?
+    _ = Assert.Equal("outer>inner><outer", probe.Trace)?
+    _ = Assert.Equal(3, probe.Tracker.Disposed)?
+    probe.Trace = ""
+    _ = (await CheckStatus(client, url + "/unmatched", 404))?
+    _ = Assert.Equal("outer>inner><inner<outer", probe.Trace)?
+    _ = Assert.Equal(4, probe.Tracker.Disposed)?
+    let cancelled = await client.Get(url + "/cancel")
+    _ = Assert.True(cancelled is Failure(_), "Cancellation closes the exchange")?
+    _ = Assert.Equal(5, probe.Tracker.Disposed)?
+    let pending = client.Get(url + "/hold")
+    _ = await probe.Entered.Task
+    app.Stop()
+    _ = Assert.True(!lifetime.IsCompleted, "Shutdown joins post-next middleware work")?
+    _ = Assert.Equal(5, probe.Tracker.Disposed)?
+    _ = probe.Release.Complete(())
+    _ = await lifetime
+    _ = await pending
+    return Assert.Equal(6, probe.Tracker.Disposed)
+}
+
+async func MiddlewareContract() -> Task<Result<unit, TestFailure>> {
+    let probe = MiddlewareProbe()
+    use builder = WebApplication.CreateBuilder()
+    builder.Server.Port = 0
+    _ = builder.Services.AddScoped<ScopedProbe>((provider) => Ok(ScopedProbe(probe.Tracker)))!
+    use app = builder.Build()!
+    _ = app.Use(probe.Outer)!
+    _ = app.Use(probe.Inner)!
+    _ = app.Map("/ordered/{id}", probe.Endpoint)!
+    _ = app.Map("/cancel", probe.Cancel)!
+    let lifetime = app.RunAsync()
+    let url = "http://127.0.0.1:" + app.GetLocalPort()!.ToString()
+    use timeout = Timer(() => { app.Stop() })
+    timeout.Start(Duration.FromTicks(3000000000L))
+    use client = HttpClient()
+    let result = await MiddlewareChecks(app, probe, client, url, lifetime)
+    app.Stop()
+    _ = probe.Release.Complete(())
+    _ = await lifetime
+    return result
+}

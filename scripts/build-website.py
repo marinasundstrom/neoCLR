@@ -343,7 +343,7 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
-        'NEO_WEB_HOME': ('samples/web/src/WebDemo/Main.rvn', '    async func Home(', '\n    }', True),
+        'NEO_WEB_HOME': ('samples/web/src/WebDemo.Logic/Endpoints.rvn', 'public async func Home(', '\n}', True),
         'NEO_WEB_MAIN': ('samples/web/src/WebDemo/Main.rvn', 'async func Main(', '\n}', True),
         'NATIVE_CALLBACK_IMPORT': ('runtime/System.Runtime/test/NativeCallbackTests/Imports.rvn', 'import System.Runtime.InteropServices.*', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_callback_twice")]', False),
         'NATIVE_RETURN_IMPORT': ('runtime/System.Runtime/test/NativeCallbackTests/Imports.rvn', '[NativeImport("native-callback-fixture", EntryPoint: "native_function_get")]', '\n\n[NativeImport("native-callback-fixture", EntryPoint: "native_notification_get")]', False),

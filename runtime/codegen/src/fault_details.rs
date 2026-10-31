@@ -148,6 +148,7 @@ pub struct Options {
     pub reflection_construction: Vec<usize>,
     pub boxed_property_receivers: HashSet<(usize, usize)>,
     pub reflection_array_sites: HashMap<(usize, usize), usize>,
+    pub function_info_queries: HashMap<usize, Vec<(usize, usize)>>,
     pub object_type_queries: HashMap<usize, Vec<(usize, neoclr::metadata::Type)>>,
     pub object_function_queries: HashMap<usize, Vec<neoclr::metadata::Type>>,
     pub scalar_box_queries: HashMap<usize, (Option<usize>, bool)>,
@@ -394,6 +395,18 @@ impl Options {
                             .flatten()
                             .map(|t| serde_json::from_value(t.clone()).unwrap())
                             .collect(),
+                    )
+                })
+                .collect(),
+            function_info_queries: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "function-info-closed-v1")
+                .map(|r| {
+                    (
+                        r["compiledIndex"].as_u64().unwrap() as usize,
+                        serde_json::from_value(r["targets"].clone()).unwrap(),
                     )
                 })
                 .collect(),

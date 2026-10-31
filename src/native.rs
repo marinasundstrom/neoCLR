@@ -37,6 +37,7 @@ pub(crate) enum Binding {
     ReflectionConstructionCheck,
     ReflectionConstruct,
     InvokeFunction,
+    FunctionInfo,
     ReflectionMember(u8),
     ReflectionMemberCheck(u8),
     ReflectionAssignable,
@@ -201,7 +202,9 @@ pub(crate) fn bind_in(module: &crate::Module, function: &Function) -> Result<Bin
         || assembly
         || matches!(
             function.name.as_str(),
-            "neoCLR.Runtime.ExecutingAssembly" | "neoCLR.Runtime.ReflectionArrayCreate"
+            "neoCLR.Runtime.ExecutingAssembly"
+                | "neoCLR.Runtime.ReflectionArrayCreate"
+                | "neoCLR.Runtime.FunctionInfo"
         );
     if relevant
         || function
@@ -369,6 +372,15 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             return Err(Fault::new("reflection collection signature mismatch"));
         }
         return Ok(Binding::ReflectionCollection(kind as u8));
+    }
+    if function.name == "neoCLR.Runtime.FunctionInfo" {
+        if function.parameters != [Type::from_name("System.Object")]
+            || function.returns != Type::from_name("System.Introspection.MethodInfo")
+            || function.no_result
+        {
+            return Err(Fault::new("function inspection signature mismatch"));
+        }
+        return Ok(Binding::FunctionInfo);
     }
     if matches!(
         function.name.as_str(),
@@ -1485,6 +1497,14 @@ impl Binding {
             (Self::ObjectIdentityHash, [value]) => {
                 crate::object_identity::hash(value).map(Value::Int32)
             }
+            (Self::FunctionInfo, [Value::Function(binding)]) => {
+                let target = crate::vm::resolve(module, binding.managed_target()?)?;
+                crate::reflection::bound_function(module, binding, &target, limits)
+            }
+            (Self::FunctionInfo, [Value::NullObjectReference(_)]) => Err(Fault::coded(
+                crate::FaultCode::NullReference,
+                "Function inspection requires a non-null function value",
+            )),
             (Self::ObjectTypeHandle, [value]) => {
                 let concrete = match value {
                     Value::ObjectReference(object) => {

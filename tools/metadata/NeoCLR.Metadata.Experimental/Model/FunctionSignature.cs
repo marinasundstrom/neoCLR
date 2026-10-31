@@ -62,14 +62,16 @@ public sealed class FunctionBinding
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
     /// <exception cref="ArgumentException">The target kind or substituted signature is incompatible.</exception>
     public FunctionBinding(SignatureType functionType, ConstructedMethodReference target) : this(functionType,
-        target?.Definition ?? throw new ArgumentNullException(nameof(target)), target, null) { }
+        target?.Definition ?? throw new ArgumentNullException(nameof(target)), target, null)
+    { }
     /// <summary>Binds an instantiated generic method to its substituted structural signature.</summary>
     /// <param name="functionType">The exact structural signature after method argument substitution.</param>
     /// <param name="target">An owned generic method instance with all arguments supplied.</param>
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
     /// <exception cref="ArgumentException">The target kind or substituted signature is incompatible.</exception>
     public FunctionBinding(SignatureType functionType, GenericMethodInstance target) : this(functionType,
-        target?.Definition ?? throw new ArgumentNullException(nameof(target)), null, target) { }
+        target?.Definition ?? throw new ArgumentNullException(nameof(target)), null, target)
+    { }
     private FunctionBinding(SignatureType functionType, MethodBuilder target, ConstructedMethodReference? constructed, GenericMethodInstance? generic)
     {
         ArgumentNullException.ThrowIfNull(functionType); ArgumentNullException.ThrowIfNull(target);
@@ -97,6 +99,12 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     public void BindFunction(SignatureType functionType, MethodBuilder target) => GetILGenerator().BindFunction(functionType, target);
+    /// <summary>Binds an output-owned imported method to an exact structural function shape.</summary>
+    /// <param name="functionType">The exact structural signature.</param>
+    /// <param name="target">The consumer-owned imported reference.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Invalid target, shape or owner.</exception>
+    public void BindFunction(SignatureType functionType, ImportedMethodReference target) => GetILGenerator().BindFunction(functionType, target);
     /// <summary>Emits a checked Function binding; consumes an instance receiver when required and pushes the callable value.</summary>
     /// <param name="opCode">BindFunction.</param>
     /// <param name="operand">The exact binding owned by this assembly.</param>

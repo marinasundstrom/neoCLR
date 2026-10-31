@@ -23,7 +23,7 @@ func Main() -> int {
 }
 ```
 
-Function objects preserve checked access, generic targets, virtual/interface
+Function values preserve checked access, generic targets, virtual/interface
 selection, shared captures and heap retention. Frame receivers and unpublished
 constructor receivers cannot escape through a binding. Default slots contain null;
 invocation faults with NullReference. Constructors must initialize Function fields
@@ -45,7 +45,7 @@ contract above supersedes their delegate-specific implementation status.
 ## Function-type review reopened (2026-09-13)
 
 **Superseded direction, 2026-09-28:** the author now selects Function types and
-Function objects to replace and remove delegates, with a nominal/structural
+Function values to replace and remove delegates, with a nominal/structural
 introspection split. See the [design and migration plan](function-types.md).
 Named function types may follow later; their identity rules remain open. The development replacement is now implemented. The text below preserves the earlier position.
 

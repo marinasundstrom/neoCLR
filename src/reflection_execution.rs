@@ -20,7 +20,8 @@ pub(crate) fn bound_type(module: &Module, handle: &Value) -> Result<Type, Constr
     };
     let owner = crate::reflection::from_identity(module, &handle.identity)
         .map_err(|_| ConstructionError::UnboundType)?;
-    if crate::type_identity::resolve(module, &owner).map_err(|_| ConstructionError::UnboundType)?
+    if crate::type_identity::resolve_loaded(module, &owner)
+        .map_err(|_| ConstructionError::UnboundType)?
         != handle.identity
     {
         return Err(ConstructionError::UnboundType);

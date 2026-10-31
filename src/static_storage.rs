@@ -51,7 +51,7 @@ impl Storage {
         heap: &mut crate::shared_heap::Access<'_>,
         limits: &crate::Limits,
     ) -> Result<TypeIdentity, Fault> {
-        let key = crate::type_identity::resolve(module, owner)?;
+        let key = crate::type_identity::resolve_loaded(module, owner)?;
         if !matches!(key, TypeIdentity::Definition { .. }) {
             return Err(Fault::new("static storage requires a closed nominal type"));
         }

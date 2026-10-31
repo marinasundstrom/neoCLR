@@ -1,0 +1,2 @@
+PASS native method function-kind authoring, forwarding, import, introspection and CLI rejection
+PASS native function-kind constraint and introspection

@@ -5180,13 +5180,25 @@ native containers. This does not imply that member references are reader-indepen
 
 ## Authored method references
 
+Development (2026-10-31): the current `CreateMethodReference` overload additionally
+accepts `IReadOnlyList<int>? functionParameters = null` after `interfaceBounds`.
+It copies the zero-based method parameter ordinals and retains structural
+`FunctionType` constraints on static or nonvirtual instance methods. Ordinals must
+be unique and in range, and cannot also have nominal bounds. Invalid ordinals or
+combinations throw `ArgumentException`; redeclaring an interned member with different
+constraints throws `InvalidDataException`. Constructed calls reject nonfunction
+arguments. This contract requires native output; CLI projection cannot erase it.
+The complete current overload also includes `nativePrimitive`, `visibility`,
+`isVirtual`, `isAbstract` and `interfaceBounds`, described in the extensions below.
+
+
 `AssemblyBuilder.CreateMethodReference(ImportedTypeReference declaringType, string name,
 MethodSignature signature, bool isStatic = false, bool isOverride = false) -> ImportedMethodReference` authors a
 public concrete nonvirtual root-class member contract without a reader definition.
 The declaring type must be an output-owned, top-level reference-class definition whose
 dependency/core/artifact contract has already been registered. Pass the generic definition,
 not its construction; use `MakeConstructedReference` on the returned member to bind owner
-arguments. Static generic methods are supported; instance generic methods are not.
+arguments. Static and ordinary nonvirtual instance generic methods are supported.
 
 Signatures admit primitive values, a Void result, scoped owner/method parameters,
 output-owned external reference-class constructions, vectors and native unions, including
@@ -6700,7 +6712,7 @@ Native metadata encodes a function type as `Function { parameters, returns, no_r
 It does not identify a nominal delegate class. The introspection load context interns
 resolved shapes: equal ordered parameter/result identities and the return convention
 share a `FunctionTypeInfo` instance within that context. Different contexts retain
-separate views. Function objects carry callable targets and optional bound receivers;
+separate views. Function values carry callable targets and optional bound receivers;
 neither participates in type identity, and the metadata facade cannot invoke them.
 Raven's current Func/Action symbol transport is a compiler adapter, not native identity.
 Inhabited unit and no-result invocation remain distinct. Where Raven converts a
@@ -10658,3 +10670,13 @@ loaded definitions reject mutation with InvalidOperationException.
 returns the constant or null. Native and CLI snapshots preserve these values. CLI
 projection uses Param flags and Constant rows. See the [native default contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/parameter-defaults.md)
 for supported kinds, typed null/default semantics, validation and remaining gaps.
+
+### Imported function-value binding (2026-10-31 development)
+
+`MethodBuilder.BindFunction(SignatureType, ImportedMethodReference)` and the same
+`IILGenerator` overload bind an imported method through a consumer-owned reference.
+The exact structural signature and output ownership are checked; instance targets
+consume their receiver under the existing binding rules. Null, foreign references
+and incompatible shapes reject. No nominal delegate encoding is introduced.
+The current Raven native emitter uses this for nongeneric module-level functions,
+allowing a host and tests to reference the same handler library.

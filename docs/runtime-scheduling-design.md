@@ -358,7 +358,7 @@ need explicit reconsideration before execution can suspend or migrate between ca
 Reviewed 2026-10-08: [.NET Delegate](https://learn.microsoft.com/en-us/dotnet/api/system.delegate?view=net-10.0)
 binds methods and receivers; [.NET IAsyncStateMachine](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.iasyncstatemachine?view=net-10.0)
 provides a compiler-generated async resumption protocol. These are useful separate
-layers, not a reason to make a Function object itself a suspended stack.
+layers, not a reason to make a Function value itself a suspended stack.
 [OpenJDK JEP 444](https://openjdk.org/jeps/444) provides the Java 21 virtual-thread
 comparison, including GC-managed stack chunks. Its implementation is not a specification
 for neoCLR or a claim about all subsequent JDK versions.

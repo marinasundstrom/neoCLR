@@ -73,7 +73,7 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
             .all(|t| crate::reflection_properties::supported_value(module, t))
             && (shape.no_result
                 || shape.returns == Type::Void
-                || crate::reflection_properties::supported_value(module, &shape.returns));
+                || supported_result(module, &shape.returns));
         if supported && check {
             let count_ok = body.len() + 8;
             body.extend([
@@ -178,4 +178,16 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
     }
     result.body = body;
     Ok(result)
+}
+
+// Buffered result carriers use ordinary managed boxing. Keep argument admission
+// separate: this does not add aggregate binding or ref/out copyback policies.
+fn supported_result(module: &Module, ty: &Type) -> bool {
+    crate::reflection_properties::supported_value(module, ty)
+        || module.type_definition(ty).is_some_and(|definition| {
+            definition.representation == crate::metadata::Representation::Record
+                && !definition.is_reference_type
+                && definition.memory_view.is_none()
+                && !crate::memory_view_contract::contains_borrowed(module, ty)
+        })
 }

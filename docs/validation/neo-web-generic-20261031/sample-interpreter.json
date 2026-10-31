@@ -1,0 +1,82 @@
+{
+  "name": "sample",
+  "mode": "interpreter",
+  "exitCode": 0,
+  "stdout": "LISTENING http://127.0.0.1:64730\ninfo: WebDemo.Request[0] Request GET /\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/Ada\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /hello/current\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /visits\ninfo: WebDemo[0] Recorded visit 2\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/42\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/7\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/-1\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /items/nope\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request POST /echo/hello\ninfo: WebDemo.Request[0] Request pipeline completed\ninfo: WebDemo.Request[0] Request GET /missing/path\ninfo: WebDemo.Request[0] Request pipeline completed\nSTOPPED\n",
+  "stderr": "",
+  "responses": [
+    {
+      "method": "GET",
+      "path": "/",
+      "status": 200,
+      "body": "Hello, neoCLR!"
+    },
+    {
+      "method": "GET",
+      "path": "/hello/Ada",
+      "status": 200,
+      "body": "Hello, Ada!"
+    },
+    {
+      "method": "GET",
+      "path": "/hello/current",
+      "status": 200,
+      "body": "The current visitor is neoCLR"
+    },
+    {
+      "method": "POST",
+      "path": "/visits",
+      "status": 201,
+      "body": "Visit 1"
+    },
+    {
+      "method": "POST",
+      "path": "/visits",
+      "status": 201,
+      "body": "Visit 2"
+    },
+    {
+      "method": "GET",
+      "path": "/items/42",
+      "status": 200,
+      "body": "The answer"
+    },
+    {
+      "method": "GET",
+      "path": "/items/7",
+      "status": 404,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/items/-1",
+      "status": 400,
+      "body": ""
+    },
+    {
+      "method": "GET",
+      "path": "/items/nope",
+      "status": 400,
+      "body": "Bad request"
+    },
+    {
+      "method": "GET",
+      "path": "/echo/hello",
+      "status": 200,
+      "body": "GET:hello"
+    },
+    {
+      "method": "POST",
+      "path": "/echo/hello",
+      "status": 200,
+      "body": "POST:hello"
+    },
+    {
+      "method": "GET",
+      "path": "/missing/path",
+      "status": 404,
+      "body": "No endpoint matched"
+    }
+  ],
+  "passed": true
+}

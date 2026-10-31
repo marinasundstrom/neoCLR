@@ -50,7 +50,7 @@ records source revisions and artifact hashes. All 440 installed SDK files and 90
 extension payload files match their packages; extension manifest version matches.
 The bundle's recorded payload hashes match. All four projects build and execute
 using the installed standalone MSBuild pipeline. The installed language server
-passes completion and hover checks for Function objects, FunctionTypeInfo, TypeInfo
+passes completion and hover checks for Function values, FunctionTypeInfo, TypeInfo
 and NominalTypeInfo over stdio LSP. This is protocol validation, not a claim that
 every editor feature was visually tested.
 

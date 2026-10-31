@@ -1,0 +1,11 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 25.63s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-998c8f9905fce89d)
+
+running 3 tests
+test limits::layout_budgets_match_native_allocator_contract ... ok
+test limits::type_budget_matches_native_collector_contract ... ok
+test limits::function_budget_matches_native_root_probe_contract ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 256 filtered out; finished in 0.00s

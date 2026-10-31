@@ -442,6 +442,31 @@ pub fn prepare(
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         reflection_retention = Some(retention);
     }
+    let function_snapshot_start = joined.functions.len();
+    let mut function_projections = vec![];
+    let function_roots = super::reflection_snapshots::bind_functions(
+        &mut joined,
+        &source_metadata,
+        &mut function_projections,
+        root,
+        &reflection_roots,
+    )?;
+    reflection_roots.extend(function_roots);
+    if !function_projections.is_empty() {
+        let retention =
+            reflection_retention.get_or_insert_with(|| json!({"snapshotFactories": []}));
+        retention["snapshotFactories"]
+            .as_array_mut()
+            .ok_or("missing snapshot factory inventory")?
+            .extend(function_projections);
+    }
+    for index in function_snapshot_start..joined.functions.len() {
+        methods.push(MemberId {
+            module: "$runtime.function-snapshots".into(),
+            revision: app.revision.clone(),
+            index: (index - function_snapshot_start) as u32,
+        });
+    }
     // Source metadata was verified and captured above. Default value bodies are
     // private execution helpers and must not become reflected declared members.
     let default_start = joined.functions.len();
@@ -1537,6 +1562,7 @@ pub fn prepare(
     if reference_arena {
         super::reflection_arrays::bind(&mut selected, &mut report)?;
         super::function_invocation::bind(&mut selected, &mut report)?;
+        super::reflection_snapshots::select_function_snapshots(&selected, &mut report)?;
     }
     super::enum_queries::bind(&mut selected, &source_metadata, &mut report)?;
     super::boxing::project(&mut selected, &mut report)?;

@@ -607,10 +607,8 @@ fn compile_with_driver<M: Module>(
                         })
                     })
             });
-            let admitted = reference_dispatch
-                || primitive_box
-                || details.is_some_and(|d| {
-                    d.object_type_queries.contains_key(&i)
+            let admitted = reference_dispatch || primitive_box || details.is_some_and(|d| {
+                (d.object_type_queries.contains_key(&i) || d.function_info_queries.contains_key(&i))
                         || d.int32_to_string.contains(&i)
                         || d.int64_to_string.contains(&i)
                         || d.uint64_to_string.contains(&i)
@@ -686,7 +684,7 @@ fn compile_with_driver<M: Module>(
                         || d.file_watch.contains(&i)
                         || d.file_input.contains(&i)
                         || d.file_output.contains(&i)
-                });
+            });
             // The exclusive callback lease admits no owner-affine scheduling,
             // socket, TLS or arbitrary native service. Broader live HTTP providers
             // remain valid only for their separately qualified owner host.
@@ -694,7 +692,8 @@ fn compile_with_driver<M: Module>(
                 || reference_dispatch
                 || primitive_box
                 || details.is_some_and(|d| {
-                    d.object_type_queries.contains_key(&i)
+                    (d.object_type_queries.contains_key(&i)
+                        || d.function_info_queries.contains_key(&i))
                         || d.int32_to_string.contains(&i)
                         || d.int64_to_string.contains(&i)
                         || d.uint64_to_string.contains(&i)
@@ -2563,7 +2562,57 @@ fn compile_with_driver<M: Module>(
                     )?;
                     continue;
                 }
-                if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
+                if let Some(targets) = details.and_then(|d| d.function_info_queries.get(&i)) {
+                    let receiver = parameters[0];
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    null_reference(&mut b, receiver, Some(&site));
+                    let text_tag = b.ins().band_imm(receiver, 1);
+                    let text = b.ins().icmp_imm(IntCC::NotEqual, text_tag, 0);
+                    let invalid = b.ins().iconst(types::I32, 3);
+                    return_if_detailed(&mut b, text, invalid, Some(&site));
+                    let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
+                    let ordinary = b.ins().icmp_imm(IntCC::NotEqual, tag, u32::MAX as i64);
+                    return_if_detailed(&mut b, ordinary, invalid, Some(&site));
+                    let target = b.ins().load(types::I64, MemFlags::new(), receiver, 8);
+                    for (bound, factory) in targets {
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        let equal = b.ins().icmp_imm(IntCC::Equal, target, (*bound + 1) as i64);
+                        b.ins().brif(equal, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let callee = module.declare_func_in_func(ids[*factory], b.func);
+                        let call = b.ins().call(callee, &[output, fault_context.unwrap()]);
+                        let status = b.inst_results(call)[0];
+                        b.ins().return_(&[status]);
+                        b.switch_to_block(next);
+                    }
+                    b.ins().return_(&[invalid]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                } else if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
                     let receiver = parameters[0];
                     let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
                     let mut site = diagnostic_data.as_ref().unwrap().site(
@@ -6758,7 +6807,12 @@ fn define_checked(
     if crate::jit::lazy::capture(id, context, stack_budget) {
         return Ok(());
     }
-    module.define_function(id, context)?;
+    module.define_function(id, context).map_err(|error| {
+        format!(
+            "native function {:?}: {error:?}",
+            module.declarations().get_function_decl(id).name
+        )
+    })?;
     check_frame(module, context, stack_budget)
 }
 

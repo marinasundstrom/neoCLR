@@ -170,6 +170,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::ReflectionAssignable
             | crate::native::Binding::ReflectionSubclass
             | crate::native::Binding::ReflectionPropertyCheck(_)
+            | crate::native::Binding::FunctionInfo
             | crate::native::Binding::Reflection(_)
             | crate::native::Binding::AssemblyInfo(_)
             | crate::native::Binding::ExecutingAssembly
@@ -283,6 +284,12 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                     instruction: None,
                 }),
             );
+        }
+        if matches!(&binding, crate::native::Binding::FunctionInfo) {
+            uses.push(ServiceUse {
+                service: RuntimeService::ManagedHeap,
+                instruction: None,
+            });
         }
         if matches!(
             &binding,

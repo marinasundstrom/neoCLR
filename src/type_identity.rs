@@ -190,7 +190,8 @@ pub(crate) fn describe_token(module: &Module, ty: &Type) -> Result<TypeDescripto
             }
         }
     }
-    describe(module, &normalized)
+    // The operand was checked in its declaring module, not the load-set root.
+    describe_loaded(module, &normalized)
 }
 
 pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
@@ -670,6 +671,14 @@ pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault>
     crate::vm::check_type(&ty, module)?;
     crate::references::check_type(module, module, &ty)?;
     build(module, &ty)
+}
+
+// Execution already validated each instruction against its declaring module. Runtime
+// storage may belong to a transitive dependency that the root cannot name directly.
+// Keep host resolution above strict; only normalized execution types use this path.
+pub(crate) fn resolve_loaded(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
+    crate::vm::check_type(ty, module)?;
+    build(module, ty)
 }
 
 fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
