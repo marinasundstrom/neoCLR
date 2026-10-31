@@ -4,6 +4,7 @@ import System.*
 import System.Collections.*
 import System.Result.*
 import System.Concurrency.Tasks.*
+import System.Concurrency.*
 import Neo.Web.*
 import Neo.DependencyInjection.*
 import Examples.Web.*
@@ -21,12 +22,47 @@ func Direct(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("42"))))
 }
 
+// Paired cases isolate transport callbacks, scopes and selected binding paths.
+func DirectContext(context: System.Web.Http.HttpContext) -> Task<Result<unit, HttpError>> {
+    context.RespondText("42")
+    return Task.FromResult<Result<unit, HttpError>>(Result<unit, HttpError>.Ok(()))
+}
+
+class ScopedDirect {
+    private val services: ServiceProvider
+    init(services: ServiceProvider) { self.services = services }
+    func Handle(context: System.Web.Http.HttpContext) -> Task<Result<unit, HttpError>> {
+        use scope = services.CreateScope()!
+        return DirectContext(context)
+    }
+}
+
+public class BenchmarkService {
+    func Value() -> string => "42"
+}
+
+func ServiceValue(service: BenchmarkService) -> HttpResult<string> => HttpResult<string>.Ok(service.Value())
+func QueryValue(value: int) -> HttpResult<string> => HttpResult<string>.Ok(value.ToString())
+func CancellationValue(token: CancellationToken) -> HttpResult<string> {
+    if !token.CanBeCancelled { return HttpResult<string>.BadRequest }
+    return HttpResult<string>.Ok("42")
+}
+
 // External harness owns process termination after measuring completed exchanges.
 async func Main(arguments: string[]) -> Task<int> {
     if arguments.Length != 1 { return 1 }
-    if arguments[0] == "direct" {
+    if arguments[0] == "direct" || arguments[0] == "direct-context" || arguments[0] == "direct-scope" {
         let server = HttpServer.Listen("127.0.0.1", 0, 128)!
-        let serverLifetime = server.Serve(Direct)
+        use services = DefaultServiceCollection().Build()!
+        let scoped = ScopedDirect(services)
+        // Select before starting: one Serve invocation owns the listener.
+        let serverLifetime = if arguments[0] == "direct" {
+            server.Serve(Direct)
+        } else if arguments[0] == "direct-scope" {
+            server.Serve(scoped.Handle)
+        } else {
+            server.Serve(DirectContext)
+        }
         Console.WriteLine("LISTENING http://127.0.0.1:" + server.GetLocalPort()!.ToString())
         _ = await serverLifetime
         server.Close()
@@ -38,8 +74,18 @@ async func Main(arguments: string[]) -> Task<int> {
         _ = builder.Services.AddSingleton<DemoResponseCache>((provider) => Ok(DemoResponseCache()))!
         _ = builder.Services.AddScoped<DemoResponseCacheMiddleware>()!
     }
+    if arguments[0] == "service" {
+        builder.Services.AddScoped<BenchmarkService>((provider) => Ok(BenchmarkService()))!
+    }
     use app = builder.Build()!
     if arguments[0] == "generic" { app.MapGet("/", Value)! }
+    else if arguments[0] == "cancellation" { app.MapGet("/", CancellationValue)! }
+    else if arguments[0] == "query" { app.MapGet("/", QueryValue)! }
+    else if arguments[0] == "service" { app.MapGet("/", ServiceValue)! }
+    else if arguments[0] == "context-middleware" {
+        app.Use((context, next) => next(context))!
+        app.MapContext("GET", "/", ContextValue)!
+    }
     else if arguments[0] == "context" { app.MapContext("GET", "/", ContextValue)! }
     else if arguments[0] == "cached" || arguments[0] == "uncached" {
         if arguments[0] == "cached" { app.UseMiddleware<DemoResponseCacheMiddleware>()! }

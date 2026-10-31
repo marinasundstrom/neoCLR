@@ -8,6 +8,11 @@ repository build ran during measurement. Workstation background activity was not
 controlled. This short run is a demonstration, not a regression threshold or
 production capacity claim.
 
+**Follow-up:** These native/JIT figures used the default stress-collection host.
+The [matched collector-policy study](/benchmarks/neo-web-gc/) separates that cost
+from framework work and reports longer paced measurements. The historical numbers
+below remain unchanged; they are not paced-host or production-capacity estimates.
+
 ## Constant two-byte response
 
 Warmed requests per second, with identical `42` responses:

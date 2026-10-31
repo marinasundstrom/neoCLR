@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
+- Add matched Neo.Web collector-policy profiling and layered HTTP benchmark cases
+  for context callbacks, scopes, middleware, service/query binding and cancellation.
+  Separate the default native stress collector from the existing opt-in paced
+  policy, retain raw trials and stack samples, and correct interpretation of the
+  earlier low native throughput. No runtime default or public API is changed.
+
 - Add lazy transport-owned `HttpContext.RequestAborted` and generic Neo.Web
   `CancellationToken` binding, including cancellation-aware JSON body reads.
   Peer receive closure/error, explicit context closure and server shutdown cancel

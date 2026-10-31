@@ -24376,3 +24376,23 @@ and 30 external HTTP responses plus a real disconnect in interpreter, JIT and AO
 Socket tests pass 39/39, dynamic invocation 8/8, host-I/O admission 1/1 and API
 snapshot checks 4/4. The website checks 6942 pages. The recorded provider limits
 remain; neither Windows/TLS cancellation parity nor a namespace redesign is claimed.
+
+
+### 2026-10-31 — Separate Neo.Web overhead from collector policy
+
+The author asked, “How is the performance?” The assistant reported the prior
+short benchmark's low native throughput and then, on “Continue,” began profiling
+HttpServer before attributing costs to Neo.Web. The first native sample showed
+collection dominating the main thread. Reviewing the host contract established
+that the benchmark used the default stress collector, while an existing paced
+policy was opt-in. The assistant's earlier broad performance assessment therefore
+needed that distinction; historical timings were retained rather than rewritten.
+
+The assistant added paired context/scope/middleware/binding/cancellation cases,
+relinked the same AOT object under both policies, and ran longer paced trials.
+The matched short comparison shows roughly 33× higher direct and 35× higher
+generic throughput with pacing. Broader defaults were not promoted on this bounded
+screen. Allocation/span validation becomes prominent in the paced profile, while
+interpreter cost and JIT startup remain separate investigations. The
+[recorded evidence](validation/neo-web-performance-20261031/README.md) distinguishes
+short comparisons, longer characterization, samples and remaining qualification.

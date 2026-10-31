@@ -31,6 +31,11 @@ Transport-owned request-abort notification and CancellationToken binding now hav
 interpreter/JIT/AOT framework coverage; see the
 [request-abort qualification](validation/neo-web-abort-20261031/README.md).
 Unread data can delay closure observation; prepared invocation remains open.
+The [performance follow-up](validation/neo-web-performance-20261031/README.md)
+identifies forced native collection as the dominant cost in the earlier benchmark.
+Matched opt-in pacing and layer screens are now recorded; default promotion still
+requires the existing broader collector qualification. Allocation/span validation,
+interpreter execution and JIT startup remain separate profiling targets.
 The author also directed a later review of System.Web.Http/Neo.Web responsibility
 boundaries (including System.Networking), primitives and higher abstractions.
 Keep .NET API ergonomics as the baseline with justified architectural adaptations.

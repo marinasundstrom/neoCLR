@@ -1,0 +1,10 @@
+{
+  "stress-sample.txt": {
+    "sha256": "4ed8fd71d2af92ed23d6af078761e1d85d5f69e8139704dbcb064d8f90951cef",
+    "bytes": 638962
+  },
+  "paced-sample.txt": {
+    "sha256": "d5cb9731017a2b85222cc0bc8b3e410d7a2f1ac4f739d95ecee3909ea241e6f9",
+    "bytes": 348733
+  }
+}

@@ -1,0 +1,3 @@
+/Users/robert/Projects/neoclr/samples/web/src/WebDemo.Logic/ResponseCache.rvn(26,12): warning RAV0505: The method 'GetUtf8ByteCount() -> int' is obsolete: Byte counting will move to explicit encoding APIs. This string member is scheduled for removal.
+Native build output: /Users/robert/Projects/neoclr/samples/web/src/WebDemo.Logic/bin/neoclr/WebDemo.Logic.dll
+Native build output: /Users/robert/Projects/neoclr/benchmarks/neo-web/bin/neoclr/NeoWebBenchmark.dll

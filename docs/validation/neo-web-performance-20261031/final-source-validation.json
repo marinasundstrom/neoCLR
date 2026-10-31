@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "measuredSourceSha256": "0c2ec5fb038aaee80fed46fad7fd78c6f174c1b6e054101c5cb1242274cd9576",
+  "finalSourceSha256": "3d9ed78cbe61c2b0369ec3d85fb8159aa3278cb8f1ad9af341c2d42b301a4e9e",
+  "measuredAssemblySha256": "16dc3880af43090e16af89e14ebda84227ffb83f69d88cc0abe3cc4f02a67798",
+  "finalAssemblySha256": "24d1d07442ff4300a0337bddccb74754bb4a006431abbffff841858152a4318e",
+  "note": "Final source compiled successfully after whitespace/comment-only formatting of the serverLifetime branch. Assembly bytes differ; recorded timings belong to the original measured build, not this recompilation."
+}
