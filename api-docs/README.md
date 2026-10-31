@@ -3172,3 +3172,15 @@ The native audit uses rebuilt System.Web, DI abstractions/implementation and Neo
 with Raven 813dad20c; component hashes preserve the provenance of reused libraries.
 No new renderer exclusions were needed. Sample-only cache types remain in the sample
 source, not the platform API reference.
+
+### Request-abort cancellation (2026-10-31)
+
+The existing Socket and both HTTP-context selections now cover
+WaitForReadClosure(CancellationToken) and RequestAborted. The aggregate reference
+bridge and authored XML include the transport members; the native reference
+includes Neo.Web's projection. Networking, System.Web and Neo.Web are rebuilt
+with Raven 813dad20c. FunctionReflection's unchanged declaration receives updated
+XML/Markdown remarks for exact boxed owned-record arguments; that documentation-only
+refresh reuses the System.Runtime binary and records its source/provenance separately.
+The invocation guide retains the borrowed-view/coercion/ref-out exclusions. No new
+public API or signature is excluded from the renderer.

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Build Neo.Web against a verified bundle and run its framework HTTP consumer and reference app."""
+import socket
+import time
 import argparse
 import hashlib
 import json
@@ -131,7 +133,7 @@ def main():
                     command += ['--']
                 if name in ('tests', 'sample-tests'):
                     result = run(command, name + '-' + mode, timeout=600, require_success=False)
-                    expected = 5 if name == 'tests' else 4
+                    expected = 6 if name == 'tests' else 4
                     passed = result.returncode == 0 and f'Tests: {expected}, passed: {expected}, failed: 0, skipped: 0' in result.stdout
                     report['cases'].append(dict(name=name, mode=mode, passed=passed, stdout=result.stdout, stderr=result.stderr))
                 else:
@@ -213,6 +215,20 @@ def sample(command, env, mode, out):
                 if response.status != status or actual != body:
                     raise RuntimeError('Reference app response mismatch: ' + actual)
                 responses.append(dict(method=method, path=path, status=status, body=actual))
+        def wait_message(expected):
+            deadline = time.monotonic() + 10
+            while True:
+                line = messages.get(timeout=max(0.01, deadline - time.monotonic()))
+                if line is None or time.monotonic() >= deadline:
+                    raise RuntimeError('Missing sample cancellation marker: ' + expected)
+                if line.strip() == expected:
+                    return
+        address = urllib.parse.urlsplit(url)
+        with socket.create_connection((address.hostname, address.port), timeout=10) as peer:
+            peer.sendall(b'GET /wait-for-abort HTTP/1.1\r\nHost: localhost\r\n\r\n')
+            wait_message('WAITING FOR REQUEST ABORT')
+        wait_message('REQUEST ABORT OBSERVED')
+        responses.append(dict(method='GET', path='/wait-for-abort', outcome='client disconnect observed'))
         code = process.wait(timeout=180)
         thread.join(timeout=5)
         if code or 'STOPPED\n' not in lines:

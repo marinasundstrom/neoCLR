@@ -149,6 +149,7 @@ Service-dependent streaming responses are not yet qualified.
 | `Request: System.Web.Http.HttpRequest` | Incoming request/body, borrowed for this handler's lifetime. |
 | `Services: ServiceProvider` | Per-request scope. The application owns disposal; handlers must not dispose it. |
 | `RouteValues: System.Web.Http.RouteMatch` | Decoded captures; use Get/GetInt32 for explicit binding. |
+| `RequestAborted: CancellationToken` | Transport-owned cancellation, observed peer closure/error, explicit context closure or server shutdown. Normal completion does not cancel it; unread socket bytes delay EOF detection. |
 | `ApplicationStopping: CancellationToken` | Application shutdown signal, not client-disconnect cancellation. |
 | `RespondText(text: string)` | Sets status 200 and independent UTF-8 text/plain content. |
 | `RespondText(statusCode: int, text: string)` | Sets explicit status and buffered text. |
@@ -205,7 +206,7 @@ No runtime code generation is required.
 Parameters bind in this order:
 
 1. `FromRoute`, `FromQuery`, `FromBody` or `FromServices` explicitly selects the source.
-2. `Neo.Web.HttpContext`, `System.Web.Http.HttpRequest` and `HttpResponse` receive
+2. `CancellationToken` receives `context.RequestAborted`. `Neo.Web.HttpContext`, `System.Web.Http.HttpRequest` and `HttpResponse` receive
    the active request's framework values.
 3. Required `string`, `int` and `bool` parameters use matching route captures,
    otherwise query values. Missing values and invalid conversions return 400.
@@ -239,7 +240,7 @@ property retention for native/JIT deployment. The existing JSON reader limits
 apply (1024 UTF-8 bytes, four container levels); recursive models, arrays, nullable
 values, custom converters, default/optional parameter substitution and arbitrary
 result serialization remain unsupported. These are development gaps, not claimed
-ASP.NET Core parity. CancellationToken request-abort binding remains pending.
+ASP.NET Core parity. CancellationToken binds the transport-owned RequestAborted signal; unread socket bytes can delay disconnect detection.
 
 ## Binding attributes (development)
 

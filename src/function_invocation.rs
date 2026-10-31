@@ -10,7 +10,7 @@ use crate::{
 /// receivers and 8 for invalid arguments; it never enters the target function.
 ///
 /// Experimental compiler/runtime primitive, not a stable hosting ABI. Arguments use
-/// Object[] with exact boxed scalar types or assignable references; no coercion,
+/// Object[] with exact boxed scalar/owned record types or assignable references; no coercion,
 /// ref/out copyback or binder policy is provided. A no-result call returns null.
 /// The supplied shape inventory must cover all reachable function bindings.
 /// Invoke faults on invalid inputs; Check returns a status before entering the target.
@@ -67,13 +67,10 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
             Op::ReferenceIsNull,
             Op::BranchTrue(0),
         ]);
-        let supported = shape
-            .parameters
-            .iter()
-            .all(|t| crate::reflection_properties::supported_value(module, t))
+        let supported = shape.parameters.iter().all(|t| supported_value(module, t))
             && (shape.no_result
                 || shape.returns == Type::Void
-                || supported_result(module, &shape.returns));
+                || supported_value(module, &shape.returns));
         if supported && check {
             let count_ok = body.len() + 8;
             body.extend([
@@ -180,9 +177,9 @@ pub fn lower(module: &Module, service: &Function, shapes: &[Type]) -> Result<Fun
     Ok(result)
 }
 
-// Buffered result carriers use ordinary managed boxing. Keep argument admission
-// separate: this does not add aggregate binding or ref/out copyback policies.
-fn supported_result(module: &Module, ty: &Type) -> bool {
+// Owned value records use ordinary managed boxing for both arguments and results.
+// Borrowed views remain excluded; this adds no coercion or ref/out copyback.
+fn supported_value(module: &Module, ty: &Type) -> bool {
     crate::reflection_properties::supported_value(module, ty)
         || module.type_definition(ty).is_some_and(|definition| {
             definition.representation == crate::metadata::Representation::Record

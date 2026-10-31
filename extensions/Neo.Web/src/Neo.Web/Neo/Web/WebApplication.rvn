@@ -260,17 +260,17 @@ public class WebApplication : Disposable {
         return Task.FromResult<Result<unit, WebError>>(Result<unit, WebError>.Ok(()))
     }
 
-    private func Dispatch(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-        let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent(""))
+    private func Dispatch(transport: System.Web.Http.HttpContext) -> Task<Result<unit, HttpError>> {
+        let response = transport.Response
         let scope = Services.CreateScope()
         if let Failure(_) = scope {
             logger.LogError("Request scope creation failed")
             response.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))
-            return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(response))
+            return Task.FromResult<Result<unit, HttpError>>(Result<unit, HttpError>.Ok(()))
         }
-        let view = Neo.Web.HttpContext(request, response, scope!, emptyRoute, stopping.Token)
+        let view = Neo.Web.HttpContext(transport, scope!, emptyRoute, stopping.Token)
         let pending = pipeline!.Handler(view)
-        let result = Promise<Result<HttpResponse, HttpError>>()
+        let result = Promise<Result<unit, HttpError>>()
         // Outcome adapter: release the scope on success, typed failure and cancellation.
         // All exposed response operations own buffered data before this callback settles.
         pending.OnCompleted(() => {
@@ -289,7 +289,7 @@ public class WebApplication : Disposable {
                         completedResponse.Respond(HttpStatusCode.InternalServerError, HttpStringContent("Internal server error"))
                     }
                 }
-                _ = result.Complete(Result<HttpResponse, HttpError>.Ok(completedResponse))
+                _ = result.Complete(Result<unit, HttpError>.Ok(()))
             }
         })
         return result.Task

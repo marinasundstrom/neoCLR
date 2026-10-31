@@ -29,6 +29,7 @@ public class WebServerOptions {
 
 /// A request-owned view with buffered response operations. Do not retain it after the request pipeline settles.
 public class HttpContext {
+    private val transport: System.Web.Http.HttpContext
     private val response: HttpResponse
     private var route: RouteMatch
     private var active = true
@@ -43,9 +44,14 @@ public class HttpContext {
     /// Application shutdown, not client-disconnect cancellation.
     val ApplicationStopping: CancellationToken
 
-    internal init(request: HttpRequest, response: HttpResponse, services: ServiceProvider, route: RouteMatch, stopping: CancellationToken) {
-        Request = request
-        self.response = response
+    /// Transport-owned request cancellation; successful completion does not cancel it.
+    /// Queued unread bytes can delay client-disconnect detection.
+    val RequestAborted: CancellationToken => transport.RequestAborted
+
+    internal init(transport: System.Web.Http.HttpContext, services: ServiceProvider, route: RouteMatch, stopping: CancellationToken) {
+        self.transport = transport
+        Request = transport.Request
+        self.response = transport.Response
         Services = services
         self.route = route
         ApplicationStopping = stopping

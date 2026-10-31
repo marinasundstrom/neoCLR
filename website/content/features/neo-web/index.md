@@ -56,7 +56,7 @@ Query parameters support required string/int/bool values and explicit `FromQuery
 POST handlers infer JSON DTO bodies; `FromBody` selects a body explicitly. Body plans cache
 constructors and writable properties at registration. Invalid input returns 400 and unsupported
 media types return 415. Current JSON reader size/depth bounds apply; optional parameters,
-array bodies, request-abort token binding, arbitrary result serialization and streaming remain gaps.
+array bodies, arbitrary result serialization and streaming remain gaps.
 Reflection planning is cached, but per-request argument arrays, checked invocation
 and DI resolution remain costs to measure.
 
@@ -107,3 +107,18 @@ separately. See the [reference app](/cases/neo-web/) for source and limits.
 
 The [initial measurements](/benchmarks/neo-web/) show both saved handler executions
 and cache overhead, with startup and warmed request times kept separate.
+
+## Request cancellation
+
+Development request cancellation binds `CancellationToken` to
+`HttpContext.RequestAborted`. Peer closure/error and server shutdown cancel it;
+successful response completion does not. Monitoring is lazy and nonconsuming,
+although unread socket data delays disconnect detection. WebDemo's
+`/wait-for-abort` endpoint demonstrates an awaited handler responding to client
+closure; its logic test supplies an ordinary cancelled token without a server.
+
+The division between System.Networking, System.Web.Http and Neo.Web remains provisional. Later
+platform work will revisit which primitives and abstractions belong at each level,
+informed by real consumers; the current namespaces are not a permanent layering
+commitment. Public APIs aim for familiar .NET structure and ergonomics, with
+deliberate adaptations to neoCLR’s architecture.

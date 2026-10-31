@@ -12,6 +12,12 @@
       "retain": [
         "customAttributes"
       ]
+    },
+    {
+      "name": "NeoClr.WebTests.AbortProbe",
+      "retain": [
+        "customAttributes"
+      ]
     }
   ],
   "modules": [

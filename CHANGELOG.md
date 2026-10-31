@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-31
 
+- Add lazy transport-owned `HttpContext.RequestAborted` and generic Neo.Web
+  `CancellationToken` binding, including cancellation-aware JSON body reads.
+  Peer receive closure/error, explicit context closure and server shutdown cancel
+  active requests; normal response completion stops monitoring without cancellation.
+  New `Socket.WaitForReadClosure` observes without consuming bytes and can coexist
+  with ordinary transfers. Unread bytes delay EOF detection; TLS closure records
+  are not interpreted. Add real disconnect/shutdown tests and a WebDemo cancellation
+  endpoint with direct function testing. Dynamic function invocation now accepts
+  exact boxes of owned value-record arguments, enabling CancellationToken without
+  admitting borrowed views or coercion. Record the author-directed later review
+  of Networking/HTTP/Neo.Web boundaries with .NET API ergonomics as the baseline.
+  Neo.Web now uses the transport’s empty default response without an implicit
+  text/plain content type; explicit response writers retain their content types.
+  This remains development behavior.
+
 - Extend experimental Neo.Web, a web framework built on top of
   System.Web.Http.HttpServer, with registration-time generic function handler
   inspection and cached route/context/service bindings. Add the closed

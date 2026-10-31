@@ -314,6 +314,8 @@ async func Main() -> Task<int> {
     _ = await http
     let middleware = MiddlewareContract()
     _ = await middleware
+    let abort = AbortContract()
+    _ = await abort
     let suite = TestSuite()
     suite.Add("web.results", "Typed results preserve content and exhaustively describe response alternatives", `Typed results preserve content and exhaustively describe response alternatives`)
     suite.Add("web.builder", "Builder snapshots options and transfers ownership once", `Builder snapshots options and transfers ownership once`)
@@ -321,5 +323,6 @@ async func Main() -> Task<int> {
     // Async consumer completes before registration; assertions still use the framework's Result contract.
     suite.Add("web.http", "HTTP consumer covers routing scopes cancellation and joined shutdown", () => http.GetResult())
     suite.Add("web.middleware", "Middleware wraps routing and retains one scope through completion", () => middleware.GetResult())
+    suite.Add("web.abort", "Peer disconnect cancels the injected request token while normal completion does not", () => abort.GetResult())
     return TestRunner.Run(suite, [])
 }

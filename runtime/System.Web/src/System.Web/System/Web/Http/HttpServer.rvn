@@ -497,6 +497,10 @@ public class HttpContext : Disposable {
     private var response: HttpResponse = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     private var closed: bool = false
     private var started: bool = false
+    private var completedNormally = false
+    private var abortSource: CancellationTokenSource? = null
+    private var abortToken = CancellationToken.None
+    private var watchSource: CancellationTokenSource? = null
     private var shutdownRegistration: CancellationRegistration? = null
     private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
     private var transfer: Optional<Task<Result<int, HttpError>>> = None()
@@ -527,6 +531,32 @@ public class HttpContext : Disposable {
 
     /// The outgoing response configuration. Initially status 200 with empty content.
     val Response: HttpResponse => response
+
+    /// Cancels on observed peer read closure, transport failure, explicit Close or server shutdown.
+    /// Monitoring starts lazily. Queued unread bytes delay peer closure detection.
+    /// Successful response completion ends monitoring without cancelling this token.
+    val RequestAborted: CancellationToken {
+        get {
+            if abortSource is null && !completedNormally {
+                let cancellation = CancellationTokenSource()
+                abortSource = cancellation
+                abortToken = cancellation.Token
+                if closed {
+                    cancellation.Cancel()
+                } else {
+                    let watching = CancellationTokenSource()
+                    watchSource = watching
+                    let pending = connection.WaitForReadClosure(watching.Token)
+                    // Outcome adapter: both EOF and transport failure abort the exchange;
+                    // acknowledged observer cancellation after completion does not.
+                    pending.OnCompleted(() => {
+                        if !closed && !pending.IsCancelled { Close() }
+                    })
+                }
+            }
+            return abortToken
+        }
+    }
 
     /// Forwards status and empty-content configuration to Response without sending.
     func Respond(statusCode: HttpStatusCode) {
@@ -616,6 +646,14 @@ public class HttpContext : Disposable {
             return
         }
         closed = true
+        if !completedNormally {
+            if abortSource is CancellationTokenSource abortCancellation { abortCancellation.Cancel() }
+        }
+        if watchSource is CancellationTokenSource watching {
+            watchSource = null
+            watching.Cancel()
+            watching.Dispose()
+        }
         request.Dispose()
         response.Dispose()
         if session is HttpRequestSession input {
@@ -655,6 +693,7 @@ public class HttpContext : Disposable {
     }
 
     private func Finish(result: Result<System.Void, HttpError>) {
+        if !closed && result is Ok(_) { completedNormally = true }
         if !closed && reuse && result is Ok(_) {
             if session is HttpRequestSession input { reused = input.Retire() }
         }

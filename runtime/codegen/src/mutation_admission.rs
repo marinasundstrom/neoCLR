@@ -290,6 +290,10 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
         ),
         ("neoclr_socket_close_v1", make(&[I64, I64, I64], &[I32])),
         (
+            "neoclr_socket_wait_read_closure_v1",
+            make(&[I64, I64, I64, I64], &[I32]),
+        ),
+        (
             "neoclr_socket_accept_v1",
             make(&[I64, I64, I64, I64], &[I32]),
         ),

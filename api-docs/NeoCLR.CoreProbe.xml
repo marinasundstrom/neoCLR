@@ -3673,7 +3673,7 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
   <param name="function">The function reference, including its bound receiver or captures.</param>
   <param name="arguments">Arguments in signature order; use an empty array for no parameters.</param>
   <returns>Ok with a boxed result, preserved reference or null; otherwise InvalidReceiver, InvalidArguments or UnsupportedType.</returns>
-  <remarks>Exact scalar boxes and compatible references only. No coercion, ref/out copyback or arbitrary value marshalling. Target faults are not converted to errors.</remarks>
+  <remarks>Exact scalar/owned-record boxes and compatible references. No coercion, ref/out copyback or borrowed-view marshalling. Target faults are not converted to errors.</remarks>
 </member>
     <member name="T:System.Collections.MapEntry`2">
 <summary>A reusable live key locator, not a borrowed storage reference or snapshot.</summary>
@@ -4331,5 +4331,7 @@ A method remains in metadata; an omitted call evaluates neither its receiver nor
     <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces"><summary>Interfaces member category. Not yet supported by native analysis; requests are rejected.</summary></member>
     <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All"><summary>All member category. Not yet supported by native analysis; requests are rejected.</summary></member>
     <member name="P:System.Introspection.MethodInfo.FunctionType"><summary>Gets the structural function signature, or a function-constrained parameter for an unresolved whole-signature method.</summary><remarks>Development API. Closed materialization exposes ordinary parameter and result reflection.</remarks></member>
+    <member name="P:System.Web.Http.HttpContext.RequestAborted"><summary>Gets the transport-owned request cancellation token.</summary><remarks>Monitoring starts on first access. Observed TCP EOF or error, explicit Close and server shutdown cancel it. Successful response completion stops monitoring without cancellation. Unread socket bytes delay EOF detection, including queued TLS records. This read-only development contract does not expose ASP.NET Core's token override.</remarks></member>
+    <member name="M:System.Networking.Sockets.Socket.WaitForReadClosure(System.Concurrency.CancellationToken)"><summary>Waits for TCP receive EOF or a transport error without consuming bytes.</summary><param name="cancellationToken">Cancels only the observer after provider acknowledgement; preserves the socket.</param><returns>Ok on receive EOF, or SocketError on admission or transport failure. Cancellation cancels the task.</returns><remarks>One observer per socket, alongside ordinary send/receive. Shares the 64-operation budget. No implicit timeout; unread socket bytes delay EOF observation. Does not interpret TLS close_notify.</remarks></member>
 </members>
 </doc>

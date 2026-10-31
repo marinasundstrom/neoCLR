@@ -175,3 +175,11 @@ The [comparison harness](../../benchmarks/neo-web/README.md) measures cache enab
 and disabled with identical computation/payload, separately from the constant-body
 HttpServer/context/generic comparison. It verifies execution counters as well as
 HTTP responses so avoided handler work is observable.
+
+`GET /wait-for-abort` demonstrates injected request cancellation: it waits until
+the client disconnects, logs `REQUEST ABORT OBSERVED`, then returns a typed result
+that cannot be delivered to the disconnected client. In real handlers, pass the
+token to cancellable I/O. The sample logic tests invoke this function with an
+already-cancelled token; the HTTP validator opens and closes a real TCP client.
+Server shutdown also cancels active request tokens. Normal response completion
+does not; unread socket data can delay EOF detection.

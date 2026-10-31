@@ -191,12 +191,11 @@ are supported when the signature admits reference values.
 | `InvalidArguments` | Argument count or type does not match; a null argument array also rejects. |
 | `UnsupportedType` | The function signature requires unsupported marshalling. |
 
-Validation does not enter the target. Exact scalar boxes and assignable references
-are supported as arguments. Development result adaptation additionally boxes ordinary
-nonborrowed value records, including standard Raven union carriers. It retains
-the exact closed result type and managed fields; this does not admit aggregate
-arguments. Numeric coercion, optional arguments, ref/out copyback, borrowed storage
-and arbitrary tuple/union marshalling remain unsupported. **Faults raised by the function itself
+Validation does not enter the target. Exact scalar boxes, owned value-record boxes
+and assignable references are supported as arguments and results. This includes
+CancellationToken and standard Raven union carriers through ordinary managed
+boxing; argument boxes must have the exact declared type. Numeric coercion,
+optional arguments, ref/out copyback and borrowed views remain unsupported. **Faults raised by the function itself
 propagate**, rather than becoming `ReflectionError`. The Object overload does not
 infer a return type; the generic overload below retains the signature explicitly.
 
@@ -241,7 +240,7 @@ static func Invoke<T>(function: T, arguments: Object?[]) -> ReturnType<T> where 
 
 `System.Runtime.Reflection.FunctionReflection.Invoke<T>` retains the structural
 signature and returns its projected result. `arguments` must be a non-null array
-of the exact arity, containing compatible references/nulls or exact scalar boxes.
+of the exact arity, containing compatible references/nulls or exact scalar/owned-record boxes.
 The same marshalling limits as the Object overload apply. Successful no-result or
 unit-returning invocation produces unit. Other supported results are cast/unboxed
 to the projected type. Validation failures call Panic through carrier extraction;

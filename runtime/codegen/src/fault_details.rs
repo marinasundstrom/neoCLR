@@ -47,6 +47,7 @@ pub struct Options {
     pub socket_connect_addresses: Vec<usize>,
     pub socket_connect_addresses_until: Vec<usize>,
     pub socket_accept: Vec<usize>,
+    pub socket_wait_read_closure: Vec<usize>,
     pub socket_connect_result: Vec<usize>,
     pub socket_cancel: Vec<usize>,
     pub socket_receive: Vec<usize>,
@@ -596,6 +597,13 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "socket-connect-addresses-until-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_wait_read_closure: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "socket-wait-read-closure-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             socket_accept: report

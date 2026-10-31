@@ -15,6 +15,19 @@ public class Socket {
         self.handle = handle
     }
 
+    /// Waits without consuming bytes until TCP receive EOF or a transport error is observed.
+    /// Queued unread bytes delay EOF observation. One observer per socket is supported;
+    /// ordinary receives may proceed concurrently. There is no implicit timeout.
+    /// Cancellation stops only this observation, after provider acknowledgement.
+    async func WaitForReadClosure(cancellationToken: CancellationToken = default) -> Task<Result<unit, SocketError>> {
+        let source = Promise<Result<int, SocketError>>()
+        let completion = SocketTransferCompletion(source, cancellationToken)
+        completion.StartReadClosure(handle)
+        let result = await source.Task
+        if let Failure(error) = result { return Failure(error) }
+        return Ok(())
+    }
+
     /// Connects to an address value. IPv6 transport is not supported yet.
     /// Requests cancellation cooperatively; the task is cancelled after provider acknowledgement.
     static func Connect(address: IPAddress, port: int, cancellationToken: CancellationToken = default) -> Task<Result<Socket, SocketError>> {
@@ -363,6 +376,21 @@ internal class SocketTransferCompletion {
         self.token = token
         registration = null
         cancellationWon = false
+    }
+
+    internal func StartReadClosure(handle: long) {
+        if token.IsCancellationRequested {
+            _ = source.Cancel()
+            return
+        }
+        _ = TaskQueue.Default
+        let payload = neoCLR.Runtime.SocketWaitReadClosure(handle, self.Complete)
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+        } else {
+            operation = neoCLR.Runtime.UnpackValue<long>(payload)
+            if token.CanBeCancelled { registration = token.Register(self.RequestCancellation) }
+        }
     }
 
     internal func StartReceive(handle: long, buffer: Memory<byte>) {

@@ -47,6 +47,7 @@ pub(super) fn native_body(
                 &d.task_queue_default,
                 &d.task_queue_current,
                 &d.socket_accept,
+                &d.socket_wait_read_closure,
                 &d.dns_lookup,
                 &d.dns_lookup_until,
                 &d.dns_cancel,

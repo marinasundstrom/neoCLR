@@ -242,6 +242,7 @@ static class HttpBindings
             public sealed class HttpContext : Disposable {
                 public HttpContext(HttpServer owner, Networking.Sockets.Socket connection, HttpRequest request) { }
                 public HttpRequest Request => default;
+                public Concurrency.CancellationToken RequestAborted => default;
                 public HttpResponse Response => default;
                 public void Respond(HttpStatusCode statusCode) { }
                 public void Respond(HttpStatusCode statusCode, HttpContent content) { }
@@ -329,6 +330,7 @@ static class HttpBindings
             ("HttpServer", "get_StopToken") when library => ("", CancellationBindings.Token, false),
             ("HttpContext", ".ctor") when library => ($"{Prefix}HttpServer,System.Networking.Sockets.Socket,{request}", "void", false),
             ("HttpResponse", "SetHeader") => ("String,String", "System.Result<Void,System.Web.Http.HttpError>", false),
+            ("HttpContext", "get_RequestAborted") => ("", CancellationBindings.Token, false),
             ("HttpContext", "get_Response") => ("", response, false),
             ("HttpContext", "Complete") => (args.Length == 1 ? CancellationBindings.Token : "", "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpContext", "RespondText") => (args.Length == 1 ? "String" : Prefix + "HttpStatusCode,String", "void", false),

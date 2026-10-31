@@ -136,3 +136,53 @@ ret
         Value::String("typed payload".into())
     );
 }
+
+#[test]
+fn owned_record_argument_unboxes_exactly_and_preserves_reference_payload() {
+    let prefix = SOURCE.split(".type class Counter").next().unwrap();
+    let source = format!(
+        r#"{prefix}
+.type Input
+.field Text String
+.field Code Int32
+.end
+.function Read(Input input) -> String
+ldarg 0
+ldfld Input::Text
+ret
+.end
+.function Main() -> String
+.local arrayref<System.Object> args
+ldc.i4 1
+array.reserve System.Object
+stloc args
+ldloc args
+ldc.i4 0
+ldstr "owned payload"
+ldc.i4 42
+newobj Input
+box Input
+stelem System.Object
+function.bind fn<Input,String> = Read(Input)
+castclass System.Object
+ldloc args
+call neoCLR.Runtime.InvokeFunction(System.Object,arrayref<System.Object>)
+castclass String
+ret
+.end
+"#
+    );
+    assert_eq!(
+        run(&source).unwrap().value,
+        Value::String("owned payload".into())
+    );
+    let checked = source.replace("call neoCLR.Runtime.InvokeFunction(System.Object,arrayref<System.Object>)\ncastclass String", "call neoCLR.Runtime.InvokeFunctionCheck(System.Object,arrayref<System.Object>)")
+        .replace(".function Main() -> String", ".function Main() -> Int32")
+        + "\n.function neoCLR.Runtime.InvokeFunctionCheck(System.Object, arrayref<System.Object>) -> Int32\n.methodimpl InternalCall\n.end\n";
+    assert_eq!(run(&checked).unwrap().value, Value::Int32(0));
+    let wrong = checked.replace(
+        "ldstr \"owned payload\"\nldc.i4 42\nnewobj Input\nbox Input",
+        "ldc.i4 42\nbox Int32",
+    );
+    assert_eq!(run(&wrong).unwrap().value, Value::Int32(8));
+}

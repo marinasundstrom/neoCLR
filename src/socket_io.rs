@@ -161,6 +161,7 @@ pub(crate) enum Operation {
     SendUntil,
     Listen,
     Accept,
+    WaitReadClosure,
     LocalPort,
     Connect,
     ConnectAddresses,
@@ -208,6 +209,7 @@ impl Default for Budget {
 struct Transfer {
     deadline: Instant,
     sending: bool,
+    watching: bool,
     socket: SocketId,
     destination: Option<Value>,
     callback: Option<Value>,
@@ -577,6 +579,9 @@ impl Sockets {
             ) => self
                 .listen(address, *port, *backlog)
                 .map(|id| Value::Int64(id.0 as i64)),
+            (Operation::WaitReadClosure, [Value::Int64(socket), callback]) => self
+                .wait_read_closure(SocketId(*socket as u64), callback.clone())
+                .map(|id| Value::Int64(id.0 as i64)),
             (Operation::Accept, [Value::Int64(listener), callback]) => self
                 .accept(SocketId(*listener as u64), callback.clone())
                 .map(|id| Value::Int64(id.0 as i64)),
@@ -711,11 +716,9 @@ impl Sockets {
         if !self.sockets.contains_key(&socket) {
             return Err(Error::Closed);
         }
-        if self
-            .operations
-            .values()
-            .any(|op| op.socket == socket && op.sending == sending && op.outcome.is_none())
-        {
+        if self.operations.values().any(|op| {
+            !op.watching && op.socket == socket && op.sending == sending && op.outcome.is_none()
+        }) {
             return Err(Error::Busy);
         }
         let offset = usize::try_from(offset).map_err(|_| Error::InvalidRange)?;
@@ -796,6 +799,7 @@ impl Sockets {
             Transfer {
                 deadline,
                 sending,
+                watching: false,
                 socket,
                 destination: if sending { None } else { Some(destination) },
                 callback: Some(callback),
@@ -807,6 +811,52 @@ impl Sockets {
         self.reserved = reserved;
         Ok(id)
     }
+    // Nonconsuming EOF/reset observation shares cancellation, callback rooting and
+    // operation admission with transfers, but never competes for their read lane.
+    fn wait_read_closure(
+        &mut self,
+        socket: SocketId,
+        callback: Value,
+    ) -> Result<OperationId, Error> {
+        if self.listeners.contains_key(&socket) {
+            return Err(Error::InvalidOperation);
+        }
+        if !self.sockets.contains_key(&socket) {
+            return Err(Error::Closed);
+        }
+        if !matches!(&callback, Value::Function(_))
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
+        {
+            return Err(Error::InvalidCallback);
+        }
+        if self
+            .operations
+            .values()
+            .any(|op| op.watching && op.socket == socket && op.outcome.is_none())
+        {
+            return Err(Error::Busy);
+        }
+        if self.operations.len() + self.connects.len() >= self.budget.operations {
+            return Err(Error::Limit);
+        }
+        let id = OperationId(next_id()?);
+        self.operations.insert(
+            id,
+            Transfer {
+                deadline: Instant::now(),
+                sending: false,
+                watching: true,
+                socket,
+                destination: None,
+                callback: Some(callback),
+                offset: 0,
+                buffer: Vec::new(),
+                outcome: None,
+            },
+        );
+        Ok(id)
+    }
+
     fn settle(op: &mut Transfer, reserved: &mut usize, outcome: Result<usize, Error>) {
         *reserved -= op.buffer.len();
         op.buffer = Vec::new();
@@ -1008,6 +1058,28 @@ impl Sockets {
                 continue;
             }
             if op.outcome.is_none() {
+                if op.watching {
+                    let socket = self
+                        .sockets
+                        .get(&op.socket)
+                        .expect("close settles pending operations");
+                    let mut byte = [0u8; 1];
+                    let outcome = match socket.peek(&mut byte) {
+                        Ok(0) => Ok(0),
+                        Ok(_) => continue,
+                        Err(error)
+                            if matches!(
+                                error.kind(),
+                                io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted
+                            ) =>
+                        {
+                            continue;
+                        }
+                        Err(error) => Err(Error::from(error)),
+                    };
+                    Self::settle(op, &mut self.reserved, outcome);
+                    return Ok(op.callback.take());
+                }
                 // Expiry wins over readiness not yet observed by the owner. No
                 // native I/O is in flight elsewhere, so no bytes can arrive late
                 // into guest storage after this operation has settled. Empty
@@ -1125,6 +1197,57 @@ mod tests {
             assert!(Instant::now() < deadline, "receive watchdog");
             std::thread::sleep(Duration::from_millis(1));
         }
+    }
+
+    #[test]
+    fn read_closure_observer_preserves_bytes_and_coexists_with_receive() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let buffer = array(&mut heap);
+        let watch = sockets.wait_read_closure(socket, callback()).unwrap();
+        assert_eq!(
+            sockets.wait_read_closure(socket, callback()),
+            Err(Error::Busy)
+        );
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        peer.write_all(&[42]).unwrap();
+        peer.shutdown(std::net::Shutdown::Write).unwrap();
+        assert!(sockets.poll(&heap).unwrap().is_none());
+        let receive = sockets
+            .receive(socket, &heap, buffer.clone(), 0, 1, callback())
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(receive), Ok(Some(Ok(1))));
+        assert_eq!(bytes(&heap, &buffer)[0], Value::Byte(42));
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(watch), Ok(Some(Ok(0))));
+        assert_eq!(sockets.reserved, 0);
+    }
+
+    #[test]
+    fn cancelling_read_closure_observer_keeps_socket_usable() {
+        let (mut peer, stream) = pair();
+        let mut sockets = Sockets::default();
+        let socket = sockets.adopt(stream).unwrap();
+        let mut heap = ManagedHeap::default();
+        let buffer = array(&mut heap);
+        let watch = sockets.wait_read_closure(socket, callback()).unwrap();
+        sockets.cancel(watch).unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(watch), Ok(Some(Err(Error::Cancelled))));
+        peer.write_all(&[17]).unwrap();
+        let receive = sockets
+            .receive(socket, &heap, buffer.clone(), 0, 1, callback())
+            .unwrap();
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(receive), Ok(Some(Ok(1))));
+        assert_eq!(bytes(&heap, &buffer)[0], Value::Byte(17));
+        let again = sockets.wait_read_closure(socket, callback()).unwrap();
+        drop(peer);
+        deliver(&mut sockets, &heap);
+        assert_eq!(sockets.take_result(again), Ok(Some(Ok(0))));
     }
 
     #[cfg(unix)]

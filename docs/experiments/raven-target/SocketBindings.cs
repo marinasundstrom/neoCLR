@@ -50,6 +50,7 @@ static class SocketBindings
                 public Concurrency.Tasks.Task<Result<int, SocketError>> ReceiveUntil(byte[] buffer, int offset, int count, long deadline, Concurrency.CancellationToken cancellationToken) => default;
                 public Concurrency.Tasks.Task<Result<int, SocketError>> SendUntil(byte[] buffer, int offset, int count, long deadline) => default;
                 public Concurrency.Tasks.Task<Result<int, SocketError>> SendUntil(byte[] buffer, int offset, int count, long deadline, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, SocketError>> WaitForReadClosure(Concurrency.CancellationToken cancellationToken) => default;
                 public Socket(long handle) { }
                 public static Concurrency.Tasks.Task<Result<Socket, SocketError>> Connect(Networking.IPAddress address, int port) => default;
                 public static Concurrency.Tasks.Task<Result<Socket, SocketError>> Connect(Networking.IPAddress address, int port, Concurrency.CancellationToken cancellationToken) => default;
@@ -123,6 +124,7 @@ static class SocketBindings
             ("System.Networking.DnsCompletion", "Start") when library => ("String", "void", false),
             (Socket, "Listen") when args[0] == IPAddressBindings.Root => (IPAddressBindings.Root + ",Int32,Int32", $"System.Result<{Socket},{Error}>", true),
             (Socket, "Listen") => ("String,Int32,Int32", $"System.Result<{Socket},{Error}>", true),
+            (Socket, "WaitForReadClosure") => ("", $"System.Concurrency.Tasks.Task<System.Result<Void,{Error}>>", false),
             (Socket, "Accept") => ("", $"System.Concurrency.Tasks.Task<System.Result<{Socket},{Error}>>", false),
             (Socket, "GetLocalPort") => ("", $"System.Result<Int32,{Error}>", false),
             (Prefix + "SocketConnectCompletion", "StartAccept") when library => ("Int64", "void", false),
@@ -144,7 +146,7 @@ static class SocketBindings
         };
         // Only selected operation overloads admit a trailing public cancellation token.
         if (owner is "System.Networking.Dns" or Socket
-            && definition.Name is "GetHostAddresses" or "GetHostAddressesUntil" or "Connect" or "ConnectUntil" or "Accept" or "Receive" or "ReceiveUntil" or "Send" or "SendUntil"
+            && definition.Name is "GetHostAddresses" or "GetHostAddressesUntil" or "Connect" or "ConnectUntil" or "Accept" or "WaitForReadClosure" or "Receive" or "ReceiveUntil" or "Send" or "SendUntil"
             && args.LastOrDefault() == "System.Concurrency.CancellationToken")
             expected.Item1 += (expected.Item1.Length == 0 ? "" : ",") + "System.Concurrency.CancellationToken";
         if (definition.IsConstructor != construct || definition.IsStatic != expected.Item3

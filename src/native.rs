@@ -1001,6 +1001,14 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 Type::Value,
             )
         }
+        ("neoCLR.Runtime.SocketWaitReadClosure", [Type::Int64, callback])
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (
+                Binding::Socket(crate::socket_io::Operation::WaitReadClosure),
+                Type::Value,
+            )
+        }
         ("neoCLR.Runtime.SocketLocalPort", [Type::Int64]) => (
             Binding::Socket(crate::socket_io::Operation::LocalPort),
             Type::Value,

@@ -655,6 +655,7 @@ fn compile_with_driver<M: Module>(
                         || d.socket_local_port.contains(&i)
                         || d.socket_close.contains(&i)
                         || d.socket_accept.contains(&i)
+                        || d.socket_wait_read_closure.contains(&i)
                         // The single-address provider copies the address and
                         // retains callbacks through the same host-root boundary
                         // as accept. Its checked result needs a published frame.
@@ -1373,6 +1374,11 @@ fn compile_with_driver<M: Module>(
                     types::I64,
                     types::I64,
                 ],
+            ),
+            (
+                &d.socket_wait_read_closure,
+                "neoclr_socket_wait_read_closure_v1",
+                vec![types::I64, types::I64, types::I64, types::I64],
             ),
             (
                 &d.socket_accept,

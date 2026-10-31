@@ -1194,6 +1194,15 @@ pub fn socket_accept(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
         .ok_or("missing selection inventory")?
     {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.SocketWaitReadClosure") => (
+                vec![
+                    Type::Int64,
+                    neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature"),
+                ],
+                Type::Value,
+                "socket-wait-read-closure-v1",
+                "neoclr_socket_wait_read_closure_v1",
+            ),
             Some("neoCLR.Runtime.SocketAccept") => (
                 vec![
                     Type::Int64,
@@ -1243,7 +1252,7 @@ pub fn socket_accept(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native socket accept binding requires exact reserved Accept/ConnectResult/Cancel InternalCall contract".into());
+            return Err("native socket accept binding requires exact reserved WaitReadClosure/Accept/ConnectResult/Cancel InternalCall contract".into());
         }
         f.impl_flags = 0;
         f.body = if result == Type::Boolean {
@@ -1253,7 +1262,7 @@ pub fn socket_accept(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
         };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
-            "storage": "explicit host socket scope; 64 accept operations; rooted callbacks; owner-thread deferred polling"}));
+            "storage": "explicit host socket scope; 64 shared operations; rooted callbacks; owner-thread deferred polling"}));
     }
     Ok(bindings)
 }
@@ -2368,6 +2377,7 @@ mod task_queue_tests {
             );
         }
         for service in [
+            "SocketWaitReadClosure",
             "SocketAccept",
             "SocketReceive",
             "SocketSend",

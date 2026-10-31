@@ -24345,3 +24345,34 @@ assistant retained the slower cases and documented the limited workload rather
 than claiming a universal benefit. JIT readiness is roughly one minute for the
 shared comparison image. All 546 benchmark HTTP responses pass; the final website
 check covers 6936 pages.
+
+On continuation, the assistant selected transport-owned request-abort cancellation
+as the next bounded follow-up. The implementation adds nonconsuming socket closure
+observation, a lazy HTTP-context token and Neo.Web parameter binding; dynamic
+invocation needed exact owned-record argument support for CancellationToken.
+Borrowed-view suspension errors in the raw HTTP test were corrected by confining
+encoding and send windows to synchronous helpers, preserving the lifetime rule.
+[Request-abort qualification](validation/neo-web-abort-20261031/README.md) records
+checks and remaining provider limits.
+
+The author then clarified the longer-term direction: “we might have to revisit
+these boundaries like System.Web.Http and then Neo.Web to see what really should
+live where, what the primitives are, and then also develop further abstractions
+at the right level.” The assistant agreed to treat the current layering as
+provisional, use real consumers to inform later responsibility/abstraction choices,
+and finish the bounded cancellation slice rather than infer an immediate redesign.
+This remains a future review direction, not a completed architecture change.
+
+The author added that “Some of the abstractions even belong to the System.Networking
+namespace” and described the goal as APIs that are ergonomic and look like .NET,
+with neoCLR's own improvements and architectural adaptations. The assistant
+included Networking in the future boundary review and retained .NET's public API
+structure/naming/behavior as the baseline, requiring concrete benefits, costs and
+validation for deliberate differences. This is direction for later design work;
+no responsibility relocation is claimed in this exchange.
+
+The final cancellation qualification passes framework 6/6, WebDemo logic 4/4,
+and 30 external HTTP responses plus a real disconnect in interpreter, JIT and AOT.
+Socket tests pass 39/39, dynamic invocation 8/8, host-I/O admission 1/1 and API
+snapshot checks 4/4. The website checks 6942 pages. The recorded provider limits
+remain; neither Windows/TLS cancellation parity nor a namespace redesign is claimed.

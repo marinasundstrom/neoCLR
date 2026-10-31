@@ -1,0 +1,55 @@
+   Compiling neoclr v0.1.0-preview.19 (/Users/robert/Projects/neoclr)
+warning: function `module_function_attributes` is never used
+    --> src/reflection.rs:1516:15
+     |
+1516 | pub(crate) fn module_function_attributes(
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `neoclr` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.66s
+     Running unittests src/lib.rs (target/debug/deps/neoclr-552dc2137edebb2f)
+
+running 39 tests
+test socket_io::tests::cancelled_connect_drops_uncommitted_stream_and_remaining_attempts ... ok
+test socket_io::tests::close_completes_pending_read_once_and_frees_native_resource ... ok
+test socket_io::tests::address_admission_validates_every_candidate_before_opening_a_socket ... ok
+test socket_io::tests::cancelled_accept_delivers_once_retains_slot_and_preserves_listener ... ok
+test socket_io::tests::cancelled_read_preserves_connection_and_bytes_for_a_new_operation ... ok
+test socket_io::tests::connect_deadline_does_not_expire_accept_or_committed_failure ... ok
+test socket_io::tests::completed_unconsumed_result_holds_admission_slot_and_is_taken_once ... ok
+test socket_io::tests::connect_committed_before_expiry_survives_delayed_consumption ... ok
+test socket_io::tests::address_slice_expiry_falls_back_without_extending_overall_deadline ... ok
+test socket_io::tests::cancelling_read_closure_observer_keeps_socket_usable ... ok
+test socket_io::tests::committed_outcomes_and_empty_transfers_survive_late_poll ... ok
+test socket_io::tests::expired_connect_drops_native_owner_and_retains_result_until_consumed ... ok
+test socket_io::tests::expired_request_does_not_admit_connect_or_transfer_and_long_budget_keeps_phase_bound ... ok
+test socket_io::tests::listener_validation_wrong_kind_and_address_in_use_are_distinct ... ok
+test socket_io::tests::invalid_admission_preserves_socket_and_aggregate_budget ... ok
+test socket_io::tests::connect_validation_and_shared_quotas_are_transactional ... ok
+test socket_io::tests::duplicate_addresses_are_skipped_without_reserving_more_sockets ... ok
+test socket_io::tests::connect_readiness_observes_kernel_writability ... ok
+test socket_io::tests::memory_send_snapshots_window_and_default_empty_transfers_complete ... ok
+test socket_io::tests::listener_accept_echo_and_close_leave_accepted_connection_independent ... ok
+test socket_io::tests::overall_expiry_does_not_start_remaining_address ... ok
+test socket_io::tests::pending_transfer_expires_at_boundary_and_does_not_renew_while_polled ... ok
+test socket_io::tests::later_ready_socket_bypasses_stalled_read_and_eof_does_not_write ... ok
+test socket_io::tests::open_socket_quota_rejects_and_releases_adopted_resource_then_reuses_capacity ... ok
+test socket_io::tests::read_closure_observer_preserves_bytes_and_coexists_with_receive ... ok
+test socket_io::tests::ready_connects_do_not_starve_ready_receives ... ok
+test socket_io::tests::one_send_and_one_receive_can_wait_on_same_connection ... ok
+test socket_io::tests::send_admission_empty_close_and_cancel_preserve_shared_accounting ... ok
+test socket_io::tests::memory_receive_retains_owner_and_releases_it_after_completion ... ok
+test socket_io::tests::send_snapshots_only_range_and_releases_guest_source_before_completion ... ok
+test socket_io::tests::shared_connect_budget_survives_fallback_and_stops_next_attempt ... ok
+test socket_io::tests::socket_and_operation_handles_do_not_alias_another_registry ... ok
+test socket_io::tests::pending_accept_reserves_socket_capacity_and_close_settles_once ... ok
+test socket_io::tests::lookup_connect_and_body_progress_share_one_absolute_budget ... ok
+test socket_io::tests::transfer_expiry_releases_storage_without_transferring_or_closing_socket ... ok
+test socket_io::tests::shared_request_deadline_is_not_renewed_by_successful_short_transfers ... ok
+test socket_io::tests::public_connect_receive_bridge_consumes_results_and_closes ... ok
+test socket_io::tests::refused_connect_releases_socket_slot_but_retains_result_until_consumed ... ok
+test socket_io::tests::tcp_backpressure_keeps_pending_bytes_until_progress ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 391 filtered out; finished in 0.30s

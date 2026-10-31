@@ -53,6 +53,7 @@ func Configure(app: WebApplication) -> Result<unit, WebError> {
     app.MapGet("/uncached", Computed)?
     app.MapGet("/cache-stats", CacheStatistics)?
     app.MapGet("/", Home)?
+    app.MapGet("/wait-for-abort", WaitForAbort)?
     app.MapGet("/hello/{name}", Greeting)?
     app.MapGet("/hello/current", Current)?
     app.MapPost("/visits", Visit)?

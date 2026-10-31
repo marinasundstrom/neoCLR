@@ -71,3 +71,13 @@ endpoint, a bounded singleton store, and fresh response content on every hit.
 Authentication/cookie/cache-control requests bypass it. There is no expiry or
 general HTTP cache policy. A dedicated harness compares the same computation with
 caching enabled and disabled across interpreter, JIT and AOT.
+
+## Request cancellation
+
+`GET /wait-for-abort` waits on an injected `CancellationToken`. Closing the client
+connection makes the handler log `REQUEST ABORT OBSERVED` and finish. The HTTP
+validator opens a real TCP connection, waits for handler entry and then closes it;
+the separate logic test supplies a cancelled token directly. Neither requires a
+special web testing framework. Successful responses leave their request token
+uncancelled, while server shutdown cancels active requests and joins the handlers.
+Unread socket data can delay disconnect detection in this experimental provider.

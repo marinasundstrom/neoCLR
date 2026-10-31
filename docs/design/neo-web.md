@@ -762,3 +762,68 @@ defaults for omitted fields. Existing strict UTF-8 JSON limits remain visible;
 arrays, nullable/defaulted endpoint parameters and general converters remain gaps.
 Prepared invocation, transport-owned request-abort notification and comparative
 benchmarks remain separate completion items; no throughput improvement is claimed.
+
+## Request-abort cancellation (2026-10-31 development)
+
+The next bounded slice follows ASP.NET Core's special CancellationToken parameter:
+registration caches a framework binding, and invocation supplies the request's
+`HttpContext.RequestAborted`. It is independent of `ApplicationStopping`.
+Neo.Web now uses HttpServer's context callback so the request, response and
+cancellation authority all belong to the same transport exchange. JSON body reads
+also receive that token. Cancellation remains cooperative; shutdown joins handlers
+and cannot force a handler that ignores cancellation to finish.
+
+The transport context lazily starts a nonconsuming
+`Socket.WaitForReadClosure(CancellationToken)` observation. TCP receive EOF or an
+error closes the exchange and requests cancellation. Explicit Close and server
+shutdown do the same. Successful response completion stops the observation without
+cancelling the request token, including when the connection is reused. The observer
+shares the existing 64-operation budget, admits one observer per socket, can coexist
+with send/receive, and has no implicit transfer timeout. Cancelling the observation
+preserves the socket. An admission failure aborts the monitored exchange rather
+than silently leaving a requested signal unmonitored.
+
+Comparison: [ASP.NET Core HttpContext guidance](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/use-http-context?view=aspnetcore-10.0)
+identifies RequestAborted as the request disconnect/abort signal and binds it to
+minimal handler CancellationToken parameters. [Kestrel HttpProtocol](https://github.com/dotnet/aspnetcore/blob/main/src/Servers/Kestrel/Core/src/Internal/Http/HttpProtocol.cs)
+likewise creates its cancellation source lazily and suppresses cancellation after
+normal completion. neoCLR's current property is read-only: transport ownership
+avoids ambiguous replacement/lifetime rules, at the cost of not supporting the
+ASP.NET Core feature override yet.
+
+This provider observes TCP receive closure with peek; unread socket bytes delay
+EOF observation. It does not consume request bodies or interpret TLS close_notify.
+Queued TLS records can therefore delay notification too. This is a documented
+transport gap, not a claim of complete Kestrel disconnect parity. HTTP tests target
+plain loopback TCP. No nominal delegates or Raven compiler changes are introduced by this
+slice. Dynamic invocation now admits exact boxes of owned value records as
+arguments, using the same ordinary boxing/unboxing already used for record
+results. This closes the runtime marshalling gap for CancellationToken, including
+its managed source reference. Borrowed views, coercion and ref/out copyback remain
+excluded. Like .NET DynamicInvoke, a boxed struct preserves its declared value
+type; validation occurs before target execution. neoCLR keeps its existing Result
+validation contract instead of adopting DynamicInvoke's exception contract.
+
+### Revisit platform boundaries as usage develops (author direction, 2026-10-31)
+
+The author explicitly identified System.Web.Http and Neo.Web as boundaries to
+revisit in later platform development: determine what belongs where, identify the
+right primitives, and develop further abstractions at the appropriate level.
+The current placement is provisional rather than a permanent layering commitment.
+
+For this slice, socket closure observation is a transport capability, the HTTP
+context owns the request lifetime, and Neo.Web binds that lifetime into endpoint
+parameters. This is a working division to validate with consumers. Future review
+should use concrete application needs, duplication, ownership/lifetime constraints,
+.NET comparisons and measured costs to decide whether responsibilities should
+move or a new abstraction is warranted. No namespace reorganization or generalized
+hosting abstraction is implied by the current implementation or this direction.
+
+The author further clarified that some abstractions belong in System.Networking.
+Review should therefore span Networking, HTTP and Neo.Web, not assume every shared
+capability belongs in the HTTP layer. The desired public experience follows .NET
+API structure, naming and ergonomics, while permitting deliberate improvements
+and adaptations to neoCLR's architecture. A proposed difference should identify
+its benefit, costs and validation; incomplete parity remains a gap rather than an
+improvement by definition. This extends the boundary-review direction and is
+consistent with the platform's existing research-backed design convention.

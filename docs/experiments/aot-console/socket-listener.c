@@ -406,18 +406,45 @@ int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback,
     scope->operations[operation].kind = 1;
     return publish(output, 5, id);
 }
+/* One nonconsuming read-closure observer per connection; shares bounded rooted
+ * operation admission but does not occupy the receive lane or retain a buffer. */
+int32_t neoclr_socket_wait_read_closure_v1(uint64_t socket, void *callback,
+    neoclr_aot_context *context, void *output) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !output || !callback) return 3;
+    unsigned slot = 0, operation = 0;
+    while (slot < 64 && scope->slots[slot].id != socket) slot++;
+    if (!socket || slot == 64) return publish(output, 2, 1);
+    if (scope->slots[slot].listener) return publish(output, 2, 12);
+    for (unsigned i = 0; i < 64; i++)
+        if (scope->operations[i].state == 1 && scope->operations[i].kind == 9 && scope->operations[i].listener == socket)
+            return publish(output, 2, 2);
+    while (operation < 64 && scope->operations[operation].state) operation++;
+    if (operation == 64) return publish(output, 2, 4);
+    uint64_t id = new_operation_id(), root = 0;
+    if (!id) return publish(output, 2, 4);
+    int32_t status = neoclr_gc_host_root_create_v1(context, callback, &root);
+    if (status) return status;
+    scope->operations[operation].id = id;
+    scope->operations[operation].listener = socket;
+    scope->operations[operation].callback = root;
+    scope->operations[operation].state = 1;
+    scope->operations[operation].kind = 9;
+    return publish(output, 5, id);
+}
+
 int32_t neoclr_socket_cancel_v1(uint64_t operation, neoclr_aot_context *context, int32_t *output) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
     for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
-        if (scope->operations[i].kind >= 5) return 3;
+        if (scope->operations[i].kind >= 5 && scope->operations[i].kind != 9) return 3;
         *output = scope->operations[i].state == 1;
         if (*output) {
             scope->operations[i].state = 2;
             scope->operations[i].tag = 2; scope->operations[i].value = 5;
 #ifdef NEOCLR_HTTPS_SERVER
             for (unsigned slot = 0; slot < 64; slot++)
-                if (scope->slots[slot].id == scope->operations[i].listener)
+                if (scope->operations[i].kind != 9 && scope->slots[slot].id == scope->operations[i].listener)
                     neoclr_tls_abort(scope->slots[slot].tls);
 #endif
             release_client(scope, i);
@@ -431,7 +458,7 @@ static int32_t take_result(uint64_t operation, neoclr_aot_context *context, void
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !output) return 3;
     for (unsigned i = 0; i < 64; i++) if (operation && scope->operations[i].id == operation) {
-        if (scope->operations[i].state != 3 || ((scope->operations[i].kind == 1 || scope->operations[i].kind == 4) != accept_result) || scope->operations[i].kind >= 5) return 3;
+        if (scope->operations[i].state != 3 || ((scope->operations[i].kind == 1 || scope->operations[i].kind == 4) != accept_result) || (scope->operations[i].kind >= 5 && scope->operations[i].kind != 9)) return 3;
         if (neoclr_gc_host_root_release_v1(context, scope->operations[i].callback)) return 3;
         publish(output, scope->operations[i].tag, scope->operations[i].value);
         release_client(scope, i);
@@ -898,6 +925,17 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
         if (i == first_timer) scope->operations[i].state = 2;
         if (scope->operations[i].state == 1 && (scope->operations[i].kind == 4 || scope->operations[i].kind == 5)) {
             if (poll_client(scope, i)) return -3;
+        }
+        if (scope->operations[i].state == 1 && scope->operations[i].kind == 9) {
+            unsigned slot = 0;
+            while (slot < 64 && scope->slots[slot].id != scope->operations[i].listener) slot++;
+            if (slot == 64) return -3;
+            char byte;
+            int64_t observed = recv(scope->slots[slot].descriptor, &byte, 1, MSG_PEEK);
+            if (observed > 0 || (observed < 0 && neoclr_os_retry(neoclr_os_error()))) continue;
+            scope->operations[i].tag = observed == 0 ? 1 : 2;
+            scope->operations[i].value = observed == 0 ? 0 : error_code(neoclr_os_error());
+            scope->operations[i].state = 2;
         }
         if (scope->operations[i].state == 1 && (scope->operations[i].kind == 2 || scope->operations[i].kind == 3)) {
             unsigned slot = 0;

@@ -6,8 +6,8 @@ import System.Runtime.CompilerServices.*
 
 /// <summary>Checked dynamic invocation of native structural function values.</summary>
 /// <remarks>Provisional development API. Target faults propagate; this API does not catch them.
-/// Exact boxed scalars and compatible references are supported. No coercion, ref/out
-/// copyback or arbitrary value marshalling is provided.</remarks>
+/// Exact boxed scalars, owned value records and compatible references are supported.
+/// No coercion, ref/out copyback or borrowed-view marshalling is provided.</remarks>
 public static class FunctionReflection {
     /// <summary>Validates arguments and invokes a bound function.</summary>
     /// <param name="function">The function value, including its bound receiver or captures.</param>

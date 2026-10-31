@@ -16398,3 +16398,28 @@ method/parameter annotation separation are checked by focused native metadata te
 Neo.Web framework and imported sample functions provide execution qualification.
 This adds no custom binding-provider interfaces, serializer inference or request-abort
 semantics. The future native metadata model retains these same semantic distinctions.
+
+### Request read-closure observation (2026-10-31 development)
+
+`Socket.WaitForReadClosure` uses a new exact reserved internal call,
+`neoCLR.Runtime.SocketWaitReadClosure(Int64, fn<Void>) -> Value`. The temporary
+provider encoding reuses socket-operation handles and erased admission/results:
+Int64 is an admitted operation, Byte is SocketError, Int32 zero is successful EOF.
+SocketTransferResult consumes the deferred completion and the existing cancellation
+acknowledgement path cancels the Task. Interpreter and native host own socket state;
+callbacks are rooted until owner-thread delivery. Native codegen admits the exact
+signature, imports `neoclr_socket_wait_read_closure_v1`, and marks the call as a GC
+point and pending host I/O. Ordinary .NET targets and Raven language semantics do
+not change. Native metadata/backend replacement should preserve a typed
+operation/result contract rather than freezing this erased bootstrap encoding.
+
+The HTTP layer projects this capability as RequestAborted. Its current nonconsuming
+TCP peek cannot observe EOF behind unread bytes or interpret encrypted TLS closure;
+those are provider limitations, not language or function-value restrictions.
+
+Dynamic function invocation additionally admits ordinary owned value records as
+arguments using exact IsInstance validation and UnboxAny, matching the existing
+boxed-record result path. This supports CancellationToken's source reference;
+borrowed records/views remain excluded. No Raven compiler semantic or Runtime
+Contract configuration change is required; runtime/codegen and the networking
+library must be upgraded together for the new socket service.

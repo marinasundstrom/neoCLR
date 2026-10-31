@@ -83,3 +83,6 @@ internal extern func TlsAbort(owner: byte[]) -> int;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func TlsPump(owner: byte[], input: byte[], output: byte[], plaintext: byte[], control: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketWaitReadClosure(socket: long, callback: () -> System.Void) -> System.Value;

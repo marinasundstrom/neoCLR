@@ -1,0 +1,97 @@
+module NeoClr.WebTests
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Time.*
+import System.Web.Http.*
+import Neo.Web.*
+import Neo.Web.HttpContext
+import NeoClr.Testing.*
+
+class AbortProbe {
+    val Entered = Promise<unit>()
+    val Aborted = Promise<unit>()
+    var NormalToken = CancellationToken.None
+    var ContextCancelled = false
+    var Expired = false
+
+    func Normal(token: CancellationToken) -> HttpResult<string> {
+        NormalToken = token
+        return HttpResult<string>.Ok("normal")
+    }
+
+    async func Wait(token: CancellationToken, context: HttpContext) -> Task<HttpResult<string>> {
+        use registration = token.Register(() => { _ = Aborted.Complete(()) })
+        _ = Entered.Complete(())
+        _ = await Aborted.Task
+        ContextCancelled = context.RequestAborted.IsCancellationRequested
+        return HttpResult<string>.Ok("aborted")
+    }
+}
+
+async func AbortContract() -> Task<Result<unit, TestFailure>> {
+    use builder = WebApplication.CreateBuilder()
+    builder.Server.Port = 0
+    use app = builder.Build()!
+    let probe = AbortProbe()
+    let stoppingProbe = AbortProbe()
+    _ = app.MapGet("/normal", probe.Normal)!
+    _ = app.MapGet("/wait", probe.Wait)!
+    _ = app.MapGet("/stop", stoppingProbe.Wait)!
+    let lifetime = app.RunAsync()
+    use watchdog = Timer(() => { probe.Expired = true; app.Stop() })
+    watchdog.Start(Duration.FromTicks(600000000L))
+    use client = HttpClient()
+    let url = "http://127.0.0.1:" + app.GetLocalPort()!.ToString()
+    let normal = await client.GetString(url + "/normal")
+    let socket = await SendAbortRequest(app.GetLocalPort()!, "/wait")
+    _ = await probe.Entered.Task
+    socket.Close()
+    _ = await probe.Aborted.Task
+    let stoppingSocket = await SendAbortRequest(app.GetLocalPort()!, "/stop")
+    _ = await stoppingProbe.Entered.Task
+    app.Stop()
+    _ = await lifetime
+    stoppingSocket.Close()
+    _ = Assert.True(!probe.Expired, "Peer closure cancels the handler before the watchdog")?
+    _ = Assert.True(normal is Ok("normal"), "Normal request succeeds")?
+    _ = Assert.True(probe.NormalToken.CanBeCancelled, "Normal handler receives a cancellable request token")?
+    _ = Assert.True(!probe.NormalToken.IsCancellationRequested, "Successful completion does not cancel its token")?
+    _ = Assert.True(probe.ContextCancelled, "Context and injected token share request cancellation")?
+    _ = Assert.True(stoppingProbe.ContextCancelled, "Server shutdown cancels active request tokens and joins handlers")?
+    return Ok(())
+}
+
+async func SendAbortRequest(port: int, path: string) -> Task<Socket> {
+    let connected = await Socket.Connect("127.0.0.1", port)
+    let socket = connected!
+    let encoded = EncodeAbortRequest(path)
+    let bytes: byte[] = [for index in 0..128 => (byte)0]
+    var index = 0
+    while index < encoded.Count {
+        bytes[index] = encoded[index]
+        index += 1
+    }
+    var sent = 0
+    while sent < encoded.Count {
+        let sending = await SendAbortWindow(socket, bytes, sent, encoded.Count - sent)
+        let count = sending!
+        sent += count
+    }
+    return socket
+}
+
+// Confine the borrowed send window to a synchronous frame; Send snapshots it
+// before returning its task, so no borrowed view survives the caller's await.
+func SendAbortWindow(socket: Socket, bytes: byte[], offset: int, count: int) -> Task<Result<int, SocketError>> {
+    let memory: ReadOnlyMemory<byte> = bytes
+    return socket.Send(memory.Slice(offset, count))
+}
+
+func EncodeAbortRequest(path: string) -> Sequence<byte> {
+    return ("GET " + path + " HTTP/1.1\r\nHost: localhost\r\n\r\n").Utf8Bytes.ToArray()
+}

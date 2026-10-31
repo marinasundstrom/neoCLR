@@ -3,6 +3,7 @@ module Examples.WebTests
 import System.*
 import System.Result.*
 import System.Concurrency.Tasks.*
+import System.Concurrency.*
 import Neo.Configuration.*
 import Neo.Logging.*
 import Neo.Web.*
@@ -70,6 +71,10 @@ func `Item lookup chooses among the closed result alternatives`() -> Result<unit
 async func AsyncGreeting() -> Task<Result<unit, TestFailure>> {
     use root = DefaultConfigurationBuilder().Build()
     use service = GreetingService(root)
+    use cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    let aborted = await WaitForAbort(cancellation.Token)
+    _ = Assert.True(aborted is HttpResult<string>.Ok("aborted"), "Handler accepts an ordinary cancelled token without hosting")?
     let result = await Home(service)
     _ = Assert.True(result is HttpResult<string>.Ok(_), "Home returns Ok after await")?
     return Assert.Equal("Hello, neoCLR!", Describe(result))

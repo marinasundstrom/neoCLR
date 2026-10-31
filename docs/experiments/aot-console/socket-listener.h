@@ -34,7 +34,7 @@ typedef struct neoclr_socket_scope {
     void *tls_config;
 #endif
     /* Private operations: state 1 pending, 2 ready, 3 delivered; kind 1 accept,
-     * 2 receive, 3 send, 4 connect, 5 DNS, 6 one-shot timer, 7 submitted runnable, 8 dormant registration. Transfer snapshots have a separate bounded native budget. */
+     * 2 receive, 3 send, 4 connect, 5 DNS, 6 one-shot timer, 7 submitted runnable, 8 dormant registration, 9 read-closure observer. Transfer snapshots have a separate bounded native budget. */
     struct { uint64_t id, listener, callback, tag, value, buffer_root, deadline;
         uint32_t state, kind, offset, count; unsigned char *buffer;
         neoclr_dns_work *dns;
@@ -78,6 +78,7 @@ int32_t neoclr_socket_close_v1(uint64_t handle, neoclr_aot_context *context, voi
 int32_t neoclr_timer_start_v1(int32_t, void *, neoclr_aot_context *, int64_t *);
 int32_t neoclr_timer_cancel_v1(uint64_t, neoclr_aot_context *, int32_t *);
 /* Callback must be a verified fn<Void> descriptor from this image/context. */
+int32_t neoclr_socket_wait_read_closure_v1(uint64_t socket, void *callback, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_accept_v1(uint64_t listener, void *callback, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_connect_result_v1(uint64_t operation, neoclr_aot_context *context, void *output);
 int32_t neoclr_socket_cancel_v1(uint64_t operation, neoclr_aot_context *context, int32_t *output);

@@ -105,3 +105,14 @@ public func CreateGreeting(input: GreetingInput, service: GreetingService) -> Ht
 }
 
 public func JsonText([FromBody] text: string) -> HttpResult<string> => HttpResult<string>.Ok(text)
+
+// Real work should pass this token to cancellable I/O. This diagnostic endpoint
+// waits for a disconnect so the reference consumer can demonstrate its lifetime.
+public async func WaitForAbort(cancellationToken: CancellationToken) -> Task<HttpResult<string>> {
+    let aborted = Promise<unit>()
+    use registration = cancellationToken.Register(() => { _ = aborted.Complete(()) })
+    Console.WriteLine("WAITING FOR REQUEST ABORT")
+    _ = await aborted.Task
+    Console.WriteLine("REQUEST ABORT OBSERVED")
+    return HttpResult<string>.Ok("aborted")
+}

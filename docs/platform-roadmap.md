@@ -27,7 +27,16 @@ FromQuery/FromBody and cached DTO plans are now implemented and qualified with
 framework/sample consumers in all three modes. The sample also demonstrates bounded
 response caching and a direct-HttpServer performance comparison. See the
 [binding qualification](validation/neo-web-bindings-20261031/README.md).
-Transport-owned request-abort notification and prepared invocation remain open.
+Transport-owned request-abort notification and CancellationToken binding now have
+interpreter/JIT/AOT framework coverage; see the
+[request-abort qualification](validation/neo-web-abort-20261031/README.md).
+Unread data can delay closure observation; prepared invocation remains open.
+The author also directed a later review of System.Web.Http/Neo.Web responsibility
+boundaries (including System.Networking), primitives and higher abstractions.
+Keep .NET API ergonomics as the baseline with justified architectural adaptations.
+Current placement is provisional;
+this does not schedule an immediate namespace or hosting redesign. See the
+[boundary-review direction](design/neo-web.md#revisit-platform-boundaries-as-usage-develops-author-direction-2026-10-31).
 [Descriptor qualification](validation/neo-web-descriptors-20261031/README.md) covers
 the binding metadata/runtime foundation. Middleware and constrained-call qualification is recorded in the
 [focused evidence](validation/neo-web-middleware-20261031/README.md).

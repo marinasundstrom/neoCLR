@@ -1,6 +1,7 @@
 module Neo.Web
 
 import System.*
+import System.Concurrency.*
 import System.Collections.*
 import System.Concurrency.Tasks.*
 import System.Introspection.*
@@ -103,6 +104,7 @@ internal class HandlerPlan {
             } else if type.Equals(typeof(HttpContext)) { binding = 1 }
             else if type.Equals(typeof(HttpRequest)) { binding = 5 }
             else if type.Equals(typeof(HttpResponse)) { binding = 6 }
+            else if type.Equals(typeof(CancellationToken)) { binding = 7 }
             else if scalar { binding = if route { 2 } else { 3 } }
             else if services.IsService(type) { binding = 0 }
             else {
@@ -134,6 +136,7 @@ internal class HandlerPlan {
             if parameter.Kind == 1 { arguments[index] = context }
             else if parameter.Kind == 5 { arguments[index] = context.Request }
             else if parameter.Kind == 6 { arguments[index] = context.Response }
+            else if parameter.Kind == 7 { arguments[index] = context.RequestAborted }
             else if parameter.Kind == 2 || parameter.Kind == 3 {
                 var text = ""
                 if parameter.Kind == 2 {
@@ -158,7 +161,7 @@ internal class HandlerPlan {
                         return Failure(WebError.UnsupportedMediaType)
                     }
                 }
-                let read = await context.Request.Content.ReadJsonNode()
+                let read = await context.Request.Content.ReadJsonNode(context.RequestAborted)
                 let Ok(value) = read else { return Failure(WebError.BadRequest("Invalid JSON body")) }
                 arguments[index] = parameter.Body!.Read(value)?
             } else {
