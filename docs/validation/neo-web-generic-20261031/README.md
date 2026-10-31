@@ -5,6 +5,10 @@ Matching unified Raven main compiler commits: `8e9bb96ec` (structural contract)
 and `9cd1c94ae` (imported module function bindings).
 This is not a published release or Windows qualification.
 
+**Follow-up:** The interpreter timeout recorded below was subsequently fixed;
+see [the unchanged-assembly qualification](../neo-web-timeout-20261031/README.md).
+The original matrix and logs below preserve the initial result.
+
 The bounded API uses `MapGet<T: func>` / `MapPost<T: func>`, registration-time
 signature inspection, cached route/service bindings and per-request checked
 invocation. Results use the standard closed `HttpResult<T>` union; the first HTTP

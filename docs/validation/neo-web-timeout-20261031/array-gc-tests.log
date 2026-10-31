@@ -1,0 +1,57 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.49s
+     Running tests/managed_arrays.rs (target/debug/deps/managed_arrays-95e40aebb7d98ad2)
+
+running 14 tests
+test direct_reference_elements_and_unsupported_default_values_are_rejected ... ok
+test current_frame_element_reference_cannot_return_even_without_verification ... ok
+test only_element_reference_roots_array_and_transitive_heap_fields ... ok
+test fixed_shape_prevents_invalidating_existing_element_paths ... ok
+test generic_arrays_substitute_elements_and_normalize_small_scalar_loads ... ok
+test payload_pressure_collects_unreachable_arrays_before_faulting ... ok
+test replacement_of_array_inside_record_preserves_shape ... ok
+test reference_elements_trace_targets_and_replacement_releases_old_roots ... ok
+test heap_arrays_have_default_elements_and_native_length_and_indices ... ok
+test value_copies_are_independent_and_element_references_follow_replacement ... ok
+test reserved_arrays_obey_budgets_and_cannot_deinitialize_existing_elements ... ok
+test reserved_capacity_faults_on_reads_and_accepts_typed_initialization ... ok
+test allocation_budgets_bound_copies_strings_and_lengths ... ok
+test bounds_and_invalid_operands_fault ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.64s
+
+     Running tests/reference_arrays.rs (target/debug/deps/reference_arrays-7ba18340fd9523b0)
+
+running 15 tests
+test array_reference_identity_is_distinct_and_substitutes_in_metadata ... ok
+test element_address_roots_returned_array_across_gc ... ok
+test interface_objects_survive_in_jagged_array_across_gc ... ok
+test aliases_share_elements_but_rebinding_preserves_old_allocation ... ok
+test generic_constructor_defaults_array_field_then_assigns_buffer ... ok
+test jagged_arrays_default_inner_references_to_null ... ok
+test exact_array_cast_preserves_identity_and_wrong_element_cast_faults ... ok
+test reference_arrays_fail_notreference_constraint ... ok
+test array_reference_slot_requires_explicit_load_and_supports_reset ... ok
+test reflection_recognizes_ordinary_array_shape ... ok
+test reference_array_is_not_an_owned_array_or_native_payload ... ok
+test ordinary_array_operations_enforce_bounds_types_and_budgets ... ok
+test null_array_operations_fault_without_verifier ... ok
+test array_isinst_returns_null_for_mismatches_without_weakening_invariance ... ok
+test mutable_arrays_are_invariant_even_for_reference_elements_and_typed_nulls ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.16s
+
+     Running tests/runtime_gc.rs (target/debug/deps/runtime_gc-7f42f6ca5f539912)
+
+running 10 tests
+test construction_and_keep_alive_use_the_same_heap_roots ... ok
+test explicit_collection_reclaims_garbage_and_preserves_stack_roots ... ok
+test explicit_collection_reclaims_unreachable_cycles ... ok
+test bundled_gc_facade_matches_canonical_service_returns ... ok
+test explicit_collection_cannot_evade_heap_limit ... ok
+test gc_control_reports_heap_requirement_and_consumes_instruction_budget ... ok
+test collection_preserves_caller_locals_and_interior_references ... ok
+test no_result_gc_controls_preserve_live_stack_roots_without_pushing_unit ... ok
+test counters_are_execution_local_and_queries_do_not_collect ... ok
+test service_signatures_are_exact ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.87s

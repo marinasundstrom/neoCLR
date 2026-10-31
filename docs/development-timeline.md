@@ -1,5 +1,35 @@
 # Development conversation record
 
+## 2026-10-31 — Common response properties on HttpResult
+
+- **Author:** Clarified that unions support members and that HttpResult could expose
+  default response properties such as StatusCode by projecting its active case.
+  Sealed/closed hierarchies remain worth considering in the future.
+- **Assistant response:** Agreed that a member-bearing union can retain exhaustive
+  matching and typed payloads while providing common response information. Recorded
+  this in the [design proposal](design/neo-web.md#common-result-members-author-direction-2026-10-31).
+  No result-property API was implemented in the interpreter timeout fix; property
+  types and additional shared information remain to be designed and validated.
+
+## 2026-10-31 — Resolve the Neo.Web interpreter HTTP timeout
+
+- **Author:** Requested investigation and repair of the remaining interpreter
+  framework HTTP timeout, validation and a commit.
+- **Assistant investigation:** Reproduced the failure with the retained framework
+  assembly. Sampling showed repeated heap/frame array-budget scans dominating
+  interpreter execution while in-process client and server share the dispatcher.
+  The transport has a five-second per-transfer deadline distinct from the longer
+  HTTP/test timeouts. This exposed execution overhead, not a need to extend deadlines.
+- **Assistant action/outcome:** Added complete numeric heap totals, invalidated by
+  allocation, slot/alias mutation and reclamation. All quota checks remain in place;
+  no compiler, web API, sample, assembly or timeout changes are needed. The unchanged
+  framework assembly passes all five tests with the updated interpreter. Focused
+  quota/alias/GC tests and repeated HTTP evidence are recorded in the
+  [fix qualification](validation/neo-web-timeout-20261031/README.md).
+- **Boundary:** Frame accounting remains a measurable cost. This resolves the
+  reproduced Neo.Web failure, not every historical interpreter HTTP timeout or a
+  general throughput/latency guarantee under arbitrary competing load.
+
 ## 2026-10-31 — Neo.Web follow-on, structural function values and cached registration
 
 - **Author pipeline direction:** Requested registration handling any request, with

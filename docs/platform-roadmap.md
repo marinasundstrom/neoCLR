@@ -9,6 +9,9 @@ bounded pipeline. Keep Neo.Web provisional and qualify compiler/runtime changes
 on unified Raven main. See the [API contract](../api-docs/neo-web.md),
 [reference app](../samples/web/README.md) and
 [follow-on evidence](validation/neo-web-generic-20261031/README.md).
+The interpreter timeout is resolved by a bounded heap-accounting cache; the
+unchanged framework suite now passes in interpreter mode. See the
+[fix qualification](validation/neo-web-timeout-20261031/README.md).
 This author-directed task does not permanently reprioritize the roadmap.
 
 **Neo.Web design proposal (2026-10-30):** At the author's request, the

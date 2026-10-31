@@ -7,8 +7,10 @@ and owns the server lifetime. This is an optional experimental development
 extension with provisional APIs, not a capability included in Preview 19 packages.
 
 The follow-on development slice adds generic `MapGet<T: func>` and `MapPost<T: func>`
-handlers, injected request services and typed buffered results. It is under
-qualification and requires matching compiler/runtime changes. Registration inspects
+handlers, injected request services and typed buffered results. Focused framework
+HTTP tests pass in interpreter, JIT and native execution on macOS ARM64 with the
+matching development compiler/runtime; the initial interpreter timeout is fixed.
+These checks are not a throughput or cross-platform qualification. Registration inspects
 `handler.Function` and caches the endpoint's binding plan. Normal application code
 imports `Neo.Web.*`; request scopes remain alive across asynchronous work.
 

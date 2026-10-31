@@ -139,6 +139,13 @@ limits and scans evaluation stacks; failed stores, aliases and collection preser
 the quota contract. The numeric cache holds no GC roots. It adds per-slot metadata
 and an invalidation obligation for future mutation paths, outside payload quotas.
 
+The [Neo.Web timeout fix](validation/neo-web-timeout-20261031/README.md) additionally
+reuses complete heap totals between mutations. Heap allocation, payload-changing
+slot writes (including aliases) and collection invalidate those totals. Frame and
+participant payloads still contribute on every check, and every caller's current
+limits are enforced. This adds a shared dirty flag and numeric cache; it changes
+neither array semantics nor collection policy or transport deadlines.
+
 Existing GC object statistics include heap arrays as allocations; they do not
 report array payload bytes. Host invocation does not yet accept array input schemas.
 The JSON format remains 5 with additive Array type and array opcode variants.

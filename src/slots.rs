@@ -14,6 +14,7 @@ pub(crate) struct Slot {
     // Invalidate on payload-changing mutations, including interior aliases.
     // Numeric summaries contain no references and never cache quota permission.
     array_usage: std::cell::Cell<Option<crate::arrays::Usage>>,
+    heap_arrays_dirty: Option<Arc<std::sync::atomic::AtomicBool>>,
     writes: u64,
     construction: Option<Vec<Type>>,
     replacements: HashMap<Vec<usize>, u64>,
@@ -42,11 +43,24 @@ impl Slot {
             ty,
             value,
             array_usage: std::cell::Cell::new(None),
+            heap_arrays_dirty: None,
             writes: 0,
             construction: None,
             replacements: HashMap::new(),
         }))
     }
+    pub(crate) fn track_heap_arrays(&mut self, dirty: Arc<std::sync::atomic::AtomicBool>) {
+        self.heap_arrays_dirty = Some(dirty);
+        self.invalidate_array_usage();
+    }
+
+    fn invalidate_array_usage(&self) {
+        self.array_usage.set(None);
+        if let Some(dirty) = &self.heap_arrays_dirty {
+            dirty.store(true, std::sync::atomic::Ordering::Relaxed);
+        }
+    }
+
     pub(crate) fn receiver(cell: &Cell, readonly_value: bool) -> Result<Value, Fault> {
         let mut reference = crate::SlotReference::new(cell);
         reference.assigned()?;
@@ -96,7 +110,7 @@ impl Slot {
         }
         let mut slot = cell.borrow_mut();
         slot.value = None;
-        slot.array_usage.set(None);
+        slot.invalidate_array_usage();
         slot.replacements.clear();
         Ok(())
     }
@@ -145,7 +159,7 @@ impl Slot {
             .checked_add(1)
             .ok_or_else(|| Fault::new("slot write counter exhausted"))?;
         self.value = Some(value);
-        self.array_usage.set(None);
+        self.invalidate_array_usage();
         self.replacements.clear();
         self.replacements.insert(vec![], self.writes);
         Ok(())
@@ -576,7 +590,7 @@ impl SlotReference {
         );
         *field = value;
         if !byte_leaf {
-            slot.array_usage.set(None);
+            slot.invalidate_array_usage();
             slot.replacements
                 .retain(|path, _| !path.starts_with(&self.path));
         }
@@ -821,6 +835,68 @@ mod tests {
                 .code,
             crate::FaultCode::ArrayLimitExceeded
         );
+    }
+
+    #[test]
+    fn heap_payload_summary_rechecks_quotas_allocation_and_shared_mutation() {
+        let size = std::mem::size_of::<Value>();
+        let mut heap = crate::ManagedHeap::default();
+        let first = heap.allocate(text_array("a")).unwrap();
+        let limits = crate::Limits {
+            array_elements: 2,
+            array_bytes: 2 * (size + 1),
+            ..Default::default()
+        };
+        let check = |heap: &crate::ManagedHeap, limits: &crate::Limits| {
+            heap.array_usage(&mut crate::arrays::Usage::default(), limits)
+        };
+        check(&heap, &limits).unwrap();
+        // Cached totals must not authorize a smaller caller quota.
+        assert!(
+            check(
+                &heap,
+                &crate::Limits {
+                    array_elements: 0,
+                    ..limits.clone()
+                }
+            )
+            .is_err()
+        );
+        let second = heap.allocate(text_array("b")).unwrap();
+        check(&heap, &limits).unwrap();
+        assert!(
+            check(
+                &heap,
+                &crate::Limits {
+                    array_elements: 1,
+                    ..limits.clone()
+                }
+            )
+            .is_err()
+        );
+        // A write through an alias on another thread invalidates heap totals too.
+        let alias = heap
+            .address(first)
+            .unwrap()
+            .element(0, &Type::String)
+            .unwrap();
+        std::thread::spawn(move || alias.write(Value::String("longer".into())).unwrap())
+            .join()
+            .unwrap();
+        assert!(check(&heap, &limits).is_err());
+        // A failed recount cannot replace the complete summary with partial counts.
+        assert!(check(&heap, &limits).is_err());
+        heap.collect(vec![second], crate::CollectionReason::AllocationPressure)
+            .unwrap();
+        check(
+            &heap,
+            &crate::Limits {
+                array_elements: 1,
+                array_bytes: size + 1,
+                ..limits
+            },
+        )
+        .unwrap();
     }
 
     #[test]

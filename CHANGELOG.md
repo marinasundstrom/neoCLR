@@ -18,6 +18,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   WebDemo demonstrates named handlers, middleware and direct handler tests in its
   own NeoClr.Testing project; framework behavior remains under `extensions/Neo.Web/test`.
   Query/body binding, general serialization and streaming remain future work.
+  Record the author's direction for common result properties projected by union
+  members; these properties are planned, with closed class hierarchies a future option.
 - Expose the structural function-value `Function` contract through the matching
   unified Raven compiler and runtime metadata service. Preserve function-value
   terminology and binding value identity in maintained documentation. Support
@@ -40,8 +42,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Avoid retaining bound-target descriptor factories when function inspection is
   unreachable, so direct handler tests do not pull in unused metadata graphs.
   Native/JIT framework and sample tests pass, as do independent HTTP consumers in
-  all three modes. The interpreter in-process HTTP test still reaches a transport
-  timeout; its middleware test and the independent HTTP sample pass.
+  all three modes. The initial interpreter in-process HTTP timeout is resolved by
+  reusing complete heap array-payload totals until allocation, mutation or collection
+  invalidates them. Preserve instruction-boundary quotas, alias invalidation and
+  collection-before-rejection; leave transport/test deadlines unchanged. The same
+  framework assembly now passes all five interpreter tests. Retain the original
+  failure and focused accounting/HTTP evidence in `docs/validation/neo-web-timeout-20261031`.
 
 - Publish Preview 19 after final source-asset upload crosses midnight in Stockholm.
   Verify all 12 public asset hashes/sizes and the checksum download; qualified

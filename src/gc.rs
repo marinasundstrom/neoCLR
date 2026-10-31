@@ -72,6 +72,10 @@ pub struct ManagedHeap {
     collector: GarbageCollector,
     pub(crate) tls: crate::tls::Resources,
     objects: BTreeMap<usize, crate::slots::Cell>,
+    // Numeric summaries retain no managed roots. Slot writes (including interior
+    // aliases) invalidate this cache; the graph gate excludes concurrent mutation.
+    arrays_dirty: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    array_usage: std::sync::Mutex<Option<crate::arrays::Usage>>,
     next_identity: usize,
     collections: usize,
     reclaimed: usize,
@@ -214,10 +218,22 @@ impl ManagedHeap {
         usage: &mut crate::arrays::Usage,
         limits: &crate::Limits,
     ) -> Result<(), Fault> {
-        for cell in self.objects.values() {
-            cell.borrow().array_usage(usage, limits)?;
+        let mut cached = self
+            .array_usage
+            .lock()
+            .expect("heap array summary lock poisoned");
+        if self.arrays_dirty.load(std::sync::atomic::Ordering::Relaxed) || cached.is_none() {
+            let mut measured = crate::arrays::Usage::default();
+            for cell in self.objects.values() {
+                cell.borrow().array_usage(&mut measured, limits)?;
+            }
+            *cached = Some(measured);
+            self.arrays_dirty
+                .store(false, std::sync::atomic::Ordering::Relaxed);
         }
-        Ok(())
+        // Cache counts, never permission: recheck the caller's current quota and
+        // add its frame/participant payloads on every check.
+        usage.add(cached.expect("complete heap array summary"), limits)
     }
     pub(crate) fn allocate(&mut self, value: Value) -> Result<usize, Fault> {
         value.ensure_heap_references()?;
@@ -228,8 +244,10 @@ impl ManagedHeap {
                 "managed heap identity budget exhausted",
             )
         })?;
-        self.objects
-            .insert(identity, crate::slots::Slot::cell(value.ty(), Some(value)));
+        let cell = crate::slots::Slot::cell(value.ty(), Some(value));
+        cell.borrow_mut()
+            .track_heap_arrays(self.arrays_dirty.clone());
+        self.objects.insert(identity, cell);
         self.peak_objects = self.peak_objects.max(self.len());
         Ok(identity)
     }
@@ -295,6 +313,10 @@ impl ManagedHeap {
         }
         let before = self.len();
         self.objects.retain(|identity, _| live.contains(identity));
+        if self.len() != before {
+            self.arrays_dirty
+                .store(true, std::sync::atomic::Ordering::Relaxed);
+        }
         self.tls.reap(&live);
         self.reclaimed = self.reclaimed.saturating_add(before - self.len());
         self.collections = self.collections.saturating_add(1);

@@ -545,3 +545,19 @@ middleware service activation, explicit UseRouting insertion or branch-builder A
 is introduced. WebDemo's LogRequest function demonstrates before/after logging;
 framework tests cover ordering, short-circuiting, failure, cancellation and scope
 lifetime with real HTTP requests.
+
+## Common result members (author direction, 2026-10-31)
+
+The author clarified that unions allow members: `HttpResult<T>` can expose common
+response properties, such as `StatusCode`, by projecting information from its active
+case. The current union need not become a class hierarchy to provide that contract.
+For example, a future status property can exhaustively map Ok to 200, Created to
+201, BadRequest to 400 and NotFound to 404 while retaining typed case payloads.
+This is a design direction; the current union does not yet expose that property.
+
+Keep sealed/closed class hierarchies as a future alternative, evaluated for their
+own requirements rather than as a prerequisite for common result members. Unlike
+nominal result interfaces/classes, union members can share the exhaustive case
+model already used by direct handler tests. Before adding the API, settle the
+status property's type, which other information is genuinely common to every case,
+and how the HTTP adapter consumes those projections without weakening typed payloads.
