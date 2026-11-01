@@ -125,6 +125,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pass in interpreter/JIT/AOT and the ownership harness passes. A wrong-defaults
   control reports one failure and two passes while completing every physical phase;
   provider behavior and platform qualifications are unchanged.
+  Complete configuration-reload framework reporting while retaining the combined
+  assertion body and all seven host-driven filesystem phases. TestSuite and
+  ConsoleReporter now report named failures and return the report exit code;
+  Python checks the exact transcript separately from READY lines and uses explicit
+  matching JIT inputs. The lifecycle passes in interpreter/JIT/AOT. An isolated
+  wrong-disposal assertion completes every phase before reporting one failure and
+  exit one. Production configuration, DI and watcher behavior are unchanged.
 
 ### 2026-10-31
 

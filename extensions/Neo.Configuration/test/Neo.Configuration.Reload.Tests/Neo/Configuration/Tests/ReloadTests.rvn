@@ -83,11 +83,3 @@ async func `JSON reload is opt in and updates DI consumers while preserving vali
     _ = Assert.True(json.TryLoad() is Failure(JsonConfigurationError.Disposed), "Disposed provider cannot load")?
     return Ok(())
 }
-
-async func Main(args: string[]) -> Task<int> {
-    if args.Length != 1 { Panic("Expected fixture directory") }
-    let result = await `JSON reload is opt in and updates DI consumers while preserving valid data`(args[0])
-    if result is Failure(let error) { Panic(error.Message) }
-    Console.WriteLine("PASS configuration reload lifecycle")
-    return 0
-}

@@ -832,3 +832,57 @@ and exit status. The repository fixture and validator are not mutated; all five
 READY-triggered write phases still execute and are checked. Run from the repository
 root with a fresh output directory. No production API or website content changes;
 no website build is needed.
+
+
+## Configuration reload
+
+The [configuration-reload fixture](../../../extensions/Neo.Configuration/test/Neo.Configuration.Reload.Tests/README.md)
+already used a named NeoClr.Testing case. This slice replaces its handwritten
+Panic/PASS entry point with a separate Main that explicitly awaits the complete
+lifecycle, registers a completed-result reference adapter with TestSuite, prints
+ConsoleReporter output and returns report.ExitCode. The assertion body is unchanged;
+a recoverable failure now produces a named framework result. Setup and terminal
+runtime failures remain terminal. Async/parameterized discovery is not added.
+
+All seven READY phases remain in order: changed, malformed, replaced, deleted,
+optional-created, optional-deleted and disposed. Python still performs real file
+writes, atomic replacement and deletion in isolated directories. The test retains
+live DI/section reads, non-reloading configuration staying fixed, malformed/required
+missing files retaining valid data with observable errors, successful reload clearing
+errors, optional-file creation/deletion, repeated disposal and rejected loads after
+disposal. Provider setup, two-second settling intervals and disposal order are
+unchanged. Existing [configuration semantics and .NET comparison](../../configuration.md)
+apply; this adds no production API or provider contract.
+
+The validator checks exact framework output after excluding READY protocol lines,
+requires the original phase list and empty guest stderr, and separates only the
+exact existing DAM2004 JIT compiler warning. JIT modules/helper/codegen are explicit
+matching inputs rather than ambient defaults. Process/instruction budgets and the
+three-mode scope are unchanged. Framework, validator and selected binary/bundle
+hashes are recorded.
+
+[The report](configuration-reload-report.json.gz) and
+[transcript](configuration-reload.log.gz) pass the full lifecycle in interpreter,
+JIT and AOT on macOS ARM64 using `target/http-header-noop/inputs/bundle`. This is
+three framework executions, each completing all seven physical phases. It does not
+claim a fresh compiler build, Windows execution or broader filesystem qualification.
+Historical configuration-reload evidence remains unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-configuration-reload.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --runtime target/http-header-noop/inputs/bundle/bin/neoclr \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/configuration-reload-testing-migration-20261101
+```
+
+[The isolated negative control](configuration-reload-negative-control.json.gz)
+requires the final disposed-provider TryLoad to succeed in a copied ReloadTests.rvn.
+Interpreter completes all seven phases, then reports `Disposed provider cannot load`
+as one named failure and exits one with empty stderr. The
+[reproduction script](configuration-reload-negative-control.py.gz) reuses the real
+filesystem driver in an isolated in-memory copy, changing only its expected failure
+transcript and exit code. Repository fixture and validator files are not mutated.
+Run from the repository root with a fresh output directory. No website content
+changes or website build is needed.
