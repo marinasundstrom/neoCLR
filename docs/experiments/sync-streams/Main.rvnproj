@@ -7,6 +7,10 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/Assertions.rvn" />
+    <Compile Include="../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestSuite.rvn" />
+    <Compile Include="../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestAttribute.rvn" />
     <Compile Include="Main.rvn" />
+    <Compile Include="Tests.rvn" />
   </ItemGroup>
 </Project>

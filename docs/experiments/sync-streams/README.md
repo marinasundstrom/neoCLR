@@ -52,3 +52,20 @@ four native API snapshot tests pass, both API references validate, and the websi
 build checks 4,610 pages plus 124 retained legacy pages. Website publication is separate.
 The initial focused unit fixture lacked an instantiated receiver (so its dispatch
 set was correctly empty); the final fixture constructs the receiver and passes.
+
+## Framework migration — 2026-11-01
+
+Tests.rvn now holds one named NeoClr.Testing lifecycle. It preserves the shared
+sync/async MemoryStream sequence, borrowed windows, sentinels, EOF, quota rejection,
+shared close state and synchronous-only provider. Borrowed slices stay inside
+synchronous helpers; Main explicitly awaits the result and reports it through a
+completed-result reference adapter, TestSuite and ConsoleReporter. Main returns
+report.ExitCode. No automatic async discovery is claimed.
+
+The lifecycle passes in interpreter/JIT/AOT. An isolated wrong EOF-count expectation
+fails after the shared stream checks, reporting a named failure and exit one.
+Python requires exact framework output and successful exit, with empty stderr except
+for the documented JIT compiler warning. See
+[migration evidence](../../validation/testing-migration-20261101/README.md#synchronous-stream-capability-behavior).
+Historical evidence and production stream contracts remain unchanged; this migration
+does not rerun compiler metadata/visibility or backend dispatch qualification.

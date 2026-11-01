@@ -1303,3 +1303,52 @@ exit one with empty stderr; later ownership/ASCII checks do not run after failur
 hashes; run from the repository root with a fresh output directory. Historical
 reports and separate async/native-provider tests are unchanged and not rerun.
 Website content requires no change and no website build was run.
+
+## Synchronous stream-capability behavior
+
+The [sync-streams fixture](../../experiments/sync-streams/README.md#framework-migration--2026-11-01)
+now uses one named NeoClr.Testing lifecycle. Main explicitly awaits its result,
+retains it in a reference adapter and reports TestSuite's actual outcome through
+ConsoleReporter and report.ExitCode. Tests.rvn replaces generic Panic checks with
+recoverable count, write/flush and phase-specific assertions. No automatic async
+discovery is claimed.
+
+The original sequence remains: write a borrowed subwindow through SyncOutputStream,
+flush, perform a zero-length borrowed read, seek, read asynchronously into a guarded
+window, continue through SyncInputStream, verify EOF, flush asynchronously, seek to
+the quota, reject a further write, close through the input view, reject output flush,
+repeat close and read EOF from a synchronous-only provider. Borrowed slices remain
+inside synchronous helper calls and never cross await. The existing
+[.NET comparison and stream design](../../stream-design.md) remain applicable; no
+provider contract, public API, runtime or compiler behavior changes are introduced.
+
+[Report](sync-streams-report.json.gz) and [log](sync-streams.log.gz) pass the complete
+lifecycle in interpreter, JIT and native AOT on macOS ARM64. Python keeps its existing
+budgets and matching execution context, requiring exact framework stdout, exit zero
+and empty stderr, permitting only the exact shared DAM2004 compiler warning for JIT.
+Source/project/framework/application and manifest hashes identify the reused matching
+`target/http-header-noop/inputs/bundle`. No Windows, fresh compiler build or release
+qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/sync-streams/Main.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/sync-streams-testing-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/sync-streams/check.py \
+  target/http-header-noop/inputs/bundle target/sync-streams-testing-20261101 \
+  --output target/sync-streams-testing-20261101/validation.json
+```
+
+[Negative control](sync-streams-negative-control.json.gz) changes the final
+synchronous-only provider's expected EOF count from zero to one in an isolated copy.
+All preceding shared-stream checks complete. Interpreter reports the named
+`Expected 1, actual 0` failure and exits one with empty stderr.
+[Reproduction script](sync-streams-negative-control.py.gz) records commands and source
+hashes; run from the repository root with a fresh output directory. Historical
+reports and separate compiler visibility/metadata and backend dispatch checks remain
+unchanged and are not rerun. Website content requires no change and no website build
+was run.

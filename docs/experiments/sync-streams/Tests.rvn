@@ -1,0 +1,77 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+import NeoClr.Testing.*
+
+func Count(result: Result<int, StreamError>, expected: int) -> Result<unit, TestFailure> {
+    return match result {
+        Ok(let count) => Assert.Equal(expected, count)
+        Failure(_) => Assert.True(false, "Unexpected read error")
+    }
+}
+
+func Succeeded(result: Result<unit, StreamError>) -> Result<unit, TestFailure> {
+    return Assert.True(result is Ok(_), "Write or flush succeeds")
+}
+
+// A synchronous-only provider demonstrates that no async interface is required.
+class EmptyInput : SyncInputStream {
+    func Read(buffer: Slice<byte>) -> Result<int, StreamError> => Ok(0)
+    func Close() { }
+}
+
+func Borrowed(input: SyncInputStream, output: SyncOutputStream) -> Result<unit, TestFailure> {
+    let source: byte[] = [(byte)1, (byte)2, (byte)3, (byte)4]
+    let view: ReadOnlySlice<byte> = source
+    _ = Succeeded(output.Write(view.Slice(1, 2)))?
+    _ = Succeeded(output.Flush())?
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    let writable: Slice<byte> = destination
+    _ = Count(input.Read(writable.Slice(1, 0)), 0)?
+    return Ok(())
+}
+
+[Test]
+async func `Synchronous stream capabilities share cursor quota and close state with async operations`() -> Task<Result<unit, TestFailure>> {
+    let stream = MemoryStream()
+    let input: SyncInputStream = stream
+    let output: SyncOutputStream = stream
+    _ = Borrowed(input, output)?
+    _ = stream.Seek(0)
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    let read = await stream.Read(destination, 1, 1)
+    _ = Count(read, 1)?
+    _ = Assert.True(destination[0] == 9 && destination[1] == 2 && destination[2] == 9, "Async read preserves window sentinels")?
+    _ = ReadRemaining(input, destination)?
+    let flushed = await stream.Flush()
+    _ = Succeeded(flushed)?
+    _ = stream.Seek(65536)
+    _ = CheckLimit(output)?
+    input.Close()
+    _ = CheckClosed(output)?
+    stream.Close()
+    let empty: SyncInputStream = EmptyInput()
+    _ = Count(empty.Read(destination), 0)?
+    return Ok(())
+}
+
+func ReadRemaining(input: SyncInputStream, destination: byte[]) -> Result<unit, TestFailure> {
+    let view: Slice<byte> = destination
+    _ = Count(input.Read(view.Slice(2, 2)), 1)?
+    _ = Assert.True(destination[2] == 3 && destination[3] == 9, "Sync read shares cursor and preserves sentinel")?
+    _ = Count(input.Read(view), 0)?
+    return Ok(())
+}
+
+func CheckLimit(output: SyncOutputStream) -> Result<unit, TestFailure> {
+    let bytes: byte[] = [(byte)1]
+    return Assert.True(output.Write(bytes) is Failure(StreamError.LimitExceeded), "Quota must reject")
+}
+
+func CheckClosed(output: SyncOutputStream) -> Result<unit, TestFailure> {
+    return Assert.True(output.Flush() is Failure(StreamError.Closed), "Shared close state")
+}

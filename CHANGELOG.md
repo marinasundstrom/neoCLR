@@ -187,6 +187,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   in interpreter/JIT/AOT; a canonically equivalent but byte-distinct expectation
   reports a named failure and exit one. Python now checks exact framework output
   and input fingerprints; production text/stream contracts remain unchanged.
+  Migrate synchronous stream-capability behavior to a named framework lifecycle,
+  retaining borrowed windows, shared sync/async cursor state, sentinels, EOF, quota
+  and shared close state. Explicitly await and report the completed result while
+  keeping slices in synchronous helpers. The lifecycle passes in interpreter/JIT/AOT;
+  a wrong final EOF count reports one named failure and exit one. Python checks exact
+  framework output and records input fingerprints; production APIs are unchanged.
 
 ### 2026-10-31
 

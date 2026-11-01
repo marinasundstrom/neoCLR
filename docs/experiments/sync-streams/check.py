@@ -2,8 +2,14 @@
 """Run the synchronous capability contract against one matching three-engine bundle."""
 import argparse
 import json
+import hashlib
+import sys
 from pathlib import Path
 import subprocess
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / 'benchmarks/framework'))
+from process import RETENTION_WARNING
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('bundle', type=Path)
@@ -26,10 +32,15 @@ for engine in ['interpreter', 'jit', 'aot']:
         else:
             command += ['--jit-compiler', str(bundle / 'bin/neoclr-codegen'), '--jit-host', str(bundle / 'bin/neoclr-jit-host.dylib')]
     result = subprocess.run(command, input=b'', capture_output=True, timeout=120)
-    passed = result.returncode == 0 and result.stdout == b'PASS sync streams\n'
+    passed = result.returncode == 0 and result.stdout == b'PASS Synchronous stream capabilities share cursor quota and close state with async operations\nTests: 1, passed: 1, failed: 0, skipped: 0\n' and result.stderr in ((b'', RETENTION_WARNING) if engine == 'jit' else (b'',))
     rows.append(dict(engine=engine, command=command, exitCode=result.returncode, passed=passed,
                      stdout=result.stdout.decode(errors='replace'), stderr=result.stderr.decode(errors='replace')))
     print(f'{engine}: {"PASS" if passed else "FAIL"}', flush=True)
 args.output.parent.mkdir(parents=True, exist_ok=True)
-args.output.write_text(json.dumps(dict(passed=all(row['passed'] for row in rows), executions=rows), indent=2) + '\n')
+paths = [Path(__file__), *Path(__file__).parent.glob('*.rvn'),
+         *Path(__file__).parent.glob('*.rvnproj'),
+         *(ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn'),
+         bundle / 'manifest.json', application / 'app', application / 'app.dll']
+args.output.write_text(json.dumps(dict(passed=all(row['passed'] for row in rows), executions=rows,
+    hashes={str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}), indent=2) + '\n')
 raise SystemExit(0 if all(row['passed'] for row in rows) else 1)
