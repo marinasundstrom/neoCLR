@@ -28,6 +28,13 @@ def main():
     report = dict(passed=False, platform=platform.platform(), cases=[],
                   sourceSha256=hashlib.sha256(fixture.with_suffix('.rvn').read_bytes()).hexdigest(),
                   bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest())
+    report['sources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in [fixture, fixture.with_suffix('.rvn'), fixture.with_name('NetworkMain.rvn')]}
+    report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
+    report['validatorSha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    report['runtimeSha256'] = hashlib.sha256(args.runtime.resolve().read_bytes()).hexdigest()
+    report['aotSha256'] = hashlib.sha256(args.aot.resolve().read_bytes()).hexdigest()
     try:
         build = out / 'build'
         result = subprocess.run([sys.executable, str(ROOT / 'scripts/build-native-project.py'), '--profile',
@@ -39,7 +46,7 @@ def main():
         if result.returncode:
             raise RuntimeError('Network consumer build failed; see logs')
         lib = bundle / 'lib'
-        interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--system', str(lib / 'System.runtime.neox'),
+        interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--execution', 'interpreter', '--system', str(lib / 'System.runtime.neox'),
                        '--object-root', str(lib / 'System.Runtime.dll')]
         for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
             interpreter += ['--module', str(lib / (name + '.dll'))]
@@ -76,7 +83,10 @@ def main():
                     worker.join(timeout=6)
                 report['cases'].append(dict(case=case, mode=mode, exitCode=result.returncode,
                                             stdout=result.stdout, stderr=result.stderr, peer=peer))
-                if result.returncode or 'PASS ' not in result.stdout or not peer.get('closed') or peer.get('error'):
+                name = ('Network timeout reports TimedOut' if case == 'timeout'
+                        else 'Disabled timeout permits a delayed network response')
+                expected = 'PASS ' + name + '\nTests: 1, passed: 1, failed: 0, skipped: 0\n'
+                if result.returncode or result.stdout != expected or result.stderr or not peer.get('closed') or peer.get('error'):
                     raise RuntimeError(f'{mode} {case} did not finish and close its socket: {report["cases"][-1]}')
         report['passed'] = True
     finally:

@@ -1,0 +1,38 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Store the completed result in a reference owner; the native compiler does not
+// support directly capturing this Result value in a closure.
+class CompletedNetworkTimeoutTest {
+    private val outcome: Result<unit, TestFailure>
+
+    init(outcome: Result<unit, TestFailure>) {
+        self.outcome = outcome
+    }
+
+    func Invoke() -> Result<unit, TestFailure> {
+        return match outcome {
+            Ok(_) => Ok(())
+            Failure(let failure) => Failure(failure)
+        }
+    }
+}
+
+async func Main(arguments: string[]) -> Task<int> {
+    let suite = TestSuite()
+    // Each process owns one independent peer exchange; async discovery is unavailable.
+    if arguments[1] == "timeout" {
+        let timeoutOutcome = CompletedNetworkTimeoutTest(await `Network timeout reports TimedOut`(arguments[0]))
+        suite.Add("network-timeout", "Network timeout reports TimedOut", timeoutOutcome.Invoke)
+    } else {
+        let successOutcome = CompletedNetworkTimeoutTest(await `Disabled timeout permits a delayed network response`(arguments[0]))
+        suite.Add("network-timeout-disabled", "Disabled timeout permits a delayed network response", successOutcome.Invoke)
+    }
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
+}

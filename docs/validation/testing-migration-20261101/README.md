@@ -886,3 +886,50 @@ filesystem driver in an isolated in-memory copy, changing only its expected fail
 transcript and exit code. Repository fixture and validator files are not mutated.
 Run from the repository root with a fresh output directory. No website content
 changes or website build is needed.
+
+
+## Real HTTP timeout sockets
+
+The separate [network timeout fixture](../../experiments/http-timeout/README.md#real-socket-timeout-fixture)
+now contains two named NeoClr.Testing cases: Network timeout reports TimedOut, and
+Disabled timeout permits a delayed network response. These replace conditional
+Panic assertions and handwritten PASS lines. NetworkMain explicitly awaits the
+selected URL-based case, registers a completed-result reference adapter with
+TestSuite, writes ConsoleReporter output and returns report.ExitCode. Automatic
+async/parameterized discovery is not added. Client disposal remains before the
+outcome/status assertions; public timeout semantics and the existing
+[.NET comparison](../../design/http-client-lifetime.md) are unchanged.
+
+Python preserves the independent loopback peer: it reads complete request headers,
+withholds a response on timeout or waits 350 ms before sending HTTP 200 and `{}`,
+then requires EOF from the client. The two-second guest timeout, timeout disabling,
+peer limits, process timeout and interpreter/AOT scope are unchanged. Interpreter
+selection is now explicit rather than depending on the runtime's former default.
+Success requires the exact named framework transcript and empty stderr as well as
+peer-confirmed socket closure; source/framework/validator/runtime/codegen hashes are
+recorded alongside the bundle identity. Socket closure is checked independently;
+this migration does not add finer-grained acknowledgement timing instrumentation.
+
+[The report](http-timeout-network-report.json.gz) and
+[log](http-timeout-network.log.gz) pass both tests in interpreter and native AOT:
+four framework executions and four peer-confirmed socket closures on macOS ARM64.
+Inputs use the matching `target/http-header-noop/inputs/bundle`; no fresh compiler
+build, JIT/Windows run or release qualification is claimed. The controlled-handler
+timeout suite and historical network-validation.json remain unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-http-timeout-network.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --runtime target/http-header-noop/inputs/bundle/bin/neoclr \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/http-timeout-network-testing-migration-20261101
+```
+
+[The isolated negative control](http-timeout-network-negative-control.json.gz)
+expects status 201 instead of 200 in a copied Network.rvn. The independent peer
+still delays its HTTP 200 response and confirms socket closure. Interpreter reports
+`Expected 201, actual 200`, one named failure and exit one with empty stderr. The
+repository fixture is not mutated. [Reproduction script](http-timeout-network-negative-control.py.gz)
+records commands and source hashes; run from the repository root with a fresh output
+directory. No production API or website content changes; no website build is needed.

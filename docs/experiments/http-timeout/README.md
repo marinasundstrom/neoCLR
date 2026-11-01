@@ -21,7 +21,7 @@ terminal runtime faults remain terminal. Invalid fixture-URL construction remain
 a terminal setup check.
 
 Faults.rvn retains six independent invalid-operation probes. Network.rvn and its
-host-controlled network validation are separate and unchanged. Python keeps builds,
+host-controlled network validation remain a separate suite, described below. Python keeps builds,
 process orchestration and terminal-failure checks, and now requires exact framework
 transcripts and empty stderr for both ordinary and long-request behavior runs.
 
@@ -34,3 +34,30 @@ python3 scripts/validate-timers.py --suite http-timeout \
 See [migration evidence](../../validation/testing-migration-20261101/README.md#http-timeout)
 and the existing [HTTP lifetime/timeout design and .NET comparison](../../design/http-client-lifetime.md).
 This changes no HttpClient API, timeout/cancellation semantics or execution-mode scope.
+
+
+## Real-socket timeout fixture
+
+Network.rvn now contains two named NeoClr.Testing cases: reporting HttpError.TimedOut
+for a two-second request timeout, and accepting HTTP 200 after a delayed response
+with the timeout disabled. NetworkMain explicitly awaits the selected case and
+reports its completed Result through TestSuite and ConsoleReporter, returning the
+report exit code. The URL and case selection remain host-supplied; automatic
+async/parameterized discovery is not added. Client disposal remains before result
+assertions.
+
+The independent Python peer still accepts and reads the request, withholds a response
+for the timeout case or delays success by 350 ms, and observes EOF on the socket.
+It requires socket closure in addition to the exact framework transcript and empty
+stderr. Interpreter selection is explicit. Peer/process timeouts and the existing
+interpreter/AOT scope remain unchanged.
+
+```sh
+python3 scripts/validate-http-timeout-network.py --bundle <matching-bundle> \
+  --runtime <matching-bundle>/bin/neoclr --aot <matching-bundle>/bin/neoclr-codegen \
+  --output target/http-timeout-network-tests
+```
+
+[Network migration evidence](../../validation/testing-migration-20261101/README.md#real-http-timeout-sockets)
+records four successful exchanges and a wrong-status assertion control that still
+closes its socket. Historical network-validation.json is unchanged.

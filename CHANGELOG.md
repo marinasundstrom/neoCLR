@@ -132,6 +132,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   matching JIT inputs. The lifecycle passes in interpreter/JIT/AOT. An isolated
   wrong-disposal assertion completes every phase before reporting one failure and
   exit one. Production configuration, DI and watcher behavior are unchanged.
+  Migrate real-socket HTTP timeout and disabled-timeout response assertions to two
+  named framework cases. Preserve two-second timeout, delayed peer response, client
+  disposal and independent EOF checks. Both cases pass in interpreter/AOT with
+  socket closure confirmed in all four exchanges. A wrong-status control reports
+  one named failure and exit one while still closing its socket. Require exact
+  framework output, empty stderr and explicit interpreter selection; public timeout
+  semantics, process budgets and historical network evidence remain unchanged.
 
 ### 2026-10-31
 
