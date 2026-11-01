@@ -42,9 +42,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cancellation, GC/sentinels, invalid ranges, EOF and client read-ahead checks.
   Keep explicit async result adaptation and Python orchestration; repair the stale
   HTTP test project path without changing production APIs or validation budgets.
-  JIT/AOT pass; interpreter retains a preexisting async wait-bridge failure,
-  reproduced with both original and migrated fixtures. Preserve failed reports and
-  keep the overall verifier failing until interpreter qualification is resolved.
+  Diagnose the preexisting interpreter wait-bridge failure as a compiler-generated
+  borrowed UTF-8 receiver temporary retained after ToArray. Move encoding into a
+  synchronous helper so its borrow ends before socket awaits; preserve the runtime's
+  conservative suspension guard. HTTP now passes interpreter, JIT and AOT with the
+  same bundle and limits. Retain the original/migrated failure reports and add the
+  passing follow-up; no runtime/compiler or production API change is required.
 
 ### 2026-10-31
 

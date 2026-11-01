@@ -20,9 +20,15 @@ class CancellationObserver {
     func Complete() { _ = Done.Complete(operation.IsCancelled) }
 }
 
+func EncodeSendWindow(text: string) -> byte[] {
+    // End the borrowed UTF-8 view's frame before SendText can suspend. The
+    // compiler retains its receiver temporary even after ToArray has copied it.
+    return ("!" + text + "!").Utf8Bytes.ToArray()
+}
+
 async func SendText(socket: Socket, text: string) -> Task<bool> {
     // Send a selected window with sentinel bytes outside the HTTP message.
-    let encoded = ("!" + text + "!").Utf8Bytes.ToArray()
+    let encoded = EncodeSendWindow(text)
     if encoded.Count > 512 { return false }
     let owned: byte[] = [for index in 0..512 => (byte)0]
     var index = 0

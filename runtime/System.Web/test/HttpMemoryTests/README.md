@@ -31,7 +31,9 @@ Memory and borrows Slice only during synchronous consumption.
 records the preserved assertions and validation. Production APIs, host profiles,
 process/instruction budgets and historical reports remain unchanged.
 
-Current migration qualification passes JIT and AOT. Interpreter fails in the async
-wait bridge with both the original and migrated fixture under the selected inputs;
-the verifier keeps that case failing and returns nonzero. The linked evidence
-includes paired reproductions. Interpreter qualification remains open.
+Qualification now passes interpreter, JIT and AOT. The earlier wait-bridge failure
+came from a compiler-generated borrowed UTF-8 receiver temporary retained in
+SendText after ToArray. EncodeSendWindow performs that copy in a synchronous frame
+that returns before any await; only the owned byte array reaches SendText.
+The interpreter's conservative borrowed-view suspension check remains unchanged.
+The linked evidence preserves the earlier failures and the passing follow-up.

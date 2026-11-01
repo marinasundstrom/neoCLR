@@ -25,9 +25,9 @@ the common runner's `report.json` schema. Existing historical evidence is unchan
 ## Remaining applicability review
 
 - Socket and HTTP memory lifecycles now use explicit async framework adapters.
-  Socket passes all three modes. HTTP passes JIT/AOT but retains a preexisting
-  interpreter wait-bridge failure with paired original/migrated evidence below;
-  that qualification gap remains open.
+  Both pass all three modes. The HTTP follow-up below diagnoses its earlier
+  interpreter wait-bridge failure and scopes the encoding borrow to a synchronous
+  helper; paired original/migrated failure evidence remains available.
 - HTTP custom-method wire peers, compiler visibility rejection and terminal-failure
   subprocess probes retain legitimate Python host orchestration. Do not mechanically
   convert these into in-process assertions.
@@ -268,7 +268,8 @@ Python retains HTTP-profile native building, exact framework transcript checks,
 artifact/source fingerprints and all three execution modes. It corrects only the
 stale Tests.rvnproj path and permits the exact existing DAM2004 JIT diagnostic.
 The 300-second process timeout and 100,000,000 interpreter instruction budget are
-unchanged. Qualification is **partial**, not passed in all modes.
+unchanged. Initial migration qualification was **partial**; the follow-up below
+now passes all three modes.
 
 [The three-mode report](http-memory-three-mode-report.json.gz) passes JIT and AOT,
 including all four phases and the final framework summary. Interpreter exits one
@@ -285,8 +286,9 @@ fails for [the original](http-memory-current-original.json.gz) and
 [the migrated fixture](http-memory-current-migrated.json.gz). That local binary is
 identified by hash; it was not freshly rebuilt or claimed as new qualification.
 These comparisons establish a preexisting failure in the selected inputs rather
-than a passing interpreter migration. Resolving and independently qualifying the
-wait-bridge/provider interaction remains open; no runtime or compiler fix is claimed.
+than a passing interpreter migration. At that stage the wait-bridge/provider
+interaction remained unresolved; the follow-up below identifies the cause without
+changing the runtime or compiler.
 
 The [initial compile failure](http-memory-initial-compile.log.gz) belongs to the
 nested-await assertion form, before awaiting into locals. That compile adaptation
@@ -299,6 +301,40 @@ SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
   --output /fresh/http-memory-output
 ```
 
-This currently records the interpreter failure and exits nonzero. Use the preserved
-paired reproduction before investigating a runtime/compiler repair; do not count
-JIT/AOT success as closing the interpreter gate.
+The current fixture passes this command in all three modes. Earlier failure
+reports above retain the pre-fix source identities and are not rewritten.
+
+### HTTP borrowed encoding lifetime follow-up
+
+The author's next request was to investigate and fix the interpreter wait-bridge
+failure. Temporary local diagnostics exposed Fault.message and the rejected frame
+value at the suspension check. [The diagnostic](http-memory-borrow-diagnostic.log.gz)
+identifies `borrowed memory views cannot cross suspension`, with a UTF-8 view of
+`!POST /window HTTP/1.1\r\nHost: localhost\r\n!` in SendText's closure. These diagnostic
+prints were removed; the CLI diagnostic contract and interpreter are unchanged.
+Disassembly of the failing app places `get_Utf8Bytes`, `stloc 0`, `ldloca 0` and
+`ToArray` at instructions 6–9 of that closure; the later bridge Wait call is at 107.
+The borrowed receiver temporary is still resident when Wait calls AwaitUnit at 13.
+The signal-release guard is not the failing operation.
+
+The interpreter deliberately rejects every resident borrowed view at suspension,
+including dead locals; see the existing [memory-view contract](../../native-memory-views.md).
+EncodeSendWindow now performs the UTF-8 copy in a synchronous helper. Its frame
+returns before SendText awaits socket work, leaving only an owned array and
+persistent readonly memory windows. The message bytes, sentinels, split writes,
+shared-server lifecycle, assertions, timeout and instruction budget are unchanged.
+This is a fixture lifetime correction under the current conservative contract,
+not a runtime wait-bridge repair or compiler liveness relaxation. General dead-local
+liveness remains a separately unqualified compiler/runtime capability.
+
+[The new report](http-memory-borrow-scope-three-mode-report.json.gz) passes the exact
+named-test transcript and summary in interpreter, JIT and AOT using the same
+`target/http-message-surfaces/inputs9/bundle` as the failures. Source, consumer,
+compiler, runtime and manifest hashes are recorded. Reproduce with the command
+above and a fresh output directory (the recorded run used
+`target/http-memory-borrow-scope-20261101`). Historical failures serve as the
+before-fix negative control. Both focused Rust checks also pass:
+`cargo test --test memory_views borrowed_views_` verifies synchronous host-call
+borrow preservation and rejection across async yield/heap boxing. The existing
+unused reflection-helper warning is unrelated. No production API, release asset,
+website content or compiler bridge contract changes; no website build is needed.
