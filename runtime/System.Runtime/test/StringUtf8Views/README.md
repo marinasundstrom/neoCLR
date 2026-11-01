@@ -2,10 +2,23 @@
 
 The existing String.Utf8Bytes API now lowers to a readonly borrowed byte window in
 JIT/AOT, sharing literal or managed text without allocating an encoding array.
-The consumer returns zero only after checking literal bytes, NUL/multibyte text,
-nested and empty windows, decoding split scalars, independent mutable copies and
-explicit GC after the method constructing the string has returned. It exercises
-the existing interpreter contract too. No source compiler or public signature change.
+Four discovered `NeoClr.Testing` cases check literal bytes and NUL/multibyte text,
+nested and empty windows, invalid split-scalar decoding, independent mutable copies
+and collection after the method constructing the string returns. The lifetime test
+keeps decoding, copying, invalid decoding and a second collection together, preserving
+the original combined sequence. The same suite runs in interpreter, JIT and AOT.
+No source compiler, public signature or storage contract changes.
+
+```sh
+python3 scripts/test-runtime-library.py --suite string-utf8-views \
+  --mode interpreter --mode jit --mode native \
+  --bundle /absolute/matching-bundle --output /fresh/output
+```
+
+The project uses generated test discovery and the shared test entry point. Behavior
+failures return `TestFailure` with named diagnostics instead of panicking from a
+single handwritten Main. Python retains build/process and transcript checks.
+[Migration evidence](../../../../docs/validation/testing-migration-20261101/README.md#string-backed-utf-8-views).
 
 Native memory kernel tests also check readonly writes, persistent conversion,
 provider access, array copying and unchanged allocation state for view creation.
@@ -17,16 +30,17 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer python3 -m unittest dis
 cargo test -p neoclr-codegen utf8_view_requires --lib
 ```
 
-Build Tests.rvnproj with scripts/build-native-project.py, console profile, using a
-matching native bundle and rebuilt neoclr-codegen. Retained build/report evidence
-contains the complete commands, library paths and native helper identity. The JIT
-host must also be rebuilt from matching sources. Evidence uses Xcode 26.2 and the
-MacOSX26.2 SDK; Raven dcf7ac41f remains unchanged.
+## Historical native implementation qualification
+
+The original standalone consumer used a matching native bundle and rebuilt codegen
+and JIT host. Retained build/report evidence contains commands, library paths and
+native helper identity. That evidence used Xcode 26.2 and the MacOSX26.2 SDK;
+Raven dcf7ac41f remained unchanged.
 
 The first consumer printed a final constant Console line. AOT/JIT passed, while
 the interpreter faulted in that console call after the assertions. This unrelated
-standalone-console path is not fixed or silently counted as passing. The final
-consumer uses its exit status and has no console dependency; both failed and final
+standalone-console path is not fixed or silently counted as passing. That final standalone
+consumer used its exit status and had no console dependency; both failed and final
 reports are retained. Initial test setup also corrected a missing System.Runtime
 import and an invalid test JSON field spelling; neither changed production behavior.
 

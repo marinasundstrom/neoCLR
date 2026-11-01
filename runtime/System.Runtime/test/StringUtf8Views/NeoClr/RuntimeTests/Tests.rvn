@@ -1,0 +1,51 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Runtime.*
+import System.Text.*
+import System.Result.*
+import NeoClr.Testing.*
+
+func HeapBytes() -> ReadOnlySlice<byte> {
+    return String.Concat("prefix", "é😀\u0000suffix").Utf8Bytes
+}
+
+[Test]
+func `String UTF8 views preserve literal NUL and multibyte bytes`() -> Result<unit, TestFailure> {
+    let literal = "A\u0000é😀".Utf8Bytes
+    _ = Assert.Equal(8, literal.Length)?
+    _ = Assert.True(literal[1] == 0, "Embedded NUL remains a byte")?
+    _ = Assert.True(literal[2] == 195, "Multibyte scalar starts at its byte offset")?
+    return Assert.True(literal[7] == 128, "Final scalar byte is preserved")
+}
+
+[Test]
+func `String UTF8 nested windows retain owners across collection decoding and copying`() -> Result<unit, TestFailure> {
+    let bytes = HeapBytes()
+    let nested = bytes[6..13][..6]
+    GC.Collect()
+    _ = Assert.True(nested[0] == 195 && nested[5] == 128, "Owner survives after its constructing method returns")?
+    let Ok(text) = Encodings.Utf8.Decode(nested) else {
+        return Assert.True(false, "Selected complete scalars decode")
+    }
+    _ = Assert.Equal("é😀", text)?
+    let copy = nested.ToArray()
+    copy[0] = (byte)0
+    _ = Assert.True(nested[0] == 195, "Mutating the array copy does not change string storage")?
+    _ = Assert.True(Encodings.Utf8.Decode(nested[1..]) is Failure(EncodingError.InvalidUtf8), "Byte slicing preserves invalid scalar boundaries")?
+    GC.Collect()
+    return Assert.True(nested[0] == 195, "Owner survives collection after decoding and copying")
+}
+
+[Test]
+func `String UTF8 views expose empty strings and end windows`() -> Result<unit, TestFailure> {
+    let bytes = HeapBytes()
+    _ = Assert.True(bytes[bytes.Length..].IsEmpty, "End window is empty")?
+    return Assert.True("".Utf8Bytes.IsEmpty, "Empty string has an empty view")
+}
+
+[Test]
+func `String UTF8 byte windows reject decoding a split scalar`() -> Result<unit, TestFailure> {
+    let nested = HeapBytes()[6..13][..6]
+    return Assert.True(Encodings.Utf8.Decode(nested[1..]) is Failure(EncodingError.InvalidUtf8), "A continuation byte cannot start a UTF-8 scalar")
+}

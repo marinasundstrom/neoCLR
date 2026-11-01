@@ -16,7 +16,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   integrity/process orchestration and the legacy command/report filename; its
   report now uses the common runtime test-runner schema. All 14 tests pass in each
   mode; a reused-output negative control preserves existing evidence. Historical
-  evidence is unchanged.
+  evidence is unchanged. Migrate the string-backed UTF-8 view consumer to four
+  discovered tests, retaining its combined collection/decoding/copy lifetime sequence,
+  byte-boundary rejection and empty/literal views; use named failure diagnostics
+  instead of standalone Panic checks. All four pass in interpreter, JIT and AOT.
 
 ### 2026-10-31
 
