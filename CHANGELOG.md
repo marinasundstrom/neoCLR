@@ -6,6 +6,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-11-01
+
+- Begin the author-directed post-release behavior-fixture migration with signed
+  range iteration: replace the single-output/numeric-exit probe with 14 discovered
+  `NeoClr.Testing` cases, descriptive backtick names and failure assertions.
+  Preserve signed-limit, overshoot, minimum-step, evaluation-order, empty-range
+  and continue/break checks across interpreter, JIT and AOT. Keep Python bundle
+  integrity/process orchestration and the legacy command/report filename; its
+  report now uses the common runtime test-runner schema. All 14 tests pass in each
+  mode; a reused-output negative control preserves existing evidence. Historical
+  evidence is unchanged.
+
 ### 2026-10-31
 
 - Separate HTTP client/server message implementations into HttpClientRequest,

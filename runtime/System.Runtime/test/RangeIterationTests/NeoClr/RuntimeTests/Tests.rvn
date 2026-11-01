@@ -1,0 +1,196 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test]
+func `Int32 range terminates at inclusive maximum with continue`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 2147483646..=2147483647 {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Int32 range terminates at overshooting positive step`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 2147483646..=2147483647 by 2 {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(1, count)
+}
+
+[Test]
+func `Int32 range terminates at inclusive minimum with continue`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in -2147483647..=-2147483648 by -1 {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Int32 range terminates at minimum valued step`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 0..=-2147483648 by -2147483648 {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Int64 range terminates at inclusive maximum with continue`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 9223372036854775806L..=9223372036854775807L {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Int64 range terminates at overshooting positive step`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 9223372036854775806L..=9223372036854775807L by 2L {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(1, count)
+}
+
+[Test]
+func `Int64 range terminates at inclusive minimum with continue`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in -9223372036854775807L..=-9223372036854775808L by -1L {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Int64 range terminates at minimum valued step`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 0L..=-9223372036854775808L by -9223372036854775808L {
+        count += 1
+        _ = Assert.True(count <= 3, "Iteration must stop before wrapping")?
+        continue
+    }
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Range bounds and explicit step evaluate once in source order`() -> Result<unit, TestFailure> {
+    var order = 0
+    var count = 0
+    for value in ({
+        order = order * 10 + 1
+        2147483646
+    })..=({
+        order = order * 10 + 2
+        2147483647
+    }) by ({
+        order = order * 10 + 3
+        1
+    }) {
+        count += 1
+        _ = Assert.True(count <= 3, "Dynamic step must stop before wrapping")?
+    }
+    _ = Assert.Equal(123, order)?
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Range break at the signed maximum skips advancement`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 2147483647..=2147483647 {
+        count += 1
+        break
+    }
+    return Assert.Equal(1, count)
+}
+
+[Test]
+func `Int32 exclusive unit ranges preserve values and skip empty or reversed bounds`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 2147483646..2147483647 {
+        count += 1
+        _ = Assert.True(value == 2147483646, "Exclusive maximum yields its predecessor")?
+        _ = Assert.True(count <= 1, "Exclusive maximum does not wrap")?
+        continue
+    }
+    _ = Assert.Equal(1, count)?
+    for value in 2147483647..2147483647 {
+        return Assert.True(false, "Equal exclusive bounds are empty")
+    }
+    for value in 2147483647..2147483646 by 1 {
+        return Assert.True(false, "Reversed positive-step bounds are empty")
+    }
+    return Assert.True(true, "Empty ranges skip their bodies")
+}
+
+[Test]
+func `Int64 exclusive unit ranges preserve values and skip empty or reversed bounds`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 9223372036854775806L..9223372036854775807L {
+        count += 1
+        _ = Assert.True(value == 9223372036854775806L, "Exclusive maximum yields its predecessor")?
+        _ = Assert.True(count <= 1, "Exclusive maximum does not wrap")?
+        continue
+    }
+    _ = Assert.Equal(1, count)?
+    for value in 9223372036854775807L..9223372036854775807L {
+        return Assert.True(false, "Equal exclusive bounds are empty")
+    }
+    for value in 9223372036854775807L..9223372036854775806L by 1L {
+        return Assert.True(false, "Reversed positive-step bounds are empty")
+    }
+    return Assert.True(true, "Empty ranges skip their bodies")
+}
+
+[Test]
+func `Exclusive range bounds evaluate once in source order`() -> Result<unit, TestFailure> {
+    var order = 0
+    var count = 0
+    for value in ({
+        order = order * 10 + 1
+        -2147483648
+    })..({
+        order = order * 10 + 2
+        -2147483646
+    }) {
+        count += 1
+        _ = Assert.True(count <= 2, "Exclusive range is bounded")?
+        continue
+    }
+    _ = Assert.Equal(12, order)?
+    return Assert.Equal(2, count)
+}
+
+[Test]
+func `Explicit unit range continue advances once and break stops the loop`() -> Result<unit, TestFailure> {
+    var count = 0
+    for value in 0..10 by 1 {
+        if value == 0 {
+            continue
+        }
+        if value == 2 {
+            break
+        }
+        count += 1
+    }
+    return Assert.Equal(1, count)
+}

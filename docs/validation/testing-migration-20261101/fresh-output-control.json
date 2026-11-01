@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "exitCode": 1,
+  "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/scripts/validate-native-range-iteration.py\", line 47, in <module>\n    main()\n    ~~~~^^\n  File \"/Users/robert/Projects/neoclr/scripts/validate-native-range-iteration.py\", line 21, in main\n    raise FileExistsError('Validation requires a fresh output directory: ' + str(output))\nFileExistsError: Validation requires a fresh output directory: /Users/robert/Projects/neoclr/target/range-testing-migration-20261101\n",
+  "existingEvidenceUnchanged": true,
+  "wrapperSha256": "a657b3247c6ef0c1f1d04b6fcb945428e8f7fcf0fe677403bb29a017d9f77459"
+}

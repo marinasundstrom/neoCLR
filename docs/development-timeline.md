@@ -1,5 +1,20 @@
 # Development conversation record
 
+## 2026-11-01 — Start the deferred behavior-fixture migration
+
+- **Author direction:** Continue after release publication; the earlier instruction
+  was to migrate applicable Python-driven behavior fixtures to `NeoClr.Testing`
+  after release.
+- **Assistant selection:** Start with the signed-range consumer, whose host wrapper
+  checked one success line and whose Raven body used numeric failure exits. Split
+  its behavior into 14 descriptive discovered tests; preserve loop guards and the
+  interpreter/JIT/AOT matrix. Keep host orchestration and bundle integrity in Python.
+- **Scope:** This is the first bounded migration, not completion of the fixture
+  inventory. Compiler/process-failure and wire-protocol checks need separate
+  applicability review. [Evidence](validation/testing-migration-20261101/README.md)
+  records qualification and follow-up candidates; historical results stay intact.
+
+
 ## 2026-10-31 — Independent HTTP message roles and lazy views
 
 - **Author:** Directed separate client/server representations and header contracts,

@@ -49,6 +49,7 @@
   "numeric-formatting": "runtime/System.Runtime/test/NumericFormattingTests/NumericFormattingTests.rvnproj",
   "path-values": "runtime/System.Runtime/test/PathValuesTests/PathValuesTests.rvnproj",
   "primitive-parsing": "runtime/System.Runtime/test/PrimitiveParsingTests/PrimitiveParsingTests.rvnproj",
+  "range-iteration": "runtime/System.Runtime/test/RangeIterationTests/RangeIterationTests.rvnproj",
   "record-allocations": "runtime/System.Runtime/test/RecordAllocationTests/RecordAllocationTests.rvnproj",
   "record-formatting": "runtime/System.Runtime/test/RecordFormattingTests/RecordFormattingTests.rvnproj",
   "runner-contract": "runtime/System.Runtime/test/RuntimeRunnerContractTests/RuntimeRunnerContractTests.rvnproj",
