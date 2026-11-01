@@ -1,0 +1,81 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Concurrency.*
+import System.Optional.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import System.Result.*
+import NeoClr.Testing.*
+
+async func Pause() -> Task<()> {
+    let done = Promise<()>()
+    // Deliberate timer callback adapter: signal completion to the awaiting test.
+    let timer = Timer(() => { done.Complete(()) })
+    timer.Start(Duration.FromTicks(10000L))
+    await done.Task
+    timer.Dispose()
+}
+
+[Test]
+async func `reset countdown and deferred zero`() -> Task<Result<unit, TestFailure>> {
+    let source = CancellationTokenSource()
+    let done = Promise<()>()
+    let registration = source.Token.Register(() => { done.Complete(()) })
+    source.CancelAfter(Duration.FromTicks(21474836470000L))
+    source.CancelAfter(Duration.FromTicks(0L))
+    _ = Assert.True(!source.IsCancellationRequested, "Zero countdown is deferred until dispatch")?
+    await done.Task
+    _ = Assert.True(source.IsCancellationRequested, "Reset countdown cancels the source")?
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.CancelAfter(Optional<Duration>.None())
+    _ = Assert.True(source.IsCancellationRequested, "CancelAfter cannot undo cancellation")?
+    registration.Dispose()
+    source.Dispose()
+    return Ok(())
+}
+
+[Test]
+async func `disable and reenable countdown`() -> Task<Result<unit, TestFailure>> {
+    let source = CancellationTokenSource()
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.CancelAfter(Optional<Duration>.None())
+    await Pause()
+    _ = Assert.True(!source.IsCancellationRequested, "Disabled countdown does not cancel")?
+    source.CancelAfter(Optional<Duration>.Some(Duration.FromTicks(0L)))
+    await Pause()
+    _ = Assert.True(source.IsCancellationRequested, "Reenabled countdown cancels")?
+    source.Dispose()
+    return Ok(())
+}
+
+[Test]
+async func `disposal suppresses timed cancellation`() -> Task<Result<unit, TestFailure>> {
+    let source = CancellationTokenSource()
+    let token = source.Token
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.Dispose()
+    source.Dispose()
+    await Pause()
+    _ = Assert.True(!token.IsCancellationRequested, "Disposal suppresses the queued countdown")?
+    return Ok(())
+}
+
+class Counter {
+    var Count = 0
+    func Tick() { Count += 1 }
+}
+
+[Test]
+async func `manual cancellation removes countdown`() -> Task<Result<unit, TestFailure>> {
+    let source = CancellationTokenSource()
+    let counter = Counter()
+    let registration = source.Token.Register(counter.Tick)
+    source.CancelAfter(Duration.FromTicks(0L))
+    source.Cancel()
+    await Pause()
+    _ = Assert.True(counter.Count == 1 && source.IsCancellationRequested, "Manual cancellation delivers exactly one notification")?
+    registration.Dispose()
+    source.Dispose()
+    return Ok(())
+}

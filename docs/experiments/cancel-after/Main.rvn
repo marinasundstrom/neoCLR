@@ -1,85 +1,39 @@
-import System.*
-import System.Concurrency.*
-import System.Optional.*
-import System.Concurrency.Tasks.*
-import System.Time.*
+module NeoClr.RuntimeTests
 
-func Check(condition: bool) {
-    if !condition {
-        Panic("CancelAfter check failed")
+import System.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Store the completed result in a reference owner; the native compiler does not
+// support directly capturing this Result value in a closure.
+class CompletedCancelAfterTest {
+    private val outcome: Result<unit, TestFailure>
+
+    init(outcome: Result<unit, TestFailure>) {
+        self.outcome = outcome
+    }
+
+    func Invoke() -> Result<unit, TestFailure> {
+        return match outcome {
+            Ok(_) => Ok(())
+            Failure(let failure) => Failure(failure)
+        }
     }
 }
 
-async func Pause() -> Task<()> {
-    let done = Promise<()>()
-    let timer = Timer(() => { done.Complete(()) })
-    timer.Start(Duration.FromTicks(10000L))
-    await done.Task
-    timer.Dispose()
-}
-
-async func Reset() -> Task<()> {
-    let source = CancellationTokenSource()
-    let done = Promise<()>()
-    let registration = source.Token.Register(() => { done.Complete(()) })
-    source.CancelAfter(Duration.FromTicks(21474836470000L))
-    source.CancelAfter(Duration.FromTicks(0L))
-    Check(!source.IsCancellationRequested)
-    await done.Task
-    Check(source.IsCancellationRequested)
-    source.CancelAfter(Duration.FromTicks(0L))
-    source.CancelAfter(Optional<Duration>.None())
-    Check(source.IsCancellationRequested)
-    registration.Dispose()
-    source.Dispose()
-    Console.WriteLine("PASS reset countdown and deferred zero")
-}
-
-async func Disable() -> Task<()> {
-    let source = CancellationTokenSource()
-    source.CancelAfter(Duration.FromTicks(0L))
-    source.CancelAfter(Optional<Duration>.None())
-    await Pause()
-    Check(!source.IsCancellationRequested)
-    source.CancelAfter(Optional<Duration>.Some(Duration.FromTicks(0L)))
-    await Pause()
-    Check(source.IsCancellationRequested)
-    source.Dispose()
-    Console.WriteLine("PASS disable and reenable countdown")
-}
-
-async func DisposePending() -> Task<()> {
-    let source = CancellationTokenSource()
-    let token = source.Token
-    source.CancelAfter(Duration.FromTicks(0L))
-    source.Dispose()
-    source.Dispose()
-    await Pause()
-    Check(!token.IsCancellationRequested)
-    Console.WriteLine("PASS disposal suppresses timed cancellation")
-}
-
-class Counter {
-    var Count = 0
-    func Tick() { Count += 1 }
-}
-
-async func CancelEarly() -> Task<()> {
-    let source = CancellationTokenSource()
-    let counter = Counter()
-    let registration = source.Token.Register(counter.Tick)
-    source.CancelAfter(Duration.FromTicks(0L))
-    source.Cancel()
-    await Pause()
-    Check(counter.Count == 1 && source.IsCancellationRequested)
-    registration.Dispose()
-    source.Dispose()
-    Console.WriteLine("PASS manual cancellation removes countdown")
-}
-
-async func Main() -> Task<()> {
-    await Reset()
-    await Disable()
-    await DisposePending()
-    await CancelEarly()
+async func Main() -> Task<int> {
+    // Async discovery is unavailable; preserve the four sequential lifecycle awaits.
+    let suite = TestSuite()
+    let reset = CompletedCancelAfterTest(await `reset countdown and deferred zero`())
+    suite.Add("cancel-after-reset", "reset countdown and deferred zero", reset.Invoke)
+    let disable = CompletedCancelAfterTest(await `disable and reenable countdown`())
+    suite.Add("cancel-after-disable", "disable and reenable countdown", disable.Invoke)
+    let disposePending = CompletedCancelAfterTest(await `disposal suppresses timed cancellation`())
+    suite.Add("cancel-after-disposePending", "disposal suppresses timed cancellation", disposePending.Invoke)
+    let cancelEarly = CompletedCancelAfterTest(await `manual cancellation removes countdown`())
+    suite.Add("cancel-after-cancelEarly", "manual cancellation removes countdown", cancelEarly.Invoke)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
 }

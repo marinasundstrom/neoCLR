@@ -76,6 +76,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native/JIT allocation counters remain unqualified. Retain the older-bundle
   512-allocation failure and a wrong-expectation control showing one named failure,
   two passes and exit one. No production or allocation-contract change is made.
+  Migrate four CancelAfter behavior cases from generic Panic checks and handwritten
+  PASS lines to named NeoClr.Testing assertions and completed-result reporting.
+  Preserve countdown replacement/disable, deferred zero, disposal and exactly-once
+  manual cancellation checks. Keep five invalid-operation probes in subprocesses;
+  require the exact framework transcript and empty stderr for behavior runs. Select
+  interpreter execution explicitly in the timer validator instead of relying on the
+  runtime's former default. Four cases and five guards pass in interpreter/AOT;
+  an isolated wrong-count control reports one named failure and exit one. No JIT
+  coverage, runtime or cancellation API change is introduced.
 
 ### 2026-10-31
 

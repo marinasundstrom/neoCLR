@@ -487,3 +487,62 @@ two passes and exit one, with empty stderr. The repository fixture is not mutate
 the repository root with a fresh output directory; commands and source hashes are
 retained. Production APIs, Python orchestration, measurement contracts and website
 content are unchanged; no website build is needed.
+
+
+## CancelAfter
+
+The [CancelAfter fixture](../../experiments/cancel-after/README.md) replaces its
+local Check/Panic helper and handwritten PASS lines with four descriptive backtick
+`[Test]` functions returning `Task<Result<unit, TestFailure>>`. Assertions now name
+which behavior failed. Main explicitly awaits the cases in their original order,
+retains completed results in reference adapters, runs TestSuite, prints the actual
+ConsoleReporter summary and returns report.ExitCode. Recoverable assertion failures
+permit later independent cases to run; terminal runtime failures remain terminal.
+Automatic async discovery is not added.
+
+The cases retain countdown reset from maximum duration to zero, deferred dispatch,
+cancellation remaining sticky, disabling and reenabling, disposal (including repeated
+disposal) suppressing pending cancellation, and manual cancellation notifying once.
+Timer-backed Pause, callback registrations, durations and disposal order are preserved.
+Callbacks have an intentional timer/cancellation observation role. There is no new
+.NET divergence; the existing [API comparison](../../http-client-design.md#shared-native-deadline-checkpoint--2026-09-24)
+and [design](../../design/http-client-lifetime.md) apply unchanged.
+
+Faults.rvn and its project remain unchanged. Python continues to run negative and
+excessive duration, cancelled-negative, disposed scheduling and disposed disabling
+as separate terminal-failure processes. For this migrated suite it now checks the
+exact four-test transcript and empty stderr, rather than counting PASS substrings,
+and records framework, validator, runtime and codegen hashes alongside fixture and
+bundle inputs. The shared timer wrapper now selects `--execution interpreter`
+explicitly: [the first run](cancel-after-initial-selector-failure.json.gz) exposed
+its stale reliance on the former execution default, rejecting instruction limits
+in JIT before guest code ran. Other timer-suite assertions are unchanged.
+
+[The final report](cancel-after-report.json.gz) and [log](cancel-after.log.gz) pass
+four behavior tests in each of interpreter and native AOT, plus five fault probes
+in each mode (eight behavior executions and ten expected-failure executions) on
+macOS ARM64. This preserves the validator's existing two-mode scope; JIT coverage
+is not claimed. The matching `target/http-header-noop/inputs/bundle` is identified
+by hashes, not claimed as a fresh compiler build or release qualification. Process
+and instruction limits are unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-timers.py --suite cancel-after \
+  --bundle target/http-header-noop/inputs/bundle \
+  --runtime target/http-header-noop/inputs/bundle/bin/neoclr \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/cancel-after-testing-migration-20261101-explicit
+```
+
+[An isolated negative control](cancel-after-negative-control.json.gz) expects two
+manual-cancellation notifications instead of one in a separate Tests.rvn copy.
+Interpreter reports the named exactly-once assertion failure, three passes, one
+failure and exit code one with empty stderr. The repository fixture is not mutated.
+[Reproduction script](cancel-after-negative-control.py.gz) retains commands and
+source hashes and runs from the repository root with a fresh output directory.
+No production API or website content changes; no website build is needed.
+
+After validation, one trailing blank line was removed from CancelAfter Tests.rvn
+to satisfy the staged whitespace check; the reports retain the tested source hash.
+No executable text changed.

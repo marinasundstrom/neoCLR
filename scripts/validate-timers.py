@@ -27,6 +27,12 @@ def main():
                   bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest(),
                   sources={p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                            for p in fixture.iterdir() if p.suffix in ('.rvn', '.rvnproj')})
+    if args.suite == 'cancel-after':
+        report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
+        report['runtimeSha256'] = hashlib.sha256(args.runtime.resolve().read_bytes()).hexdigest()
+        report['aotSha256'] = hashlib.sha256(args.aot.resolve().read_bytes()).hexdigest()
+        report['validatorSha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     try:
         for project in ('Timers', 'Faults'):
             build = out / project
@@ -40,7 +46,7 @@ def main():
             if result.returncode:
                 raise RuntimeError('Runtime fixture build failed; see retained logs')
             lib = bundle / 'lib'
-            interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--system', str(lib / 'System.runtime.neox'),
+            interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--execution', 'interpreter', '--system', str(lib / 'System.runtime.neox'),
                            '--object-root', str(lib / 'System.Runtime.dll'), '--instructions', '100000000']
             for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
                 interpreter += ['--module', str(lib / (name + '.dll'))]
@@ -67,6 +73,13 @@ def main():
                     report['cases'].append(record)
                     valid = (result.returncode != 0 and message in result.stderr and 'ERROR' not in result.stdout) if message else (
                         result.returncode == 0 and result.stdout.count('PASS ') == expected and 'ERROR' not in result.stdout)
+                    if args.suite == 'cancel-after' and message is None:
+                        transcript = ('PASS reset countdown and deferred zero\n'
+                                      'PASS disable and reenable countdown\n'
+                                      'PASS disposal suppresses timed cancellation\n'
+                                      'PASS manual cancellation removes countdown\n'
+                                      'Tests: 4, passed: 4, failed: 0, skipped: 0\n')
+                        valid = result.returncode == 0 and result.stdout == transcript and not result.stderr
                     if not valid:
                         raise RuntimeError(f'{case} {mode} failed: {record}')
             if args.suite == 'http-timeout' and project == 'Timers':
