@@ -16444,3 +16444,31 @@ carrier or a native runtime encoding. MediaType/GetContentType remain native-onl
 in that legacy facade and are explicitly listed in api-docs/exclusions.json; the
 native reference contains those members. The native compiler/docs reader are the
 replacement for this temporary facade, as described in api-docs/README.md.
+
+## Raven constructor delegation and safe reference casts (2026-11-01)
+
+Raven's compiler port exposed missing `init(...) : self(...)` support. The compiler
+now resolves same-type overloads, rejects cycles and instance use in initializer
+arguments, and runs instance initialization only in the terminal constructor.
+Both .NET and native emission call the chosen constructor on the existing receiver.
+The native metadata builder now accepts same-type calls, including exact open
+generic owners and value-type receivers, and retains flow verification of exactly
+one constructor-chain call. Unrelated owners and repeated initialization remain
+invalid. The interpreter/verifier already supported same-type constructor chaining;
+no Rust runtime change is required. This is a metadata-authoring gap correction,
+not a new permanent difference from .NET semantics or a temporary CLI encoding.
+
+The same port found nullable-reference `as` rejection and a missing native planning
+case in Raven. Shared binding now compares the underlying reference types. The
+native planner performs a guarded reference conversion, returning null for null or
+incompatible operands and evaluating the operand once. Runtime Contract
+configuration is unchanged. The CLI backend retains its ordinary safe type test.
+
+Validation commands in the metadata project use `--constructor-delegation`,
+`--constructed-class-bases` and `--generic-class-bases`. The Raven
+`NeoClrMetadataProbe --native-source-core` record-copy artifact additionally
+covers class/struct delegation, initializer side effects, safe casts and record
+copying; it returns 42 on the existing local neoCLR interpreter. Native JIT/AOT
+and a self-hosted Raven compiler are not claimed. Raven integration changes live
+on `codex/raven-compiler-port`; this metadata correction is isolated on
+`codex/raven-constructor-delegation` pending integration.
