@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT / 'runtime/System.Runtime/test/FileSystemWatcherTests/FileSystemWatcherTests.rvnproj'
 
 
-def execute(command, root, env):
+def execute(command, root, env, mode):
     root.mkdir(parents=True)
     (root / 'nested').mkdir()
     process = subprocess.Popen([*command, str(root)], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -57,9 +57,19 @@ def execute(command, root, env):
         code = process.wait(timeout=5)
         error_reader.join(timeout=5)
         output = ''.join(lines)
-        if code != 0 or output.count('PASS ') != 3 or phases != ['create', 'replace', 'stopped', 'restart', 'disposed']:
+        transcript = ''.join(line for line in lines if not line.startswith(('READY ', 'OBS ')))
+        expected = (
+            'PASS Watchers start disabled and disposal permanently closes them\n'
+            'PASS Watcher setup preserves invalid and missing directory errors\n'
+            'PASS Physical notifications filter descendants and respect stop restart and disposal\n'
+            'Tests: 3, passed: 3, failed: 0, skipped: 0\n'
+        )
+        stderr = ''.join(errors)
+        warning = 'warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n'
+        diagnostic = warning if mode == 'jit' and stderr == warning else ''
+        if code != 0 or transcript != expected or stderr != diagnostic or phases != ['create', 'replace', 'stopped', 'restart', 'disposed']:
             raise RuntimeError(f'Watcher consumer failed ({code}): {output}\n{"".join(errors)}')
-        return dict(exitCode=code, stdout=output, stderr=''.join(errors), phases=phases)
+        return dict(exitCode=code, stdout=output, stderr=stderr, compilerDiagnostic=diagnostic, phases=phases)
     finally:
         if process.poll() is None:
             process.kill()
@@ -101,6 +111,14 @@ def main():
                            for p in [*PROJECT.parent.rglob('*.rvn'), PROJECT,
                                      ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn',
                                      ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemNotification.rvn']})
+    report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
+    report['validatorSha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    report['runtimeSha256'] = hashlib.sha256(args.runtime.resolve().read_bytes()).hexdigest()
+    report['aotSha256'] = hashlib.sha256(args.aot.resolve().read_bytes()).hexdigest()
+    report['bundleManifestSha256'] = hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest()
+    jit_host = bundle / 'bin' / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')
+    report['jitHostSha256'] = hashlib.sha256(jit_host.read_bytes()).hexdigest()
     try:
         build = out / 'native'
         result = subprocess.run([sys.executable, str(ROOT / 'scripts/build-native-project.py'),
@@ -126,14 +144,19 @@ def main():
         if owned.returncode:
             raise RuntimeError('Native watcher ownership/teardown failed')
         native = [str(build / ('app.exe' if os.name == 'nt' else 'app'))]
-        report['cases']['native'] = execute(native, out / 'native-files', env)
+        report['cases']['native'] = execute(native, out / 'native-files', env, 'native')
         lib = bundle / 'lib'
         interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--execution', 'interpreter', '--system', str(lib / 'System.runtime.neox'),
                        '--object-root', str(lib / 'System.Runtime.dll'), '--instructions', '100000000']
         for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
             interpreter += ['--module', str(lib / (name + '.dll'))]
-        report['cases']['interpreter'] = execute([*interpreter, '--'], out / 'interpreter-files', env)
-        report['cases']['jit'] = execute([str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--'], out / 'jit-files', env)
+        report['cases']['interpreter'] = execute([*interpreter, '--'], out / 'interpreter-files', env, 'interpreter')
+        jit = interpreter[:]
+        jit[jit.index('--execution') + 1] = 'jit'
+        limit = jit.index('--instructions')
+        del jit[limit:limit + 2]
+        jit += ['--jit-host', str(jit_host), '--jit-compiler', str(args.aot.resolve()), '--']
+        report['cases']['jit'] = execute(jit, out / 'jit-files', env, 'jit')
         report['passed'] = True
     finally:
         (out / 'results.json').write_text(json.dumps(report, indent=2) + '\n')

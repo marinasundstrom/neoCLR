@@ -777,3 +777,58 @@ independently of wire correctness. The repository fixture is not mutated.
 [Reproduction script](media-types-negative-control.py.gz) retains commands and source
 hashes; run from the repository root with a fresh output directory. No website
 content changes or website build is needed.
+
+
+## Filesystem watcher
+
+The [filesystem-watcher fixture](../../../runtime/System.Runtime/test/FileSystemWatcherTests/README.md)
+already used three named NeoClr.Testing functions and assertions. This slice removes
+its handwritten Panic/PASS reporter and moves Main into its own file. Main retains
+the same order, explicitly awaits the physical lifecycle and registers completed
+Results through reference adapters with TestSuite. ConsoleReporter prints actual
+outcomes and Main returns report.ExitCode. Recoverable assertion failures allow
+remaining independent cases to run; terminal faults remain terminal. Automatic
+async/parameterized discovery remains unsupported.
+
+The three assertion bodies are unchanged: disabled defaults and permanent disposal,
+invalid/missing directory errors, and physical notification filtering across create,
+atomic replacement, stop, restart and disposal. Subscription removal, descendant
+paths, callback payloads, two-second settling and existing RescanRequired acceptance
+remain intact. This adds no OS rename guarantee, provider semantics or new .NET
+divergence; the existing [watcher design](../../file-system-watcher.md) applies.
+
+Python retains the READY-triggered file writes, OBS diagnostics, isolated directories
+and unchanged native invocation-ownership/teardown harness. It now compares the
+exact framework transcript after excluding READY/OBS protocol lines and still
+requires the original phase list. Guest stderr must be empty; only the exact
+existing DAM2004 JIT compiler warning is allowed and recorded separately. JIT now
+uses the explicit matching module list, helper and compiler, instead of relying on
+ambient defaults. The instruction/process budgets and three-mode scope are unchanged.
+
+[The report](filewatch-report.json.gz) and [transcript](filewatch.log.gz) pass three
+cases in interpreter, JIT and AOT on macOS ARM64 (nine framework executions), plus
+the native ownership/teardown harness. Both existing validator harness-command unit
+tests pass via `python3 -m unittest discover -s scripts -p test_filewatch_validator.py`.
+The matching `target/http-header-noop/inputs/bundle` and selected binaries are
+fingerprinted. This does not claim a fresh compiler build, Windows run or expanded
+provider qualification; historical watcher evidence remains unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-filewatch.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --runtime target/http-header-noop/inputs/bundle/bin/neoclr \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/filewatch-testing-migration-20261101
+```
+
+[The isolated negative control](filewatch-negative-control.json.gz) requires the
+initially disabled watcher to be enabled in a copied Tests.rvn. Interpreter reports
+`Starts disabled` as one named failure, then passes setup errors and the complete
+physical lifecycle, yielding two passes, one failure and exit one with empty stderr.
+[The reproduction script](filewatch-negative-control.py.gz) reuses the real filesystem
+driver in an isolated in-memory copy, changing only its expected failure transcript
+and exit status. The repository fixture and validator are not mutated; all five
+READY-triggered write phases still execute and are checked. Run from the repository
+root with a fresh output directory. No production API or website content changes;
+no website build is needed.

@@ -117,6 +117,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and exit one while the peer still validates response bytes. Exact framework
   transcripts and input fingerprints replace permissive PASS-substring checks;
   public contracts, parser behavior and historical reports are unchanged.
+  Complete filesystem-watcher framework reporting with three named TestSuite
+  outcomes, retaining the existing assertion bodies, READY/OBS protocol, physical
+  writes and native ownership harness. Check the exact framework summary separately
+  from protocol lines; select matching JIT modules/helper/codegen explicitly and
+  separate only the documented compiler warning from guest stderr. All three cases
+  pass in interpreter/JIT/AOT and the ownership harness passes. A wrong-defaults
+  control reports one failure and two passes while completing every physical phase;
+  provider behavior and platform qualifications are unchanged.
 
 ### 2026-10-31
 
