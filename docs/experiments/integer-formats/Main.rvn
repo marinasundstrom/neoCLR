@@ -1,43 +1,73 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Globalization.*
+import System.Result.*
+import NeoClr.Testing.*
 
-func Check(value: bool, message: string) {
-    if !value {
-        Panic(message)
-    }
-}
-
-func Main() {
+[Test]
+func `Integer formats honor precision and culture separators`() -> Result<unit, TestFailure> {
     let invariant = Culture.Invariant
     let swedish = Culture.SwedishSweden
     let value = -12345
-    Check(value.ToString("D8", invariant) == "-00012345", "Decimal padding")
-    Check(value.ToString("d0", invariant) == "-12345", "Lowercase decimal")
-    Check(value.ToString("", invariant) == "-12345", "Default")
-    Check(value.ToString("G0", invariant) == "-12345", "General zero precision")
-    Check(value.ToString("F", invariant) == "-12345.00", "Default fixed precision")
-    Check(value.ToString("f3", swedish) == "-12345,000", "Swedish fixed")
-    Check(value.ToString("N0", invariant) == "-12,345", "Grouped integer")
-    Check(value.ToString("n", swedish) == "-12 345,00", "Swedish NBSP grouping")
-    Check(value.ToString("N2", Culture.HebrewIsrael) == "-12,345.00", "Israeli number")
-    Check(value.ToString("N2", Culture.EnglishUnitedKingdom) == "-12,345.00", "UK number")
-    Check(value.ToString("N2", Culture.EnglishUnitedStates) == "-12,345.00", "US number")
+    _ = Assert.True(value.ToString("D8", invariant) == "-00012345", "Decimal padding")?
+    _ = Assert.True(value.ToString("d0", invariant) == "-12345", "Lowercase decimal")?
+    _ = Assert.True(value.ToString("", invariant) == "-12345", "Default")?
+    _ = Assert.True(value.ToString("G0", invariant) == "-12345", "General zero precision")?
+    _ = Assert.True(value.ToString("F", invariant) == "-12345.00", "Default fixed precision")?
+    _ = Assert.True(value.ToString("f3", swedish) == "-12345,000", "Swedish fixed")?
+    _ = Assert.True(value.ToString("N0", invariant) == "-12,345", "Grouped integer")?
+    _ = Assert.True(value.ToString("n", swedish) == "-12 345,00", "Swedish NBSP grouping")?
+    _ = Assert.True(value.ToString("N2", Culture.HebrewIsrael) == "-12,345.00", "Israeli number")?
+    _ = Assert.True(value.ToString("N2", Culture.EnglishUnitedKingdom) == "-12,345.00", "UK number")?
+    _ = Assert.True(value.ToString("N2", Culture.EnglishUnitedStates) == "-12,345.00", "US number")?
+    return Ok(())
+}
+
+[Test]
+func `Zero formatting supports precision boundaries`() -> Result<unit, TestFailure> {
+    let invariant = Culture.Invariant
     let zero = 0
-    Check(zero.ToString("D4", invariant) == "0000", "Zero padding")
-    Check(zero.ToString("N0", invariant) == "0", "Zero grouping")
-    Check(zero.ToString("F0", invariant) == "0", "Zero fractions")
-    Check(zero.ToString("D99", invariant).Length == 99, "Maximum decimal precision")
-    Check(zero.ToString("F99", invariant).Length == 101, "Maximum fixed precision")
+    _ = Assert.True(zero.ToString("D4", invariant) == "0000", "Zero padding")?
+    _ = Assert.True(zero.ToString("N0", invariant) == "0", "Zero grouping")?
+    _ = Assert.True(zero.ToString("F0", invariant) == "0", "Zero fractions")?
+    _ = Assert.True(zero.ToString("D99", invariant).Length == 99, "Maximum decimal precision")?
+    _ = Assert.True(zero.ToString("F99", invariant).Length == 101, "Maximum fixed precision")?
+    return Ok(())
+}
+
+[Test]
+func `Signed integer extremes format without overflow`() -> Result<unit, TestFailure> {
+    let invariant = Culture.Invariant
     let minimum = -2147483648
-    Check(minimum.ToString("N0", invariant) == "-2,147,483,648", "Int32 minimum")
-    Check(Int64.MinValue.ToString("N0", invariant) == "-9,223,372,036,854,775,808", "Int64 minimum")
-    Check(Int64.MaxValue.ToString("D", invariant) == "9223372036854775807", "Int64 maximum")
+    _ = Assert.True(minimum.ToString("N0", invariant) == "-2,147,483,648", "Int32 minimum")?
+    _ = Assert.True(Int64.MinValue.ToString("N0", invariant) == "-9,223,372,036,854,775,808", "Int64 minimum")?
+    _ = Assert.True(Int64.MaxValue.ToString("D", invariant) == "9223372036854775807", "Int64 maximum")?
+    return Ok(())
+}
+
+[Test]
+func `Boxed and composite integer formatting survives collection`() -> Result<unit, TestFailure> {
+    let invariant = Culture.Invariant
+    let swedish = Culture.SwedishSweden
+    let value = -12345
     let formattable: Formattable = value
-    Check(formattable.ToString("N1", swedish) == "-12 345,0", "Boxed interface")
-    Check(String.Format(swedish, "{0:N2}", value) == "-12 345,00", "Composite Int32")
-    Check(String.Format(invariant, "{0:D}", Int64.MinValue) == "-9223372036854775808", "Composite Int64")
-    Check(value.ToString("D") == "-12345", "Current culture overload")
+    _ = Assert.True(formattable.ToString("N1", swedish) == "-12 345,0", "Boxed interface")?
+    _ = Assert.True(String.Format(swedish, "{0:N2}", value) == "-12 345,00", "Composite Int32")?
+    _ = Assert.True(String.Format(invariant, "{0:D}", Int64.MinValue) == "-9223372036854775808", "Composite Int64")?
+    _ = Assert.True(value.ToString("D") == "-12345", "Current culture overload")?
     System.Runtime.GC.Collect()
-    Check(formattable.ToString("F0", invariant) == "-12345", "Interface after GC")
-    Console.WriteLine("Integer formatting: passed")
+    _ = Assert.True(formattable.ToString("F0", invariant) == "-12345", "Interface after GC")?
+    return Ok(())
+}
+
+func Main() -> int {
+    let suite = TestSuite()
+    suite.Add("integer-formats-1", "Integer formats honor precision and culture separators", `Integer formats honor precision and culture separators`)
+    suite.Add("integer-formats-2", "Zero formatting supports precision boundaries", `Zero formatting supports precision boundaries`)
+    suite.Add("integer-formats-3", "Signed integer extremes format without overflow", `Signed integer extremes format without overflow`)
+    suite.Add("integer-formats-4", "Boxed and composite integer formatting survives collection", `Boxed and composite integer formatting survives collection`)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
 }

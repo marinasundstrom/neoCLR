@@ -1078,3 +1078,57 @@ source hashes; run from the repository root with a fresh output directory.
 The native kernel boundary checks and allocation diagnostic remain unchanged and
 are not rerun: no primitive implementation or measured region changed. Historical
 reports are preserved. Website content requires no change and no build was run.
+
+## Integer-formatting behavior
+
+The [integer-format consumer](../../experiments/integer-formats/README.md#framework-migration--2026-11-01)
+now uses four descriptive NeoClr.Testing cases with explicit TestSuite registration:
+culture/precision formats, zero precision boundaries, signed extremes and
+boxed/composite dispatch across collection. Main writes ConsoleReporter output and
+returns report.ExitCode. No automatic discovery coverage is claimed.
+
+All original assertions remain: default/lowercase D/G/F/N formats, all five cultures,
+Swedish NBSP grouping, precision zero and 99, Int32 minimum and Int64 extremes,
+Formattable and composite formatting, current-culture overload and post-GC use of
+the same boxed owner. Existing
+[.NET comparison](../../experiments/integer-formats/README.md#contract-and-implementation-comparison)
+remains applicable; this test migration changes no API or formatting semantics.
+
+[Report](integer-formats-report.json.gz) and [log](integer-formats.log.gz) pass all
+four tests in interpreter, JIT and native AOT (12 test executions) on macOS ARM64.
+Python requires exact framework output, exit zero and empty stderr, allowing only
+the exact shared DAM2004 compiler warning for JIT. Source/project/framework and
+compiler/runtime/library/application fingerprints accompany the manifest hash.
+The matching existing `target/http-header-noop/inputs/bundle` is reused; process and
+instruction budgets remain unchanged. No Windows, fresh compiler build or release
+qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/integer-formats/IntegerFormats.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/integer-formats-testing-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/integer-formats/check.py \
+  target/http-header-noop/inputs/bundle target/integer-formats-testing-20261101 \
+  --output target/integer-formats-testing-20261101/validation.json
+```
+
+The separate Invalid.rvn/Invalid.rvnproj remain unchanged. Build that project with
+the same console command into `target/integer-formats-fault-testing-20261101`, then
+run check.py against it with `--fault G3`, `--fault D-1`, `--fault Q` or `--fault N100`
+and a distinct output path. All 12 subprocess guards pass: [general](integer-formats-fault-general.json.gz),
+[malformed](integer-formats-fault-malformed.json.gz), [unknown](integer-formats-fault-unknown.json.gz),
+[precision](integer-formats-fault-precision.json.gz), [log](integer-formats-faults.log.gz).
+They retain nonzero exit, empty stdout and the existing unsupported-integer diagnostic
+check; terminal errors are not converted into recoverable framework assertions.
+
+[Negative control](integer-formats-negative-control.json.gz) changes expected F99
+length from 101 to 102 in an isolated source copy. Interpreter reports the named
+maximum-fixed-precision failure, continues the other three cases and exits one
+with empty stderr. [Reproduction script](integer-formats-negative-control.py.gz)
+records commands and source hashes; run from the repository root with a fresh
+output directory. Historical evidence is preserved. Website content requires no
+change and no website build was run.

@@ -159,6 +159,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   one named failure, two passes and exit one. Python now requires exact framework
   output and records input fingerprints. Native boundary checks, allocation probes,
   historical evidence and the platform's LF-default contract remain unchanged.
+  Migrate integer-formatting behavior to four named framework tests, preserving
+  culture separators, precision boundaries, signed extremes and boxed/composite
+  dispatch across collection. All four pass in interpreter/JIT/AOT; an isolated
+  wrong-length control reports one named failure, three passes and exit one.
+  The four invalid-format subprocess probes still pass in all three modes.
+  Require exact framework output and record source/input fingerprints; formatting
+  semantics and historical evidence remain unchanged.
 
 ### 2026-10-31
 

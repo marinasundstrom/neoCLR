@@ -47,3 +47,19 @@ specifiers, malformed/excessive precision and unsupported significant-digit form
 Evidence records interpreter/JIT/AOT execution and binary hashes. Documentation
 mirrors the new methods and interface in the compiler reference and native snapshot.
 No runtime ABI or compiler contract change is intended.
+
+## Framework migration — 2026-11-01
+
+Main.rvn now registers four named NeoClr.Testing cases for culture-aware formats,
+zero/precision boundaries, signed extremes and boxed/composite dispatch across GC.
+All original assertions remain. TestSuite and ConsoleReporter replace generic Panic
+checks and the handwritten success line; Main returns report.ExitCode. Registration
+is explicit rather than automatic discovery.
+
+The Python wrapper requires the exact framework transcript and exit zero, with empty
+stderr except for the exact documented JIT compiler warning. The four tests pass in
+interpreter/JIT/AOT. An isolated wrong-precision-length control reports one failure,
+three passes and exit one. Invalid.rvn remains a terminal-fault subprocess fixture;
+G3, D-1, Q and N100 still fail as expected in all three modes. See
+[current migration evidence](../../validation/testing-migration-20261101/README.md#integer-formatting-behavior).
+The historical reports and development coverage statements above remain unchanged.
