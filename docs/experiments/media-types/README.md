@@ -65,3 +65,25 @@ base library report, preserving the actual source identity of the changed librar
 The [.NET 10.0.0 output](dotnet-comparison.json) records parsing/equality differences;
 its probe is independently runnable. Website source content is updated, but a full
 website build and deployment were not part of this focused slice.
+
+
+## NeoClr.Testing wire-fixture migration — 2026-11-01
+
+Client invalid-content rejection, client response type/length and server quoted
+boundary parsing now use three named NeoClr.Testing cases. The seven invalid inputs
+still run in separate client processes. Main explicitly awaits each selected
+lifecycle and reports its Result through TestSuite and ConsoleReporter, returning
+the report's exit code. The server records callback assertions and exposes them
+after ServeOne settles; setup failures and the conflicting-charset probe remain
+terminal. Automatic async/parameterized discovery is not added.
+
+Python retains independent request/response header and body checks, the server's
+initial port-line protocol, the charset-conflict subprocess and existing budgets.
+Successful guest output must exactly match the named framework result and summary,
+with empty stderr. Interpreter/AOT scope is unchanged; public contract/allocation
+suites and historical reports above remain separate and unchanged.
+
+[Migration evidence](../../validation/testing-migration-20261101/README.md#media-type-wire-fixtures)
+records the matching-bundle run and a boundary-capitalization negative control whose
+wire response still passes the independent peer checks. No production API or parser
+behavior changes are introduced.

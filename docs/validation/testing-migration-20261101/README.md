@@ -28,7 +28,7 @@ the common runner's `report.json` schema. Existing historical evidence is unchan
   Both pass all three modes. The HTTP follow-up below diagnoses its earlier
   interpreter wait-bridge failure and scopes the encoding borrow to a synchronous
   helper; paired original/migrated failure evidence remains available.
-- HTTP custom-method guest assertions now use named framework cases, while their
+- HTTP custom-method and media-type guest assertions now use named framework cases, while their
   independent wire peers remain in Python. Compiler visibility rejection and
   terminal-failure subprocess probes also retain legitimate host orchestration.
   Do not mechanically convert these into in-process assertions.
@@ -723,3 +723,57 @@ without a compiler change. The [first negative receipt](http-method-initial-nega
 correctly failed the guest but rejected its transcript because the control omitted
 quotes around string values. The final control corrects that expected formatting.
 No website content changes or website build is needed.
+
+
+## Media-type wire fixtures
+
+The [media-type wire fixture](../../experiments/media-types/README.md) now reports
+three named NeoClr.Testing cases: invalid content rejected before DNS, client response
+type/length and server quoted-boundary case/value. The invalid-content test still
+runs once per input in a fresh process. Assertions preserve request construction,
+InvalidRequest classification, successful response, parsed problem+json identity,
+two-byte response length and the exact `AbC; 123` boundary. The server handler stores
+its assertion Result and reports it after ServeOne settles, so a request mismatch
+becomes a named failure while the host can finish its independent response checks.
+
+Main explicitly awaits the selected lifecycle and uses the shared completed-result
+reference adapter with TestSuite, ConsoleReporter and report.ExitCode. Automatic
+async/parameterized discovery is not added. Listener/port setup failures and the
+conflicting-charset probe remain terminal. No production API, media-type parsing
+semantics or .NET divergence is introduced; the existing
+[structured-media-type comparison](../../http-client-design.md#structured-media-types--development-2026-10-23)
+continues to apply.
+
+Python retains all seven invalid inputs (malformed type, duplicate parameter names,
+wildcard type, invalid spacing, unterminated quote, embedded CR/LF and q parameter),
+the charset-conflict process and independent peers. Request checks still cover POST,
+Content-Length, the quoted `profile="A; B"` and `{}` body; response checks retain
+problem+json and exact body bytes. The initial server port line remains host protocol.
+Successful runs now require exact framework transcripts, exit zero and empty stderr.
+Framework/validator/runtime/codegen hashes accompany the fixture/bundle identities.
+Mode selection and process/instruction budgets are unchanged.
+
+[The report](media-types-report.json.gz) and [log](media-types.log.gz) pass all twenty
+process cases on macOS ARM64: seven invalid-content variants plus client/server
+behavior in each of interpreter and native AOT (eighteen framework executions), and
+the charset fault in each mode. Independent wire checks pass in both modes.
+The matching `target/http-header-noop/inputs/bundle` is fingerprinted; no new compiler
+build, JIT/Windows run or release qualification is claimed. Existing contract and
+allocation suites and historical reports remain unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-media-types.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --output target/media-types-testing-migration-20261101
+```
+
+[The isolated negative control](media-types-negative-control.json.gz) changes only
+the server's expected boundary to `abc; 123` in a copied Server.rvn. The peer still
+sends `AbC; 123` and independently validates the response content type/body.
+Interpreter reports `Expected 'abc; 123', actual 'AbC; 123'`, one named failure and
+exit one with empty stderr. This verifies callback-to-framework failure propagation
+independently of wire correctness. The repository fixture is not mutated.
+[Reproduction script](media-types-negative-control.py.gz) retains commands and source
+hashes; run from the repository root with a fresh output directory. No website
+content changes or website build is needed.

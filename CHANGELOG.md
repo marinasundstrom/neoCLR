@@ -109,6 +109,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pass in interpreter/AOT, as do six expected constructor faults. An isolated server
   spelling-expectation control returns a named failure and exit one while the peer
   still validates the echoed wire response. No production HTTP contract changes.
+  Migrate media-type wire-fixture assertions to three named framework cases covering
+  invalid content, client response type/length and server quoted-boundary parsing.
+  Preserve all seven invalid inputs, independent header/body peers and the isolated
+  charset conflict. Eighteen behavior executions and both expected charset faults
+  pass in interpreter/AOT. A boundary-case negative control produces a named failure
+  and exit one while the peer still validates response bytes. Exact framework
+  transcripts and input fingerprints replace permissive PASS-substring checks;
+  public contracts, parser behavior and historical reports are unchanged.
 
 ### 2026-10-31
 

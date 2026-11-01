@@ -1,33 +1,54 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
+import NeoClr.Testing.*
 
-async func Main(arguments: string[]) -> Task<()> {
+[Test]
+async func `Invalid media types are rejected before DNS`(value: string) -> Task<Result<unit, TestFailure>> {
+    let client = HttpClient()
+    let content = HttpMemoryContent(default(ReadOnlyMemory<byte>), value)
+    let Ok(request) = HttpClientRequest.Post("http://invalid.invalid/", content) else {
+        return Assert.True(false, "Construct the legacy content request")
+    }
+    let result = await client.Send(request)
+    client.Dispose()
+    return Assert.True(result is Failure(HttpError.InvalidRequest(_)), "Invalid media type must fail before DNS")
+}
+
+[Test]
+async func `Media type client preserves response type and length`(url: string) -> Task<Result<unit, TestFailure>> {
+    let client = HttpClient()
+    let Ok(media) = MediaTypes.Application.Json.WithParameter("profile", "A; B") else {
+        return Assert.True(false, "Construct the quoted profile parameter")
+    }
+    let Ok(request) = HttpClientRequest.Post(url, HttpStringContent("{}", media)) else {
+        return Assert.True(false, "Construct the media type request")
+    }
+    let result = await client.Send(request)
+    client.Dispose()
+    let Ok(response) = result else { return Assert.True(false, "Media type request succeeds") }
+    let Ok(Some(received)) = response.GetContentType() else {
+        return Assert.True(false, "Parse the response content type")
+    }
+    _ = Assert.True(received.Equals(MediaTypes.Application.ProblemJson), "Response has application/problem+json type")?
+    return Assert.True(response.Content.Length == 2, "Response has two body bytes")
+}
+
+async func Main(arguments: string[]) -> Task<int> {
+    // A conflicting charset remains a terminal-failure subprocess probe.
     if arguments[0] == "charset" {
         let Ok(media) = MediaType.Parse("text/plain; charset=iso-8859-1") else { Panic("Parse") }
         _ = HttpStringContent("body", media)
         Panic("Conflicting charset accepted")
     }
-    let client = HttpClient()
     if arguments[0] == "invalid" {
-        let content = HttpMemoryContent(default(ReadOnlyMemory<byte>), arguments[1])
-        let Ok(request) = HttpClientRequest.Post("http://invalid.invalid/", content) else { Panic("Construct legacy") }
-        let invalidResult = await client.Send(request)
-        client.Dispose()
-        let Failure(HttpError.InvalidRequest(_)) = invalidResult else { Panic("Invalid media type must fail before DNS") }
-        Console.WriteLine("PASS invalid media type before DNS")
-        return
+        let invalidOutcome = await `Invalid media types are rejected before DNS`(arguments[1])
+        return ReportMediaType("Invalid media types are rejected before DNS", invalidOutcome)
     }
-    let Ok(media) = MediaTypes.Application.Json.WithParameter("profile", "A; B") else { Panic("Parameter") }
-    let Ok(request) = HttpClientRequest.Post(arguments[0], HttpStringContent("{}", media)) else { Panic("Request") }
-    let result = await client.Send(request)
-    client.Dispose()
-    let Ok(response) = result else { Panic("Send") }
-    let Ok(Some(received)) = response.GetContentType() else { Panic("Response type") }
-    if !received.Equals(MediaTypes.Application.ProblemJson) || response.Content.Length != 2 {
-        Panic("Response mismatch")
-    }
-    Console.WriteLine("PASS media type client")
+    let clientOutcome = await `Media type client preserves response type and length`(arguments[0])
+    return ReportMediaType("Media type client preserves response type and length", clientOutcome)
 }

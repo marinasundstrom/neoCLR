@@ -1,9 +1,12 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Collections.*
 import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
+import NeoClr.Testing.*
 
 func OpenServer() -> HttpServer {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else { Panic("Listen") }
@@ -12,21 +15,46 @@ func OpenServer() -> HttpServer {
     return server
 }
 
-func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
-    let Ok(Some(media)) = request.GetContentType() else { Panic("Request type") }
-    let Some(boundary) = media.GetParameter("boundary") else { Panic("Boundary") }
-    if boundary != "AbC; 123" {
-        Panic("Boundary case or quoting lost")
+class MediaTypeProbe {
+    private var outcome: Result<unit, TestFailure> = Ok(())
+
+    private func Check(request: HttpServerRequest) -> Result<unit, TestFailure> {
+        let Ok(Some(media)) = request.GetContentType() else {
+            return Assert.True(false, "Parse the request content type")
+        }
+        let Some(boundary) = media.GetParameter("boundary") else {
+            return Assert.True(false, "Request contains a boundary parameter")
+        }
+        return Assert.Equal("AbC; 123", boundary)
     }
-    let response = HttpServerResponse(HttpStatusCode.OK, Array<HttpHeader>.Empty, HttpStringContent("{}", MediaTypes.Application.ProblemJson))
-    let outcome: Result<HttpServerResponse, HttpError> = Ok(response)
-    return Task.FromResult(outcome)
+
+    // Retain the handler assertion until the request lifecycle completes.
+    func Respond(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+        outcome = Check(request)
+        let response = HttpServerResponse(HttpStatusCode.OK, Array<HttpHeader>.Empty, HttpStringContent("{}", MediaTypes.Application.ProblemJson))
+        let result: Result<HttpServerResponse, HttpError> = Ok(response)
+        return Task.FromResult(result)
+    }
+
+    func Result() -> Result<unit, TestFailure> {
+        return match outcome {
+            Ok(_) => Ok(())
+            Failure(let failure) => Failure(failure)
+        }
+    }
 }
 
-async func Main() -> Task<()> {
+[Test]
+async func `Media type server preserves quoted boundary case and value`() -> Task<Result<unit, TestFailure>> {
     let server = OpenServer()
-    let result = await server.ServeOne(Respond)
+    let probe = MediaTypeProbe()
+    let result = await server.ServeOne(probe.Respond)
     server.Close()
-    let Ok(_) = result else { Panic("Serve") }
-    Console.WriteLine("PASS media type server")
+    _ = Assert.True(result is Ok(_), "Media type server completes one request")?
+    return probe.Result()
+}
+
+async func Main() -> Task<int> {
+    let result = await `Media type server preserves quoted boundary case and value`()
+    return ReportMediaType("Media type server preserves quoted boundary case and value", result)
 }

@@ -37,7 +37,15 @@ def main():
                   sources={p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in fixture.iterdir()
                            if p.suffix in ('.rvn', '.rvnproj')},
                   bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest())
+    report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
+    report['validatorSha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    report['runtimeSha256'] = hashlib.sha256(args.runtime.resolve().read_bytes()).hexdigest()
+    report['aotSha256'] = hashlib.sha256(args.aot.resolve().read_bytes()).hexdigest()
     commands = {}
+    def passed_test(record, name):
+        expected = 'PASS ' + name + '\nTests: 1, passed: 1, failed: 0, skipped: 0\n'
+        return record['exitCode'] == 0 and record['stdout'] == expected and not record['stderr']
     def run_case(case, mode, command, parameters):
         result = subprocess.run([*command, *(['--'] if mode == 'interpreter' else []), *parameters],
                                 cwd=ROOT, capture_output=True, text=True, timeout=30)
@@ -71,7 +79,7 @@ def main():
                             'text/plain; x="a\r\nb"', 'text/plain; q=0.5'):
                 record = run_case('invalid-before-dns', mode, command, ['invalid', invalid])
                 record['input'] = invalid
-                if record['exitCode'] or 'PASS invalid media type before DNS' not in record['stdout']:
+                if not passed_test(record, 'Invalid media types are rejected before DNS'):
                     raise RuntimeError('Invalid media type guard failed')
             peer = {}
             with socket.socket() as listener:
@@ -104,7 +112,7 @@ def main():
                 record = run_case('media-type-client', mode, command, [url])
                 worker.join(timeout=6)
                 record['peer'] = peer
-                if record['exitCode'] or 'PASS media type client' not in record['stdout'] or not peer.get('validated'):
+                if not passed_test(record, 'Media type client preserves response type and length') or not peer.get('validated') or peer.get('error'):
                     raise RuntimeError('Media type client failed: ' + repr(record))
             process = http_json.start_process(commands['Server'][mode], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
             try:
@@ -120,7 +128,7 @@ def main():
                 record = dict(case='media-type-server', mode=mode, exitCode=process.returncode,
                               stdout=stdout.decode(), stderr=stderr.decode(), responseHex=response.hex())
                 report['cases'].append(record)
-                if process.returncode or b'PASS media type server' not in stdout or b'Content-Type: application/problem+json\r\n' not in response or not response.endswith(b'\r\n\r\n{}'):
+                if not passed_test(record, 'Media type server preserves quoted boundary case and value') or b'Content-Type: application/problem+json\r\n' not in response or not response.endswith(b'\r\n\r\n{}'):
                     raise RuntimeError('Media type server failed: ' + repr(record))
             finally:
                 http_json.stop_process(process)
