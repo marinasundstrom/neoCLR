@@ -32,7 +32,15 @@ def main():
                   sources={p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in fixture.iterdir()
                            if p.suffix in ('.rvn', '.rvnproj')},
                   bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest())
+    report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
+    report['validatorSha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    report['runtimeSha256'] = hashlib.sha256(args.runtime.resolve().read_bytes()).hexdigest()
+    report['aotSha256'] = hashlib.sha256(args.aot.resolve().read_bytes()).hexdigest()
     commands = {}
+    def passed_test(record, name):
+        expected = 'PASS ' + name + '\nTests: 1, passed: 1, failed: 0, skipped: 0\n'
+        return record['exitCode'] == 0 and record['stdout'] == expected and not record['stderr']
     def run_case(case, mode, command, parameters):
         result = subprocess.run([*command, *(['--'] if mode == 'interpreter' else []), *parameters],
                                 cwd=ROOT, capture_output=True, text=True, timeout=30)
@@ -51,7 +59,7 @@ def main():
             if result.returncode:
                 raise RuntimeError(project + ' build failed; see logs')
             lib = bundle / 'lib'
-            interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--system', str(lib / 'System.runtime.neox'),
+            interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--execution', 'interpreter', '--system', str(lib / 'System.runtime.neox'),
                            '--object-root', str(lib / 'System.Runtime.dll'), '--instructions', '100000000']
             for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
                 interpreter += ['--module', str(lib / (name + '.dll'))]
@@ -63,7 +71,7 @@ def main():
                 if not record['exitCode'] or 'Invalid HTTP method' not in record['stderr'] or 'ERROR' in record['stdout']:
                     raise RuntimeError('Invalid constructor did not fault')
             record = run_case('connect-unsupported', mode, command, ['connect'])
-            if record['exitCode'] or 'PASS CONNECT remains unsupported' not in record['stdout']:
+            if not passed_test(record, 'CONNECT remains unsupported'):
                 raise RuntimeError('CONNECT transport guard failed')
             peer = {}
             with socket.socket() as listener:
@@ -96,7 +104,7 @@ def main():
                 record = run_case('custom-client', mode, command, [url])
                 worker.join(timeout=6)
                 record['peer'] = peer
-                if record['exitCode'] or 'PASS custom method client' not in record['stdout'] or not peer.get('validated'):
+                if not passed_test(record, 'Custom HTTP method client preserves response status and length') or not peer.get('validated') or peer.get('error'):
                     raise RuntimeError('Custom client request failed: ' + repr(record))
             process = http_json.start_process(commands['Server'][mode], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
             try:
@@ -112,7 +120,7 @@ def main():
                 record = dict(case='custom-server', mode=mode, exitCode=process.returncode,
                               stdout=stdout.decode(), stderr=stderr.decode(), responseHex=response.hex())
                 report['cases'].append(record)
-                if process.returncode or b'PASS custom method server' not in stdout or b'X-Method: m-SEARCH\r\n' not in response or not response.endswith(b'\r\n\r\nbody'):
+                if not passed_test(record, 'Custom HTTP method server preserves request spelling and length') or b'X-Method: m-SEARCH\r\n' not in response or not response.endswith(b'\r\n\r\nbody'):
                     raise RuntimeError('Custom server response failed: ' + repr(record))
             finally:
                 http_json.stop_process(process)

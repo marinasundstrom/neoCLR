@@ -1,0 +1,32 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+import NeoClr.Testing.*
+
+// Store the completed result in a reference owner; the native compiler does not
+// support directly capturing this Result value in a closure.
+class CompletedHttpMethodTest {
+    private val outcome: Result<unit, TestFailure>
+
+    init(outcome: Result<unit, TestFailure>) {
+        self.outcome = outcome
+    }
+
+    func Invoke() -> Result<unit, TestFailure> {
+        return match outcome {
+            Ok(_) => Ok(())
+            Failure(let failure) => Failure(failure)
+        }
+    }
+}
+
+func ReportMethod(name: string, outcome: Result<unit, TestFailure>) -> int {
+    let completed = CompletedHttpMethodTest(outcome)
+    let suite = TestSuite()
+    suite.Add(name, name, completed.Invoke)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
+}

@@ -6,5 +6,11 @@
     <AssemblyName>HttpMethodClient</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
-  <ItemGroup><Compile Include="Client.rvn" /></ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/Assertions.rvn" />
+    <Compile Include="../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestSuite.rvn" />
+    <Compile Include="../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestAttribute.rvn" />
+    <Compile Include="Reporting.rvn" />
+    <Compile Include="Client.rvn" />
+  </ItemGroup>
 </Project>

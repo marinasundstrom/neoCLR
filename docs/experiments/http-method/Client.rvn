@@ -1,42 +1,46 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
+import NeoClr.Testing.*
 
-func Request(url: string) -> HttpClientRequest {
-    let Ok(request) = HttpClientRequest.Create(HttpMethod("m-SEARCH"), url, HttpStringContent("body")) else {
-        Panic("Custom request construction failed")
-    }
-    return request
-}
-
-func ConnectRequest() -> HttpClientRequest {
+[Test]
+async func `CONNECT remains unsupported`() -> Task<Result<unit, TestFailure>> {
     let Ok(request) = HttpClientRequest.Create(HttpMethod.Connect, "http://example.test/") else {
-        Panic("CONNECT request construction failed")
+        return Assert.True(false, "Construct the CONNECT request")
     }
-    return request
+    let client = HttpClient()
+    let result = await client.Send(request)
+    client.Dispose()
+    return Assert.True(result is Failure(HttpError.Unsupported(_)), "CONNECT must not pretend to tunnel")
 }
 
-async func Main(arguments: string[]) -> Task<()> {
+[Test]
+async func `Custom HTTP method client preserves response status and length`(url: string) -> Task<Result<unit, TestFailure>> {
+    let Ok(request) = HttpClientRequest.Create(HttpMethod("m-SEARCH"), url, HttpStringContent("body")) else {
+        return Assert.True(false, "Construct the custom method request")
+    }
+    let client = HttpClient()
+    let result = await client.Send(request)
+    client.Dispose()
+    let Ok(response) = result else { return Assert.True(false, "Custom method request succeeds") }
+    _ = Assert.Equal(200, (int)response.StatusCode)?
+    return Assert.True(response.Content.Length == 4, "Custom method response has four body bytes")
+}
+
+async func Main(arguments: string[]) -> Task<int> {
+    // Invalid constructors remain terminal-failure subprocess probes.
     if arguments[0] == "invalid" {
         _ = HttpMethod(arguments[1])
         Console.WriteLine("ERROR invalid method constructor returned")
-        return
+        return 0
     }
     if arguments[0] == "connect" {
-        let connectClient = HttpClient()
-        let connectResult = await connectClient.Send(ConnectRequest())
-        connectClient.Dispose()
-        let Failure(HttpError.Unsupported(_)) = connectResult else { Panic("CONNECT must not pretend to tunnel") }
-        Console.WriteLine("PASS CONNECT remains unsupported")
-        return
+        let connectOutcome = await `CONNECT remains unsupported`()
+        return ReportMethod("CONNECT remains unsupported", connectOutcome)
     }
-    let client = HttpClient()
-    let result = await client.Send(Request(arguments[0]))
-    client.Dispose()
-    let Ok(response) = result else { Panic("Custom method request failed") }
-    if (int)response.StatusCode != 200 || response.Content.Length != 4 {
-        Panic("Custom method response mismatch")
-    }
-    Console.WriteLine("PASS custom method client")
+    let customOutcome = await `Custom HTTP method client preserves response status and length`(arguments[0])
+    return ReportMethod("Custom HTTP method client preserves response status and length", customOutcome)
 }

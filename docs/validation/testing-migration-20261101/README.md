@@ -28,9 +28,10 @@ the common runner's `report.json` schema. Existing historical evidence is unchan
   Both pass all three modes. The HTTP follow-up below diagnoses its earlier
   interpreter wait-bridge failure and scopes the encoding borrow to a synchronous
   helper; paired original/migrated failure evidence remains available.
-- HTTP custom-method wire peers, compiler visibility rejection and terminal-failure
-  subprocess probes retain legitimate Python host orchestration. Do not mechanically
-  convert these into in-process assertions.
+- HTTP custom-method guest assertions now use named framework cases, while their
+  independent wire peers remain in Python. Compiler visibility rejection and
+  terminal-failure subprocess probes also retain legitimate host orchestration.
+  Do not mechanically convert these into in-process assertions.
 - Published sample output checks and package/file-integrity checks remain distinct
   from framework behavior tests. This slice does not retire them wholesale.
 
@@ -665,3 +666,60 @@ and exit one with empty stderr. The repository fixture is not mutated.
 [Reproduction script](http-timeout-negative-control.py.gz) records commands and source
 hashes; run from the repository root with a fresh output directory. No website
 content changes or website build is needed.
+
+
+## Custom HTTP methods
+
+The [custom-method fixture](../../experiments/http-method/README.md) moves client,
+CONNECT rejection and server behavior checks into three named NeoClr.Testing cases.
+The client checks request construction, successful response, status and length;
+CONNECT still must report HttpError.Unsupported. The server handler records its
+method-spelling and length assertions in a reference owner, echoes the response,
+and exposes the saved Result after ServeOne completes and the listener closes.
+This lets a handler assertion produce a named failure instead of terminating with
+Panic. Listener/port setup failures remain terminal.
+
+A shared completed-result adapter uses TestSuite, ConsoleReporter and report.ExitCode.
+Main explicitly awaits the selected lifecycle; no automatic async/parameterized
+discovery is claimed. Python still supplies the URL, consumes the server's initial
+port line, and independently validates request spelling `m-SEARCH`, Content-Length
+and body bytes, plus response X-Method and body bytes. Those wire checks are not
+replaced by in-process assertions. The three invalid-constructor strings remain
+terminal-failure subprocess probes. Successful guest runs now require exact named
+framework output and empty stderr. Interpreter selection is explicit, preserving
+its instruction budget under the runtime's JIT default. Native/profile and process
+limits are unchanged.
+
+[The report](http-method-report.json.gz) and [log](http-method.log.gz) pass all three
+behavior cases in interpreter and native AOT, with six expected constructor failures
+and independent client/server wire checks. This is macOS ARM64 qualification using
+the fingerprinted `target/http-header-noop/inputs/bundle`; no fresh compiler build,
+JIT/Windows run or new release qualification is claimed. Existing
+[HTTP method design and .NET comparison](../../http-client-design.md#httpmethod-implementation--development-2026-10-11)
+remain applicable. Historical validation.json and method-value suite evidence are
+unchanged; production HTTP APIs and behavior are unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-http-method.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --runtime target/http-header-noop/inputs/bundle/bin/neoclr \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/http-method-testing-migration-20261101-distinct
+```
+
+[The isolated negative control](http-method-negative-control.json.gz) changes only
+the server handler's expected spelling to `M-SEARCH` in a copied Server.rvn. The
+peer sends `m-SEARCH` and independently validates the echoed X-Method/body. Interpreter
+then reports `Expected 'M-SEARCH', actual 'm-SEARCH'`, one named failure and exit one
+with empty stderr. This proves callback failures survive the adapter even when wire
+checks pass. [Reproduction script](http-method-negative-control.py.gz) records commands
+and source hashes; run from the repository root with a fresh output directory.
+The repository fixture is not mutated.
+
+[Initial compilation](http-method-initial-compile.log.gz) rejected repeated nested
+and outer `result` locals with RAV0174; distinct outcome names compile and qualify
+without a compiler change. The [first negative receipt](http-method-initial-negative.json.gz)
+correctly failed the guest but rejected its transcript because the control omitted
+quotes around string values. The final control corrects that expected formatting.
+No website content changes or website build is needed.

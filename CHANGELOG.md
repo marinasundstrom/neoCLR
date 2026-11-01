@@ -101,6 +101,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   executions retain their expected faults. A wrong-default-timeout control reports
   eight passes, one named failure and exit one. Python now checks exact framework
   output for ordinary/long runs; production and network-peer contracts are unchanged.
+  Migrate custom HTTP-method client, CONNECT rejection and server assertions to
+  three named framework cases. Retain server callback failures until ServeOne
+  settles, then report them through TestSuite. Preserve independent Python wire
+  spelling/header/body checks and invalid-constructor subprocess probes; require
+  exact guest framework output and explicit interpreter selection. All three cases
+  pass in interpreter/AOT, as do six expected constructor faults. An isolated server
+  spelling-expectation control returns a named failure and exit one while the peer
+  still validates the echoed wire response. No production HTTP contract changes.
 
 ### 2026-10-31
 

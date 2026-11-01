@@ -1,29 +1,55 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Collections.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
+import NeoClr.Testing.*
 
 func OpenServer() -> HttpServer {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else { Panic("Listen failed") }
     let Ok(port) = server.GetLocalPort() else { Panic("Port unavailable") }
+    // Host protocol: announce the actual listening port before accepting its peer.
     Console.WriteLine(port)
     return server
 }
 
-func Echo(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
-    if request.Method.Method != "m-SEARCH" || request.Content.Length != 4 {
-        Panic("Custom method request mismatch")
+class MethodProbe {
+    private var outcome: Result<unit, TestFailure> = Ok(())
+
+    private func Check(request: HttpServerRequest) -> Result<unit, TestFailure> {
+        _ = Assert.Equal("m-SEARCH", request.Method.Method)?
+        return Assert.True(request.Content.Length == 4, "Custom method request has four body bytes")
     }
-    let headers = ArrayList<HttpHeader>()
-    headers.Add(HttpHeader("X-Method", request.Method.Method))
-    return Task.FromResult<Result<HttpServerResponse, HttpError>>(System.Result<HttpServerResponse, HttpError>.Ok(HttpServerResponse(200, headers, request.Content)))
+
+    // Deliberate request-handler adapter: retain assertions until ServeOne settles.
+    func Echo(request: HttpServerRequest) -> Task<Result<HttpServerResponse, HttpError>> {
+        outcome = Check(request)
+        let headers = ArrayList<HttpHeader>()
+        headers.Add(HttpHeader("X-Method", request.Method.Method))
+        return Task.FromResult<Result<HttpServerResponse, HttpError>>(System.Result<HttpServerResponse, HttpError>.Ok(HttpServerResponse(200, headers, request.Content)))
+    }
+
+    func Result() -> Result<unit, TestFailure> {
+        return match outcome {
+            Ok(_) => Ok(())
+            Failure(let failure) => Failure(failure)
+        }
+    }
 }
 
-async func Main() -> Task<()> {
+[Test]
+async func `Custom HTTP method server preserves request spelling and length`() -> Task<Result<unit, TestFailure>> {
     let server = OpenServer()
-    let result = await server.ServeOne(Echo)
+    let probe = MethodProbe()
+    let result = await server.ServeOne(probe.Echo)
     server.Close()
-    let Ok(_) = result else { Panic("Custom method server failed") }
-    Console.WriteLine("PASS custom method server")
+    _ = Assert.True(result is Ok(_), "Custom method server completes one request")?
+    return probe.Result()
+}
+
+async func Main() -> Task<int> {
+    let result = await `Custom HTTP method server preserves request spelling and length`()
+    return ReportMethod("Custom HTTP method server preserves request spelling and length", result)
 }
