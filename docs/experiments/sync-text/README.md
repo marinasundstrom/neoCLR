@@ -68,3 +68,21 @@ engines pass against target/sync-text-libraries-v12. See the
 [async delimiter qualification](../text-line-endings/README.md) for matching
 artifacts, the input-inventory cap repair and behavior coverage. The full current
 website check renders 4690 pages with 124 legacy pages retained.
+
+## Framework migration — 2026-11-01
+
+Main.rvn now runs one explicitly registered NeoClr.Testing lifecycle. TestSuite and
+ConsoleReporter replace standalone Panic checks and the handwritten success line;
+Main returns report.ExitCode. The full mixed cursor, delimiter, retry and ownership
+sequence stays together, including all four input chunk sizes and six delimiters.
+Text/grapheme helpers retain String.CompareOrdinal for byte-sensitive assertions.
+Their stale `char` signatures now use `System.Character`.
+
+The lifecycle passes in interpreter/JIT/AOT. An isolated roundtrip expectation using
+a decomposed accent instead of the actual composed accent produces the named Text
+bytes failure and exit one, preserving ordinal checks despite canonical equivalence.
+Python keeps its process/input orchestration and now requires exact framework output
+and successful exit, with empty stderr except for the documented JIT compiler warning.
+See [migration evidence](../../validation/testing-migration-20261101/README.md#synchronous-text-wrapper-behavior).
+No automatic discovery or new async/provider coverage is claimed. Historical evidence
+and production text/stream behavior remain unchanged.

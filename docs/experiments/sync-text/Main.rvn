@@ -1,3 +1,5 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Optional.*
 import System.Result.*
@@ -6,6 +8,7 @@ import System.Text.*
 import System.Collections.*
 import System.Concurrency.*
 import System.Concurrency.Tasks.*
+import NeoClr.Testing.*
 
 class FragmentedInput : SyncInputStream {
     private val text: string
@@ -36,177 +39,168 @@ class FragmentedInput : SyncInputStream {
     func Close() { }
 }
 
-func Check(condition: bool, message: string) {
-    if !condition {
-        Panic(message)
+func Text(result: Result<string, TextReadError>, expected: string) -> Result<unit, TestFailure> {
+    return match result {
+        Ok(let value) => Assert.True(String.CompareOrdinal(value, expected) == 0, "Text bytes")
+        Failure(let error) => Assert.True(false, "Unexpected text error: " + error.ToString())
     }
 }
 
-func Text(result: Result<string, TextReadError>, expected: string) {
-    match result {
-        Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
-        Failure(let error) => Panic("Unexpected text error: " + error.ToString())
+func Character(result: Result<Optional<System.Character>, TextReadError>, expected: string) -> Result<unit, TestFailure> {
+    return match result {
+        Ok(Some(let value)) => Assert.True(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
+        _ => Assert.True(false, "Expected character")
     }
 }
 
-func Character(result: Result<Optional<char>, TextReadError>, expected: string) {
-    match result {
-        Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
-        _ => Panic("Expected character")
-    }
+func End(result: Result<Optional<System.Character>, TextReadError>) -> Result<unit, TestFailure> {
+    return Assert.True(result is Ok(None), "Expected character EOF")
 }
 
-func End(result: Result<Optional<char>, TextReadError>) {
-    match result {
-        Ok(None) => { }
-        _ => Panic("Expected character EOF")
-    }
-}
-
-func Main() {
+[Test]
+func `Synchronous text wrappers preserve cursor delimiters limits and ownership`() -> Result<unit, TestFailure> {
     for chunk in [1, 2, 7, 256] {
         let input = FragmentedInput("é👩‍💻🇸🇪\r\nnext\nlast", chunk)
         let Ok(reader) = SyncStreamReader.Create(input) else {
-            Panic("Unable to create text wrapper")
+            return Assert.True(false, "Unable to create text wrapper")
         }
-        Character(reader.PeekChar(), "é")
+        _ = Character(reader.PeekChar(), "é")?
         let reads = input.Reads
-        Character(reader.PeekChar(), "é")
-        Check(input.Reads == reads, "Repeated peek performed input")
-        Character(reader.ReadChar(), "é")
-        Text(reader.Read(2), "👩‍💻🇸🇪")
-        Character(reader.PeekChar(), "\r\n")
+        _ = Character(reader.PeekChar(), "é")?
+        _ = Assert.True(input.Reads == reads, "Repeated peek performed input")?
+        _ = Character(reader.ReadChar(), "é")?
+        _ = Text(reader.Read(2), "👩‍💻🇸🇪")?
+        _ = Character(reader.PeekChar(), "\r\n")?
         reader.NewLine = "\r\n"
-        match reader.ReadLine(100) {
-            Ok(Some(let line)) => Check(line.IsEmpty, "Peek before empty line")
-            _ => Panic("Expected empty line")
+        let Ok(Some(emptyLine)) = reader.ReadLine(100) else {
+            return Assert.True(false, "Expected empty line")
         }
+        _ = Assert.True(emptyLine.IsEmpty, "Peek before empty line")?
         reader.NewLine = "\n"
-        Character(reader.ReadChar(), "n")
-        match reader.ReadLine(100) {
-            Ok(Some(let line)) => Check(line == "ext", "Mixed character and line cursor")
-            _ => Panic("Expected remaining line")
+        _ = Character(reader.ReadChar(), "n")?
+        let Ok(Some(remainingLine)) = reader.ReadLine(100) else {
+            return Assert.True(false, "Expected remaining line")
         }
-        Text(reader.Read(20), "last")
-        End(reader.PeekChar())
-        End(reader.ReadChar())
-        Text(reader.Read(4), "")
-        Text(reader.ReadToEnd(100), "")
+        _ = Assert.True(remainingLine == "ext", "Mixed character and line cursor")?
+        _ = Text(reader.Read(20), "last")?
+        _ = End(reader.PeekChar())?
+        _ = End(reader.ReadChar())?
+        _ = Text(reader.Read(4), "")?
+        _ = Text(reader.ReadToEnd(100), "")?
         reader.Close()
-        match reader.PeekChar() {
-            Failure(TextReadError.Closed) => { }
-            _ => Panic("Closed peek")
-        }
+        _ = Assert.True(reader.PeekChar() is Failure(TextReadError.Closed), "Closed peek")?
     }
 
     let limitedInput = FragmentedInput("éx", 256)
     let Ok(limited) = SyncStreamReader.Create(limitedInput) else {
-        Panic("Unable to create text wrapper")
+        return Assert.True(false, "Unable to create text wrapper")
     }
-    Text(limited.Read(0, 0), "")
-    Check(limitedInput.Reads == 0, "Zero read consumed input")
-    match limited.Read(-1) {
-        Failure(TextReadError.InvalidRange) => { }
-        _ => Panic("Invalid count")
-    }
-    Check(limitedInput.Reads == 0, "Invalid read consumed input")
-    match limited.Read(1, 1) {
-        Failure(TextReadError.LimitExceeded) => { }
-        _ => Panic("Expected byte limit")
-    }
-    Character(limited.PeekChar(), "é")
-    Text(limited.Read(1, 2), "é")
-    Text(limited.ReadToEnd(2), "x")
+    _ = Text(limited.Read(0, 0), "")?
+    _ = Assert.True(limitedInput.Reads == 0, "Zero read consumed input")?
+    _ = Assert.True(limited.Read(-1) is Failure(TextReadError.InvalidRange), "Invalid count")?
+    _ = Assert.True(limitedInput.Reads == 0, "Invalid read consumed input")?
+    _ = Assert.True(limited.Read(1, 1) is Failure(TextReadError.LimitExceeded), "Expected byte limit")?
+    _ = Character(limited.PeekChar(), "é")?
+    _ = Text(limited.Read(1, 2), "é")?
+    _ = Text(limited.ReadToEnd(2), "x")?
 
     for ending in ["\n", "\r\n", "\r", "END", "abab", "💥"] {
         let input = FragmentedInput("a" + ending + "b" + ending, 1)
         let Ok(lines) = SyncStreamReader.Create(input) else {
-            Panic("Delimiter reader")
+            return Assert.True(false, "Delimiter reader")
         }
         let textReader: SyncTextReader = lines
         textReader.NewLine = ending
-        Check(textReader.NewLine == ending, "Interface newline property")
-        Check(lines.ReadLine(1) is Ok(Some("a")), "First configured line")
-        Check(lines.ReadLine(1) is Ok(Some("b")), "Second configured line")
-        Check(lines.ReadLine(0) is Ok(None), "Delimiter EOF")
+        _ = Assert.True(textReader.NewLine == ending, "Interface newline property")?
+        _ = Assert.True(lines.ReadLine(1) is Ok(Some("a")), "First configured line")?
+        _ = Assert.True(lines.ReadLine(1) is Ok(Some("b")), "Second configured line")?
+        _ = Assert.True(lines.ReadLine(0) is Ok(None), "Delimiter EOF")?
     }
     let exactInput = FragmentedInput("xéyéz", 1)
     let Ok(exact) = SyncStreamReader.Create(exactInput) else {
-        Panic("Exact delimiter reader")
+        return Assert.True(false, "Exact delimiter reader")
     }
     exact.NewLine = "é"
-    Check(exact.ReadLine(4) is Ok(Some("xéy")), "Delimiter must compare UTF-8 ordinally")
-    Check(exact.ReadLine(1) is Ok(Some("z")), "Delimiter tail")
+    _ = Assert.True(exact.ReadLine(4) is Ok(Some("xéy")), "Delimiter must compare UTF-8 ordinally")?
+    _ = Assert.True(exact.ReadLine(1) is Ok(Some("z")), "Delimiter tail")?
 
     let invalidInput = FragmentedInput("aaabtail", 1)
     let Ok(overlap) = SyncStreamReader.Create(invalidInput) else {
-        Panic("Overlap reader")
+        return Assert.True(false, "Overlap reader")
     }
     overlap.NewLine = ""
-    Check(overlap.ReadLine(8) is Failure(TextReadError.InvalidRange), "Empty delimiter")
-    Check(invalidInput.Reads == 0, "Invalid delimiter consumed input")
+    _ = Assert.True(overlap.ReadLine(8) is Failure(TextReadError.InvalidRange), "Empty delimiter")?
+    _ = Assert.True(invalidInput.Reads == 0, "Invalid delimiter consumed input")?
     overlap.NewLine = "aab"
-    Check(overlap.ReadLine(1) is Ok(Some("a")), "Overlapping delimiter prefixes")
+    _ = Assert.True(overlap.ReadLine(1) is Ok(Some("a")), "Overlapping delimiter prefixes")?
     overlap.NewLine = "il"
-    Check(overlap.ReadLine(2) is Ok(Some("ta")), "Changed delimiter")
+    _ = Assert.True(overlap.ReadLine(2) is Ok(Some("ta")), "Changed delimiter")?
 
     let Ok(prefixReader) = SyncStreamReader.Create(FragmentedInput("xEN", 1)) else {
-        Panic("Partial delimiter reader")
+        return Assert.True(false, "Partial delimiter reader")
     }
     prefixReader.NewLine = "END"
-    Check(prefixReader.ReadLine(3) is Ok(Some("xEN")), "Partial delimiter at EOF")
+    _ = Assert.True(prefixReader.ReadLine(3) is Ok(Some("xEN")), "Partial delimiter at EOF")?
     let Ok(lfReader) = SyncStreamReader.Create(FragmentedInput("x\r\n", 1)) else {
-        Panic("LF reader")
+        return Assert.True(false, "LF reader")
     }
-    Check(lfReader.ReadLine(2) is Ok(Some("x\r")), "LF must preserve CR")
+    _ = Assert.True(lfReader.ReadLine(2) is Ok(Some("x\r")), "LF must preserve CR")?
 
     let newlineOutput = MemoryStream()
     let Ok(createdWriter) = SyncStreamWriter.Create(newlineOutput, true) else {
-        Panic("Newline writer")
+        return Assert.True(false, "Newline writer")
     }
     let textWriter: SyncTextWriter = createdWriter
     textWriter.NewLine = "\r\n"
-    Check(textWriter.WriteLine("x") is Ok(3), "CRLF writer bytes")
+    _ = Assert.True(textWriter.WriteLine("x") is Ok(3), "CRLF writer bytes")?
     textWriter.NewLine = "💥"
-    Check(textWriter.WriteLine("") is Ok(4), "Unicode writer delimiter")
+    _ = Assert.True(textWriter.WriteLine("") is Ok(4), "Unicode writer delimiter")?
     textWriter.NewLine = ""
-    Check(textWriter.WriteLine("y") is Ok(1), "Empty writer delimiter")
-    Check(textWriter.Finish() is Ok(0), "Newline finish")
+    _ = Assert.True(textWriter.WriteLine("y") is Ok(1), "Empty writer delimiter")?
+    _ = Assert.True(textWriter.Finish() is Ok(0), "Newline finish")?
     textWriter.Close()
-    Check(newlineOutput.Seek(0) is Ok(0), "Newline seek")
+    _ = Assert.True(newlineOutput.Seek(0) is Ok(0), "Newline seek")?
     let Ok(newlineReader) = SyncStreamReader.Create(newlineOutput) else {
-        Panic("Newline output reader")
+        return Assert.True(false, "Newline output reader")
     }
-    Text(newlineReader.ReadToEnd(20), "x\r\n💥y")
+    _ = Text(newlineReader.ReadToEnd(20), "x\r\n💥y")?
 
     let memory = MemoryStream()
     let Ok(writer) = SyncStreamWriter.Create(memory, true) else {
-        Panic("Writer creation")
+        return Assert.True(false, "Writer creation")
     }
-    Check(writer.Write("é") is Ok(2), "UTF-8 write count")
-    Check(writer.WriteLine("x") is Ok(2), "WriteLine count")
-    Check(writer.Flush() is Ok(_), "Flush")
-    Check(writer.Write("tail") is Ok(4), "Flush finalized encoder")
-    Check(writer.Finish() is Ok(0), "Finish")
-    Check(writer.Finish() is Ok(0), "Repeat finish")
-    Check(writer.Write("bad") is Failure(StreamError.InvalidEncoding), "Write after finish")
+    _ = Assert.True(writer.Write("é") is Ok(2), "UTF-8 write count")?
+    _ = Assert.True(writer.WriteLine("x") is Ok(2), "WriteLine count")?
+    _ = Assert.True(writer.Flush() is Ok(_), "Flush")?
+    _ = Assert.True(writer.Write("tail") is Ok(4), "Flush finalized encoder")?
+    _ = Assert.True(writer.Finish() is Ok(0), "Finish")?
+    _ = Assert.True(writer.Finish() is Ok(0), "Repeat finish")?
+    _ = Assert.True(writer.Write("bad") is Failure(StreamError.InvalidEncoding), "Write after finish")?
     writer.Close()
-    Check(writer.Flush() is Failure(StreamError.Closed), "Closed writer")
-    Check(memory.Seek(0) is Ok(0), "leaveOpen")
+    _ = Assert.True(writer.Flush() is Failure(StreamError.Closed), "Closed writer")?
+    _ = Assert.True(memory.Seek(0) is Ok(0), "leaveOpen")?
     let Ok(roundtrip) = SyncStreamReader.Create(memory) else {
-        Panic("Roundtrip reader creation")
+        return Assert.True(false, "Roundtrip reader creation")
     }
-    Text(roundtrip.ReadToEnd(100), "éx\ntail")
+    _ = Text(roundtrip.ReadToEnd(100), "éx\ntail")?
     roundtrip.Close()
-    Check(memory.GetLength() is Failure(StreamError.Closed), "Reader owns input")
+    _ = Assert.True(memory.GetLength() is Failure(StreamError.Closed), "Reader owns input")?
 
     let ascii = MemoryStream()
     let Ok(asciiWriter) = SyncStreamWriter.Create(ascii, Encodings.Ascii) else {
-        Panic("ASCII writer creation")
+        return Assert.True(false, "ASCII writer creation")
     }
-    Check(ascii.GetLength() is Ok(0), "Creation wrote bytes")
-    Check(asciiWriter.Write("é") is Failure(StreamError.InvalidEncoding), "ASCII rejection")
+    _ = Assert.True(ascii.GetLength() is Ok(0), "Creation wrote bytes")?
+    _ = Assert.True(asciiWriter.Write("é") is Failure(StreamError.InvalidEncoding), "ASCII rejection")?
     asciiWriter.Close()
-    Check(ascii.GetLength() is Failure(StreamError.Closed), "Writer owns output")
-    Console.Write("PASS sync text wrappers\n")
+    _ = Assert.True(ascii.GetLength() is Failure(StreamError.Closed), "Writer owns output")?
+    return Ok(())
+}
+
+func Main() -> int {
+    let suite = TestSuite()
+    suite.Add("sync-text-wrappers", "Synchronous text wrappers preserve cursor delimiters limits and ownership", `Synchronous text wrappers preserve cursor delimiters limits and ownership`)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
 }

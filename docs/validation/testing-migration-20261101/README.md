@@ -1252,3 +1252,54 @@ failure. [Reproduction script](culture-negative-control.py.gz) records commands 
 source hashes; run from the repository root with a fresh output directory. Historical
 evidence is preserved. The already migrated composite consumer is unaffected and
 is not rerun. Website content requires no change and no website build was run.
+
+## Synchronous text-wrapper behavior
+
+The [sync-text fixture](../../experiments/sync-text/README.md#framework-migration--2026-11-01)
+now uses one named NeoClr.Testing lifecycle with explicit TestSuite registration.
+ConsoleReporter replaces the handwritten success marker and Main returns its report
+exit code. Setup failures and Text/Character/End helpers propagate TestFailure;
+ordinal String.CompareOrdinal checks are preserved rather than using canonical
+string equality. The first build exposed obsolete `char` helper signatures; these
+now use `System.Character`. [Rejected build](sync-text-stale-build.log.gz) is retained.
+
+The same lifecycle retains input chunks 1/2/7/256, decomposed and multi-scalar
+graphemes, peek reuse, mixed character/count/line cursors, EOF and closed state,
+zero/invalid counts without input consumption and byte-limit retry. It preserves
+all six delimiters, interface properties, exact UTF-8 matching, overlapping prefixes,
+changed/empty delimiters, partial EOF prefixes and CR preservation under LF.
+Writer checks retain UTF-8 counts, newline configuration, Flush versus Finish,
+repeated Finish, write-after-finish/close errors, leaveOpen and owned stream closure,
+and ASCII encoding rejection. Existing [.NET comparison and tradeoffs](../../experiments/sync-text/README.md)
+remain applicable; no public API or stream behavior changes are introduced.
+
+[Report](sync-text-report.json.gz) and [log](sync-text.log.gz) pass the lifecycle in
+interpreter, JIT and native AOT on macOS ARM64. Python retains process budgets, explicit
+matching execution inputs and supplied stdin; the current fixture uses in-memory
+streams, so this does not establish console-read coverage. Exact framework stdout,
+exit zero and empty stderr are required, allowing only the exact shared DAM2004
+compiler warning for JIT. Source/project/framework/application and manifest hashes
+identify the reused matching `target/http-header-noop/inputs/bundle`. No automatic
+discovery, Windows, fresh compiler build or release qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/sync-text/Main.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/sync-text-testing-fixed-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/sync-text/check.py \
+  target/http-header-noop/inputs/bundle target/sync-text-testing-fixed-20261101 \
+  --output target/sync-text-testing-fixed-20261101/validation.json
+```
+
+[Negative control](sync-text-negative-control.json.gz) changes the expected composed
+accent in the final memory roundtrip to its canonically equivalent decomposed form
+in an isolated source copy. Interpreter reports the named Text bytes failure and
+exit one with empty stderr; later ownership/ASCII checks do not run after failure.
+[Reproduction script](sync-text-negative-control.py.gz) records commands and source
+hashes; run from the repository root with a fresh output directory. Historical
+reports and separate async/native-provider tests are unchanged and not rerun.
+Website content requires no change and no website build was run.

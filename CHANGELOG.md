@@ -180,6 +180,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   in interpreter/JIT/AOT (15 executions); an inverted identity control reports the
   named snapshot failure and exit one. Exact transcripts and source fingerprints
   replace the handwritten success marker; production contracts remain unchanged.
+  Migrate synchronous text-wrapper behavior to one named framework lifecycle,
+  retaining fragmented graphemes, mixed cursors, configurable delimiters, limit
+  retries, writer finalization and stream ownership. Update stale char helper types
+  to System.Character and preserve ordinal byte assertions. The lifecycle passes
+  in interpreter/JIT/AOT; a canonically equivalent but byte-distinct expectation
+  reports a named failure and exit one. Python now checks exact framework output
+  and input fingerprints; production text/stream contracts remain unchanged.
 
 ### 2026-10-31
 
