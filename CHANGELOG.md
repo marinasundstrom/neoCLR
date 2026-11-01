@@ -25,6 +25,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   precedence checks. Keep isolated files and exact byte checks in Python; repair
   its stale project filename. Both tests pass, and an existing-file negative control
   reports a named failure without overwriting data. No JIT/AOT file coverage is added.
+  Migrate the stale console-memory consumer to a discovered synchronous slice test
+  with quiet success reporting and exact host byte checks. Retain invalid windows
+  as subprocess bounds guards; the removed async console/cancellation contract is
+  explicitly superseded by existing SyncOutputStream behavior. Separate only the
+  exact documented JIT compiler warning from stderr payload bytes. The three-mode
+  byte checks and nine bounds guards pass; retain a separate read-only-stderr probe
+  exposing unresolved provider-error/exit-status differences for follow-up.
 
 ### 2026-10-31
 

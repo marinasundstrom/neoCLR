@@ -135,3 +135,57 @@ python3 runtime/System.Runtime/test/FileMemoryTests/verify.py \
   --bundle target/http-message-surfaces/inputs9/bundle \
   --output target/file-memory-testing-migration-20261101-retry
 ```
+
+## Console memory windows
+
+The [console fixture](../../../runtime/System.Runtime/test/ConsoleMemoryTests/README.md)
+now uses one discovered `NeoClr.Testing` case and a quiet TestSuite result path.
+Success prints no test transcript into the binary channels; failures use the normal
+ConsoleReporter and nonzero exit. Python still validates exact stdout `2800ff`
+and guest stderr `00ff` in interpreter, managed JIT and AOT. Only the exact existing
+DAM2004 JIT compiler warning may precede the stderr payload; raw bytes and the
+separated diagnostic remain recorded.
+
+The former fixture no longer compiled against the current public console surface:
+OpenStandardOutput/Error return SyncOutputStream with ReadOnlySlice writes, not
+array/range Task APIs. The migration follows the existing
+[provider capability decision](../../stream-design.md#text-capabilities-and-provider-dependent-modes--2026-10-20-proposal)
+and .NET comparison; it introduces no new semantic divergence. Closed valid/empty
+writes and flush are asserted in-process. Negative, oversized and beyond-end empty
+windows now fault during Slice construction; three subprocess guards preserve
+those negative inputs in every mode. Async console/pre-cancellation assertions are
+obsolete under the current contract, not silently counted as passing. Current
+asynchronous file/stream cancellation fixtures retain their own contracts.
+
+The wrapper's stale Tests.rvnproj path is corrected. Generated discovery and final
+registration verification use the shared tooling.
+
+[The final report](console-memory-report.json.gz) passes all three binary-output
+runs and all nine bounds guards on macOS ARM64 with the same fingerprinted
+`target/http-message-surfaces/inputs9/bundle`. [Discovered identities](console-memory-discovery.json.gz)
+are reverified against the final assembly. The original
+[obsolete-API compile failure](console-memory-old-api-compile.log.gz) and
+[unseparated JIT warning failure](console-memory-unseparated-warning.json.gz) are
+preserved separately. No compiler/runtime/library code changes were made.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 runtime/System.Runtime/test/ConsoleMemoryTests/verify.py \
+  --bundle target/http-message-surfaces/inputs9/bundle \
+  --output target/console-memory-testing-migration-20261101-final
+```
+
+### Open diagnostic: provider write-error propagation
+
+An additional [read-only-stderr probe](console-memory-readonly-stderr-probe.json.gz)
+redirected child stderr to a null device opened read-only, keeping stdout captured.
+It is not passing qualification: interpreter returned zero with only the normal
+stdout payload; AOT printed the named failed assertion and one-failure summary but
+returned two, not the probe's expected one. JIT was not probed because compiler
+diagnostics share that stderr descriptor. The probe used the same test/native
+assembly as the preceding synchronous run; only host descriptor permissions changed.
+This exposes an unresolved provider-error/exit-status difference requiring focused
+runtime investigation. Do not infer corrected I/O error propagation from this
+fixture migration or silently relabel the diagnostic as passed. Existing file-fixture
+failure-control evidence still covers ordinary framework failure propagation in the
+interpreter. Native host memory/binding probes remain separate and unaffected.

@@ -1,25 +1,31 @@
-import System.*
-import System.IO.*
-import System.Result.*
-import System.Concurrency.*
-import System.Concurrency.Tasks.*
+module NeoClr.RuntimeTests
 
-async func Main() -> Task<int> {
-    let output = Console.OpenStandardOutput()
-    let error = Console.OpenStandardError()
-    let bytes: byte[] = [(byte)165, (byte)40, (byte)0, (byte)255, (byte)166]
-    if await output.Write(bytes, 1, 3) is Failure(_) { return 1 }
-    if await error.Write(bytes, 2, 2) is Failure(_) { return 2 }
-    if await output.Write(bytes, 5, 0) is Failure(_) { return 3 }
-    if await output.Write(bytes, -1, 1) is not Failure(StreamError.InvalidRange) { return 4 }
-    if await output.Write(bytes, 4, 2) is not Failure(StreamError.InvalidRange) { return 5 }
-    if await output.Write(bytes, 6, 0) is not Failure(StreamError.InvalidRange) { return 6 }
-    if await output.Flush() is Failure(_) { return 7 }
-    if await error.Flush() is Failure(_) { return 8 }
-    output.Close()
-    if await output.Write(bytes, -1, 1) is not Failure(StreamError.Closed) { return 9 }
-    let cancellation = CancellationTokenSource()
-    cancellation.Cancel()
-    if !output.Write(bytes, -1, 1, cancellation.Token).IsCancelled { return 10 }
-    return 0
+import System.*
+import NeoClr.Testing.*
+
+func Main(arguments: string[]) -> int {
+    if arguments.Length == 2 && arguments[0] == "--guard" {
+        let bytes: byte[] = [(byte)165, (byte)40, (byte)0, (byte)255, (byte)166]
+        let source: ReadOnlySlice<byte> = bytes
+        let output = Console.OpenStandardOutput()
+        if arguments[1] == "negative" {
+            _ = output.Write(source.Slice(-1, 1))
+        }
+        if arguments[1] == "oversized" {
+            _ = output.Write(source.Slice(4, 2))
+        }
+        if arguments[1] == "beyond-end" {
+            _ = output.Write(source.Slice(6, 0))
+        }
+        Console.WriteLine("ERROR invalid window did not fault")
+        return 0
+    }
+    let suite = TestSuite()
+    RegisterDiscoveredTests(suite)
+    // Success reporting would contaminate the binary streams under test.
+    let report = suite.Run()
+    if report.ExitCode != 0 {
+        ConsoleReporter.Write(report)
+    }
+    return report.ExitCode
 }

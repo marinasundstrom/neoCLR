@@ -1,0 +1,23 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.IO.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test]
+func `Console memory windows preserve bytes flush and closed state`() -> Result<unit, TestFailure> {
+    let output = Console.OpenStandardOutput()
+    let error = Console.OpenStandardError()
+    let bytes: byte[] = [(byte)165, (byte)40, (byte)0, (byte)255, (byte)166]
+    let source: ReadOnlySlice<byte> = bytes
+    _ = Assert.True(output.Write(source.Slice(1, 3)) is Ok(_), "Selected stdout window is written")?
+    _ = Assert.True(error.Write(source.Slice(2, 2)) is Ok(_), "Selected stderr window is written")?
+    _ = Assert.True(output.Write(source.Slice(5, 0)) is Ok(_), "End-position empty write succeeds")?
+    _ = Assert.True(output.Flush() is Ok(_), "Stdout flush succeeds")?
+    _ = Assert.True(error.Flush() is Ok(_), "Stderr flush succeeds")?
+    output.Close()
+    _ = Assert.True(output.Write(source.Slice(0, 1)) is Failure(StreamError.Closed), "Closed output rejects a valid nonempty window")?
+    _ = Assert.True(output.Write(source.Slice(5, 0)) is Failure(StreamError.Closed), "Closed state precedes empty-window handling")?
+    return Assert.True(output.Flush() is Failure(StreamError.Closed), "Closed output rejects flush")
+}
