@@ -263,3 +263,19 @@ an extracted release package gate.
 
 API snapshots, 23 website tests and the 5,626-page local website build pass.
 [Supporting check logs](supporting-checks.json) retain the focused source checks.
+
+## Framework migration — 2026-11-01
+
+Program.rvn now registers three named NeoClr.Testing cases for scalar/nested display,
+quoted Unicode text and boxed dispatch. The assertions retain ordinal string equality,
+including the original decomposed text and escaping expectations. The old `char`
+field annotation is updated to `System.Character`. TestSuite/ConsoleReporter replace
+generic Panic checks and the success marker, and Main returns report.ExitCode.
+
+All three tests pass in interpreter/JIT/AOT; the copy-constructor collision still
+produces RAV0111. An isolated canonically equivalent but byte-distinct expected Name
+reports one failure, two passes and exit one. Python requires the exact framework
+transcript, successful exit and empty stderr except for the documented JIT compiler
+warning. See [migration evidence](../../validation/testing-migration-20261101/README.md#record-formatting-behavior).
+Registration is explicit; no automatic discovery or new compiler capability is claimed.
+Historical reports, allocation diagnostics and other record consumers remain unchanged.

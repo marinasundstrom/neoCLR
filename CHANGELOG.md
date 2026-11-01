@@ -199,6 +199,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   in interpreter/JIT/AOT; a wrong retained-byte control reports a named failure and
   exit one. Require exact framework output and record source/input fingerprints;
   borrowed-view compiler rejection and production memory contracts are unchanged.
+  Migrate record-display behavior to three named framework tests for scalar/nested
+  structure, quoted Unicode text and boxed dispatch. Preserve ordinal comparisons
+  and update the stale char field annotation to System.Character. All three pass
+  in interpreter/JIT/AOT, and the copy-constructor collision remains rejected.
+  A canonically equivalent text expectation reports one failure, two passes and
+  exit one. Exact framework transcripts and input fingerprints replace the generic
+  success marker; compiler synthesis and allocation diagnostics are unchanged.
 
 ### 2026-10-31
 

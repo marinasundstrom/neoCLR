@@ -1398,3 +1398,51 @@ with empty stderr. The final nominal-unboxing assertion does not run after failu
 hashes; run from the repository root with a fresh output directory. The unchanged
 Borrowed.rvn compiler-rejection probe remains separate and is not rerun; historical
 reports are preserved. Website content requires no change and no website build was run.
+
+## Record-formatting behavior
+
+The [record-formatting fixture](../../experiments/record-formatting/README.md#framework-migration--2026-11-01)
+now uses three descriptive NeoClr.Testing cases with explicit TestSuite registration:
+scalar/nested structure, quoted Unicode text and boxed synthesized display. The helper
+returns failures from ordinal equality, preserving byte-sensitive expectations; Main
+writes ConsoleReporter output and returns report.ExitCode. No automatic discovery
+coverage is claimed. The obsolete `char` field annotation now uses `System.Character`.
+
+All original assertions remain: positive and minimum Int32, nested records, null and
+quoted strings, Boolean/Int64 display, escaped backslashes and quotes, composed and
+decomposed character/text spelling and boxed record dispatch. Existing
+[.NET comparison and implementation scope](../../experiments/record-formatting/README.md#contract-and-implementation)
+remain applicable. This changes no compiler synthesis, public APIs or record semantics.
+
+[Report](record-format-report.json.gz) and [log](record-format.log.gz) pass all three
+tests in interpreter, JIT and native AOT (nine test executions) on macOS ARM64, plus
+the existing CopyConstructorCollision compiler rejection with RAV0111. The unchanged
+compiler probe remains separate from behavior assertions. Python keeps its matching
+execution context and budgets, requiring exact framework stdout, exit zero and empty
+stderr, allowing only the exact shared DAM2004 compiler warning for JIT. Source,
+project, framework, application, compiler, runtime and library hashes accompany the
+manifest fingerprint for the reused matching `target/http-header-noop/inputs/bundle`.
+No Windows, fresh compiler build or release qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/record-formatting/RecordFormatting.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/record-format-testing-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/record-formatting/check.py \
+  target/http-header-noop/inputs/bundle target/record-format-testing-20261101 \
+  --output target/record-format-testing-20261101/validation.json
+```
+
+[Negative control](record-format-negative-control.json.gz) changes only the expected
+record Name from a decomposed accent to its canonically equivalent composed form in
+an isolated copy. Interpreter reports the named Record display bytes failure, passes
+the other two cases and exits one with empty stderr. This confirms that canonical
+equality does not weaken the original ordinal assertion.
+[Reproduction script](record-format-negative-control.py.gz) records commands and source
+hashes; run from the repository root with a fresh output directory. Historical reports,
+allocation diagnostics and other record consumers are unchanged and not rerun.
+Website content requires no change and no website build was run.
