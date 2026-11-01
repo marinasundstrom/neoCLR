@@ -70,6 +70,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   decoding/quota and validation checks. All eight pass in interpreter, JIT and AOT;
   an isolated wrong-count JIT control reports seven passes, one named failure and
   exit one. Production APIs, Python orchestration and validation budgets are unchanged.
+  Complete HTTP header-allocation reporting with actual TestSuite outcomes while
+  preserving all measured regions and three-case order. All three pass in the
+  interpreter with the previously qualified response-header-retention bundle;
+  native/JIT allocation counters remain unqualified. Retain the older-bundle
+  512-allocation failure and a wrong-expectation control showing one named failure,
+  two passes and exit one. No production or allocation-contract change is made.
 
 ### 2026-10-31
 

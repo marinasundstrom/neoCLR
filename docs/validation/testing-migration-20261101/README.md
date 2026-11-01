@@ -434,3 +434,56 @@ The repository fixture is not mutated. The
 repository root with a fresh output directory; the report retains commands and
 source hashes. No production API, website content or runtime/compiler change is
 required, and no website build is needed.
+
+
+## HTTP header allocations
+
+The [header-allocation fixture](../../../runtime/System.Web/test/HttpHeaderAllocationTests/README.md)
+already used descriptive `[Test]` functions and NeoClr.Testing assertions. Its custom
+Main still panicked on Failure and printed a literal three-pass summary. It now
+runs the cases in the same order, explicitly awaits the parsed-header HTTP lifecycle,
+retains completed results in bound reference adapters and uses TestSuite,
+ConsoleReporter and report.ExitCode. Recoverable failures now contribute named
+results while later independent cases run; terminal faults remain terminal.
+Automatic async discovery remains unsupported.
+
+Tests.rvn is unchanged. Adapter construction, registration and reporting are outside
+all measured allocation regions. Warmup, loop counts, cached-view identity checks,
+parsed request/response checks, zero-allocation lookups/configuration and exactly
+one materialized header on positional access remain intact. This is reporting work,
+not an allocation optimization or a new .NET divergence; the existing
+[header API comparison](../../../api-docs/http-headers.md#net-comparison) applies.
+
+The first run used `target/http-message-surfaces/inputs9/bundle`, which predates the
+response-header retention fix. [Its report](http-header-allocations-old-bundle.json.gz)
+correctly records two passes and the final case failing with 512 allocations.
+That is the same known negative baseline documented in the
+[retention qualification](../http-header-noop-20261031/README.md), not a reporting
+regression. The first wrong-expectation experiment also used that older bundle and
+therefore produced two failures rather than the expected one;
+[its failed report](http-header-allocations-initial-negative.json.gz) is retained.
+
+Using the fixture's previously qualified `target/http-header-noop/inputs/bundle`,
+[the final report](http-header-allocations-report.json.gz) and
+[transcript](http-header-allocations.log.gz) pass all three tests on macOS ARM64.
+The report fingerprints the sources and selected inputs; no compiler rebuild or
+new release qualification is claimed. The existing runner explicitly rejects
+native/JIT modes because their allocation counters are not bound. No execution-mode
+coverage or budgets change.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/test-runtime-library.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --output target/http-header-allocations-testing-migration-20261101-matched \
+  --suite http-header-allocations --mode interpreter
+```
+
+[The final isolated negative control](http-header-allocations-negative-control.json.gz)
+changes the first case's expected allocation count from zero to one in a separate
+Tests.rvn copy. The interpreter reports `Managed allocations: 0`, one named failure,
+two passes and exit one, with empty stderr. The repository fixture is not mutated.
+[The reproduction script](http-header-allocations-negative-control.py.gz) runs from
+the repository root with a fresh output directory; commands and source hashes are
+retained. Production APIs, Python orchestration, measurement contracts and website
+content are unchanged; no website build is needed.
