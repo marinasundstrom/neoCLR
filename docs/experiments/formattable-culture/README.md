@@ -58,3 +58,20 @@ Validation completed: all 18 public/regression/fault executions pass across
 interpreter/JIT/AOT (three current-format, three composite-regression and twelve
 invalid-format executions). Four native API snapshot checks pass. The website build
 checks 4913 pages; no publication or release qualification is implied.
+
+## Framework migration — 2026-11-01
+
+Program.rvn now registers one named NeoClr.Testing lifecycle and reports its actual
+outcome through TestSuite/ConsoleReporter. All duration, civil-format, boxing and
+culture-propagation assertions remain. CultureSnapshot records a sticky identity
+mismatch during ToString; the lifecycle checks that observation immediately after
+the formatting call, giving a named failure without changing the formatter contract.
+Construction and parse failures now also produce framework failures.
+
+The lifecycle passes in interpreter/JIT/AOT, as do all four unsupported-format
+subprocess probes. An isolated inverted identity observation reports the snapshot
+failure and exit one. Python requires exact framework output and successful exit,
+with empty stderr except for the exact documented JIT compiler warning. See
+[migration evidence](../../validation/testing-migration-20261101/README.md#culture-aware-formatting-behavior).
+Registration is explicit; no automatic discovery or production API change is added.
+Historical reports and qualification statements above remain unchanged.

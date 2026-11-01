@@ -6,6 +6,13 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / 'benchmarks/framework'))
+from process import RETENTION_WARNING
+
+EXPECTED = 'PASS Culture formatting preserves duration civil values and shared culture dispatch\nTests: 1, passed: 1, failed: 0, skipped: 0\n'
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('bundle', type=Path)
@@ -35,12 +42,15 @@ for engine in ['interpreter', 'jit', 'aot']:
     result = subprocess.run(command, text=True, capture_output=True, timeout=120)
     passed = (result.returncode != 0 and not result.stdout and 'Unsupported ' in result.stderr and 'format' in result.stderr
               if args.fault else
-              result.returncode == 0 and result.stdout.strip() == 'PASS culture formatting' and not result.stderr)
+              result.returncode == 0 and result.stdout == EXPECTED and result.stderr in (('', RETENTION_WARNING.decode()) if engine == 'jit' else ('',)))
     rows.append(dict(case=engine, command=command, exitCode=result.returncode,
                      stdout=result.stdout, stderr=result.stderr, passed=passed))
     print(f'{engine}: {"PASS" if passed else "FAIL"}', flush=True)
 compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
-paths = [application / 'app', application / 'app.dll', compiler,
+paths = [Path(__file__), *Path(__file__).parent.glob('*.rvn'),
+         *Path(__file__).parent.glob('*.rvnproj'),
+         *(ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn'),
+         bundle / 'manifest.json', application / 'app', application / 'app.dll', compiler,
          compiler.with_name('Raven.CodeAnalysis.NeoClr.dll'), bundle / 'bin/neoclr',
          bundle / 'bin/neoclr-codegen', bundle / 'lib/System.Runtime.dll']
 report = dict(expectedFault=args.fault, passed=all(row['passed'] for row in rows), executions=rows,

@@ -173,6 +173,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   An isolated wrong-payload control reports a named failure and exit one. Python
   retains console/fault checks and records exact framework output and input hashes;
   allocation diagnostics and production formatting semantics are unchanged.
+  Migrate culture-aware formatting to one named framework lifecycle, preserving
+  duration boundaries/roundtrip, civil formats, boxing and culture propagation.
+  The custom formatter records sticky culture-identity mismatches for a framework
+  assertion after formatting. The lifecycle and four unsupported-format guards pass
+  in interpreter/JIT/AOT (15 executions); an inverted identity control reports the
+  named snapshot failure and exit one. Exact transcripts and source fingerprints
+  replace the handwritten success marker; production contracts remain unchanged.
 
 ### 2026-10-31
 

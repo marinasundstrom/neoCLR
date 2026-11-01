@@ -1195,3 +1195,60 @@ and the validator fault branch were unchanged. Final behavior evidence uses the
 rebuilt ordinal helper. Allocation diagnostics and historical reports remain
 unchanged and are not rerun; no implementation or measured region changed. Website content requires
 no change and no website build was run.
+
+## Culture-aware formatting behavior
+
+The [culture-formatting consumer](../../experiments/formattable-culture/README.md#framework-migration--2026-11-01)
+now uses one named NeoClr.Testing lifecycle with explicit TestSuite registration.
+ConsoleReporter replaces the handwritten success marker and Main returns report.ExitCode.
+No automatic discovery coverage is claimed. The custom CultureSnapshot formatter
+records sticky reference-identity mismatches; an assertion immediately after the
+same repeated-placeholder formatting call observes that result. It preserves the
+original identity check without forcing TestFailure into Formattable's string result.
+
+All original behavior checks remain: duration zero/general/constant formats,
+Int64 tick extrema and minimum roundtrip, Object/Formattable/composite dispatch,
+default culture identity, explicit culture propagation across fixed and params
+arities, Gregorian roundtrip date, Swedish time precision, sortable/roundtrip local
+values and boxed civil dispatch. Parse/date/time setup errors produce named framework
+failures. Existing [.NET comparison and tradeoffs](../../experiments/formattable-culture/README.md#comparison-and-tradeoffs)
+remain applicable; no production formatting semantics or public APIs change.
+
+[Report](culture-report.json.gz) and [log](culture.log.gz) pass the lifecycle in
+interpreter, JIT and native AOT on macOS ARM64. Python requires the exact framework
+transcript, exit zero and empty stderr, allowing only the exact shared DAM2004 compiler
+warning for JIT. Source/project/framework and application/compiler/runtime/library
+hashes accompany the manifest fingerprint for the reused matching
+`target/http-header-noop/inputs/bundle`. Existing instruction/process limits are
+unchanged. No Windows, fresh compiler build or release qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/formattable-culture/FormattableCulture.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/culture-testing-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/formattable-culture/check.py \
+  target/http-header-noop/inputs/bundle target/culture-testing-20261101 \
+  --output target/culture-testing-20261101/validation.json
+```
+
+Invalid.rvn and its project remain unchanged. Build Invalid.rvnproj with the same
+console command into `target/culture-fault-testing-20261101`, then run check.py against
+that directory with `--fault duration`, `date`, `time` or `local` and distinct output
+paths. All twelve terminal-fault checks pass: [duration](culture-fault-duration.json.gz),
+[date](culture-fault-date.json.gz), [time](culture-fault-time.json.gz),
+[local](culture-fault-local.json.gz), [log](culture-faults.log.gz). They retain the
+existing nonzero exit, empty stdout and unsupported-format diagnostic checks.
+Together with the behavior lifecycle this covers 15 executions across three modes.
+
+[Negative control](culture-negative-control.json.gz) inverts the reference-identity
+observation in an isolated source copy. Interpreter reports the named `one culture
+snapshot` failure and exit one with empty stderr, confirming that the observation
+reaches framework reporting. Later lifecycle checks intentionally do not run after
+failure. [Reproduction script](culture-negative-control.py.gz) records commands and
+source hashes; run from the repository root with a fresh output directory. Historical
+evidence is preserved. The already migrated composite consumer is unaffected and
+is not rerun. Website content requires no change and no website build was run.

@@ -1,16 +1,18 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Time.*
 import System.Globalization.*
 import System.Result.*
-
-func Check(value: bool, message: string) {
-    if !value { Panic(message) }
-}
+import NeoClr.Testing.*
 
 class CultureSnapshot : Formattable {
     private var previous: Culture? = null
+    var SameCulture: bool = true
     func ToString(format: string, culture: Culture) -> string {
-        if previous is Culture selected { Check(Object.ReferenceEquals(selected, culture), "one culture snapshot") }
+        if previous is Culture selected {
+            SameCulture = SameCulture && Object.ReferenceEquals(selected, culture)
+        }
         previous = culture
         return "ok"
     }
@@ -20,51 +22,66 @@ class CultureEcho : Formattable {
     func ToString(format: string, culture: Culture) -> string => culture.Name + format
 }
 
-func Main() {
+[Test]
+func `Culture formatting preserves duration civil values and shared culture dispatch`() -> Result<unit, TestFailure> {
     let invariant = Culture.Invariant
     let swedish = Culture.SwedishSweden
     let zero = Duration.FromTicks(0)
-    Check(zero.ToString() == "00:00:00", "zero constant")
-    Check(zero.ToString("g", swedish) == "0:00:00", "zero general")
-    Check(zero.ToString("G", swedish) == "0:00:00:00,0000000", "zero long")
+    _ = Assert.True(zero.ToString() == "00:00:00", "zero constant")?
+    _ = Assert.True(zero.ToString("g", swedish) == "0:00:00", "zero general")?
+    _ = Assert.True(zero.ToString("G", swedish) == "0:00:00:00,0000000", "zero long")?
     let value = Duration.FromTicks(937841200000L)
-    Check(value.ToString() == "1.02:03:04.1200000", "constant")
-    Check(value.ToString("g", swedish) == "1:2:03:04,12", "short culture")
-    Check(value.ToString("G", invariant) == "1:02:03:04.1200000", "long invariant")
-    Check(value.ToString("c", swedish) == value.ToString(), "constant ignores culture")
+    _ = Assert.True(value.ToString() == "1.02:03:04.1200000", "constant")?
+    _ = Assert.True(value.ToString("g", swedish) == "1:2:03:04,12", "short culture")?
+    _ = Assert.True(value.ToString("G", invariant) == "1:02:03:04.1200000", "long invariant")?
+    _ = Assert.True(value.ToString("c", swedish) == value.ToString(), "constant ignores culture")?
     let min = Duration.FromTicks(-9223372036854775807L - 1L)
     let max = Duration.FromTicks(9223372036854775807L)
-    Check(min.ToString() == "-10675199.02:48:05.4775808", "minimum")
-    Check(max.ToString() == "10675199.02:48:05.4775807", "maximum")
-    if Duration.Parse(min.ToString()) is Ok(let parsed) { Check(parsed.Equals(min), "minimum roundtrip") } else { Panic("parse minimum") }
+    _ = Assert.True(min.ToString() == "-10675199.02:48:05.4775808", "minimum")?
+    _ = Assert.True(max.ToString() == "10675199.02:48:05.4775807", "maximum")?
+    let Ok(parsed) = Duration.Parse(min.ToString()) else {
+        return Assert.True(false, "parse minimum")
+    }
+    _ = Assert.True(parsed.Equals(min), "minimum roundtrip")?
     let boxed: Object = value
-    Check(boxed.ToString() == value.ToString(), "boxed display")
+    _ = Assert.True(boxed.ToString() == value.ToString(), "boxed display")?
     let contract: Formattable = value
-    Check(contract.ToString("g", swedish) == "1:2:03:04,12", "interface format")
-    Check(String.Format(swedish, "{0:g}", value) == "1:2:03:04,12", "composite value")
+    _ = Assert.True(contract.ToString("g", swedish) == "1:2:03:04,12", "interface format")?
+    _ = Assert.True(String.Format(swedish, "{0:g}", value) == "1:2:03:04,12", "composite value")?
     let snapshot = CultureSnapshot()
-    Check(String.Format("{0}/{0}", snapshot) == "ok/ok", "default culture dispatch")
+    _ = Assert.True(String.Format("{0}/{0}", snapshot) == "ok/ok", "default culture dispatch")?
+    _ = Assert.True(snapshot.SameCulture, "one culture snapshot")?
     let echo = CultureEcho()
-    Check(String.Format(swedish, "{0:x}/{1:y}", echo, echo) == "sv-SEx/sv-SEy", "two args")
-    Check(String.Format(swedish, "{0}/{1}/{2}", echo, echo, echo) == "sv-SE/sv-SE/sv-SE", "three args")
+    _ = Assert.True(String.Format(swedish, "{0:x}/{1:y}", echo, echo) == "sv-SEx/sv-SEy", "two args")?
+    _ = Assert.True(String.Format(swedish, "{0}/{1}/{2}", echo, echo, echo) == "sv-SE/sv-SE/sv-SE", "three args")?
     let arguments: Object?[] = [echo, echo, echo, echo]
-    Check(String.Format(swedish, "{0}/{3}", arguments) == "sv-SE/sv-SE", "params")
-    if Date.Create(2026, 10, 20) is Ok(let date) {
-        if TimeOfDay.Create(14, 5, 9, 1234000) is Ok(let time) {
-            let local = LocalDateTime.Create(date, time)
-            Check(date.ToString("O", Culture.HebrewIsrael) == "2026-10-20", "Gregorian roundtrip")
-            Check(time.ToString("t", swedish) == "14:05", "short time")
-            Check(time.ToString("T", swedish) == "14:05:09", "long time")
-            Check(time.ToString("G", swedish) == "14:05:09,1234000", "Swedish precision")
-            Check(time.ToString("O", swedish) == "14:05:09.1234000", "invariant time")
-            Check(local.ToString("s", swedish) == "2026-10-20T14:05:09", "sortable")
-            Check(local.ToString("O", swedish) == "2026-10-20T14:05:09.1234000", "roundtrip local")
-            Check(String.Format(swedish, "{0:d}|{1:G}|{2:G}", date, time, local) == "2026-10-20|14:05:09,1234000|2026-10-20 14:05:09,1234000", "composite civil")
-            let dateBox: Object = date
-            let timeBox: Object = time
-            let localBox: Object = local
-            Check(dateBox.ToString() == date.ToString() && timeBox.ToString() == time.ToString() && localBox.ToString() == local.ToString(), "civil Object dispatch")
-        } else { Panic("time creation") }
-    } else { Panic("date creation") }
-    Console.WriteLine("PASS culture formatting")
+    _ = Assert.True(String.Format(swedish, "{0}/{3}", arguments) == "sv-SE/sv-SE", "params")?
+    let Ok(date) = Date.Create(2026, 10, 20) else {
+        return Assert.True(false, "date creation")
+    }
+    let Ok(time) = TimeOfDay.Create(14, 5, 9, 1234000) else {
+        return Assert.True(false, "time creation")
+    }
+    let local = LocalDateTime.Create(date, time)
+    _ = Assert.True(date.ToString("O", Culture.HebrewIsrael) == "2026-10-20", "Gregorian roundtrip")?
+    _ = Assert.True(time.ToString("t", swedish) == "14:05", "short time")?
+    _ = Assert.True(time.ToString("T", swedish) == "14:05:09", "long time")?
+    _ = Assert.True(time.ToString("G", swedish) == "14:05:09,1234000", "Swedish precision")?
+    _ = Assert.True(time.ToString("O", swedish) == "14:05:09.1234000", "invariant time")?
+    _ = Assert.True(local.ToString("s", swedish) == "2026-10-20T14:05:09", "sortable")?
+    _ = Assert.True(local.ToString("O", swedish) == "2026-10-20T14:05:09.1234000", "roundtrip local")?
+    _ = Assert.True(String.Format(swedish, "{0:d}|{1:G}|{2:G}", date, time, local) == "2026-10-20|14:05:09,1234000|2026-10-20 14:05:09,1234000", "composite civil")?
+    let dateBox: Object = date
+    let timeBox: Object = time
+    let localBox: Object = local
+    _ = Assert.True(dateBox.ToString() == date.ToString() && timeBox.ToString() == time.ToString() && localBox.ToString() == local.ToString(), "civil Object dispatch")?
+    return Ok(())
+}
+
+func Main() -> int {
+    let suite = TestSuite()
+    suite.Add("culture-formatting", "Culture formatting preserves duration civil values and shared culture dispatch", `Culture formatting preserves duration civil values and shared culture dispatch`)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
 }
