@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-11-01
 
+- Permit metadata-builder constructor delegation to the same declaring type,
+  including exact open generic owners and value types. Keep unrelated-owner,
+  non-constructor and repeated-initialization rejection. Flow validation requires
+  the current receiver to be initialized exactly once on delegating paths and
+  carries definite field assignment from a completed value constructor. Raven's
+  `: self(...)` integration uses this native contract; no runtime/CLI semantic
+  divergence is introduced. Focused builder tests and the Raven source-core
+  consumer validate the change; native JIT/AOT was not run for this slice.
+
 - Begin the author-directed post-release behavior-fixture migration with signed
   range iteration: replace the single-output/numeric-exit probe with 14 discovered
   `NeoClr.Testing` cases, descriptive backtick names and failure assertions.

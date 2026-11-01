@@ -77,7 +77,10 @@ public sealed partial class MethodBuilder
         var work = new Queue<int>();
         var initiallyAssigned = new bool[locals.Count + ParameterCount + (IsConstructor && DeclaringType!.IsValueType ? DeclaringType.Fields.Count : 0)];
         for (int i = 0; i < ParameterCount; i++) initiallyAssigned[locals.Count + i] = !Signature.TransportSignature.OutParameters.Contains(i);
-        states[0] = new([], initiallyAssigned, !(IsConstructor && DeclaringType!.HasExplicitClassBase)); work.Enqueue(0);
+        var delegatesToSelf = IsConstructor && Instructions.Any(instruction =>
+            instruction.Op is "call" or "call.constructed" && instruction.Target is { } target &&
+            DeclaringType!.IsSameTypeConstructor(target, instruction.Type));
+        states[0] = new([], initiallyAssigned, !(IsConstructor && (DeclaringType!.HasExplicitClassBase || delegatesToSelf))); work.Enqueue(0);
         while (work.TryDequeue(out var index))
         {
             var state = states[index]!;
@@ -471,10 +474,12 @@ public sealed partial class MethodBuilder
                     }
                     if (instruction.Target!.IsConstructor)
                     {
-                        if (baseInitialized || !IsConstructor || !DeclaringType!.IsDirectBaseConstructor(instruction.Target, instruction.Type) ||
-                            stack.Count != 1 || !stack[0].ConstructionReceiver || !(stack[0] with { ConstructionReceiver = false }).Equals((BodyValueType)DeclaringType.OpenSignature))
-                            throw new InvalidDataException("base constructor must initialize the current receiver exactly once");
+                        if (baseInitialized || !IsConstructor || !DeclaringType!.IsConstructorChainTarget(instruction.Target, instruction.Type) ||
+                            stack.Count != 1 || !stack[0].ConstructionReceiver || !(stack[0] with { ConstructionReceiver = false }).Equals(BodyValueType.Receiver(DeclaringType)))
+                            throw new InvalidDataException("constructor chain must initialize the current receiver exactly once");
                         stack.Clear(); baseInitialized = true;
+                        if (DeclaringType.IsValueType && DeclaringType.IsSameTypeConstructor(instruction.Target, instruction.Type))
+                            for (int field = locals.Count + ParameterCount; field < assigned.Length; field++) assigned[field] = true;
                     }
                     else if (!instruction.Target.IsStatic)
                     {

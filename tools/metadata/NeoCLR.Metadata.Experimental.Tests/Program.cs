@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--constructor-delegation"]) { ConstructorDelegationChecks.Run(); return 0; }
+
 if (args is ["--static-interface-helpers"]) { StaticInterfaceHelperChecks.Run(); StaticInterfaceChecks.Run(); ConstrainedInterfaceChecks.Run(); ImportedInterfaceChecks.Run(); return 0; }
 
 if (args is ["--parameter-defaults"]) { ParameterDefaultChecks.Run(); return 0; }
@@ -110,17 +112,28 @@ if (args is ["--module-retention", var moduleInput, var moduleRoots])
     {
         if (type!["origin"]?["name"]?.GetValue<string>() is not ("Acme.CoffeeMaker.Machine" or "Acme.CoffeeMaker.Factories.Factory")) continue;
         catalogIdentity ??= type["origin"]!["assembly"]!.GetValue<string>();
-        selected.Add(new System.Text.Json.Nodes.JsonObject {
-            ["definition"] = new System.Text.Json.Nodes.JsonObject {
-                ["module"] = image["name"]!.DeepClone(), ["revision"] = image["revision"]!.DeepClone(), ["index"] = types.IndexOf(type)
+        selected.Add(new System.Text.Json.Nodes.JsonObject
+        {
+            ["definition"] = new System.Text.Json.Nodes.JsonObject
+            {
+                ["module"] = image["name"]!.DeepClone(),
+                ["revision"] = image["revision"]!.DeepClone(),
+                ["index"] = types.IndexOf(type)
             },
-            ["construct"] = false, ["properties"] = false, ["getters"] = false,
-            ["setters"] = false, ["customAttributes"] = false
+            ["construct"] = false,
+            ["properties"] = false,
+            ["getters"] = false,
+            ["setters"] = false,
+            ["customAttributes"] = false
         });
     }
     if (selected.Count != 2) throw new Exception("Expected the two module-ownership fixture types");
-    File.WriteAllText(moduleRoots, new System.Text.Json.Nodes.JsonObject { ["schemaVersion"] = 4, ["types"] = selected,
-        ["moduleCatalogs"] = new System.Text.Json.Nodes.JsonArray(catalogIdentity!) }.ToJsonString());
+    File.WriteAllText(moduleRoots, new System.Text.Json.Nodes.JsonObject
+    {
+        ["schemaVersion"] = 4,
+        ["types"] = selected,
+        ["moduleCatalogs"] = new System.Text.Json.Nodes.JsonArray(catalogIdentity!)
+    }.ToJsonString());
     return 0;
 }
 
@@ -713,6 +726,7 @@ var tests = new (string Name, Action Body)[]
     ("Imported special constraints", ImportedSpecialConstraintChecks.Run),
     ("Native function-kind constraints", FunctionKindConstraintChecks.Run),
     ("Dependent function signatures", DependentFunctionSignatureChecks.Run),
+    ("Constructor delegation", ConstructorDelegationChecks.Run),
     ("Constructed class bases", ConstructedClassBaseChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),

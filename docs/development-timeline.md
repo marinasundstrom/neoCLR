@@ -24546,3 +24546,17 @@ requested a shared `HttpHeaderCollection.Empty`. The assistant adopted the selec
 names for the next split and added Empty to the current provisional concrete
 collection. Interface conversion and the message-type migration remain subsequent
 work, not completed API claims.
+
+## 2026-11-01 — Fix constructor delegation discovered during Raven porting
+
+The author reiterated that shared .NET corrections must be checked against both
+target implementations, including duplicated target logic. During annotation
+porting, the assistant proposed consolidating a forwarding constructor because
+Raven did not support `: self(...)`. The author asked whether delegation had been
+implemented and directed implementation if not. The assistant restored the
+constructor overloads and implemented delegation in Raven, then found and
+corrected a native metadata-builder restriction that admitted only direct-base
+constructor calls. The existing interpreter/verifier already allowed same-type
+chaining. Focused metadata checks and the native source-core consumer supply the
+bounded evidence recorded in `raven-cli-bridge.md`; native JIT/AOT and completion
+of the full compiler port remain outside that evidence.

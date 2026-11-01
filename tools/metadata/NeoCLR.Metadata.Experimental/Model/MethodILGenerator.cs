@@ -138,7 +138,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         SignatureType? receiver = operand.Definition.IsConstructor
             ? (SignatureType)operand.Definition.DeclaringType!.MakeGenericInstance(operand.DeclaringTypeArguments.ToArray()) : null;
         var baseConstructor = operand.Definition.IsConstructor && opCode == OpCode.Call && bodyBuilder.IsConstructor &&
-            DeclaringType?.IsDirectBaseConstructor(operand.Definition, receiver) == true;
+            DeclaringType?.IsConstructorChainTarget(operand.Definition, receiver) == true;
         if (!baseConstructor && !(opCode == OpCode.Callvirt && operand.Definition.IsVirtual && operand.Definition.DeclaringType?.IsValueType == false) && opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : operand.Definition.IsAbstract ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("invalid constructed member dispatch opcode");
         if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("constructed calls require an owned definition");
         foreach (var type in operand.DeclaringTypeArguments.Concat(operand.MethodArguments))
@@ -590,8 +590,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         else
         {
             RequireCall(opCode);
-            if (operand.IsConstructor && (!bodyBuilder.IsConstructor || !ReferenceEquals(DeclaringType?.LocalBase, operand.DeclaringType)))
-                throw new ArgumentException("constructor calls require the direct base of the current constructor", nameof(operand));
+            if (operand.IsConstructor && (!bodyBuilder.IsConstructor || DeclaringType?.IsConstructorChainTarget(operand) != true))
+                throw new ArgumentException("constructor calls require the current type or its direct base", nameof(operand));
             Append(new("call", Target: operand));
         }
     }

@@ -124,6 +124,13 @@ public sealed partial class TypeBuilder
         var bound = current.GenericInstance is { } construction ? external.Substitute(construction.Substitute) : external;
         return bound.Equals(target) || Assembly.HasDeclaredClassBase(bound, target);
     }
+    internal bool IsSameTypeConstructor(MethodBuilder target, SignatureType? receiver = null)
+        => target.IsConstructor && ReferenceEquals(this, target.DeclaringType) &&
+            (GenericParameterNames.Count == 0 ? receiver is null : receiver == OpenSignature);
+
+    internal bool IsConstructorChainTarget(MethodBuilder target, SignatureType? receiver = null)
+        => IsSameTypeConstructor(target, receiver) || IsDirectBaseConstructor(target, receiver);
+
     internal bool IsDirectBaseConstructor(MethodBuilder target, SignatureType? receiver = null)
         => ReferenceEquals(LocalBase, target.DeclaringType) && LocalBase is not null &&
             (LocalBaseSignature?.GenericInstance is null ? receiver is null : receiver == LocalBaseSignature) ||
