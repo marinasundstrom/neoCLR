@@ -27,7 +27,7 @@ def main():
                   bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest(),
                   sources={p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                            for p in fixture.iterdir() if p.suffix in ('.rvn', '.rvnproj')})
-    if args.suite == 'cancel-after':
+    if args.suite in ('timers', 'cancel-after'):
         report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
         report['runtimeSha256'] = hashlib.sha256(args.runtime.resolve().read_bytes()).hexdigest()
@@ -79,6 +79,9 @@ def main():
                                       'PASS disposal suppresses timed cancellation\n'
                                       'PASS manual cancellation removes countdown\n'
                                       'Tests: 4, passed: 4, failed: 0, skipped: 0\n')
+                        valid = result.returncode == 0 and result.stdout == transcript and not result.stderr
+                    if args.suite == 'timers' and message is None:
+                        transcript = 'PASS Synchronous timers preserve one shot stop disposal repeat and reschedule lifecycles\nPASS Async repeating timers wait for callback completion\nPASS Restarting an async timer does not overlap callbacks\nPASS Disposal allows the active async callback to finish\nPASS Cancelled callbacks stop repeating timers\nPASS Pending callback cancellation stops repeating timers\nTests: 6, passed: 6, failed: 0, skipped: 0\n'
                         valid = result.returncode == 0 and result.stdout == transcript and not result.stderr
                     if not valid:
                         raise RuntimeError(f'{case} {mode} failed: {record}')

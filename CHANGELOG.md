@@ -85,6 +85,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   runtime's former default. Four cases and five guards pass in interpreter/AOT;
   an isolated wrong-count control reports one named failure and exit one. No JIT
   coverage, runtime or cancellation API change is introduced.
+  Migrate Timer checks to six named framework lifecycles, preserving the original
+  ten checkpoints by keeping the five synchronous phases together. Capture callback
+  count/overlap violations in sticky flags and assert them through NeoClr.Testing;
+  preserve durations, barriers, disposal and cancellation order. Require exact
+  six-test reporting; six cases and five terminal-failure probes pass in both
+  interpreter and AOT. An isolated callback-invariant control produces one named
+  failure, five passes and exit one. Timer APIs and scheduling are unchanged.
 
 ### 2026-10-31
 

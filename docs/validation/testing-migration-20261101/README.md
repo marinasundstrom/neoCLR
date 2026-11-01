@@ -546,3 +546,62 @@ No production API or website content changes; no website build is needed.
 After validation, one trailing blank line was removed from CancelAfter Tests.rvn
 to satisfy the staged whitespace check; the reports retain the tested source hash.
 No executable text changed.
+
+
+## Timers
+
+The [Timer fixture](../../experiments/timers/README.md) replaces generic Check/Panic
+assertions and handwritten PASS lines with six named NeoClr.Testing cases. The
+original ten checkpoints are retained: the five synchronous phases remain combined
+because they share a timer's one-shot/stop/dispose history and a repeat/reschedule
+sequence. The other five cases preserve async repeating, restart, active-callback
+disposal, already-cancelled callback and pending cancellation behavior.
+
+Main explicitly awaits the six lifecycles in their original order and registers
+completed-result reference adapters with TestSuite. ConsoleReporter and report.ExitCode
+replace manual success reporting. Recoverable assertion failures allow later
+independent cases to run; terminal failures remain terminal. Async discovery is
+not added. Existing durations, pauses, promise barriers and explicit disposal order
+are retained. Timer callbacks intentionally exercise notification/serialization;
+there is no new scheduler or .NET API divergence. The existing
+[timer design and comparison](../../design/http-client-lifetime.md) apply.
+
+The three callback helper types now keep sticky validity flags. Repeating and
+rescheduling callbacks record excessive invocation counts; async callbacks record
+any overlap at callback entry. Tests assert those flags after their existing
+completion barriers, including every async lifecycle that uses the helper. A
+callback violation therefore becomes a named framework failure rather than a generic
+Panic. Invariants are not inferred solely from final counts.
+
+Python retains native building, instruction/process budgets and five separate
+terminal-failure probes (negative/excessive duration, zero/negative interval and
+starting a disposed timer). Faults.rvn and its project are unchanged. The behavior
+run now requires the exact six-test transcript and empty stderr, and the report
+includes framework, validator, runtime and codegen hashes as in CancelAfter.
+
+[The report](timers-report.json.gz) and [log](timers.log.gz) pass all six tests in
+interpreter and native AOT plus all five guards in each mode: twelve behavior-test
+executions and ten expected-failure processes on macOS ARM64. The existing two-mode
+scope remains; JIT coverage is not claimed. Inputs use the fingerprinted
+`target/http-header-noop/inputs/bundle`, without claiming a fresh compiler build
+or a new release qualification. Historical validation.json in the experiment is
+unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-timers.py --suite timers \
+  --bundle target/http-header-noop/inputs/bundle \
+  --runtime target/http-header-noop/inputs/bundle/bin/neoclr \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/timers-testing-migration-20261101
+```
+
+[The isolated negative control](timers-negative-control.json.gz) changes the repeating
+callback's accepted count from `Count <= 3` to `Count < 3` in a copied Tests.rvn.
+The third delivery records a violation, then the combined synchronous test reports
+`No callback exceeds three deliveries`; all five async cases pass. Interpreter exits
+one with one named failure and empty stderr. This directly checks callback-to-test
+failure propagation rather than just a failure in Main. The repository fixture is
+not mutated. [Reproduction script](timers-negative-control.py.gz) retains commands
+and source hashes; run from the repository root with a fresh output directory.
+No production API or website content changes; no website build is needed.

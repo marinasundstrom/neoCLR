@@ -1,0 +1,224 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import System.Result.*
+import NeoClr.Testing.*
+
+class Counter {
+    var Value = 0
+}
+
+class RepeatingCheck {
+    var Valid = true
+    var Current: Timer? = null
+    var Count: int = 0
+    val Done: Promise<()> = Promise<()>()
+
+    func Tick() {
+        Count += 1
+        if Count == 3 {
+            let timer = Current
+            if timer is Timer active {
+                active.Stop()
+            }
+            Done.Complete(())
+        }
+        Valid = Valid && Count <= 3
+    }
+}
+
+class RescheduleCheck {
+    var Valid = true
+    var Current: Timer? = null
+    var Count: int = 0
+    val Done: Promise<()> = Promise<()>()
+
+    func Tick() {
+        Count += 1
+        if Count == 1 {
+            let timer = Current
+            if timer is Timer active {
+                active.Start(Duration.FromTicks(0L))
+            }
+        } else {
+            Valid = Valid && Count == 2
+            Done.Complete(())
+        }
+    }
+}
+
+async func Pause() -> Task<()> {
+    let done = Promise<()>()
+    // Timer callback adapter supplies a completion barrier for the awaiting test.
+    let timer = Timer(() => { done.Complete(()) })
+    timer.Start(Duration.FromTicks(10000L))
+    await done.Task
+    timer.Dispose()
+}
+
+// Retain explicit disposal and record callback invariants for the awaiting test.
+// Callbacks intentionally exercise Timer notification and async serialization.
+class AsyncCheck {
+    var Valid = true
+    var Current: Timer? = null
+    var Count = 0
+    var Active = 0
+    val Started: Promise<()> = Promise<()>()
+    val Release: Promise<()> = Promise<()>()
+    val Done: Promise<()> = Promise<()>()
+
+    async func Tick() -> Task<()> {
+        Active += 1
+        Valid = Valid && Active == 1
+        Count += 1
+        if Count == 1 {
+            Started.Complete(())
+            await Release.Task
+        }
+        await Pause()
+        Active -= 1
+        if Count == 2 {
+            let timer = Current
+            if timer is Timer current {
+                current.Stop()
+            }
+            Done.Complete(())
+        }
+    }
+}
+
+func CancelledCallback() -> Task<()> {
+    let done = Promise<()>()
+    done.Cancel()
+    return done.Task
+}
+
+[Test]
+async func `Synchronous timers preserve one shot stop disposal repeat and reschedule lifecycles`() -> Task<Result<unit, TestFailure>> {
+    let done = Promise<()>()
+    let count = Counter()
+    let once = Timer(() => {
+        count.Value += 1
+        done.Complete(())
+    })
+    _ = Assert.True(!once.IsRunning, "New timer is stopped")?
+    once.Start(Duration.FromTicks(0L))
+    await done.Task
+    _ = Assert.True(count.Value == 1 && !once.IsRunning, "One shot runs once and stops")?
+
+    once.Start(Duration.FromTicks(21474836470000L))
+    once.Stop()
+    await Pause()
+    _ = Assert.True(count.Value == 1 && !once.IsRunning, "Stop suppresses the maximum-duration countdown")?
+
+    once.Start(Duration.FromTicks(0L))
+    once.Dispose()
+    once.Dispose()
+    await Pause()
+    _ = Assert.True(count.Value == 1 && !once.IsRunning, "Repeated disposal suppresses pending delivery")?
+
+    let repeated = RepeatingCheck()
+    let periodic = Timer(repeated.Tick)
+    repeated.Current = periodic
+    periodic.Start(Duration.FromTicks(0L), Duration.FromTicks(1L))
+    await repeated.Done.Task
+    await Pause()
+    _ = Assert.True(repeated.Count == 3 && !periodic.IsRunning, "Repeating callback stops after three deliveries")?
+
+    let changed = RescheduleCheck()
+    let rescheduled = Timer(changed.Tick)
+    changed.Current = rescheduled
+    rescheduled.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await changed.Done.Task
+    await Pause()
+    _ = Assert.True(changed.Count == 2 && !rescheduled.IsRunning, "Callback rescheduling replaces the interval")?
+    _ = Assert.True(repeated.Valid, "No callback exceeds three deliveries")?
+    _ = Assert.True(changed.Valid, "Rescheduled callback has exactly two deliveries")?
+    periodic.Dispose()
+    rescheduled.Dispose()
+
+    return Ok(())
+}
+
+[Test]
+async func `Async repeating timers wait for callback completion`() -> Task<Result<unit, TestFailure>> {
+    let asynchronous = AsyncCheck()
+    let asyncTimer = Timer(asynchronous.Tick)
+    asynchronous.Current = asyncTimer
+    asyncTimer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await asynchronous.Started.Task
+    await Pause()
+    _ = Assert.True(asynchronous.Count == 1 && asyncTimer.IsRunning, "Repeating callback waits for release")?
+    asynchronous.Release.Complete(())
+    await asynchronous.Done.Task
+    await Pause()
+    _ = Assert.True(asynchronous.Count == 2 && !asyncTimer.IsRunning, "Repeating timer stops after the second callback")?
+    _ = Assert.True(asynchronous.Valid, "Async callbacks never overlap")?
+    asyncTimer.Dispose()
+
+    return Ok(())
+}
+
+[Test]
+async func `Restarting an async timer does not overlap callbacks`() -> Task<Result<unit, TestFailure>> {
+    let restarted = AsyncCheck()
+    let restartedTimer = Timer(restarted.Tick)
+    restarted.Current = restartedTimer
+    restartedTimer.Start(Duration.FromTicks(0L))
+    await restarted.Started.Task
+    restartedTimer.Start(Duration.FromTicks(0L))
+    await Pause()
+    _ = Assert.True(restarted.Count == 1 && restarted.Active == 1, "Restart waits for the active callback")?
+    restarted.Release.Complete(())
+    await restarted.Done.Task
+    _ = Assert.True(restarted.Valid, "Async callbacks never overlap")?
+    restartedTimer.Dispose()
+
+    return Ok(())
+}
+
+[Test]
+async func `Disposal allows the active async callback to finish`() -> Task<Result<unit, TestFailure>> {
+    let stopped = AsyncCheck()
+    let stoppedTimer = Timer(stopped.Tick)
+    stoppedTimer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await stopped.Started.Task
+    stoppedTimer.Stop()
+    stoppedTimer.Dispose()
+    _ = Assert.True(!stoppedTimer.IsRunning && stopped.Active == 1, "Disposal stops scheduling without aborting the active callback")?
+    stopped.Release.Complete(())
+    await Pause()
+    await Pause()
+    _ = Assert.True(stopped.Count == 1 && stopped.Active == 0, "Disposed timer permits completion without another callback")?
+    _ = Assert.True(stopped.Valid, "Disposed async callbacks never overlap")?
+
+    return Ok(())
+}
+
+[Test]
+async func `Cancelled callbacks stop repeating timers`() -> Task<Result<unit, TestFailure>> {
+    let cancelledTimer = Timer(CancelledCallback)
+    cancelledTimer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await Pause()
+    _ = Assert.True(!cancelledTimer.IsRunning, "An already-cancelled callback stops repetition")?
+    cancelledTimer.Dispose()
+    return Ok(())
+}
+
+[Test]
+async func `Pending callback cancellation stops repeating timers`() -> Task<Result<unit, TestFailure>> {
+    let cancelled = AsyncCheck()
+    let timer = Timer(cancelled.Tick)
+    timer.Start(Duration.FromTicks(0L), Duration.FromTicks(10000L))
+    await cancelled.Started.Task
+    cancelled.Release.Cancel()
+    await Pause()
+    await Pause()
+    _ = Assert.True(cancelled.Count == 1 && !timer.IsRunning, "Pending cancellation stops repetition")?
+    _ = Assert.True(cancelled.Valid, "Cancelled async callbacks never overlap")?
+    timer.Dispose()
+    return Ok(())
+}
