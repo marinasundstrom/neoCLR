@@ -139,6 +139,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   one named failure and exit one while still closing its socket. Require exact
   framework output, empty stderr and explicit interpreter selection; public timeout
   semantics, process budgets and historical network evidence remain unchanged.
+  Migrate the incoming HTTP body-copy wire probe to one named framework lifecycle,
+  retaining all five framing exchanges, per-byte/sentinel checks and replay rejection.
+  The independent peer still withholds bodies until HEADERS and checks socket EOF.
+  The lifecycle passes in interpreter/AOT (ten exchanges); an isolated wrong-length
+  control reports one named failure and exit one after the first delivered body.
+  Require the exact framework transcript and retain source/input hashes; production
+  APIs, process budgets and historical content-copy evidence remain unchanged.
 
 ### 2026-10-31
 

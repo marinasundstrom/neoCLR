@@ -1,0 +1,42 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Concurrency.Tasks.*
+import System.IO.*
+import System.Result.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+[Test]
+async func `Incoming HTTP body copy preserves framing bytes and single consumption`(url: string) -> Task<Result<unit, TestFailure>> {
+    let client = HttpClient()
+    for mode in 0..5 {
+        let Ok(request) = HttpClientRequest.Get(url) else { return Assert.True(false, "Construct the incoming-body request") }
+        let Ok(response) = await client.Send(request, HttpCompletionOption.ResponseHeadersRead) else { return Assert.True(false, "Receive response headers") }
+        _ = Assert.True(!response.Content.IsBuffered, "Headers are delivered before body buffering")?
+        let destination = MemoryStream()
+        Console.WriteLine("HEADERS")
+        let result = await response.Content.CopyTo(destination)
+        if mode < 3 {
+            _ = Assert.True(result is Ok(_), "Valid framing copies successfully")?
+            _ = Assert.True(destination.GetLength() is Ok(2049L), "Copied body length is 2049 bytes")?
+            _ = Assert.True(destination.Seek(0) is Ok(0L), "Rewind the copied body")?
+            let buffer: byte[] = [(byte)77, (byte)0, (byte)99]
+            for index in 0..2049 {
+                let read = await destination.Read(buffer, 1, 1)
+                _ = Assert.True(read is Ok(1), "Read each copied byte")?
+                _ = Assert.True(buffer[0] == 77 && buffer[1] == 120 && buffer[2] == 99, "Copied byte and surrounding sentinels are preserved")?
+            }
+        } else {
+            _ = Assert.True(result is Failure(HttpError.Content(StreamError.InvalidData)), "Truncated or malformed framing reports InvalidData")?
+        }
+        let replay = await response.Content.CopyTo(destination)
+        _ = Assert.True(replay is Failure(HttpError.InvalidRequest(_)), "Incoming content cannot be copied twice")?
+        destination.Close()
+        response.Dispose()
+        Console.WriteLine("CASE")
+    }
+    client.Dispose()
+    Console.WriteLine("DONE")
+    return Ok(())
+}

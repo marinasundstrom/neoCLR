@@ -63,3 +63,18 @@ Qualification result: all six lifecycle cases pass in interpreter, JIT and AOT
 (10 exchanges). Both API snapshots validate. Initial rejected fixture builds are
 retained separately from passing results; native compilation was not treated as
 proof of execution.
+
+## Framework migration — 2026-11-01
+
+The current wire probe keeps all five exchanges in one named NeoClr.Testing
+lifecycle in Tests.rvn. Main explicitly awaits it and reports its completed result
+through TestSuite and ConsoleReporter, returning report.ExitCode. This does not add
+async/parameterized discovery. Python retains the HEADERS/CASE handshake, independent
+framing bytes and EOF checks, and now requires the exact framework transcript.
+All byte, length, sentinel, invalid-framing and single-consumption assertions remain.
+
+The lifecycle passes in interpreter and AOT; an isolated wrong-length assertion
+produces a named failure and exit one after the first body. See the
+[migration evidence](../../validation/testing-migration-20261101/README.md#incoming-http-content-copy)
+for current inputs, reproduction and scope. The original evidence above remains
+historical; the separate managed content-copy suite now has eight framework cases.

@@ -49,8 +49,16 @@ def run(command):
                 guest.line(b'CASE')
                 rows.append(dict(case=case, passed=True, headersBeforeBody=True))
             guest.line(b'DONE')
-            guest.finish()
-            return rows
+            guest.line(b'PASS Incoming HTTP body copy preserves framing bytes and single consumption')
+            guest.line(b'Tests: 1, passed: 1, failed: 0, skipped: 0')
+            stderr = guest.finish()
+            expected = ([b'HEADERS\n', b'CASE\n'] * 5 + [b'DONE\n',
+                        b'PASS Incoming HTTP body copy preserves framing bytes and single consumption\n',
+                        b'Tests: 1, passed: 1, failed: 0, skipped: 0\n'])
+            if guest.output != expected:
+                raise AssertionError('Unexpected body-copy framework transcript: ' + repr(guest.output))
+            return rows, dict(exitCode=guest.process.returncode,
+                              stdoutHex=b''.join(guest.output).hex(), stderrHex=stderr.hex())
         finally:
             guest.close()
 
@@ -71,9 +79,15 @@ def main():
         'interpreter': [str(bundle / manifest['runtime']), 'run', str(build / 'app.dll'), '--execution', 'interpreter', '--instructions', '2000000000', *context],
     }
     report = dict(passed=False, scope='Loopback body-copy correctness; not throughput or TLS qualification.', commands=commands, cases={}, inputs={str(build / name): hashlib.sha256((build / name).read_bytes()).hexdigest() for name in ('app', 'app.dll', 'build.json')})
+    report['sources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in [Path(__file__), *Path(__file__).parent.glob('*.rvn'), *Path(__file__).parent.glob('*.rvnproj')]}
+    report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
+    report['bundleManifestSha256'] = hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest()
+    report['executions'] = {}
     try:
         for mode, command in commands.items():
-            report['cases'][mode] = run(command)
+            report['cases'][mode], report['executions'][mode] = run(command)
             print('PASS', mode, flush=True)
         report['passed'] = True
     finally:

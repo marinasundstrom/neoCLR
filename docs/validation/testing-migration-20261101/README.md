@@ -933,3 +933,48 @@ still delays its HTTP 200 response and confirms socket closure. Interpreter repo
 repository fixture is not mutated. [Reproduction script](http-timeout-network-negative-control.py.gz)
 records commands and source hashes; run from the repository root with a fresh output
 directory. No production API or website content changes; no website build is needed.
+
+## Incoming HTTP content copy
+
+The [wire probe](../../experiments/http-content-copy/README.md#framework-migration--2026-11-01)
+now uses one named NeoClr.Testing lifecycle, Incoming HTTP body copy preserves
+framing bytes and single consumption. It retains one shared client and all five
+ordered fixed-length, chunked, EOF-delimited, truncated and malformed exchanges.
+Tests.rvn replaces generic Panic checks with phase-specific assertions; Main awaits
+the outcome explicitly, adapts it through a reference owner and reports TestSuite's
+actual result and exit code. No async/parameterized discovery is added.
+
+Python still withholds each body until HEADERS, supplies independent framing bytes,
+checks peer EOF and waits for CASE. It now also requires the exact named framework
+transcript, exit zero and empty stderr. The 2049 per-byte reads, destination sentinels,
+rewind/length checks, invalid-framing errors and replay rejection remain intact.
+Production contracts and the existing .NET comparison are unchanged.
+
+[Report](http-body-copy-report.json.gz) and [log](http-body-copy.log.gz) record
+one passing lifecycle in each of interpreter and native AOT: ten peer exchanges
+on macOS ARM64. Source/framework/build fingerprints and the bundle manifest hash
+identify the reused matching `target/http-header-noop/inputs/bundle`. Existing
+instruction/process limits are retained; no JIT, Windows, TLS, performance or release
+qualification is added. Historical evidence is unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile http \
+  --project docs/experiments/http-content-copy/Probe.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/http-body-copy-testing-migration-20261101
+python3 docs/experiments/http-content-copy/validate.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --build target/http-body-copy-testing-migration-20261101 \
+  --output target/http-body-copy-testing-migration-20261101/validation.json
+```
+
+[Negative control](http-body-copy-negative-control.json.gz) changes expected length
+2049 to 2050 in an isolated Tests.rvn copy. Interpreter reports the named body-length
+failure and exit one with empty stderr after the first delivered body, without CASE
+or DONE; the peer observes EOF. Remaining exchanges intentionally do not run after
+that failure. The repository fixture is unchanged. The
+[reproduction script](http-body-copy-negative-control.py.gz) records commands and
+source hashes; run it from the repository root with a fresh output directory.
+No public API or website content changes are required; no website build was run.
