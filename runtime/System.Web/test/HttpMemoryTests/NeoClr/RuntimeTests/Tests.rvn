@@ -1,0 +1,169 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Runtime.*
+import System.Result.*
+import System.Optional.*
+import System.IO.*
+import System.Time.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+class CancellationObserver {
+    private val operation: Task<Result<int, StreamError>>
+    val Done = Promise<bool>()
+    init(operation: Task<Result<int, StreamError>>) { self.operation = operation }
+    // Outcome observation keeps cancellation from cancelling the test entry point.
+    func Complete() { _ = Done.Complete(operation.IsCancelled) }
+}
+
+async func SendText(socket: Socket, text: string) -> Task<bool> {
+    // Send a selected window with sentinel bytes outside the HTTP message.
+    let encoded = ("!" + text + "!").Utf8Bytes.ToArray()
+    if encoded.Count > 512 { return false }
+    let owned: byte[] = [for index in 0..512 => (byte)0]
+    var index = 0
+    while index < encoded.Count {
+        owned[index] = encoded[index]
+        index += 1
+    }
+    let bytes: ReadOnlyMemory<byte> = owned
+    let source = bytes.Slice(1, encoded.Count - 2)
+    var sent = 0
+    while sent < source.Length {
+        let Ok(count) = await socket.Send(source.Slice(sent)) else { return false }
+        if count == 0 { return false }
+        sent += count
+    }
+    return true
+}
+
+async func CheckBody(server: HttpServer, port: int, chunked: bool, cancel: bool) -> Task<Result<unit, TestFailure>> {
+    let accepting = server.AcceptHeaders()
+    let Ok(client) = await Socket.Connect("127.0.0.1", port) else {
+        return Assert.True(false, "Connect the request peer")
+    }
+    let sentHeaders = await SendText(client, "POST /window HTTP/1.1\r\nHost: localhost\r\n")
+    _ = Assert.True(sentHeaders, "Send the split header prefix")?
+    let framing = if chunked { "Transfer-Encoding: chunked\r\n\r\n" } else { "Content-Length: 4\r\n\r\n" }
+    let sentFraming = await SendText(client, framing)
+    _ = Assert.True(sentFraming, "Send the framing header suffix")?
+    let Ok(context) = await accepting else {
+        return Assert.True(false, "Accept request headers")
+    }
+    let Some(input) = context.Request.Content.TryGetStream() else {
+        return Assert.True(false, "Obtain request body stream")
+    }
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    let cancellation = CancellationTokenSource()
+    let pending = input.Read(destination, 1, 2, cancellation.Token)
+    GC.Collect()
+    if cancel {
+        let observer = CancellationObserver(pending)
+        pending.OnCompleted(observer.Complete)
+        cancellation.Cancel()
+        let acknowledgedCancellation = await observer.Done.Task
+        _ = Assert.True(acknowledgedCancellation, "Pending body read acknowledges cancellation")?
+        _ = Assert.True(destination[1] == 9 && destination[2] == 9, "Cancellation leaves destination unchanged")?
+    } else {
+        let sentFirstBody = await SendText(client, if chunked { "2\r\nab\r\n" } else { "ab" })
+        _ = Assert.True(sentFirstBody, "Send first body segment")?
+        let firstRead = await pending
+        _ = Assert.True(firstRead is Ok(2), "First pending read returns two bytes")?
+        _ = Assert.True(destination[0] == 9 && destination[1] == 97 && destination[2] == 98 && destination[3] == 9, "First read preserves sentinels and expected bytes")?
+        let next = input.Read(destination, 1, 2)
+        GC.Collect()
+        let sentFinalBody = await SendText(client, if chunked { "2\r\ncd\r\n0\r\n\r\n" } else { "cd" })
+        _ = Assert.True(sentFinalBody, "Send final body segment and framing terminator")?
+        let finalRead = await next
+        _ = Assert.True(finalRead is Ok(2), "Second pending read returns two bytes")?
+        _ = Assert.True(destination[0] == 9 && destination[1] == 99 && destination[2] == 100 && destination[3] == 9, "Second read preserves sentinels and expected bytes")?
+        let requestEof = await input.Read(destination, 1, 2)
+        _ = Assert.True(requestEof is Ok(0), "Request body reaches EOF")?
+        let emptyRead = await input.Read(destination, 4, 0)
+        _ = Assert.True(emptyRead is Ok(0), "End-position empty body read succeeds")?
+        let invalidRead = await input.Read(destination, 3, 2)
+        _ = Assert.True(invalidRead is Failure(StreamError.InvalidRange), "Invalid request-body destination range is rejected")?
+    }
+    context.Close()
+    client.Close()
+    return Ok(())
+}
+
+func ResponseUrl(port: int) -> string {
+    return "http://127.0.0.1:" + port.ToString() + "/response"
+}
+
+async func CheckClient(server: HttpServer, port: int) -> Task<Result<unit, TestFailure>> {
+    use client = HttpClient()
+    let Ok(request) = HttpClientRequest.Get(ResponseUrl(port)) else {
+        return Assert.True(false, "Create the HTTP client request")
+    }
+    let accepting = server.Accept()
+    let receiving = client.Send(request, HttpCompletionOption.ResponseHeadersRead)
+    let Ok(context) = await accepting else {
+        return Assert.True(false, "Accept the client request")
+    }
+    context.RespondText("abcd")
+    let completing = context.Complete()
+    let Ok(response) = await receiving else {
+        return Assert.True(false, "Receive response headers")
+    }
+    let Some(input) = response.Content.TryGetStream() else {
+        return Assert.True(false, "Obtain response body stream")
+    }
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    var count = 0
+    while count < 4 {
+        GC.Collect()
+        let Ok(read) = await input.Read(destination, 1, 2) else {
+            return Assert.True(false, "Read the response body window")
+        }
+        _ = Assert.True(read != 0 && read <= 2, "Response read makes bounded progress")?
+        _ = Assert.True(destination[0] == 9 && destination[3] == 9, "Response read preserves outside sentinels")?
+        var index = 0
+        while index < read {
+            _ = Assert.True(destination[1 + index] == (byte)(97 + count + index), "Response window contains the next expected byte")?
+            index += 1
+        }
+        count += read
+    }
+    let responseEof = await input.Read(destination, 1, 2)
+    _ = Assert.True(responseEof is Ok(0), "Response body reaches EOF")?
+    let completedResponse = await completing
+    _ = Assert.True(completedResponse is Ok(_), "Server response completion succeeds")?
+    input.Close()
+    return Ok(())
+}
+
+func WithPhase(result: Result<unit, TestFailure>, phase: string) -> Result<unit, TestFailure> {
+    return match result {
+        Ok(_) => Ok(())
+        Failure(let failure) => Failure(TestFailure(phase + ": " + failure.Message, failure.Expected, failure.Actual))
+    }
+}
+
+[Test]
+async func `HTTP memory windows preserve framing ownership cancellation and read ahead`() -> Task<Result<unit, TestFailure>> {
+    let options = HttpServerOptions()
+    options.RequestReadTimeout = Duration.FromTicks(600000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4, options) else {
+        return Assert.True(false, "Listen on the isolated HTTP port")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        return Assert.True(false, "Read the assigned HTTP port")
+    }
+    let fixedResult = await CheckBody(server, port, false, false)
+    _ = WithPhase(fixedResult, "Fixed-length request")?
+    let chunkedResult = await CheckBody(server, port, true, false)
+    _ = WithPhase(chunkedResult, "Chunked request")?
+    let cancelledResult = await CheckBody(server, port, false, true)
+    _ = WithPhase(cancelledResult, "Cancelled request")?
+    let clientResult = await CheckClient(server, port)
+    _ = WithPhase(clientResult, "Client response")?
+    server.Close()
+    return Ok(())
+}

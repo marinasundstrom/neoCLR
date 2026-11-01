@@ -24,10 +24,10 @@ the common runner's `report.json` schema. Existing historical evidence is unchan
 
 ## Remaining applicability review
 
-- HTTP and socket memory consumers contain behavior suitable for framework tests,
-  but asynchronous lifecycle/cancellation observation and native host profiles need
-  deliberate preservation. The inspected HTTP wrapper has a stale project name
-  and old stream signatures; migrate and validate as a separate bounded task.
+- Socket and HTTP memory lifecycles now use explicit async framework adapters.
+  Socket passes all three modes. HTTP passes JIT/AOT but retains a preexisting
+  interpreter wait-bridge failure with paired original/migrated evidence below;
+  that qualification gap remains open.
 - HTTP custom-method wire peers, compiler visibility rejection and terminal-failure
   subprocess probes retain legitimate Python host orchestration. Do not mechanically
   convert these into in-process assertions.
@@ -240,3 +240,65 @@ SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
 The original numeric-exit source remains in Git history. Historical socket/kernel
 ownership reports and negative controls remain unchanged. No website build is
 needed for this test-only slice.
+
+## HTTP memory lifecycle
+
+The [HTTP memory fixture](../../../runtime/System.Web/test/HttpMemoryTests/README.md)
+now uses a named async `NeoClr.Testing` case with the same shared server and
+fixed-length, chunked, cancellation and client-response phase order. Each phase
+returns descriptive TestFailure values; WithPhase attaches the phase while retaining
+expected/actual values. Main awaits the whole lifecycle, then uses the already
+qualified bound-reference TestSuite adapter. Automatic async discovery is not added.
+
+Preserved behavior includes selected readonly socket sends with surrounding
+sentinels, headers split across sends, pending nonzero destination windows,
+collections before body delivery, exact body bytes and unchanged sentinels,
+fixed/chunked EOF, empty end windows, invalid destination ranges, acknowledged
+cancellation without byte mutation, and client ResponseHeadersRead partial reads
+with collections and read-ahead byte order. Failed phases still stop before the
+next request, matching the original early-return contract.
+
+The initial nested-await assertion form was rejected by the selected compiler's
+native value-block emission. Awaiting into named locals before asserting preserves
+the ordering and compiles more clearly. No compiler fix or new platform rule is
+claimed. The existing HTTP/stream ownership design and .NET comparison are unchanged;
+there are no production library/API/runtime changes.
+
+Python retains HTTP-profile native building, exact framework transcript checks,
+artifact/source fingerprints and all three execution modes. It corrects only the
+stale Tests.rvnproj path and permits the exact existing DAM2004 JIT diagnostic.
+The 300-second process timeout and 100,000,000 interpreter instruction budget are
+unchanged. Qualification is **partial**, not passed in all modes.
+
+[The three-mode report](http-memory-three-mode-report.json.gz) passes JIT and AOT,
+including all four phases and the final framework summary. Interpreter exits one
+inside RuntimeAwaitProvider.Bridge.Wait while SendText waits; it produces no test
+result. The verifier retains this failure and returns nonzero overall. No mode is
+skipped and no timeout/instruction limit is relaxed.
+
+The [original numeric-exit fixture](http-memory-original-interpreter.json.gz),
+compiled separately from the pre-migration committed source, fails at the same
+wait-bridge location using the same bundle and limits. Its source hash, commands,
+output and duration are recorded. [Reproduction script](http-memory-baseline-reproduction.py.gz).
+A second paired diagnostic using the existing local `target/release/neoclr` also
+fails for [the original](http-memory-current-original.json.gz) and
+[the migrated fixture](http-memory-current-migrated.json.gz). That local binary is
+identified by hash; it was not freshly rebuilt or claimed as new qualification.
+These comparisons establish a preexisting failure in the selected inputs rather
+than a passing interpreter migration. Resolving and independently qualifying the
+wait-bridge/provider interaction remains open; no runtime or compiler fix is claimed.
+
+The [initial compile failure](http-memory-initial-compile.log.gz) belongs to the
+nested-await assertion form, before awaiting into locals. That compile adaptation
+is distinct from the interpreter execution failure. Historical evidence is unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 runtime/System.Web/test/HttpMemoryTests/verify.py \
+  --bundle target/http-message-surfaces/inputs9/bundle \
+  --output /fresh/http-memory-output
+```
+
+This currently records the interpreter failure and exits nonzero. Use the preserved
+paired reproduction before investigating a runtime/compiler repair; do not count
+JIT/AOT success as closing the interpreter gate.

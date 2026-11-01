@@ -19,7 +19,7 @@ output.mkdir(parents=True, exist_ok=False)
 build = output / 'build'
 command = [sys.executable, str(ROOT / 'scripts/build-native-project.py'),
            '--profile', 'windows-http' if os.name == 'nt' else 'http',
-           '--project', str(Path(__file__).with_name('Tests.rvnproj')),
+           '--project', str(Path(__file__).with_name('HttpMemoryTests.rvnproj')),
            '--bundle', str(bundle), '--aot', str(bundle / 'bin' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen')),
            '--output', str(build)]
 result = subprocess.run(command, capture_output=True, timeout=600)
@@ -40,13 +40,24 @@ commands = {
                    '--jit-compiler', str(bundle / 'bin' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))],
     'aot': [str(build / ('app.exe' if os.name == 'nt' else 'app'))],
 }
+RETENTION_WARNING = b'warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n'
+EXPECTED = (b'PASS HTTP memory windows preserve framing ownership cancellation and read ahead\n'
+            b'Tests: 1, passed: 1, failed: 0, skipped: 0\n')
 cases = []
 for mode, run in commands.items():
     result = subprocess.run(run, capture_output=True, timeout=300)
-    passed = result.returncode == 0 and result.stdout.strip() == b'PASS HTTP memory windows, framing, GC, cancellation and EOF' and result.stderr == b''
+    diagnostic = RETENTION_WARNING if mode == 'jit' and result.stderr == RETENTION_WARNING else b''
+    passed = result.returncode == 0 and result.stdout == EXPECTED and result.stderr == diagnostic
     cases.append(dict(mode=mode, passed=passed, command=run, exitCode=result.returncode,
-                      stdoutHex=result.stdout.hex(), stderrHex=result.stderr.hex()))
+                      stdoutHex=result.stdout.hex(), stderrHex=result.stderr.hex(),
+                      compilerDiagnostic=diagnostic.decode()))
 report = dict(passed=all(case['passed'] for case in cases), cases=cases, buildCommand=command,
+              testAdapter='Await the shared-server lifecycle, then report through a bound reference owner; not async discovery',
+              sources={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                       for p in [Path(__file__).resolve(), Path(__file__).with_name('Main.rvn').resolve(),
+                                 Path(__file__).with_name('HttpMemoryTests.rvnproj').resolve(),
+                                 Path(__file__).parent.resolve() / 'NeoClr/RuntimeTests/Tests.rvn']},
+              bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest(),
               runtimeSha256=hashlib.sha256(runtime.read_bytes()).hexdigest(),
               consumerSha256=hashlib.sha256((build / 'app.dll').read_bytes()).hexdigest(),
               compilerSha256=hashlib.sha256((bundle / 'sdk/tools/rvnc/rvnc.dll').read_bytes()).hexdigest())

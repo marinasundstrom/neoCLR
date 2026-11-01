@@ -37,6 +37,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cancellation, empty windows, EOF and closed-state checks. Await explicitly and
   report the completed result through a bound reference adapter; fix the wrapper's
   stale project filename. The full lifecycle passes in interpreter, JIT and AOT.
+  Migrate HTTP memory behavior to a named async framework case with phase-specific
+  failures, retaining the shared server, request order, fixed/chunked framing,
+  cancellation, GC/sentinels, invalid ranges, EOF and client read-ahead checks.
+  Keep explicit async result adaptation and Python orchestration; repair the stale
+  HTTP test project path without changing production APIs or validation budgets.
+  JIT/AOT pass; interpreter retains a preexisting async wait-bridge failure,
+  reproduced with both original and migrated fixtures. Preserve failed reports and
+  keep the overall verifier failing until interpreter qualification is resolved.
 
 ### 2026-10-31
 
