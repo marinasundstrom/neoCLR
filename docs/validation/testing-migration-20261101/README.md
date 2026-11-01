@@ -189,3 +189,54 @@ runtime investigation. Do not infer corrected I/O error propagation from this
 fixture migration or silently relabel the diagnostic as passed. Existing file-fixture
 failure-control evidence still covers ordinary framework failure propagation in the
 interpreter. Native host memory/binding probes remain separate and unaffected.
+
+## Socket memory ownership
+
+The [socket fixture](../../../runtime/System.Networking/test/SocketMemoryTests/README.md)
+is now a named async `NeoClr.Testing` case. Its original lifecycle remains combined:
+loopback pair creation, a pending selected receive, collection, selected send,
+source alias mutation, collection, exact byte/count/sentinel checks, default and
+end windows, expired deadline, acknowledged cancellation and unchanged destination,
+pre-cancelled empty receive, detached send/receive owners with collections, EOF and
+closed receive. Numeric early-return codes become descriptive framework failures.
+No production API, runtime/compiler behavior or socket contract changes. The
+existing memory-view ownership design and .NET comparison remain authoritative;
+this migration does not introduce a new divergence.
+
+The runner's discovery contract is synchronous, so Main explicitly awaits the
+whole lifecycle before handing its result to TestSuite. A small reference owner
+stores the result and exposes a bound Invoke method. The first direct closure
+capture failed with NEOMETA001; this adapter respects the selected compiler's
+current restriction without turning it into a permanent platform contract.
+OnCompleted remains only for observing cancellation without cancelling Main.
+
+Python retains native-profile building, process execution, exact framework output
+and artifact fingerprints. The stale Tests.rvnproj path now selects the existing
+SocketMemoryTests.rvnproj. Only the exact known DAM2004 JIT compiler warning is
+accepted; other diagnostics still fail validation.
+
+[The final report](socket-memory-three-mode-report.json.gz) passes the complete
+lifecycle in interpreter, managed JIT and native AOT on macOS ARM64. Each mode
+prints one passing framework case and the standard summary. Source/compiler/runtime
+and bundle identities are fingerprinted; inputs use the same qualified
+`target/http-message-surfaces/inputs9/bundle` as the preceding migrations.
+No fresh compiler rebuild or Windows qualification is implied.
+
+Retained compile attempts identify the adapter repairs:
+[direct capture](socket-memory-capture-compile.log.gz) rejects the Result capture;
+[a missing System import](socket-memory-import-compile.log.gz) prevents resolving
+Result's type; [stored-result analysis](socket-memory-stored-result-compile.log.gz)
+requires proving the union is active. Invoke now matches Ok/Failure and returns
+the corresponding active case, preserving the failure payload. These are fixture
+adaptations; no compiler change or general async discovery feature is implemented.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 runtime/System.Networking/test/SocketMemoryTests/verify.py \
+  --bundle target/http-message-surfaces/inputs9/bundle \
+  --output target/socket-memory-testing-migration-20261101-validated
+```
+
+The original numeric-exit source remains in Git history. Historical socket/kernel
+ownership reports and negative controls remain unchanged. No website build is
+needed for this test-only slice.

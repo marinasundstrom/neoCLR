@@ -1,0 +1,88 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Runtime.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import NeoClr.Testing.*
+
+class CancellationObserver {
+    private val operation: Task<Result<int, SocketError>>
+    val Done = Promise<bool>()
+    init(operation: Task<Result<int, SocketError>>) { self.operation = operation }
+    // Observe cancellation without cancelling the test's own async entry.
+    func Complete() { _ = Done.Complete(operation.IsCancelled) }
+}
+
+func StartOwnedReceive(socket: Socket) -> Task<Result<int, SocketError>> {
+    let destination: Memory<byte> = [(byte)9, (byte)9, (byte)9, (byte)9]
+    return socket.Receive(destination.Slice(1, 2))
+}
+
+func StartOwnedSend(socket: Socket) -> Task<Result<int, SocketError>> {
+    let source: ReadOnlyMemory<byte> = [(byte)165, (byte)31, (byte)32, (byte)166]
+    return socket.Send(source.Slice(1, 2))
+}
+
+[Test]
+async func `Socket memory windows preserve snapshots ownership cancellation and EOF`() -> Task<Result<unit, TestFailure>> {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else { return Assert.True(false, "Listen on an isolated loopback port") }
+    let Ok(port) = listener.GetLocalPort() else { return Assert.True(false, "Read the assigned listener port") }
+    let accepting = listener.Accept()
+    let Ok(client) = await Socket.Connect("127.0.0.1", port) else { return Assert.True(false, "Connect the client") }
+    let Ok(peer) = await accepting else { return Assert.True(false, "Accept the peer") }
+    listener.Close()
+    let bytes: byte[] = [(byte)165, (byte)40, (byte)255, (byte)166]
+    let source: ReadOnlyMemory<byte> = bytes
+    let result: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9]
+    let destination: Memory<byte> = result
+    let receiving = peer.Receive(destination.Slice(1, 2))
+    GC.Collect()
+    let sending = client.Send(source.Slice(1, 2))
+    bytes[1] = (byte)99
+    GC.Collect()
+    let sent = await sending
+    _ = Assert.True(sent is Ok(2), "Selected send transfers two bytes")?
+    let received = await receiving
+    _ = Assert.True(received is Ok(2), "Selected receive transfers two bytes")?
+    _ = Assert.True(result[0] == 9 && result[1] == 40 && result[2] == 255 && result[3] == 9, "Send snapshots original bytes and receive preserves sentinels")?
+    let emptySend = await client.Send(default(ReadOnlyMemory<byte>))
+    _ = Assert.True(emptySend is Ok(0), "Default send window is empty")?
+    let emptyReceive = await peer.Receive(default(Memory<byte>))
+    _ = Assert.True(emptyReceive is Ok(0), "Default receive window is empty")?
+    let endSend = await client.Send(source.Slice(4))
+    _ = Assert.True(endSend is Ok(0), "End-position send is empty")?
+    let endReceive = await peer.Receive(destination.Slice(4))
+    _ = Assert.True(endReceive is Ok(0), "End-position receive is empty")?
+    let expired = NetworkDeadline.Expired
+    let timedOut = await peer.ReceiveUntil(destination, expired, CancellationToken.None)
+    _ = Assert.True(timedOut is Failure(SocketError.TimedOut), "Expired receive deadline returns TimedOut")?
+    let cancellation = CancellationTokenSource()
+    let cancelled = peer.Receive(destination.Slice(1, 2), cancellation.Token)
+    let observer = CancellationObserver(cancelled)
+    cancelled.OnCompleted(observer.Complete)
+    GC.Collect()
+    cancellation.Cancel()
+    let acknowledged = await observer.Done.Task
+    _ = Assert.True(acknowledged, "Pending receive acknowledges cancellation")?
+    _ = Assert.True(result[1] == 40 && result[2] == 255, "Cancelled receive leaves destination bytes unchanged")?
+    _ = Assert.True(peer.Receive(default(Memory<byte>), cancellation.Token).IsCancelled, "Pre-cancellation precedes empty receive")?
+    let retainedReceive = StartOwnedReceive(peer)
+    GC.Collect()
+    let detachedSend = StartOwnedSend(client)
+    GC.Collect()
+    let detached = await detachedSend
+    _ = Assert.True(detached is Ok(2), "Send retains its detached source owner across collection")?
+    GC.Collect()
+    let retained = await retainedReceive
+    _ = Assert.True(retained is Ok(2), "Receive retains its detached destination owner across collection")?
+    client.Close()
+    let eof = await peer.Receive(destination)
+    _ = Assert.True(eof is Ok(0), "Closed client produces peer EOF")?
+    peer.Close()
+    let closed = await peer.Receive(destination)
+    return Assert.True(closed is Failure(SocketError.Closed), "Closed peer rejects receive")
+}

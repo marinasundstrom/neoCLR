@@ -32,6 +32,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   exact documented JIT compiler warning from stderr payload bytes. The three-mode
   byte checks and nine bounds guards pass; retain a separate read-only-stderr probe
   exposing unresolved provider-error/exit-status differences for follow-up.
+  Migrate the socket-memory lifecycle to a named async framework case while
+  retaining send snapshots, pending-receive collection, detached owners, deadlines,
+  cancellation, empty windows, EOF and closed-state checks. Await explicitly and
+  report the completed result through a bound reference adapter; fix the wrapper's
+  stale project filename. The full lifecycle passes in interpreter, JIT and AOT.
 
 ### 2026-10-31
 
