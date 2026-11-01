@@ -1,0 +1,72 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Optional.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.Tasks.TaskOutcome.*
+import NeoClr.Testing.*
+
+// Observe the provider's documented inline completion, not asynchronous OS I/O.
+func CompletedValue<T>(task: Task<T>) -> Result<T, TestFailure> {
+    let Some(Completed(value)) = task.Outcome else {
+        return Failure(TestFailure("File operation must complete inline", "Completed", "Pending, cancelled or faulted"))
+    }
+    return Ok(value)
+}
+
+[Test]
+func `File memory windows preserve bytes sentinels EOF and range position`() -> Result<unit, TestFailure> {
+    let Ok(output) = FileOutputStream.CreateNew(FileFixture.Path) else {
+        return Assert.True(false, "Create a new isolated file")
+    }
+    let bytes: byte[] = [(byte)165, (byte)40, (byte)2, (byte)166]
+    let written = CompletedValue(output.Write(bytes, 1, 2))?
+    _ = Assert.True(written is Ok(_), "Selected output window is written")?
+    let emptyWrite = CompletedValue(output.Write(bytes, 4, 0))?
+    _ = Assert.True(emptyWrite is Ok(_), "End-position empty write succeeds")?
+    let invalidWrite = CompletedValue(output.Write(bytes, -1, 1))?
+    _ = Assert.True(invalidWrite is Failure(StreamError.InvalidRange), "Invalid source range is rejected")?
+    let flushed = CompletedValue(output.Flush())?
+    _ = Assert.True(flushed is Ok(_), "Flush completes inline")?
+    output.Close()
+
+    let Ok(input) = FileInputStream.Open(FileFixture.Path) else {
+        return Assert.True(false, "Open the written file")
+    }
+    let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
+    let read = CompletedValue(input.Read(destination, 1, 3))?
+    _ = Assert.True(read is Ok(2), "Short read reports only stored bytes")?
+    _ = Assert.True(destination[0] == 9 && destination[1] == 40 && destination[2] == 2 && destination[3] == 9 && destination[4] == 9, "Read preserves surrounding sentinels")?
+    let emptyRead = CompletedValue(input.Read(destination, 5, 0))?
+    _ = Assert.True(emptyRead is Ok(0), "End-position empty read succeeds")?
+    let eof = CompletedValue(input.Read(destination, 0, 1))?
+    _ = Assert.True(eof is Ok(0), "End of file returns zero")?
+    let invalidRead = CompletedValue(input.Read(destination, 4, 2))?
+    _ = Assert.True(invalidRead is Failure(StreamError.InvalidRange), "Invalid destination range is rejected")?
+    let position = input.GetPosition()
+    input.Close()
+    return Assert.True(position is Ok(2L), "Rejected read does not advance position")
+}
+
+[Test]
+func `File closed state precedes ranges and cancellation precedes closed state`() -> Result<unit, TestFailure> {
+    let path = FileFixture.Path + ".closed"
+    let Ok(output) = FileOutputStream.CreateNew(path) else {
+        return Assert.True(false, "Create the isolated closed-state file")
+    }
+    output.Close()
+    let Ok(input) = FileInputStream.Open(path) else {
+        return Assert.True(false, "Open the closed-state file")
+    }
+    input.Close()
+    let bytes: byte[] = [(byte)9, (byte)9]
+    let closedRead = CompletedValue(input.Read(bytes, -1, 1))?
+    _ = Assert.True(closedRead is Failure(StreamError.Closed), "Closed read wins over invalid range")?
+    let cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    _ = Assert.True(input.Read(bytes, -1, 1, cancellation.Token).IsCancelled, "Read pre-cancellation wins over closed state and range")?
+    return Assert.True(output.Write(bytes, -1, 1, cancellation.Token).IsCancelled, "Write pre-cancellation wins over closed state and range")
+}

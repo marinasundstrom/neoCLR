@@ -96,3 +96,42 @@ SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
   --bundle target/http-message-surfaces/inputs9/bundle \
   --output target/string-utf8-testing-migration-20261101
 ```
+
+## File memory windows
+
+Two discovered [file-memory tests](../../../runtime/System.Runtime/test/FileMemoryTests/README.md)
+replace numeric exits and the inline-completion Panic helper. The first preserves
+selected write/read windows, empty end windows, invalid ranges, sentinel bytes,
+short read/EOF and cursor preservation. The second preserves closed-state versus
+range validation and pre-cancellation precedence for both input and output.
+Each case has its own file; execution order is immaterial. Explicit task-outcome
+observation is intentional: these assertions qualify the current blocking provider's
+inline completion, not asynchronous OS I/O. Stream behavior and its existing .NET
+comparison are unchanged; this migration changes no production API or implementation.
+
+Python retains isolated temporary-directory ownership and independent file-byte
+checks (`2802` and an empty closed-state file), while the common metadata discovery
+and registration verifier check the test identity. A small custom entry point passes
+the host-selected path to the fixtures and forwards optional selectors to TestRunner.
+The wrapper's stale `Tests.rvnproj` reference now selects `FileMemoryTests.rvnproj`.
+
+[The interpreter report](file-memory-report.json.gz) passes both tests on macOS ARM64
+using the same fingerprinted development bundle as the previous migrations.
+[Discovered identities](file-memory-discovery.json.gz) are verified again against
+the final compiled assembly. An [existing-file negative control](file-memory-negative-control.json.gz)
+passes: CreateNew's rejected input produces a named test failure, exit code one and
+one passing/one failing result, while the preexisting bytes remain unchanged.
+This demonstrates failure propagation through the migrated runner.
+
+The [initial compile diagnostic](file-memory-initial-compile-error.log.gz) exposed
+that slicing entry arguments produces Slice<string>, while TestRunner expects
+string[]. The fixture now calls ToArray on that slice; the successful run uses a
+fresh output directory. No compiler change was needed. Historical host-call/rooting
+and legacy bootstrap tests remain separate and unaffected. JIT/AOT file-service
+coverage is not inferred from this interpreter-only fixture.
+
+```sh
+python3 runtime/System.Runtime/test/FileMemoryTests/verify.py \
+  --bundle target/http-message-surfaces/inputs9/bundle \
+  --output target/file-memory-testing-migration-20261101-retry
+```

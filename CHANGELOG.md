@@ -20,6 +20,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   discovered tests, retaining its combined collection/decoding/copy lifetime sequence,
   byte-boundary rejection and empty/literal views; use named failure diagnostics
   instead of standalone Panic checks. All four pass in interpreter, JIT and AOT.
+  Migrate file-memory behavior into two discovered interpreter tests, retaining
+  inline-completion, byte-window, EOF/range-position and closed/cancellation
+  precedence checks. Keep isolated files and exact byte checks in Python; repair
+  its stale project filename. Both tests pass, and an existing-file negative control
+  reports a named failure without overwriting data. No JIT/AOT file coverage is added.
 
 ### 2026-10-31
 
