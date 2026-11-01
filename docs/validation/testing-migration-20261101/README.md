@@ -386,3 +386,51 @@ mutated. [Reproduction script](memory-lifetimes-negative-control.py.gz) retains 
 compile/run commands and source hashes; run from the repository root with a fresh
 output directory. No public APIs, production behavior or website content change;
 no website build is needed.
+
+
+## HTTP content copy
+
+The next bounded slice completes framework reporting for the eight
+[HTTP content-copy cases](../../../runtime/System.Web/test/HttpContentCopyTests/README.md).
+They already used NeoClr.Testing assertions and descriptive `[Test]` functions;
+the remaining custom entry point panicked on failures and printed a literal
+success summary. Main now awaits the cases in their original order and registers
+bound completed-result adapters with TestSuite, writes ConsoleReporter output and
+returns report.ExitCode. Recoverable assertion failures contribute named failures
+while later independent cases still run. Terminal runtime faults remain terminal;
+this does not add automatic async discovery.
+
+Tests.rvn is unchanged. Coverage retains pending-write backpressure, collection and
+buffer ownership, selected memory windows and aliasing, buffered replay and stream
+single consumption, read/write error preservation, truncated/invalid counts,
+declared lengths and empty I/O, cancellation, disposal, UTF-8/text-quota checks and
+creation validation before ownership transfer. The existing
+[.NET API comparison and design](../../design/http-content-streaming.md) still apply.
+Python retains process/build orchestration, exact transcripts and bundle integrity
+checks; independent wire peers remain outside this in-process fixture migration.
+
+[Report](http-content-copy-three-mode-report.json.gz) and
+[transcript](http-content-copy-three-mode.log.gz) pass eight tests in interpreter,
+JIT and native AOT: 24 test executions on macOS ARM64 with the same fingerprinted
+`target/http-message-surfaces/inputs9/bundle`. Inputs are recorded in the report;
+this does not claim a freshly rebuilt compiler or a new release qualification.
+The existing interpreter instruction/timeout budgets, including the longer timeout
+for the 65,537-byte text-quota boundary, are unchanged.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/test-runtime-library.py \
+  --bundle target/http-message-surfaces/inputs9/bundle \
+  --output target/http-content-copy-testing-migration-20261101 \
+  --suite http-content-copy --mode interpreter --mode jit --mode native
+```
+
+[The isolated negative control](http-content-copy-negative-control.json.gz) changes
+one copied-count assertion from 2500 to 2501 in a separate Tests.rvn copy. JIT reports
+`Expected 2501, actual 2500`, seven passing cases, one failure and exit code one.
+Only the existing exact DAM2004 compiler warning is permitted on stderr.
+The repository fixture is not mutated. The
+[reproduction script](http-content-copy-negative-control.py.gz) runs from the
+repository root with a fresh output directory; the report retains commands and
+source hashes. No production API, website content or runtime/compiler change is
+required, and no website build is needed.

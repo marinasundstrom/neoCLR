@@ -64,6 +64,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   name and continue the remaining independent cases. All four pass in interpreter,
   JIT and AOT; an isolated wrong-count control reports three passes, one failure
   and exit one. Compiler-rejection fixtures and Python orchestration are unchanged.
+  Migrate HTTP content-copy reporting to the same completed-result adapter pattern:
+  replace the Panic reporter and hard-coded summary with actual TestSuite outcomes.
+  Preserve all eight async behavior cases and their copy, GC, cancellation, disposal,
+  decoding/quota and validation checks. All eight pass in interpreter, JIT and AOT;
+  an isolated wrong-count JIT control reports seven passes, one named failure and
+  exit one. Production APIs, Python orchestration and validation budgets are unchanged.
 
 ### 2026-10-31
 
