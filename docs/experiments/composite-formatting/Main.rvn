@@ -1,5 +1,8 @@
+module NeoClr.RuntimeTests
+
 import System.*
-import System.Concurrency.Tasks.*
+import System.Result.*
+import NeoClr.Testing.*
 
 class Label {
     override func ToString() -> string => "label"
@@ -23,38 +26,36 @@ struct FormattedPayload : Formattable {
     func ToString(format: string, culture: System.Globalization.Culture) -> string => text + format
 }
 
-func Check(actual: string, expected: string) {
-    if String.CompareOrdinal(actual, expected) != 0 {
-        Console.WriteLine(actual)
-        Panic("Composite formatting contract")
-    }
+func Check(actual: string, expected: string) -> Result<unit, TestFailure> {
+    return Assert.True(String.CompareOrdinal(actual, expected) == 0, "Expected '" + expected + "', actual '" + actual + "'")
 }
 
-async func Main() -> Task<unit> {
-    Check(String.Format("{{}}"), "{}")
-    Check(String.Format("plain 👩‍💻", 42), "plain 👩‍💻")
-    Check(String.Format("{0} {0}", 42), "42 42")
-    Check(String.Format("{1}/{0}", "a", "b"), "b/a")
-    Check(String.Format("{2}/{0}/{1}", "a", true, 17), "17/a/True")
-    Check(String.Format("{{{0}}}", "é"), "{é}")
-    Check(String.Format("{{}}", null), "{}")
-    Check(String.Format("[{0,3}][{1,-3}]", "é", "👩‍💻"), "[  é][👩‍💻  ]")
-    Check(String.Format("{0,1}|{1}", "long", null), "long|")
-    Check(String.Format("{0:}", Label()), "label")
-    Check(String.Format("{0, 0 }", "x"), "x")
-    Check(String.Format("{3}:{0}", "a", "b", "c", "d"), "d:a")
+[Test]
+func `Composite formatting preserves text dispatch retained values and console output`() -> Result<unit, TestFailure> {
+    _ = Check(String.Format("{{}}"), "{}")?
+    _ = Check(String.Format("plain 👩‍💻", 42), "plain 👩‍💻")?
+    _ = Check(String.Format("{0} {0}", 42), "42 42")?
+    _ = Check(String.Format("{1}/{0}", "a", "b"), "b/a")?
+    _ = Check(String.Format("{2}/{0}/{1}", "a", true, 17), "17/a/True")?
+    _ = Check(String.Format("{{{0}}}", "é"), "{é}")?
+    _ = Check(String.Format("{{}}", null), "{}")?
+    _ = Check(String.Format("[{0,3}][{1,-3}]", "é", "👩‍💻"), "[  é][👩‍💻  ]")?
+    _ = Check(String.Format("{0,1}|{1}", "long", null), "long|")?
+    _ = Check(String.Format("{0:}", Label()), "label")?
+    _ = Check(String.Format("{0, 0 }", "x"), "x")?
+    _ = Check(String.Format("{3}:{0}", "a", "b", "c", "d"), "d:a")?
     let arguments: object?[] = ["a", 2, null, "d"]
-    Check(String.Format("{3}:{1}:{2}", arguments), "d:2:")
-    Check(String.Format("{0}", Char.FromString("🇸🇪")), "🇸🇪")
-    Check(String.Format("a\u0000{0}z", "é"), "a\u0000éz")
-    Check(String.Format("{0}|{0:é}|{0,12:tag}", CustomFormat()), "default|custom:é|  custom:tag")
-    Check(String.Format("{0:token}", FormattedValue()), "value:token")
+    _ = Check(String.Format("{3}:{1}:{2}", arguments), "d:2:")?
+    _ = Check(String.Format("{0}", Character.FromString("🇸🇪")), "🇸🇪")?
+    _ = Check(String.Format("a\u0000{0}z", "é"), "a\u0000éz")?
+    _ = Check(String.Format("{0}|{0:é}|{0,12:tag}", CustomFormat()), "default|custom:é|  custom:tag")?
+    _ = Check(String.Format("{0:token}", FormattedValue()), "value:token")?
     let payload: object = FormattedPayload(String.Concat("retained", ":"))
     let unrelated = String.Concat("other", " allocation")
-    Check(unrelated, "other allocation")
-    Check(String.Format("{0:tag}", payload), "retained:tag")
-    Check(String.Format("{0:ignored}", Label()), "label")
-    Check(String.Format("{0:anything}", null), "")
+    _ = Check(unrelated, "other allocation")?
+    _ = Check(String.Format("{0:tag}", payload), "retained:tag")?
+    _ = Check(String.Format("{0:ignored}", Label()), "label")?
+    _ = Check(String.Format("{0:anything}", null), "")?
     Console.WriteLine("line:{0}", 1)
     Console.WriteLine("line:{0}:{1}", 1, 2)
     Console.WriteLine("line:{0}:{1}:{2}", 1, 2, 3)
@@ -64,5 +65,13 @@ async func Main() -> Task<unit> {
     Console.Write(":{0}:{1}:{2}", 4, 5, 6)
     Console.Write(":{3}", 7, 8, 9, 10)
     Console.WriteLine()
-    Console.WriteLine("PASS composite formatting")
+    return Ok(())
+}
+
+func Main() -> int {
+    let suite = TestSuite()
+    suite.Add("composite-formatting", "Composite formatting preserves text dispatch retained values and console output", `Composite formatting preserves text dispatch retained values and console output`)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
 }

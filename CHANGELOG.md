@@ -166,6 +166,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   The four invalid-format subprocess probes still pass in all three modes.
   Require exact framework output and record source/input fingerprints; formatting
   semantics and historical evidence remain unchanged.
+  Migrate composite-formatting behavior to one named framework lifecycle, retaining
+  argument ordering, Unicode alignment, custom dispatch, boxed payload retention
+  and exact console bytes. Update the stale Char spelling to Character. The lifecycle
+  and twelve malformed-format guards pass in interpreter/JIT/AOT (39 executions).
+  An isolated wrong-payload control reports a named failure and exit one. Python
+  retains console/fault checks and records exact framework output and input hashes;
+  allocation diagnostics and production formatting semantics are unchanged.
 
 ### 2026-10-31
 

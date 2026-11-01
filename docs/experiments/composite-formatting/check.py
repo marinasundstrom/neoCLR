@@ -2,8 +2,14 @@
 """Check built composite formatting consumer against one matched macOS bundle."""
 import argparse
 import json
+import hashlib
+import sys
 from pathlib import Path
 import subprocess
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / 'benchmarks/framework'))
+from process import RETENTION_WARNING
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('bundle', type=Path)
@@ -36,9 +42,16 @@ for name, directory, fault in cases:
             command += ([fault] if engine == 'aot' else ['--', fault])
         result = subprocess.run(command, text=True, capture_output=True, timeout=120)
         output = result.stdout + result.stderr
-        passed = (result.returncode > 0 and ('composite format' in output.lower() or 'StringBuilder UTF-8 byte limit exceeded' in output) and 'x' not in result.stdout) if fault is not None else (result.returncode == 0 and result.stdout == 'line:1\nline:1:2\nline:1:2:3\nline:4\nwrite:1:2:3:4:5:6:10\nPASS composite formatting\n')
+        passed = (result.returncode > 0 and ('composite format' in output.lower() or 'StringBuilder UTF-8 byte limit exceeded' in output) and 'x' not in result.stdout) if fault is not None else (result.returncode == 0 and result.stdout == 'line:1\nline:1:2\nline:1:2:3\nline:4\nwrite:1:2:3:4:5:6:10\nPASS Composite formatting preserves text dispatch retained values and console output\nTests: 1, passed: 1, failed: 0, skipped: 0\n' and result.stderr in (('', RETENTION_WARNING.decode()) if engine == 'jit' else ('',)))
         rows.append(dict(fixture=name, engine=engine, command=command, exitCode=result.returncode, passed=passed, stdout=result.stdout, stderr=result.stderr))
         print(f'{name} {engine}: {"PASS" if passed else "FAIL"}', flush=True)
 args.output.parent.mkdir(parents=True, exist_ok=True)
-args.output.write_text(json.dumps(dict(passed=all(row['passed'] for row in rows), executions=rows), indent=2) + '\n')
+paths = [Path(__file__), *Path(__file__).parent.glob('*.rvn'),
+         *Path(__file__).parent.glob('*.rvnproj'),
+         *(ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn'),
+         bundle / 'manifest.json', args.public / 'app', args.public / 'app.dll']
+if args.invalid:
+    paths += [args.invalid / 'app', args.invalid / 'app.dll']
+args.output.write_text(json.dumps(dict(passed=all(row['passed'] for row in rows), executions=rows,
+    hashes={str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}), indent=2) + '\n')
 raise SystemExit(0 if all(row['passed'] for row in rows) else 1)

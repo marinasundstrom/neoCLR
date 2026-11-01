@@ -1132,3 +1132,66 @@ with empty stderr. [Reproduction script](integer-formats-negative-control.py.gz)
 records commands and source hashes; run from the repository root with a fresh
 output directory. Historical evidence is preserved. Website content requires no
 change and no website build was run.
+
+## Composite-formatting behavior
+
+The [composite-formatting consumer](../../experiments/composite-formatting/README.md#framework-migration--2026-11-01)
+now uses one named NeoClr.Testing lifecycle with explicit TestSuite registration.
+ConsoleReporter replaces the handwritten success marker and Main returns its actual
+exit code. The former async entry point had no awaits; the current synchronous
+Console.Write contract permits a synchronous framework case. No automatic-discovery
+or async behavior coverage is claimed.
+
+The assertion helper preserves String.CompareOrdinal rather than using canonical
+string equality. All original assertions and console writes remain: escaped braces,
+repeated/reordered arguments, fixed/params overloads, nulls, grapheme alignment, embedded NUL, custom
+Formattable class/struct dispatch and ToString fallback. The same boxed payload is
+formatted after an unrelated allocation. The initial build exposed the obsolete
+`Char` type name; `Character.FromString` now preserves the flag-grapheme check.
+[The rejected build](composite-stale-build.log.gz) is retained. Existing
+[.NET comparisons and limits](../../experiments/composite-formatting/README.md#comparison-and-limits)
+remain applicable with the later culture-interface update; no production API or
+formatting semantics change is introduced.
+
+[Behavior report](composite-report.json.gz), [log](composite.log.gz) and
+[fault report](composite-fault-report.json.gz) pass the lifecycle and all twelve
+malformed-format probes in interpreter, JIT and native AOT: 39 executions
+on macOS ARM64. Python retains the exact five console lines and requires the named
+framework PASS and summary, exit zero and empty stderr, allowing only the exact shared
+DAM2004 compiler warning for JIT. The terminal probes retain their existing diagnostic,
+nonzero exit and partial-output checks. Source/project/framework/application and
+manifest hashes identify the reused matching `target/http-header-noop/inputs/bundle`.
+Instruction/process budgets remain unchanged; no Windows, fresh compiler build or
+release qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/composite-formatting/Main.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/composite-testing-ordinal-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/composite-formatting/Invalid.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/composite-fault-testing-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/composite-formatting/check.py \
+  target/http-header-noop/inputs/bundle target/composite-testing-ordinal-20261101 \
+  --invalid target/composite-fault-testing-20261101 \
+  --output target/composite-testing-ordinal-20261101/validation.json
+```
+
+[Negative control](composite-negative-control.json.gz) expects wrong instead of
+retained:tag for the boxed payload in an isolated copy. Interpreter reports the named
+failure and exits one with empty stderr; the later assertions and console writes
+intentionally do not run after failure. [Reproduction script](composite-negative-control.py.gz)
+records commands and source hashes; run from the repository root with a fresh output
+directory. Fault receipts are extracted from the initial validation run, excluding
+its behavior rows after the ordinal-helper correction; Invalid.rvn, its executable
+and the validator fault branch were unchanged. Final behavior evidence uses the
+rebuilt ordinal helper. Allocation diagnostics and historical reports remain
+unchanged and are not rerun; no implementation or measured region changed. Website content requires
+no change and no website build was run.

@@ -97,3 +97,20 @@ The executable custom implementations now use `ToString(format, culture)`. The
 original one-argument interface and provider limitations above describe the original
 checkpoint. See [culture integration](../formattable-culture/README.md) for current
 culture propagation, supported formats and matching-library validation.
+
+## Framework migration — 2026-11-01
+
+The current Main.rvn uses one named NeoClr.Testing lifecycle, with explicit TestSuite
+registration and ConsoleReporter output. It retains all formatting assertions, the
+boxed payload/unrelated-allocation sequence and every console write. The entry point
+is now synchronous because the fixture contains no awaits and current Console.Write
+is synchronous. Main returns the framework report's exit code. The stale `Char`
+spelling is updated to `Character`, preserving the flag-grapheme formatting check.
+
+Python still checks the exact console bytes and now also checks the exact framework
+transcript, successful exit and empty stderr apart from the documented JIT compiler
+warning. The lifecycle and all twelve malformed-format subprocess probes pass in
+interpreter/JIT/AOT. An isolated wrong-payload expectation produces one named failure
+and exit one. See [migration evidence](../../validation/testing-migration-20261101/README.md#composite-formatting-behavior).
+Allocation.rvn/measure.py and historical evidence remain unchanged; this migration
+makes no new performance claim or automatic-discovery claim.
