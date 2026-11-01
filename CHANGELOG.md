@@ -146,6 +146,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   control reports one named failure and exit one after the first delivered body.
   Require the exact framework transcript and retain source/input hashes; production
   APIs, process budgets and historical content-copy evidence remain unchanged.
+  Migrate HTTP response metadata to one named framework lifecycle, retaining seven
+  wire scenarios and the headers-before-body handshake. Replace the obsolete client
+  Respond mutation with separate 200/201 constructions after the message-type split.
+  The lifecycle passes in interpreter/JIT/AOT (21 responses); a wrong-body control
+  completes every peer exchange before reporting one named failure and exit one.
+  Require exact framework output and explicit matching JIT inputs; production APIs
+  and historical reason-phrase evidence remain unchanged.
 
 ### 2026-10-31
 

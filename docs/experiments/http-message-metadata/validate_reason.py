@@ -10,10 +10,10 @@ import threading
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / 'benchmarks/framework'))
-from process import Guest
+from process import Guest, RETENTION_WARNING
 
 
-def run(command):
+def run(command, mode):
     ready = threading.Event()
     errors = []
     listener = socket.socket()
@@ -56,12 +56,18 @@ def run(command):
     try:
         guest.line(b'HEADERS_READY')
         ready.set()
-        guest.line(b'PASS HTTP response metadata')
-        guest.finish()
+        guest.line(b'PASS HTTP response metadata preserves status version and reason phrases')
+        guest.line(b'Tests: 1, passed: 1, failed: 0, skipped: 0')
+        stderr = guest.finish(allowed_stderr=(b'', RETENTION_WARNING) if mode == 'jit' else (b'',))
+        expected = [b'HEADERS_READY\n',
+                    b'PASS HTTP response metadata preserves status version and reason phrases\n',
+                    b'Tests: 1, passed: 1, failed: 0, skipped: 0\n']
+        assert guest.output == expected, guest.output
         worker.join(10)
         assert not worker.is_alive(), 'peer did not finish'
         assert not errors, errors
-        return dict(passed=True, responses=len(cases), metadataBeforeBody=True)
+        return dict(passed=True, responses=len(cases), metadataBeforeBody=True, exitCode=guest.process.returncode,
+                    stdoutHex=b''.join(guest.output).hex(), stderrHex=stderr.hex())
     finally:
         ready.set()
         listener.close()
@@ -80,16 +86,17 @@ def main():
     for module in manifest['modules']:
         context += ['--module', str(bundle / module)]
     commands = {'aot': [str(build / 'app'), '--'],
-                'jit': [str(bundle / manifest['runtime']), 'run', str(build / 'app.dll'), '--'],
+                'jit': [str(bundle / manifest['runtime']), 'run', str(build / 'app.dll'), '--execution', 'jit', '--jit-host', str(bundle / 'bin/neoclr-jit-host.dylib'), '--jit-compiler', str(bundle / 'bin/neoclr-codegen'), *context, '--'],
                 'interpreter': [str(bundle / manifest['runtime']), 'run', str(build / 'app.dll'), '--execution', 'interpreter', '--instructions', '1000000000', *context, '--']}
     # Native application arguments have no CLI delimiter.
     commands['aot'].pop()
     report = dict(passed=False, cases={}, commands=commands, inputs={})
-    for path in (Path(__file__), Path(__file__).with_name('ReasonPhrase.rvn'), build / 'app', build / 'app.dll', bundle / 'manifest.json'):
+    for path in (Path(__file__), *Path(__file__).parent.glob('*.rvn'), *Path(__file__).parent.glob('*.rvnproj'),
+                 *(ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn'), build / 'app', build / 'app.dll', bundle / 'manifest.json'):
         report['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
     try:
         for mode, command in commands.items():
-            report['cases'][mode] = run(command)
+            report['cases'][mode] = run(command, mode)
             print('PASS', mode, flush=True)
         report['passed'] = True
     finally:

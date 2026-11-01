@@ -1,46 +1,52 @@
+module NeoClr.RuntimeTests
+
 import System.*
+import NeoClr.Testing.*
 import System.Result.*
 import System.Collections.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
-async func Check(client: HttpClient, url: string, code: int, reason: string, streamed: bool, disposeFirst: bool) -> Task<unit> {
-    let Ok(request) = HttpClientRequest.Get(url) else { Panic("Request creation failed") }
+async func Check(client: HttpClient, url: string, code: int, reason: string, streamed: bool, disposeFirst: bool) -> Task<Result<unit, TestFailure>> {
+    let Ok(request) = HttpClientRequest.Get(url) else {
+        return Assert.True(false, "Request creation failed")
+    }
     use ownedRequest = request
     let mode = if streamed { HttpCompletionOption.ResponseHeadersRead } else { HttpCompletionOption.ResponseContentRead }
-    let Ok(response) = await client.Send(request, mode) else { Panic("HTTP request failed") }
+    let Ok(response) = await client.Send(request, mode) else {
+        return Assert.True(false, "HTTP request failed")
+    }
     use ownedResponse = response
     if disposeFirst { response.Dispose() }
-    if (int)response.StatusCode != code || response.IsSuccessStatusCode != (code >= 200 && code <= 299) {
-        Panic("Status metadata mismatch")
-    }
-    if response.Version.Major != 1 || response.Version.Minor != 1 {
-        Panic("Version mismatch")
-    }
-    if response.ReasonPhrase != reason || response.ReasonPhrase != reason {
-        Panic("Reason phrase mismatch")
-    }
+    _ = Assert.Equal(code, (int)response.StatusCode)?
+    _ = Assert.True(response.IsSuccessStatusCode == (code >= 200 && code <= 299), "Success follows the status code")?
+    _ = Assert.Equal(1, response.Version.Major)?
+    _ = Assert.Equal(1, response.Version.Minor)?
+    _ = Assert.Equal(reason, response.ReasonPhrase)?
+    _ = Assert.Equal(reason, response.ReasonPhrase)?
     if streamed {
         Console.WriteLine("HEADERS_READY")
-        let Ok(text) = await HttpStringContent.Read(response.Content) else { Panic("Body read failed") }
-        if text != "x" { Panic("Body mismatch") }
+        let Ok(text) = await HttpStringContent.Read(response.Content) else {
+            return Assert.True(false, "Body read failed")
+        }
+        _ = Assert.Equal("x", text)?
     }
+    return Ok(())
 }
 
-async func Main(arguments: string[]) -> Task<int> {
+[Test]
+async func `HTTP response metadata preserves status version and reason phrases`(root: string) -> Task<Result<unit, TestFailure>> {
     let local = HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
-    if local.ReasonPhrase != "OK" { Panic("Local status phrase mismatch") }
-    local.Respond(HttpStatusCode.Created)
-    if local.ReasonPhrase != "" { Panic("Changed status phrase mismatch") }
+    _ = Assert.Equal("OK", local.ReasonPhrase)?
+    let created = HttpClientResponse(201, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    _ = Assert.Equal("", created.ReasonPhrase)?
     use client = HttpClient()
-    let root = arguments[0]
-    await Check(client, String.Concat(root, "/custom"), 201, "Created\tHere  ", false, false)
-    await Check(client, String.Concat(root, "/empty"), 204, "", false, false)
-    await Check(client, String.Concat(root, "/ok"), 200, "OK", false, false)
-    await Check(client, String.Concat(root, "/informational"), 299, "Nearly OK", false, false)
-    await Check(client, String.Concat(root, "/error"), 404, "Different text", false, false)
-    await Check(client, String.Concat(root, "/disposed"), 204, "Still readable", false, true)
-    await Check(client, String.Concat(root, "/stream"), 200, "Body Later", true, false)
-    Console.WriteLine("PASS HTTP response metadata")
-    return 0
+    _ = (await Check(client, String.Concat(root, "/custom"), 201, "Created\tHere  ", false, false))?
+    _ = (await Check(client, String.Concat(root, "/empty"), 204, "", false, false))?
+    _ = (await Check(client, String.Concat(root, "/ok"), 200, "OK", false, false))?
+    _ = (await Check(client, String.Concat(root, "/informational"), 299, "Nearly OK", false, false))?
+    _ = (await Check(client, String.Concat(root, "/error"), 404, "Different text", false, false))?
+    _ = (await Check(client, String.Concat(root, "/disposed"), 204, "Still readable", false, true))?
+    _ = (await Check(client, String.Concat(root, "/stream"), 200, "Body Later", true, false))?
+    return Ok(())
 }

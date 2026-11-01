@@ -33,3 +33,19 @@ this is an allocation/retention tradeoff, not a measured throughput improvement.
 The current parser accepts ASCII reason text and tabs, not extended bytes.
 Native documentation audit, reference fingerprints and all four native snapshot
 checks pass. See `evidence/reason-phrase.json` for inputs and three-mode results.
+
+## Framework migration — 2026-11-01
+
+The current reason-phrase probe uses one named NeoClr.Testing lifecycle, explicitly
+awaited and reported through TestSuite/ConsoleReporter with the actual exit code.
+It preserves all seven wire scenarios, repeated reason access and HEADERS_READY
+before the peer releases the streaming body. Python verifies the exact transcript
+and selects matching JIT modules, compiler and helper explicitly.
+
+The old local `HttpClientResponse.Respond` call predates the client/server split and
+no longer compiles. Separate locally constructed 200 and 201 responses now verify
+current default phrases; mutable client status is not part of the current contract.
+The incoming response checks are unchanged. All three modes pass; a wrong final body
+expectation produces a named failure after every wire exchange. See
+[current migration evidence](../../validation/testing-migration-20261101/README.md#http-response-metadata).
+The reports and qualification statements above remain historical.

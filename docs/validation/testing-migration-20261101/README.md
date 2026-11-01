@@ -978,3 +978,56 @@ that failure. The repository fixture is unchanged. The
 [reproduction script](http-body-copy-negative-control.py.gz) records commands and
 source hashes; run it from the repository root with a fresh output directory.
 No public API or website content changes are required; no website build was run.
+
+## HTTP response metadata
+
+The [reason-phrase fixture](../../experiments/http-message-metadata/README.md#framework-migration--2026-11-01)
+now reports one named NeoClr.Testing lifecycle, HTTP response metadata preserves
+status version and reason phrases. Main explicitly awaits the outcome, adapts it
+through a reference owner, runs TestSuite and returns its report exit code. This
+adds no async/parameterized discovery. Assertions preserve status-based success,
+HTTP/1.1, repeated phrase access, exact tabs/trailing spaces, empty/OK/custom phrases,
+informational/final responses, error status, disposal and delayed streaming content.
+
+The first build exposed a stale `HttpClientResponse.Respond` call, removed by the
+client/server type split. The fixture now constructs separate 200 and 201 responses
+for default phrase checks. It does not claim client status mutation coverage or
+change production semantics. [The rejected build](http-reason-stale-build.log.gz)
+is retained; the seven incoming-response scenarios are unchanged. Existing HTTP
+metadata design/.NET comparisons remain applicable without a new divergence.
+
+Python retains its independent raw HTTP peer and withholds the final body until
+HEADERS_READY. It requires the exact framework transcript and empty guest stderr,
+allowing only the exact shared DAM2004 compiler diagnostic for JIT. JIT execution,
+module context, compiler and helper now explicitly come from the same bundle.
+[Report](http-reason-report.json.gz) and [log](http-reason.log.gz) record one passing
+lifecycle in each of AOT, JIT and interpreter: 21 response exchanges on macOS ARM64.
+Source/project/framework, executable/image and manifest hashes identify the inputs.
+The matching existing `target/http-header-noop/inputs/bundle` is reused; process
+limits and historical evidence remain unchanged. No Windows/TLS/performance or
+release qualification is added.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile http \
+  --project docs/experiments/http-message-metadata/ReasonPhrase.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/http-reason-testing-migration-fixed-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/http-message-metadata/validate_reason.py \
+  --bundle target/http-header-noop/inputs/bundle \
+  --build target/http-reason-testing-migration-fixed-20261101 \
+  --output target/http-reason-testing-migration-fixed-20261101/validation.json
+```
+
+[Negative control](http-reason-negative-control.json.gz) changes the final streamed
+body expectation from x to y in an isolated source copy. The same seven-response
+peer completes, including the headers-before-body handshake. Interpreter reports
+`Expected 'y', actual 'x'`, one named failure and exit one with empty stderr.
+[Reproduction script](http-reason-negative-control.py.gz) reuses the validator peer
+with exact failure transcript/exit expectations; run from the repository root with
+a fresh output directory. An initial control harness omitted the quotes in its
+expected failure message; [that rejected run](http-reason-negative-harness.log.gz)
+is retained separately. The repository fixture was not mutated. No public API or
+website content changes are required; no website build was run.
