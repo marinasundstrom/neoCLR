@@ -27,7 +27,7 @@ def main():
                   bundleManifestSha256=hashlib.sha256((bundle / 'manifest.json').read_bytes()).hexdigest(),
                   sources={p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                            for p in fixture.iterdir() if p.suffix in ('.rvn', '.rvnproj')})
-    if args.suite in ('timers', 'cancel-after'):
+    if args.suite in ('timers', 'cancel-after', 'http-timeout'):
         report['frameworkSources'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in (ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn')}
         report['runtimeSha256'] = hashlib.sha256(args.runtime.resolve().read_bytes()).hexdigest()
@@ -83,6 +83,20 @@ def main():
                     if args.suite == 'timers' and message is None:
                         transcript = 'PASS Synchronous timers preserve one shot stop disposal repeat and reschedule lifecycles\nPASS Async repeating timers wait for callback completion\nPASS Restarting an async timer does not overlap callbacks\nPASS Disposal allows the active async callback to finish\nPASS Cancelled callbacks stop repeating timers\nPASS Pending callback cancellation stops repeating timers\nTests: 6, passed: 6, failed: 0, skipped: 0\n'
                         valid = result.returncode == 0 and result.stdout == transcript and not result.stderr
+                    if args.suite == 'http-timeout' and message is None:
+                        transcript = (
+                            'PASS Timeout waits for handler acknowledgement\n'
+                            'PASS Caller cancellation remains cancellation\n'
+                            'PASS Client disposal cancellation remains cancellation\n'
+                            'PASS Caller cancellation after timeout remains cancellation\n'
+                            'PASS Disabled timeout permits normal completion\n'
+                            'PASS Completed response removes pending timeout\n'
+                            'PASS Concurrent requests own independent countdowns\n'
+                            'PASS Completed sends release timer capacity\n'
+                            'PASS Normally completing handler retains its result after cancellation request\n'
+                            'Tests: 9, passed: 9, failed: 0, skipped: 0\n'
+                        )
+                        valid = result.returncode == 0 and result.stdout == transcript and not result.stderr
                     if not valid:
                         raise RuntimeError(f'{case} {mode} failed: {record}')
             if args.suite == 'http-timeout' and project == 'Timers':
@@ -90,7 +104,9 @@ def main():
                 result = subprocess.run([*native, 'long'], cwd=ROOT, capture_output=True, text=True, timeout=30)
                 report['cases'].append(dict(case='long-request', mode='native', exitCode=result.returncode,
                                             stdout=result.stdout, stderr=result.stderr))
-                if result.returncode or 'PASS default timeout permits requests beyond fifteen seconds' not in result.stdout:
+                if (result.returncode or result.stderr or result.stdout !=
+                        'PASS Default timeout permits requests beyond fifteen seconds\n'
+                        'Tests: 1, passed: 1, failed: 0, skipped: 0\n'):
                     raise RuntimeError('Long request was cut short by the native host')
         report['passed'] = True
     finally:

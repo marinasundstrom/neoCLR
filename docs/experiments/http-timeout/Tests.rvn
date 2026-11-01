@@ -1,0 +1,240 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Optional.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+func Response() -> HttpClientResponse {
+    return HttpClientResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+}
+
+async func Pause() -> Task<()> {
+    let done = Promise<()>()
+    // Timer notification adapter supplies the completion barrier for Pause.
+    let timer = Timer(() => { done.Complete(()) })
+    timer.Start(Duration.FromTicks(10000L))
+    await done.Task
+    timer.Dispose()
+}
+
+// Cancellation-outcome observation is intentional: awaiting a cancelled task
+// would cancel the test instead of letting it assert the outcome.
+func Observe(task: Task<Result<HttpClientResponse, HttpError>>) -> Task<()> {
+    let done = Promise<()>()
+    task.OnCompleted(() => { done.Complete(()) })
+    return done.Task
+}
+
+class Pending : Disposable {
+    val Observed: Promise<()> = Promise<()>()
+    val Result: Promise<Result<HttpClientResponse, HttpError>> = Promise<Result<HttpClientResponse, HttpError>>()
+    val Token: CancellationToken
+    private val registration: CancellationRegistration
+
+    init(token: CancellationToken) {
+        Token = token
+        registration = token.Register(self.Cancelled)
+    }
+
+    private func Cancelled() { Observed.Complete(()) }
+    func Dispose() { registration.Dispose() }
+}
+
+class ControlledHandler : HttpHandler {
+    val Requests: ArrayList<Pending> = ArrayList<Pending>()
+
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
+        let pending = Pending(cancellationToken)
+        Requests.Add(pending)
+        return pending.Result.Task
+    }
+
+    override func Dispose() {
+        for pending in Requests { pending.Dispose() }
+    }
+}
+
+class ImmediateHandler : HttpHandler {
+    override func Send(request: HttpClientRequest, cancellationToken: CancellationToken) -> Task<Result<HttpClientResponse, HttpError>> {
+        return Task.FromResult<Result<HttpClientResponse, HttpError>>(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
+    }
+}
+
+[Test]
+async func `Timeout waits for handler acknowledgement`() -> Task<Result<unit, TestFailure>> {
+    let handler = ControlledHandler()
+    let client = HttpClient(handler)
+    let Some(initial) = client.Timeout else { return Assert.True(false, "Default timeout is configured") }
+    _ = Assert.True(initial.Ticks == 1000000000L, "Default timeout is one hundred seconds")?
+    client.Timeout = Some(Duration.FromTicks(1L))
+    let task = client.Get("http://example.test/")
+    let pending = handler.Requests[0]
+    await pending.Observed.Task
+    _ = Assert.True(pending.Token.IsCancellationRequested && !task.IsCompleted, "Timeout requests cancellation and waits for acknowledgement")?
+    pending.Result.Cancel()
+    let result = await task
+    let Failure(HttpError.TimedOut) = result else { return Assert.True(false, "Request reports HttpError.TimedOut") }
+    client.Dispose()
+    return Ok(())
+}
+
+async func CancellationRace(mode: int) -> Task<Result<unit, TestFailure>> {
+    let handler = ControlledHandler()
+    let client = HttpClient(handler, false)
+    let caller = CancellationTokenSource()
+    client.Timeout = Some(Duration.FromTicks(1L))
+    let task = client.Get("http://example.test/", caller.Token)
+    let pending = handler.Requests[0]
+    if mode == 0 { caller.Cancel() }
+    if mode == 1 { client.Dispose() }
+    await pending.Observed.Task
+    if mode == 2 { caller.Cancel() }
+    _ = Assert.True(!task.IsCompleted, "Cancellation waits for handler acknowledgement")?
+    pending.Result.Cancel()
+    await Observe(task)
+    _ = Assert.True(task.IsCancelled, "Caller or disposal cancellation remains a cancelled task")?
+    client.Dispose()
+    handler.Dispose()
+    caller.Dispose()
+    return Ok(())
+}
+
+[Test]
+async func `Disabled timeout permits normal completion`() -> Task<Result<unit, TestFailure>> {
+    let handler = ControlledHandler()
+    let client = HttpClient(handler)
+    client.Timeout = Optional<Duration>.None()
+    let task = client.Get("http://example.test/")
+    let pending = handler.Requests[0]
+    await Pause()
+    _ = Assert.True(!task.IsCompleted && !pending.Token.IsCancellationRequested, "Disabled timeout leaves the request pending")?
+    pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
+    let result = await task
+    let Ok(response) = result else { return Assert.True(false, "Request returns a successful response") }
+    _ = Assert.True((int)response.StatusCode == 200, "Normal completion preserves the response status")?
+    client.Dispose()
+    return Ok(())
+}
+
+[Test]
+async func `Completed response removes pending timeout`() -> Task<Result<unit, TestFailure>> {
+    let handler = ControlledHandler()
+    let client = HttpClient(handler)
+    client.Timeout = Some(Duration.FromTicks(1L))
+    let task = client.Get("http://example.test/")
+    let pending = handler.Requests[0]
+    pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
+    let success = await ExpectSuccess(task)
+    _ = success?
+    await Pause()
+    _ = Assert.True(!pending.Token.IsCancellationRequested, "Successful completion removes the timeout")?
+    client.Dispose()
+    return Ok(())
+}
+
+async func ExpectSuccess(task: Task<Result<HttpClientResponse, HttpError>>) -> Task<Result<unit, TestFailure>> {
+    let result = await task
+    let Ok(response) = result else { return Assert.True(false, "Request returns a successful response") }
+    return Ok(())
+}
+
+async func ExpectTimeout(task: Task<Result<HttpClientResponse, HttpError>>) -> Task<Result<unit, TestFailure>> {
+    let result = await task
+    let Failure(HttpError.TimedOut) = result else { return Assert.True(false, "Request reports HttpError.TimedOut") }
+    return Ok(())
+}
+
+[Test]
+async func `Concurrent requests own independent countdowns`() -> Task<Result<unit, TestFailure>> {
+    let handler = ControlledHandler()
+    let client = HttpClient(handler)
+    client.Timeout = Some(Duration.FromTicks(10000L))
+    let first = client.Get("http://example.test/first")
+    let second = client.Get("http://example.test/second")
+    handler.Requests[0].Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
+    let firstSuccess = await ExpectSuccess(first)
+    _ = firstSuccess?
+    await handler.Requests[1].Observed.Task
+    _ = Assert.True(!handler.Requests[0].Token.IsCancellationRequested, "The first completed request is not cancelled by the second timeout")?
+    handler.Requests[1].Result.Cancel()
+    let secondTimeout = await ExpectTimeout(second)
+    _ = secondTimeout?
+    client.Dispose()
+    return Ok(())
+}
+
+func PreparedRequest() -> HttpClientRequest {
+    let Ok(request) = HttpClientRequest.Get("http://example.test/") else { Panic("Invalid fixture URL") }
+    return request
+}
+
+[Test]
+async func `Completed sends release timer capacity`() -> Task<Result<unit, TestFailure>> {
+    let client = HttpClient(ImmediateHandler())
+    client.Timeout = Some(Duration.FromTicks(21474836470000L))
+    let request = PreparedRequest()
+    var count = 0
+    while count < 96 {
+        let success = await ExpectSuccess(client.Send(request))
+        _ = success?
+        count += 1
+    }
+    client.Dispose()
+    return Ok(())
+}
+
+[Test]
+async func `Normally completing handler retains its result after cancellation request`() -> Task<Result<unit, TestFailure>> {
+    let handler = ControlledHandler()
+    let client = HttpClient(handler)
+    client.Timeout = Some(Duration.FromTicks(1L))
+    let task = client.Get("http://example.test/")
+    let pending = handler.Requests[0]
+    await pending.Observed.Task
+    pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response()))
+    let success = await ExpectSuccess(task)
+    _ = success?
+    client.Dispose()
+    return Ok(())
+}
+
+[Test]
+async func `Default timeout permits requests beyond fifteen seconds`() -> Task<Result<unit, TestFailure>> {
+    let handler = ControlledHandler()
+    let client = HttpClient(handler)
+    let task = client.Get("http://example.test/")
+    let pending = handler.Requests[0]
+    let timer = Timer(() => { pending.Result.Complete(System.Result<HttpClientResponse, HttpError>.Ok(Response())) })
+    timer.Start(Duration.FromTicks(160000000L))
+    let result = await task
+    let Ok(response) = result else { return Assert.True(false, "Long request returns a successful response") }
+    _ = Assert.True(!pending.Token.IsCancellationRequested, "Default timeout does not cancel the sixteen-second request")?
+    timer.Dispose()
+    client.Dispose()
+    return Ok(())
+}
+
+
+[Test]
+async func `Caller cancellation remains cancellation`() -> Task<Result<unit, TestFailure>> {
+    let result = await CancellationRace(0)
+    return result
+}
+
+[Test]
+async func `Client disposal cancellation remains cancellation`() -> Task<Result<unit, TestFailure>> {
+    let result = await CancellationRace(1)
+    return result
+}
+
+[Test]
+async func `Caller cancellation after timeout remains cancellation`() -> Task<Result<unit, TestFailure>> {
+    let result = await CancellationRace(2)
+    return result
+}

@@ -605,3 +605,63 @@ failure propagation rather than just a failure in Main. The repository fixture i
 not mutated. [Reproduction script](timers-negative-control.py.gz) retains commands
 and source hashes; run from the repository root with a fresh output directory.
 No production API or website content changes; no website build is needed.
+
+
+## HTTP timeout
+
+The [HTTP-timeout fixture](../../experiments/http-timeout/README.md) replaces generic
+Check/Panic behavior assertions and handwritten PASS lines with nine named
+NeoClr.Testing cases plus the separately invoked long-request case. The three
+cancellation races now have distinct backtick names: caller cancellation, client
+disposal and caller cancellation after a timeout request. Their shared parameterized
+helper still executes the original ordering and returns a framework Result.
+
+Assertions preserve the default timeout, handler acknowledgement before settlement,
+sticky caller/disposal cancellation, disabled timeout completion, successful
+completion removing its countdown, independent concurrent requests, 96 completed
+sends releasing timer capacity, and a successful handler result after a cancellation
+request. Async ExpectSuccess/ExpectTimeout helpers now propagate TestFailure rather
+than Panic. Invalid fixed fixture-URL construction remains a terminal setup check.
+Cancellation observation deliberately uses OnCompleted to avoid cancelling the test.
+
+Main explicitly awaits the same lifecycle order and registers completed-result
+reference adapters with TestSuite. ConsoleReporter writes actual outcomes and Main
+returns report.ExitCode. Recoverable failures allow later independent cases to run;
+terminal faults remain terminal. Async discovery is not added. The one-argument
+invocation still runs only the real sixteen-second request under the default timeout.
+Python now requires exact framework transcripts and empty stderr for both ordinary
+and long-request runs. Framework/validator/runtime/codegen hashes are recorded.
+
+Faults.rvn, its project and the six invalid-operation subprocess checks remain
+unchanged: zero/negative/excessive timeout, changes after disposal, after a send
+starts and after a pre-cancelled send. Independent Network.rvn/host-peer checks and
+historical reports are unchanged. The existing
+[HTTP lifetime/timeout design and .NET comparison](../../design/http-client-lifetime.md)
+still apply; no production timeout, cancellation, API or execution-mode change is
+introduced.
+
+[The final report](http-timeout-report.json.gz) and [log](http-timeout.log.gz) pass
+nine ordinary tests in interpreter and native AOT, the single long-request test in
+AOT, and six fault probes in each mode: nineteen behavior-test executions and twelve
+expected-failure processes on macOS ARM64. The long request retains its sixteen-second
+timer and thirty-second process budget, continuing to guard the former fifteen-second
+native host limit. Other process/instruction budgets are unchanged. JIT coverage is
+not claimed. The matching `target/http-header-noop/inputs/bundle` is fingerprinted;
+this does not claim a fresh compiler build or new release qualification.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/validate-timers.py --suite http-timeout \
+  --bundle target/http-header-noop/inputs/bundle \
+  --runtime target/http-header-noop/inputs/bundle/bin/neoclr \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/http-timeout-testing-migration-20261101
+```
+
+[The isolated negative control](http-timeout-negative-control.json.gz) changes the
+expected default timeout from 1,000,000,000 to 1,000,000,001 ticks in a copied Tests.rvn.
+Interpreter reports the named default-timeout assertion, eight passes, one failure
+and exit one with empty stderr. The repository fixture is not mutated.
+[Reproduction script](http-timeout-negative-control.py.gz) records commands and source
+hashes; run from the repository root with a fresh output directory. No website
+content changes or website build is needed.

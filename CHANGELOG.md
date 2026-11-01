@@ -92,6 +92,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   six-test reporting; six cases and five terminal-failure probes pass in both
   interpreter and AOT. An isolated callback-invariant control produces one named
   failure, five passes and exit one. Timer APIs and scheduling are unchanged.
+  Migrate HTTP-timeout assertions to nine named framework cases plus the separate
+  sixteen-second request test. Give caller/disposal/post-timeout cancellation races
+  distinct names and propagate async result-check failures through TestFailure.
+  Preserve handler acknowledgement, independent countdowns, 96-send capacity churn,
+  completion precedence and cancellation observation. All nine cases pass in
+  interpreter/AOT, the long request passes in AOT, and twelve invalid-operation
+  executions retain their expected faults. A wrong-default-timeout control reports
+  eight passes, one named failure and exit one. Python now checks exact framework
+  output for ordinary/long runs; production and network-peer contracts are unchanged.
 
 ### 2026-10-31
 
