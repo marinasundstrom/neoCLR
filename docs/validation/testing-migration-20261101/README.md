@@ -1352,3 +1352,49 @@ hashes; run from the repository root with a fresh output directory. Historical
 reports and separate compiler visibility/metadata and backend dispatch checks remain
 unchanged and are not rerun. Website content requires no change and no website build
 was run.
+
+## Persistent-memory Object contracts
+
+The [memory-object fixture](../../experiments/memory-object/README.md#framework-migration--2026-11-01)
+now uses one named NeoClr.Testing lifecycle with explicit TestSuite registration.
+The equality helper propagates framework failures; Main writes ConsoleReporter output
+and returns report.ExitCode. No automatic discovery coverage is claimed.
+
+The original order and assertions remain: mutable/readonly region equality and
+matching hashes, wrong types, diagnostic display, distinct windows/owners, mutation
+without hash changes, ownerless defaults, empty offsets, dictionary identity,
+collection and exact unboxing. The same box retains the sole backing array after
+Retain returns and GC runs. The existing [.NET comparison](../../experiments/memory-object/README.md)
+remains applicable; no memory semantics, boxing rules, compiler or public APIs change.
+Native coverage remains the existing byte-view profile; this adds no allocation or
+throughput claim.
+
+[Report](memory-object-report.json.gz) and [log](memory-object.log.gz) pass the full
+lifecycle in interpreter, JIT and native AOT on macOS ARM64. Python keeps its matching
+execution inputs and budgets, requiring exact framework stdout, exit zero and empty
+stderr, allowing only the exact shared DAM2004 compiler warning for JIT. Source,
+project, framework, application, compiler, runtime and library hashes accompany the
+manifest fingerprint for the reused matching `target/http-header-noop/inputs/bundle`.
+No Windows, fresh compiler build or release qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/memory-object/MemoryObject.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/memory-object-testing-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/memory-object/check.py \
+  target/http-header-noop/inputs/bundle target/memory-object-testing-20261101 \
+  --output target/memory-object-testing-20261101/validation.json
+```
+
+[Negative control](memory-object-negative-control.json.gz) changes the first expected
+sole-owner byte from two to five in an isolated source copy. Interpreter reaches the
+post-collection assertion, reports `Box retains sole owner across GC` and exits one
+with empty stderr. The final nominal-unboxing assertion does not run after failure.
+[Reproduction script](memory-object-negative-control.py.gz) records commands and source
+hashes; run from the repository root with a fresh output directory. The unchanged
+Borrowed.rvn compiler-rejection probe remains separate and is not rerun; historical
+reports are preserved. Website content requires no change and no website build was run.

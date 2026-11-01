@@ -1,16 +1,15 @@
+module NeoClr.RuntimeTests
+
 import System.*
 import System.Collections.*
+import System.Result.*
+import NeoClr.Testing.*
 
-func Check(value: bool, message: string) {
-    if !value {
-        Panic(message)
-    }
-}
-
-func Equal(left: Object, right: Object) {
-    Check(left.Equals(right) && right.Equals(left), "Memory region equality")
-    Check(left.GetHashCode() == right.GetHashCode(), "Memory region hashes")
-    Check(!left.Equals(null) && !left.Equals(0), "Memory wrong type")
+func Equal(left: Object, right: Object) -> Result<unit, TestFailure> {
+    _ = Assert.True(left.Equals(right) && right.Equals(left), "Memory region equality")?
+    _ = Assert.True(left.GetHashCode() == right.GetHashCode(), "Memory region hashes")?
+    _ = Assert.True(!left.Equals(null) && !left.Equals(0), "Memory wrong type")?
+    return Ok(())
 }
 
 func Retain() -> Object {
@@ -18,47 +17,56 @@ func Retain() -> Object {
     return memory.Slice(1, 2)
 }
 
-func Main() {
+[Test]
+func `Persistent memory regions preserve identity hashing and boxed ownership across collection`() -> Result<unit, TestFailure> {
     let data = [10b, 20b, 30b, 40b]
     let memory: Memory<byte> = data
     let same: Memory<byte> = data
     let readonly: ReadOnlyMemory<byte> = memory
-    Equal(memory, same)
-    Equal(memory, readonly)
-    Check(memory.Equals(readonly) && memory.GetHashCode() == readonly.GetHashCode(), "Direct region calls")
-    Check(memory.ToString().ContainsOrdinal("Memory"), "Memory diagnostic display")
-    Equal(memory.Slice(1, 2), readonly.Slice(1, 2))
-    Check(!((Object)memory).Equals(memory.Slice(1)), "Different offset and length")
-    Check(!((Object)memory.Slice(0, 2)).Equals(memory.Slice(1, 2)), "Different offset")
+    _ = Equal(memory, same)?
+    _ = Equal(memory, readonly)?
+    _ = Assert.True(memory.Equals(readonly) && memory.GetHashCode() == readonly.GetHashCode(), "Direct region calls")?
+    _ = Assert.True(memory.ToString().ContainsOrdinal("Memory"), "Memory diagnostic display")?
+    _ = Equal(memory.Slice(1, 2), readonly.Slice(1, 2))?
+    _ = Assert.True(!((Object)memory).Equals(memory.Slice(1)), "Different offset and length")?
+    _ = Assert.True(!((Object)memory.Slice(0, 2)).Equals(memory.Slice(1, 2)), "Different offset")?
     let other: Memory<byte> = [10b, 20b, 30b, 40b]
-    Check(!((Object)memory).Equals(other), "Equal contents have distinct owners")
+    _ = Assert.True(!((Object)memory).Equals(other), "Equal contents have distinct owners")?
     let retained: Object = memory.Slice(1, 2)
     let hash = retained.GetHashCode()
     data[1] = 99b
-    Equal(retained, readonly.Slice(1, 2))
-    Check(retained.GetHashCode() == hash, "Mutation preserves region hash")
-    Equal(default(Memory<byte>), default(ReadOnlyMemory<byte>))
-    Check(((Object)default(Memory<byte>)).GetHashCode() == 0, "Default region hash")
-    Equal(memory.Slice(4, 0), readonly.Slice(4, 0))
-    Check(!((Object)memory.Slice(0, 0)).Equals(memory.Slice(4, 0)), "Empty offsets remain distinct")
-    Check(!((Object)default(Memory<byte>)).Equals(memory.Slice(0, 0)), "Default has no owner")
+    _ = Equal(retained, readonly.Slice(1, 2))?
+    _ = Assert.True(retained.GetHashCode() == hash, "Mutation preserves region hash")?
+    _ = Equal(default(Memory<byte>), default(ReadOnlyMemory<byte>))?
+    _ = Assert.True(((Object)default(Memory<byte>)).GetHashCode() == 0, "Default region hash")?
+    _ = Equal(memory.Slice(4, 0), readonly.Slice(4, 0))?
+    _ = Assert.True(!((Object)memory.Slice(0, 0)).Equals(memory.Slice(4, 0)), "Empty offsets remain distinct")?
+    _ = Assert.True(!((Object)default(Memory<byte>)).Equals(memory.Slice(0, 0)), "Default has no owner")?
     let map = HashMap<Object, int>((left, right) => left.Equals(right), key => key.GetHashCode())
-    Check(map.TryAdd(memory, 1) && !map.TryAdd(readonly, 2), "Readonly shares region identity")
+    _ = Assert.True(map.TryAdd(memory, 1) && !map.TryAdd(readonly, 2), "Readonly shares region identity")?
     let soleOwner = Retain()
     System.Runtime.GC.Collect()
-    Equal(retained, readonly.Slice(1, 2))
+    _ = Equal(retained, readonly.Slice(1, 2))?
     if retained is Memory<byte> restored {
         let view: Slice<byte> = restored
-        Check(view[0] == 99b && view[1] == 30b, "Unboxed retained owner and window")
+        _ = Assert.True(view[0] == 99b && view[1] == 30b, "Unboxed retained owner and window")?
     } else {
-        Panic("Exact memory unboxing")
+        return Assert.True(false, "Exact memory unboxing")
     }
     if soleOwner is Memory<byte> owned {
         let bytes: Slice<byte> = owned
-        Check(bytes[0] == 2b && bytes[1] == 3b, "Box retains sole owner across GC")
+        _ = Assert.True(bytes[0] == 2b && bytes[1] == 3b, "Box retains sole owner across GC")?
     } else {
-        Panic("Sole owner unboxing")
+        return Assert.True(false, "Sole owner unboxing")
     }
-    Check(!(retained is ReadOnlyMemory<byte>), "Equality does not change nominal unboxing")
-    Console.WriteLine("Memory region contracts: passed")
+    _ = Assert.True(!(retained is ReadOnlyMemory<byte>), "Equality does not change nominal unboxing")?
+    return Ok(())
+}
+
+func Main() -> int {
+    let suite = TestSuite()
+    suite.Add("memory-object", "Persistent memory regions preserve identity hashing and boxed ownership across collection", `Persistent memory regions preserve identity hashing and boxed ownership across collection`)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
 }

@@ -193,6 +193,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   keeping slices in synchronous helpers. The lifecycle passes in interpreter/JIT/AOT;
   a wrong final EOF count reports one named failure and exit one. Python checks exact
   framework output and records input fingerprints; production APIs are unchanged.
+  Migrate persistent-memory Object contracts to one named framework lifecycle,
+  preserving region equality/hashes, mutation, dictionary identity, defaults,
+  exact unboxing and sole-owner retention across collection. The lifecycle passes
+  in interpreter/JIT/AOT; a wrong retained-byte control reports a named failure and
+  exit one. Require exact framework output and record source/input fingerprints;
+  borrowed-view compiler rejection and production memory contracts are unchanged.
 
 ### 2026-10-31
 

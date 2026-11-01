@@ -47,3 +47,19 @@ python3 docs/experiments/memory-object/check.py \
   target/memory-object-bundle/bundle target/memory-object-app \
   --output docs/experiments/memory-object/validation-20261020.json
 ```
+
+## Framework migration — 2026-11-01
+
+Main.rvn now uses one explicitly registered NeoClr.Testing lifecycle. TestSuite and
+ConsoleReporter replace generic Panic assertions and the handwritten success line;
+Main returns report.ExitCode. The original mutation, boxing, dictionary and collection
+sequence remains intact, including a box retaining the sole owner and exact unboxing.
+
+The lifecycle passes in interpreter/JIT/AOT. An isolated wrong expected byte in the
+sole-owner check reports a named failure after collection and exit one. Python now
+requires exact framework output and successful exit, with empty stderr except for
+the documented JIT compiler warning. See
+[migration evidence](../../validation/testing-migration-20261101/README.md#persistent-memory-object-contracts).
+No automatic discovery, performance or additional element-type coverage is claimed.
+Borrowed.rvn and its compiler-rejection evidence remain unchanged and are not rerun;
+no compiler rules or production memory behavior changed.
