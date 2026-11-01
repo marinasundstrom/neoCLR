@@ -13,7 +13,13 @@ python3 scripts/test-runtime-library.py --bundle <bundle> \
   --mode native --mode jit --mode interpreter
 ```
 
-An explicit async Main runs these tests because the discovery runner is synchronous.
+An explicit async Main runs these tests sequentially because the discovery runner
+is synchronous. Each completed Result is retained by a reference adapter and
+registered with TestSuite; ConsoleReporter prints the actual outcomes and Main
+returns the report's ExitCode. Recoverable assertion failures are reported by name
+and do not prevent the remaining independent cases from running. Terminal runtime
+faults still terminate execution. This replaces the handwritten Panic reporter and
+hard-coded success summary; it does not add automatic async discovery.
 Progress promises identify the intermediate suspension; draining TaskQueue alone
 is not a completion barrier for native suspended frames.
 
@@ -35,3 +41,7 @@ This does not qualify native I/O completion ownership, pointer retention/pinning
 root release after settlement, terminal runtime faults, Task<Memory<byte>> results,
 non-byte native views, or Windows execution. Production stream/socket migration
 must validate those relevant boundaries separately.
+
+[Migration evidence](../../../../docs/validation/testing-migration-20261101/README.md#persistent-memory-lifetimes)
+records four passing tests in each of interpreter, JIT and AOT, plus an isolated
+wrong-count negative control reporting three passes, one named failure and exit one.

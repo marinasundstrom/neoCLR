@@ -48,6 +48,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   conservative suspension guard. HTTP now passes interpreter, JIT and AOT with the
   same bundle and limits. Retain the original/migrated failure reports and add the
   passing follow-up; no runtime/compiler or production API change is required.
+  Complete the persistent-memory lifetime fixture's framework reporting: replace
+  its Panic reporter and hard-coded success summary with bound completed-result
+  adapters, TestSuite and ConsoleReporter. Preserve four sequential async cases,
+  assertions and lifetime/GC/cancellation ordering; report recoverable failures by
+  name and continue the remaining independent cases. All four pass in interpreter,
+  JIT and AOT; an isolated wrong-count control reports three passes, one failure
+  and exit one. Compiler-rejection fixtures and Python orchestration are unchanged.
 
 ### 2026-10-31
 

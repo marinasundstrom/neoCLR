@@ -338,3 +338,51 @@ before-fix negative control. Both focused Rust checks also pass:
 borrow preservation and rejection across async yield/heap boxing. The existing
 unused reflection-helper warning is unrelated. No production API, release asset,
 website content or compiler bridge contract changes; no website build is needed.
+
+
+## Persistent memory lifetimes
+
+The [memory-lifetime fixture](../../../runtime/System.Runtime/test/MemoryLifetimeTests/README.md)
+already used descriptive `[Test]` functions and NeoClr.Testing assertions, but Main
+called a handwritten Report helper that panicked on a Failure and printed a literal
+four-pass summary. This bounded migration completes framework reporting rather
+than claiming the assertions were previously in Python.
+
+Main awaits the four existing cases in their original order, retains each completed
+Result in a bound reference owner and registers it with TestSuite. ConsoleReporter
+prints real outcomes and Main returns report.ExitCode. The adapter reconstructs the
+Result cases, following the already qualified socket/HTTP pattern; it avoids direct
+value-union closure capture. Recoverable assertion failures now allow the remaining
+independent cases to run and contribute to the final report. Terminal runtime faults
+are unchanged. Async metadata discovery is still unsupported and is not claimed.
+
+Tests.rvn is unchanged: two pending awaits, creator-frame return, explicit collection,
+selected destination/source windows and sentinel checks, cancellation observation,
+rejected transfer and default/end-position empties retain their sequencing. The
+existing .NET persistent-memory versus borrowed-span comparison still applies.
+The Python runner retains native-profile building, exact transcript checks and
+bundle integrity checks. Ref-like capture compiler-rejection fixtures remain
+separate and unchanged; their existing evidence is reused.
+
+[Three-mode report](memory-lifetimes-three-mode-report.json.gz) and
+[transcript](memory-lifetimes-three-mode.log.gz): all four cases pass in interpreter,
+JIT and native AOT on macOS ARM64, using the same fingerprinted development bundle
+as the preceding migrations. Source hashes are recorded; no freshly rebuilt compiler
+or new release qualification is implied.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/test-runtime-library.py \
+  --bundle target/http-message-surfaces/inputs9/bundle \
+  --output target/memory-lifetimes-testing-migration-20261101 \
+  --suite memory-lifetimes --mode interpreter --mode jit --mode native
+```
+
+[An isolated negative control](memory-lifetimes-negative-control.json.gz) changes only
+the expected destination count from two to three in a copied Tests.rvn. It runs all
+four lifecycles in the interpreter and reports `Expected 3, actual 2`, three passes,
+one failure and exit code one, with empty stderr. The repository fixture is not
+mutated. [Reproduction script](memory-lifetimes-negative-control.py.gz) retains the
+compile/run commands and source hashes; run from the repository root with a fresh
+output directory. No public APIs, production behavior or website content change;
+no website build is needed.
