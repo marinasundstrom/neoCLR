@@ -1,27 +1,50 @@
-import System.*
+module NeoClr.RuntimeTests
 
-func Check(actual: string, expected: string) {
-    if String.CompareOrdinal(actual, expected) != 0 {
-        Panic("Line ending bytes")
-    }
+import System.*
+import System.Result.*
+import NeoClr.Testing.*
+
+func Check(actual: string, expected: string) -> Result<unit, TestFailure> {
+    return Assert.Equal(expected, actual)
 }
 
-func Main() {
+[Test]
+func `Recognized line endings normalize without rescanning replacements`() -> Result<unit, TestFailure> {
     let mixed = "a\r\nb\rc\nd\u000ce\u0085f\u2028g\u2029h"
-    Check(mixed.ReplaceLineEndings(), "a\nb\nc\nd\ne\nf\ng\nh")
-    Check(mixed.ReplaceLineEndings("|"), "a|b|c|d|e|f|g|h")
-    Check(mixed.ReplaceLineEndings(""), "abcdefgh")
-    Check("\r\n".ReplaceLineEndings("\r\n\n"), "\r\n\n")
-    Check("\r\r\n\n".ReplaceLineEndings("|"), "|||")
-    Check("é\ré👨‍👩‍👧‍👦\u2028".ReplaceLineEndings("🌿"), "é🌿é👨‍👩‍👧‍👦🌿")
-    Check("\u000b\u0000\u00a0".ReplaceLineEndings(), "\u000b\u0000\u00a0")
+    _ = Check(mixed.ReplaceLineEndings(), "a\nb\nc\nd\ne\nf\ng\nh")?
+    _ = Check(mixed.ReplaceLineEndings("|"), "a|b|c|d|e|f|g|h")?
+    _ = Check(mixed.ReplaceLineEndings(""), "abcdefgh")?
+    _ = Check("\r\n".ReplaceLineEndings("\r\n\n"), "\r\n\n")?
+    _ = Check("\r\r\n\n".ReplaceLineEndings("|"), "|||")?
+    _ = Check("".ReplaceLineEndings(), "")?
+    _ = Check("\r\n".ReplaceLineEndings(""), "")?
+    return Ok(())
+}
+
+[Test]
+func `Other text bytes survive line ending replacement`() -> Result<unit, TestFailure> {
+    _ = Check("é\ré👨‍👩‍👧‍👦\u2028".ReplaceLineEndings("🌿"), "é🌿é👨‍👩‍👧‍👦🌿")?
+    _ = Check("\u000b\u0000\u00a0".ReplaceLineEndings(), "\u000b\u0000\u00a0")?
+    return Ok(())
+}
+
+[Test]
+func `Unchanged line endings retain the original string`() -> Result<unit, TestFailure> {
     let plain = "é👨‍👩‍👧‍👦"
     let lf = "a\nb\n"
     let crlf = "a\r\nb\r\n"
-    if !Object.ReferenceEquals(plain, plain.ReplaceLineEndings()) || !Object.ReferenceEquals(lf, lf.ReplaceLineEndings()) || !Object.ReferenceEquals(crlf, crlf.ReplaceLineEndings("\r\n")) {
-        Panic("Unchanged line ending owner")
-    }
-    Check("".ReplaceLineEndings(), "")
-    Check("\r\n".ReplaceLineEndings(""), "")
-    Console.WriteLine("PASS string lines")
+    _ = Assert.True(Object.ReferenceEquals(plain, plain.ReplaceLineEndings()), "Plain text retains its owner")?
+    _ = Assert.True(Object.ReferenceEquals(lf, lf.ReplaceLineEndings()), "Default LF retains its owner")?
+    _ = Assert.True(Object.ReferenceEquals(crlf, crlf.ReplaceLineEndings("\r\n")), "Matching CRLF retains its owner")?
+    return Ok(())
+}
+
+func Main() -> int {
+    let suite = TestSuite()
+    suite.Add("string-lines-1", "Recognized line endings normalize without rescanning replacements", `Recognized line endings normalize without rescanning replacements`)
+    suite.Add("string-lines-2", "Other text bytes survive line ending replacement", `Other text bytes survive line ending replacement`)
+    suite.Add("string-lines-3", "Unchanged line endings retain the original string", `Unchanged line endings retain the original string`)
+    let report = suite.Run()
+    ConsoleReporter.Write(report)
+    return report.ExitCode
 }

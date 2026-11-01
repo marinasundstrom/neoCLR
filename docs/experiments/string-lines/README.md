@@ -61,3 +61,20 @@ The [128-iteration native allocation diagnostic](allocations.json) reports:
 Unchanged replacement adds no managed allocations; changed replacement adds one
 per result. All tracked allocations are reclaimed. Whole-process eager-GC counts
 are not a throughput measurement, and they do not count host Rust allocations.
+
+## Framework migration — 2026-11-01
+
+Main.rvn now registers three named NeoClr.Testing cases for newline normalization,
+other text bytes and unchanged string identity. TestSuite/ConsoleReporter replace
+generic Panic checks and the handwritten PASS line, and Main returns report.ExitCode.
+All original behavior assertions remain, including the platform's LF default,
+non-rescanned replacement text, deletion, Unicode and embedded NUL. Registration is
+explicit; this fixture does not claim automatic discovery coverage.
+
+The Python wrapper requires the exact three-test transcript and successful exit,
+with empty stderr except for the exact documented JIT compiler warning. All three
+cases pass in interpreter, JIT and AOT. An isolated wrong deletion-result control
+reports a named failure and continues the other two tests. See
+[migration evidence](../../validation/testing-migration-20261101/README.md#string-line-ending-behavior).
+Native kernel checks and Allocation.rvn/measure.py remain separate and unchanged;
+their historical results above are not rerun or replaced by this migration.

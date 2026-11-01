@@ -2,8 +2,16 @@
 """Check built string lines consumer against one matched macOS bundle."""
 import argparse
 import json
+import hashlib
+import sys
 from pathlib import Path
 import subprocess
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT / 'benchmarks/framework'))
+from process import RETENTION_WARNING
+
+EXPECTED = 'PASS Recognized line endings normalize without rescanning replacements\nPASS Other text bytes survive line ending replacement\nPASS Unchanged line endings retain the original string\nTests: 3, passed: 3, failed: 0, skipped: 0\n'
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('bundle', type=Path)
@@ -29,9 +37,14 @@ for name, directory, fault in [('lines', args.public, False)]:
                 command += ['--jit-compiler', str(bundle / 'bin/neoclr-codegen'), '--jit-host', str(bundle / 'bin/neoclr-jit-host.dylib')]
         result = subprocess.run(command, text=True, capture_output=True, timeout=120)
         output = result.stdout + result.stderr
-        passed = (result.returncode > 0 and 'NullReference' in output) if fault else (result.returncode == 0 and 'PASS string lines' in output)
+        passed = (result.returncode == 0 and result.stdout == EXPECTED and
+                  result.stderr in (('', RETENTION_WARNING.decode()) if engine == 'jit' else ('',)))
         rows.append(dict(fixture=name, engine=engine, command=command, exitCode=result.returncode, passed=passed, stdout=result.stdout, stderr=result.stderr))
         print(f'{name} {engine}: {"PASS" if passed else "FAIL"}', flush=True)
 args.output.parent.mkdir(parents=True, exist_ok=True)
-args.output.write_text(json.dumps(dict(passed=all(row['passed'] for row in rows), executions=rows), indent=2) + '\n')
+inputs = [Path(__file__), *Path(__file__).parent.glob('Main.rvn*'),
+          *(ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing').glob('*.rvn'),
+          bundle / 'manifest.json', args.public / 'app', args.public / 'app.dll']
+args.output.write_text(json.dumps(dict(passed=all(row['passed'] for row in rows), executions=rows,
+    inputs={str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}), indent=2) + '\n')
 raise SystemExit(0 if all(row['passed'] for row in rows) else 1)

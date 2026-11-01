@@ -153,6 +153,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   completes every peer exchange before reporting one named failure and exit one.
   Require exact framework output and explicit matching JIT inputs; production APIs
   and historical reason-phrase evidence remain unchanged.
+  Migrate string line-ending behavior from Panic checks to three named framework
+  tests for normalization, preserved text bytes and unchanged owner identity.
+  All three pass in interpreter/JIT/AOT; a wrong deletion-result control reports
+  one named failure, two passes and exit one. Python now requires exact framework
+  output and records input fingerprints. Native boundary checks, allocation probes,
+  historical evidence and the platform's LF-default contract remain unchanged.
 
 ### 2026-10-31
 

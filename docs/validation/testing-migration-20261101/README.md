@@ -1031,3 +1031,50 @@ a fresh output directory. An initial control harness omitted the quotes in its
 expected failure message; [that rejected run](http-reason-negative-harness.log.gz)
 is retained separately. The repository fixture was not mutated. No public API or
 website content changes are required; no website build was run.
+
+## String line-ending behavior
+
+The [string-lines fixture](../../experiments/string-lines/README.md#framework-migration--2026-11-01)
+now uses three descriptive NeoClr.Testing cases with explicit TestSuite registration:
+recognized line endings normalize without rescanning replacements; other text bytes
+survive replacement; unchanged line endings retain the original string. Main reports
+actual outcomes through ConsoleReporter and returns report.ExitCode. No automatic
+discovery coverage is claimed.
+
+All original assertions remain: CRLF/CR/LF/FF/NEL/LS/PS, adjacent sequences, default
+LF and custom replacements, deletion and empty input, replacements containing
+newlines, composed/decomposed text, emoji, retained VT/NUL/NBSP and reference identity
+for plain text, LF and matching CRLF. Existing
+[.NET comparison and design](../../design/string-api-review-20261019.md#replacelineendings-implementation-2026-10-19)
+remain applicable, including the deliberate platform-wide LF default. No API or
+runtime behavior changes are introduced.
+
+[Report](string-lines-report.json.gz) and [log](string-lines.log.gz) pass all three
+tests in interpreter, JIT and native AOT (nine test executions) on macOS ARM64.
+Python requires exact framework stdout, exit zero and empty stderr, permitting only
+the exact shared DAM2004 compiler warning for JIT. Source/project/framework,
+application and manifest fingerprints identify the reused matching
+`target/http-header-noop/inputs/bundle`. Existing process/instruction budgets are
+unchanged. No Windows, fresh compiler build or release qualification is claimed.
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 scripts/build-native-project.py --profile console \
+  --project docs/experiments/string-lines/Main.rvnproj \
+  --bundle target/http-header-noop/inputs/bundle \
+  --aot target/http-header-noop/inputs/bundle/bin/neoclr-codegen \
+  --output target/string-lines-testing-20261101
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk \
+  python3 docs/experiments/string-lines/check.py \
+  target/http-header-noop/inputs/bundle target/string-lines-testing-20261101 \
+  --output target/string-lines-testing-20261101/validation.json
+```
+
+[Negative control](string-lines-negative-control.json.gz) changes expected deleted
+text from abcdefgh to wrong in an isolated source copy. Interpreter reports one named
+failure, continues the two independent cases and exits one with empty stderr.
+[Reproduction script](string-lines-negative-control.py.gz) records commands and
+source hashes; run from the repository root with a fresh output directory.
+The native kernel boundary checks and allocation diagnostic remain unchanged and
+are not rerun: no primitive implementation or measured region changed. Historical
+reports are preserved. Website content requires no change and no build was run.
